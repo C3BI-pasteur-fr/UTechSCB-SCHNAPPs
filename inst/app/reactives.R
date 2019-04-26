@@ -1009,6 +1009,11 @@ dbCluster <- reactive({
 })
 
 
+clusterMethodReact = reactiveValues(
+  clusterMethod = "igraph",
+  clusterSource = "PCA"
+)
+
 scran_Cluster <- reactive({
   if (DEBUG) cat(file = stderr(), "scran_Cluster started.\n")
   start.time <- base::Sys.time()
@@ -1027,10 +1032,10 @@ scran_Cluster <- reactive({
   scEx_log <- scEx_log()
   seed <- input$seed
   kNr <- input$kNr
-  clusterSource <- input$clusterSource
+  clusterSource <- clusterMethodReact$clusterSource
   geneSelectionClustering <- input$geneSelectionClustering
   minClusterSize <- input$minClusterSize
-  clusterMethod <- input$clusterMethod
+  clusterMethod <- clusterMethodReact$clusterMethod
 
   if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
     if (DEBUG) {

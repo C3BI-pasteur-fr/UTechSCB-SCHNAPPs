@@ -1,8 +1,8 @@
 require(shinyTree)
 
 # SUMMARY STATS ----------------------------------------------------------------
-source (paste0(packagePath,  "/moduleServer.R"), local = TRUE)
-source (paste0(packagePath,  "/reactives.R"), local = TRUE)
+source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
+source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
 
 # normalizationRadioButtonValue --------------------------------
@@ -13,12 +13,21 @@ output$normalizationRadioButtonValue <- renderPrint({
 
 normaliztionParameters <- list(raw = "no Parameters needed")
 localContributionDir <- .SCHNAPPs_locContributionDir
-parFiles <- dir(path = c(paste0(packagePath,  "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+parFiles <-
+  dir(
+    path = c(paste0(packagePath, "/contributions"), localContributionDir),
+    pattern = "parameters.R",
+    full.names = TRUE,
+    recursive = TRUE
+  )
 for (fp in parFiles) {
   myNormalizationParameters <- list()
   source(fp, local = TRUE)
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/normalizationsParameters.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParameters.RData')
   if (length(myNormalizationParameters) > 0) {
@@ -26,12 +35,29 @@ for (fp in parFiles) {
       lVal <- myNormalizationParameters[[li]]
       if (length(lVal) > 0) {
         if (DEBUG) {
-          cat(file = stderr(), paste("normalization Choice: ", names(myNormalizationParameters)[li], " ", lVal, "\n"))
-          cat(file = stderr(), paste("class: ", class(myNormalizationParameters[[li]]), " ", lVal, "\n"))
+          cat(
+            file = stderr(),
+            paste(
+              "normalization Choice: ",
+              names(myNormalizationParameters)[li],
+              " ",
+              lVal,
+              "\n"
+            )
+          )
+          cat(file = stderr(), paste(
+            "class: ",
+            class(myNormalizationParameters[[li]]),
+            " ",
+            lVal,
+            "\n"
+          ))
         }
         oldNames <- names(normaliztionParameters)
-        normaliztionParameters[[length(normaliztionParameters) + 1]] <- lVal
-        names(normaliztionParameters) <- c(oldNames, names(myNormalizationParameters)[li])
+        normaliztionParameters[[length(normaliztionParameters) + 1]] <-
+          lVal
+        names(normaliztionParameters) <-
+          c(oldNames, names(myNormalizationParameters)[li])
       }
     }
   }
@@ -45,10 +71,19 @@ output$normalizationsParametersDynamic <- renderUI({
   selectedChoice <- input$normalizationRadioButton
 
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
-  do.call("switch", args = c(selectedChoice, normaliztionParameters, h3("no parameters provided")))
+  do.call("switch",
+    args = c(
+      selectedChoice,
+      normaliztionParameters,
+      h3("no parameters provided")
+    )
+  )
 })
 
 
@@ -71,22 +106,46 @@ output$summaryStatsSideBar <- renderUI({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
   line0 <- paste(input$file1$name)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
   line3 <- paste("Median UMIs per cell: ", medianUMI(), sep = "\t")
-  line4 <- paste("Median Genes with min 1 UMI: ", medianENSG(), sep = "\t")
-  line5 <- paste("Total number of reads: ", sum(assays(scEx)[["counts"]]))
+  line4 <-
+    paste("Median Genes with min 1 UMI: ", medianENSG(), sep = "\t")
+  line5 <-
+    paste("Total number of reads: ", sum(assays(scEx)[["counts"]]))
   line6 <- paste("Memory used:", getMemoryUsed())
-  line7 <- paste("Normalization used:", input$normalizationRadioButton)
+  line7 <-
+    paste("Normalization used:", input$normalizationRadioButton)
   htmlOut <- paste0(
-    "Summary statistics of this dataset:", "<br/>", "<br/>", line0, "<br/>",  line1, "<br/>", line2, "<br/>", line3, "<br/>", line4, "<br/>",
-    line5, "<br/>", line6, "<br/>", line7
+    "Summary statistics of this dataset:",
+    "<br/>",
+    "<br/>",
+    line0,
+    "<br/>",
+    line1,
+    "<br/>",
+    line2,
+    "<br/>",
+    line3,
+    "<br/>",
+    line4,
+    "<br/>",
+    line5,
+    "<br/>",
+    line6,
+    "<br/>",
+    line7
   )
-  exportTestValues(summaryStatsSideBar = { htmlOut })
+  exportTestValues(summaryStatsSideBar = {
+    htmlOut
+  })
 
   HTML(htmlOut)
 })
@@ -114,7 +173,10 @@ output$selectedGenesTable <- DT::renderDataTable({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/selectedGenesTable.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
 
@@ -123,7 +185,9 @@ output$selectedGenesTable <- DT::renderDataTable({
   dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
-  exportTestValues(selectedGenesTable = { as.data.frame(dt) })
+  exportTestValues(selectedGenesTable = {
+    as.data.frame(dt)
+  })
   DT::datatable(as.data.frame(dt))
 })
 
@@ -142,7 +206,10 @@ output$removedGenesTable <- DT::renderDataTable({
   useGenes <- !useGenes
 
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/removedGenesTable.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/removedGenesTable.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
   scEx <- assays(dataTables$scEx)[[1]]
@@ -150,7 +217,9 @@ output$removedGenesTable <- DT::renderDataTable({
   dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
-  exportTestValues(removedGenesTable = { as.data.frame(dt) })
+  exportTestValues(removedGenesTable = {
+    as.data.frame(dt)
+  })
   DT::datatable(as.data.frame(dt))
 })
 
@@ -164,12 +233,16 @@ output$gsSelectedGenes <- renderText({
   dataTables <- inputData()
   useGenes <- useGenes()
   useCells <- useCells()
-  selectedGenesTable_rows_selected <- input$selectedGenesTable_rows_selected
+  selectedGenesTable_rows_selected <-
+    input$selectedGenesTable_rows_selected
   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gsSelectedGenes.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/gsSelectedGenes.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/gsSelectedGenes.RData")
 
@@ -177,7 +250,9 @@ output$gsSelectedGenes <- renderText({
   fd <- rowData(dataTables$scEx)
   dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
   retVal <- paste0(dt$symbol[selectedGenesTable_rows_selected], ",")
-  exportTestValues(gsSelectedGenes = { retVal })
+  exportTestValues(gsSelectedGenes = {
+    retVal
+  })
   return(retVal)
 })
 
@@ -190,29 +265,35 @@ output$gsrmGenes <- renderText({
   dataTables <- inputData()
   useGenes <- useGenes()
   useCells <- useCells()
-  removedGenesTable_rows_selected <- input$removedGenesTable_rows_selected
+  removedGenesTable_rows_selected <-
+    input$removedGenesTable_rows_selected
   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gsrmGenes.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/gsrmGenes.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/gsrmGenes.RData")
-  useGenes = !useGenes
+  useGenes <- !useGenes
   # scEx <- as.matrix(exprs(dataTables$scEx))
   fd <- rowData(dataTables$scEx)
   dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
   if (DEBUG) {
     cat(file = stderr(), "gsrmGenes: done\n")
   }
-  retVal <-  paste0(dt$symbol[removedGenesTable_rows_selected], ",")
-  exportTestValues(gsrmGenes = { retVal })
+  retVal <- paste0(dt$symbol[removedGenesTable_rows_selected], ",")
+  exportTestValues(gsrmGenes = {
+    retVal
+  })
   return(retVal)
 })
 
 # DEBUGSAVEstring ----
 output$DEBUGSAVEstring <- renderText({
-  if (DEBUG){
+  if (DEBUG) {
     DEBUGSAVE <<- input$DEBUGSAVE
   } else {
     NULL
@@ -223,7 +304,11 @@ output$DEBUGSAVEstring <- renderText({
 callModule(tableSelectionServer, "cellSelectionMod", inputSample)
 
 # normalizationResult ----
-callModule(tableSelectionServer, "normalizationResult", scExLogMatrixDisplay)
+callModule(
+  tableSelectionServer,
+  "normalizationResult",
+  scExLogMatrixDisplay
+)
 
 # descriptionOfWork ----
 output$descriptOfWorkOutput <- renderPrint({
@@ -233,13 +318,16 @@ output$descriptOfWorkOutput <- renderPrint({
 # sampleColorSelection ----
 output$sampleColorSelection <- renderUI({
   scEx <- scEx()
-  sampCol = sampleCols$colPal
+  sampCol <- sampleCols$colPal
 
-  if (is.null(scEx) ) {
+  if (is.null(scEx)) {
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleColorSelection.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
 
@@ -248,13 +336,14 @@ output$sampleColorSelection <- renderUI({
 
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
-    colourpicker::colourInput(inputId = paste0("sampleNamecol", lev[i]),
-                              label = paste0("Choose colour for sample ","\"", lev[i],"\""),
-                              # value = "#762A83"
-                              # ,
-                              value = sampCol[i],
-                              allowedCols = allowedColors,
-                              palette = "limited"
+    colourpicker::colourInput(
+      inputId = paste0("sampleNamecol", lev[i]),
+      label = paste0("Choose colour for sample ", "\"", lev[i], "\""),
+      # value = "#762A83"
+      # ,
+      value = sampCol[i],
+      allowedCols = allowedColors,
+      palette = "limited"
     )
   })
 })
@@ -262,14 +351,17 @@ output$sampleColorSelection <- renderUI({
 # clusterColorSelection ----
 output$clusterColorSelection <- renderUI({
   scEx <- scEx()
-  projections = projections()
-  clusterCol = clusterCols$colPal
+  projections <- projections()
+  clusterCol <- clusterCols$colPal
 
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/clusterColorSelection.RData", list = c("normaliztionParameters", ls(), ls(envir = globalenv())))
+    save(
+      file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+    )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
 
@@ -278,13 +370,14 @@ output$clusterColorSelection <- renderUI({
 
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
-    colourpicker::colourInput(inputId = paste0("clusterNamecol", lev[i]),
-                              label = paste0("Choose colour for cluster ","\"", lev[i],"\""),
-                              # value = "#762A83"
-                              # ,
-                              value = clusterCol[i],
-                              allowedCols = allowedColors,
-                              palette = "limited"
+    colourpicker::colourInput(
+      inputId = paste0("clusterNamecol", lev[i]),
+      label = paste0("Choose colour for cluster ", "\"", lev[i], "\""),
+      # value = "#762A83"
+      # ,
+      value = clusterCol[i],
+      allowedCols = allowedColors,
+      palette = "limited"
     )
   })
 })
@@ -299,16 +392,16 @@ observeEvent(input$updateColors, {
   if (is.null(scExx) || is.null(projections)) {
     return(NULL)
   }
-  #sample colors
-  scols = sampleCols$colPal
+  # sample colors
+  scols <- sampleCols$colPal
 
-  inCols = list()
+  inCols <- list()
   lev <- levels(colData(scExx)$sampleNames)
 
-  inCols <- lapply(seq_along(lev), function(i){
+  inCols <- lapply(seq_along(lev), function(i) {
     input[[paste0("sampleNamecol", lev[i])]]
   })
-  names(inCols) = lev
+  names(inCols) <- lev
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv())))
     cat(file = stderr(), paste0("observeEvent save done\n"))
@@ -316,19 +409,19 @@ observeEvent(input$updateColors, {
   # load(file="~/SCHNAPPsDebug/updateColors.RData")
 
   # isolate({
-  sampleCols$colPal = unlist(inCols)
+  sampleCols$colPal <- unlist(inCols)
   # })
 
-  #cluster colors
+  # cluster colors
   ccols <- clusterCols$colPal
 
-  inCols = list()
+  inCols <- list()
   lev <- levels(projections$dbCluster)
 
-  inCols <- lapply(seq_along(lev), function(i){
+  inCols <- lapply(seq_along(lev), function(i) {
     input[[paste0("clusterNamecol", lev[i])]]
   })
-  names(inCols) = lev
+  names(inCols) <- lev
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv())))
     cat(file = stderr(), paste0("observeEvent 2 save done\n"))
@@ -336,13 +429,13 @@ observeEvent(input$updateColors, {
   # load(file="~/SCHNAPPsDebug/updateColors2.RData")
 
   # isolate({
-  clusterCols$colPal = unlist(inCols)
+  clusterCols$colPal <- unlist(inCols)
   # })
 })
 
 # Nclusters ----
 output$Nclusters <- renderText({
-  scran_Cluster = scran_Cluster()
+  scran_Cluster <- scran_Cluster()
   if (is.null(scran_Cluster)) {
     return(NULL)
   }
@@ -352,7 +445,9 @@ output$Nclusters <- renderText({
   }
   # load(file="~/SCHNAPPsDebug/Nclusters.RData")
   retVal <- paste(levels(scran_Cluster$Cluster))
-  exportTestValues(Nclusters = { retVal })
+  exportTestValues(Nclusters = {
+    retVal
+  })
   return(retVal)
 })
 
@@ -360,7 +455,9 @@ output$Nclusters <- renderText({
 output$countscsv <- downloadHandler(
   filename = paste0("counts.", Sys.Date(), ".csv"),
   content = function(file) {
-    if (DEBUG) cat(file = stderr(), paste("countcsv: \n"))
+    if (DEBUG) {
+      cat(file = stderr(), paste("countcsv: \n"))
+    }
     scEx_log <- scEx_log()
     if (is.null(scEx_log)) {
       return(NULL)
@@ -373,7 +470,9 @@ output$countscsv <- downloadHandler(
 output$RDSsave <- downloadHandler(
   filename = paste0("project.", Sys.Date(), ".Rds"),
   content = function(file) {
-    if (DEBUG) cat(file = stderr(), paste("RDSsave: \n"))
+    if (DEBUG) {
+      cat(file = stderr(), paste("RDSsave: \n"))
+    }
 
     scEx <- scEx()
     projections <- projections()
@@ -390,9 +489,11 @@ output$RDSsave <- downloadHandler(
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
 
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
-      
+
     save(file = file, list = c("scEx"))
-    if (DEBUG) cat(file = stderr(), paste("RDSsave:done \n"))
+    if (DEBUG) {
+      cat(file = stderr(), paste("RDSsave:done \n"))
+    }
 
     # write.csv(as.matrix(exprs(scEx)), file)
   }
@@ -403,7 +504,7 @@ output$report <- downloadHandler(
   filename = "report.zip",
 
   content = function(outZipFile) {
-    outrepFile = reacativeReport()
+    outrepFile <- reacativeReport()
     file.copy(from = outrepFile, to = outZipFile)
   }
 )
@@ -420,15 +521,21 @@ forceCalc <- shiny::observe({
   start.time <- base::Sys.time()
   if (go) {
     isolate({
-      if (DEBUG) base::cat(file = stderr(), "forceCalc\n")
+      if (DEBUG) {
+        base::cat(file = stderr(), "forceCalc\n")
+      }
       # list of output variable and function name
 
       withProgress(message = "Performing heavy calculations", value = 0, {
         n <- length(heavyCalculations)
         for (calc in heavyCalculations) {
           shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
-          if (DEBUG) cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
-          assign(calc[1], eval(parse(text = base::paste0(calc[2], "()"))))
+          if (DEBUG) {
+            cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
+          }
+          assign(calc[1], eval(parse(text = base::paste0(
+            calc[2], "()"
+          ))))
         }
       })
     })
@@ -440,9 +547,10 @@ forceCalc <- shiny::observe({
 scranWarning <- function() {
   cat(file = stderr(), paste0("scranWarning\n"))
   modalDialog(
-    span('The parameters clusterSource=normData and/or clusterMethod=hclust can ',
-         'can result in very long wait times (>6hrs). Do you really want to do this?'),
-
+    span(
+      "The parameters clusterSource=normData and/or clusterMethod=hclust can ",
+      "can result in very long wait times (>6hrs). Do you really want to do this?"
+    ),
     footer = tagList(
       actionButton("scranWarning_cancel", "Cancel"),
       actionButton("scranWarning_ok", "OK")
@@ -451,28 +559,40 @@ scranWarning <- function() {
 }
 
 # handle long executions ----
-observeEvent(input$clusterMethod ,
-             {
-               cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
-               if (input$clusterMethod == "hclust")
-                 showModal(scranWarning())
-             })
-observeEvent(input$clusterSource,
-             {
-               cat(file = stderr(), paste0("observe: input$clusterSource\n"))
-               if (input$clusterSource == "normData")
-                 showModal(scranWarning())
-             })
+observeEvent(input$clusterMethod, {
+  cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
+  if (input$clusterMethod == "hclust") {
+    showModal(scranWarning())
+  } else {
+    clusterMethodReact$clusterMethod <- "igraph"
+  }
+})
+
+observeEvent(input$clusterSource, {
+  cat(file = stderr(), paste0("observe: input$clusterSource\n"))
+  if (input$clusterSource == "normData") {
+    showModal(scranWarning())
+  } else {
+    clusterMethodReact$clusterSource <- "PCA"
+  }
+})
+
 observeEvent(input$scranWarning_cancel, {
   updateSelectInput(session, "clusterMethod",
-                    selected = "igraph"
+    selected = "igraph"
   )
   updateSelectInput(session, "clusterSource",
-                    selected = "PCA"
+    selected = "PCA"
   )
   removeModal()
 })
 observeEvent(input$scranWarning_ok, {
+  if (input$clusterMethod == "hclust") {
+    clusterMethodReact$clusterMethod <- "hclust"
+  }
+  if (input$clusterSource == "normData") {
+    clusterMethodReact$clusterSource <- "normData"
+  }
   removeModal()
 })
 
@@ -481,4 +601,3 @@ observeEvent(input$scranWarning_ok, {
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))
 }
-
