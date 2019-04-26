@@ -66,6 +66,13 @@ library(magrittr)
 
 ### Heatmap
 
+genesin : `r input$coE_heatmap_geneids`
+
+sampCol : `r sampleCols$colPal`
+
+ccols : `r clusterCols$colPal`
+
+
 ```{r}
 genesin <- input$coE_heatmap_geneids
 sampCol <- sampleCols$colPal
@@ -236,7 +243,7 @@ moduleName <- "coE_heatmapSelectedModule"
 heatmapPlotFromModule(heatmapData, moduleName, input, projections)
 ```
 
-#### table of selected cells
+#### table of genes that have at least `r input$coEtgMinExpr` UMIs in `r input$coEtgPerc`% of the selected cells
 
 ```{r topexpCells, echo=TRUE, eval=TRUE}
 
@@ -342,6 +349,66 @@ if (is.null(projections)) {
   retVal
 }
 ```
+
+
+## Self organizing map (SOM)
+
+  genesin : `r input$coE_geneSOM`
+  
+  nSOM : `r input$coE_dimSOM`
+
+
+```{r}
+  genesin <- input$coE_geneSOM
+  nSOM <- input$coE_dimSOM
+  sampCol <- sampleCols$colPal
+  ccols <- clusterCols$colPal
+
+  scEx_matrix <- as.matrix(assays(scEx_log)[[1]])
+  featureData <- rowData(scEx_log)
+  # go from readable gene name to ENSG number
+  genesin <- geneName2Index(genesin, featureData)
+
+  geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin)
+
+  annotation <- data.frame(projections[, c("dbCluster", "sampleNames")])
+  rownames(annotation) <- rownames(projections)
+  colnames(annotation) <- c("Cluster", "sampleNames")
+  annCols <- list("sampleNames" = sampCol,
+                  "Cluster" = ccols)
+  
+  retVal <- list(
+    mat = scEx_matrix[geneNames, ],
+    cluster_rows = TRUE,
+    cluster_cols = TRUE,
+    # scale = "row",
+    fontsize_row = 14,
+    labels_row = featureData[geneNames, "symbol"],
+    show_rownames = TRUE,
+    annotation_col = annotation,
+    show_colnames = FALSE,
+    annotation_legend = TRUE,
+    # breaks = seq(minBreak, maxBreak, by = stepBreak),
+    # filename = 'test.png',
+    # filename = normalizePath(outfile),
+    color = colorRampPalette(rev(RColorBrewer::brewer.pal(
+      n = 6, name =
+        "RdBu"
+    )))(6),
+    annotation_colors = annCols
+  )
+  # system.time(do.call(TRONCO::pheatmap, retVal))
+
+
+
+moduleName <- "coE_heatmapSOM"
+heatmapPlotFromModule(retVal, moduleName, input, projections)
+
+```
+
+*Genes found by SOM*:
+
+`r paste(featureData[geneNames, "symbol"], collapse = ", ", sep = ",")`
 
 
 

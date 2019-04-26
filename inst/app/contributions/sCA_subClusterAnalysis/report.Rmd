@@ -129,12 +129,13 @@ if (is.null(input$db1) | is.null(input$db2)) {
 ## DGE table
 
 
-  gn <- `r dim(groupNames$namesDF)`
+  gn : `r dim(groupNames$namesDF)`
   
-  cl1 = `r input$sCA_dgeClustersSelection`
+  cl1 : `r input$sCA_dgeClustersSelection`
+  
+  method : `r input$sCA_dgeRadioButton`
   
   
-
 ```{r DGETable, eval=TRUE, echo=TRUE}
 
 
