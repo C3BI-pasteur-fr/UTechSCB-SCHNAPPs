@@ -1,0 +1,347 @@
+---
+title: "coExpression"
+author: "Bernd Jagla"
+date: "3/23/2018"
+output: html_document
+  code_folding: hide
+---
+
+# Co-expression
+
+```{r bj-coExp-setup, echo=TRUE, warning=FALSE}
+library(magrittr)
+if (exists("params")) {
+  cat(file = stderr(), paste("Scater Plot report\n"))
+} else {
+  rm(list = ls())
+  load("~/SCHNAPPsDebug/report.RData")
+  cat(file = stderr(), getwd())
+  
+library(magrittr)
+  require(shiny)
+  require(plotly)
+  require(shinythemes)
+  require(ggplot2)
+  require(DT)
+  require(pheatmap)
+  require(threejs)
+  require(sm)
+  require(RColorBrewer)
+  require(mclust)
+  require(reshape)
+  # require(cellrangerRkit)
+  # require(SCORPIUS)
+  require(ggplot2)
+  require(knitr)
+  require(kableExtra)
+  require(shinyWidgets)
+  require(scater)
+  
+  source("../../../serverFunctions.R")
+  source("../../../reactives.R", local = TRUE)
+  # source("reactives.R", local = TRUE)
+  
+  LOCALEXECUTION <- TRUE # to know that we are debugging.
+  useCells <- useCellsFunc(dataTables,
+                           geneNames = input$minExpGenes,
+                           rmCells = input$cellsFiltersOut,
+                           rmPattern = input$cellPatternRM,
+                           keepCells = input$cellKeep,
+                           cellKeepOnly = input$cellKeepOnly
+  )
+  ipIDs <- input$selectIds
+  geneListSelection <- input$geneListSelection
+  minGene <- input$minGenesGS
+  
+  useGenes <- useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
+  featureDataReact <- dataTables$featuredata[useGenes, ]
+  featureData <- dataTables$featuredata[useGenes, ]
+  scEx <- dataTables$scEx[useGenes, useCells]
+  scEx_log <- dataTables$scEx_log[useGenes, useCells]
+  log2cpm <- dataTables$log2cpm[useGenes, useCells]
+}
+```
+
+## All clusters 
+
+### Heatmap
+
+```{r}
+genesin <- input$coE_heatmap_geneids
+sampCol <- sampleCols$colPal
+ccols <- clusterCols$colPal
+
+
+scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]])
+heatmapData <- coE_heatmapFunc(
+  featureData = featureData, scEx_matrix = scEx_matrix,
+  projections = projections, genesin = genesin, cells = colnames(scEx_matrix),
+  sampCol = sampCol, ccols = ccols
+)
+
+moduleName <- "coExpHeatmapModule"
+heatmapPlotFromModule(heatmapData, moduleName, input, projections)
+```
+
+
+
+## Selected
+
+### 2D plot with selection of cells 
+
+clId <- `r input$"coE_selected-clusters"`
+
+dimX <- `r input$"coE_selected-dimension_x"`
+
+dimY <- `r input$"coE_selected-dimension_y"`
+
+
+
+```{r selectd2D, echo=TRUE, eval=TRUE, warning=FALSE}
+
+DEBUGSAVE <- FALSE
+grpNs <- groupNames$namesDF
+grpN <- make.names(input$groupName)
+
+dimY <- input$"coE_selected-dimension_y"
+dimX <- input$"coE_selected-dimension_x"
+dimCol <- input$"coE_selected-dimension_col"
+clId <- input$"coE_selected-clusters"
+g_id <- NULL
+geneNames <- input$"coE_selected-geneIds"
+geneNames2 <- input$"coE_selected-geneIds2"
+logx <- input$"coE_selected-logX"
+logy <- input$"coE_selected-logY"
+divXBy <- input$"coE_selected-devideXBy"
+divYBy <- input$"coE_selected-devideYBy"
+scols <- sampleCols$colPal
+ccols <- clusterCols$colPal
+legend.position <- "none"
+scCells <- `coE_selctedCluster-selectedCells`
+
+if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
+  if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
+  return(NULL)
+}
+
+featureData <- rowData(scEx_log)
+
+# load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."))
+if (is.null(g_id) || nchar(g_id) == 0) {
+  g_id <- featureData$symbol
+}
+if (is.null(logx)) logx <- FALSE
+if (is.null(logy)) logy <- FALSE
+if (is.null(divXBy)) divXBy <- "None"
+if (is.null(divYBy)) divYBy <- "None"
+
+subsetData <- updateProjectionsWithUmiCount(
+  dimX = dimX, dimY = dimY,
+  geneNames = geneNames,
+  geneNames2 = geneNames2,
+  scEx = scEx_log, projections = projections
+)
+if (dimCol == "sampleNames") {
+  myColors <- scols
+} else {
+  myColors <- NULL
+}
+if (dimCol == "dbCluster") {
+  myColors <- ccols
+}
+
+p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
+                       geneNames2, dimX, dimY, clId, grpN, legend.position,
+                       grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+)
+
+
+if (!is.null(p1)){
+  p1 %>%
+    add_trace(
+      data = subsetData[scCells, ],
+      x =
+        ~ get(dimX), y = ~ get(dimY),
+      type = "scatter", mode =
+        "markers", color = "red",
+      name =
+        "selected", showlegend = TRUE,
+      inherit = F
+    )
+}
+
+```
+
+
+#### Heatmap selected
+
+callModule(
+pHeatMapModule, 
+"coE_heatmapSelectedModule", 
+coE_heatmapSelectedReactive
+)
+
+coE_heatmapselected_geneids `r input$coE_heatmapselected_geneids`
+
+'selected-geneIds' `r input$'coE_selected-geneIds'`
+
+'selected-clusters' `r input$'coE_selected-clusters'`
+
+'coE_heatmapSelectedModule-ColNames' `r input$'coE_heatmapSelectedModule-ColNames'`
+
+orderColNames : `r input$'coE_heatmapSelectedModule-orderNames'`
+
+moreOptions <- `r input$'coE_heatmapSelectedModule-moreOptions'`
+
+
+```{r coE_heatmapSelectedModule, echo=TRUE, eval=TRUE}
+# save(file = "~/SCHNAPPsDebug/selectedHeatmap.1.RData", list = c(ls(), ls(envir = globalenv())))
+genesin <- input$coE_heatmapselected_geneids
+
+# get selected cells
+scCells <- `coE_selctedCluster-selectedCells`
+
+# brushedPs <- input$"coE_selected-b1"
+# geneNames <- input$'coE_selected-geneIds'
+inpClusters <- input$"coE_selected-clusters"
+# dimX <- brushedPs$mapping$x
+# dimY <- brushedPs$mapping$y
+sampCol <- sampleCols$colPal
+ccols <- clusterCols$colPal
+
+
+# geneid <- geneName2Index(geneNames, featureData)
+projections <- updateProjectionsWithUmiCount(
+  dimX = dimX, dimY = dimY,
+  geneNames = geneNames,
+  scEx = scEx_log, projections = projections
+)
+
+subsetData <- subset(projections, dbCluster %in% inpClusters)
+# cells.names <- shiny::brushedPoints(subsetData, brushedPs)
+
+# cells.1 <- rownames(scCells)
+heatmapData <- coE_heatmapFunc(featureData,
+                               scEx_matrix,
+                               projections,
+                               genesin,
+                               cells = scCells,
+                               sampCol = sampCol,
+                               ccols = ccols
+)
+
+
+
+moduleName <- "coE_heatmapSelectedModule"
+heatmapPlotFromModule(heatmapData, moduleName, input, projections)
+```
+
+#### table of selected cells
+
+```{r topexpCells, echo=TRUE, eval=TRUE}
+
+
+coEtgPerc <- input$coEtgPerc
+coEtgminExpr <- input$coEtgMinExpr
+scCells <- `coE_selctedCluster-selectedCells`
+
+if (is.null(scEx_log) || is.null(scCells)) {
+  
+} else {
+  
+  
+  
+  featureData <- rowData(scEx_log)
+  # we only work on cells that have been selected
+  mat <- assays(scEx_log)[[1]][, scCells]
+  # only genes that express at least coEtgminExpr UMIs
+  mat[mat < coEtgminExpr] <- 0
+  # only genes that are expressed in coEtgPerc or more cells
+  allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
+  mat <- mat[allexpressed, ]
+  
+  cv <- function(x) {
+    sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)
+  }
+  matCV <- apply(mat, 1, cv)
+  # top.genes <- as.data.frame(exprs(scEx_log))
+  maxRows <- min(nrow(mat), 200)
+  top.genesOrder <- order(matCV, decreasing = TRUE)[1:maxRows]
+  dataTables <- NULL
+  if (dim(mat)[1] > 0) {
+    mat <- mat[top.genesOrder, ]
+    fd <- featureData[rownames(mat), c("symbol", "Description")]
+    matCV <- matCV[rownames(mat)]
+    fd <- cbind(fd, matCV)
+    colnames(fd) <- c("gene", "description", "CV")
+    # since we are returning a table to be plotted, we convert to regular table (non-sparse)
+    outMat <- cbind2(fd, as.matrix(mat))
+    rownames(outMat) <- make.unique(as.character(outMat$gene), sep = "___")
+    dataTables <- as.data.frame(outMat)
+  }
+  
+  maxCol <- min(20, ncol(dataTables))
+  if (dim(dataTables)[1] > 1) {
+    DT::datatable(dataTables[, 1:maxCol],
+                  rownames = F, filter = "top",
+                  options = list(
+                    orderClasses = TRUE,
+                    autoWidth = TRUE
+                  )
+    )
+  } else {
+    print("no table to print")
+  }
+}
+```
+
+```{r saveTOPGENES, echo=TRUE, eval=TRUE}
+# save full table in tmp folder to be included in report
+if (is.data.frame(dataTables)) {
+  write.csv(dataTables, file = paste0(reportTempDir, "/output_coE_topExpGenes.csv"))
+}
+```
+
+Full table can be found here: [output_coE_topExpGenes.csv](output_coE_topExpGenes.csv)
+
+
+
+## Violin plot coexpressed genes
+
+geneListStr <- `r input$coE_geneGrpVioIds`
+
+projectionVar <- `r input$coE_dimension_xVioiGrp`
+
+minExpr <- `r input$coEminExpr`
+
+```{r violinPlot, echo=TRUE, eval=TRUE}
+
+geneListStr <- input$coE_geneGrpVioIds
+projectionVar <- input$coE_dimension_xVioiGrp
+minExpr <- input$coEminExpr
+coE_showPermutations <- input$coE_showPermutations
+# colPal = coE_geneGrp_vioFunc # TODO must be wrong
+sampCol <- sampleCols$colPal
+ccols <- clusterCols$colPal
+
+if (is.null(projections)) {
+  print("no violin plot to print")
+} else {
+  featureData <- rowData(scEx_log)
+  retVal <- coE_geneGrp_vioFunc(
+    genesin = geneListStr,
+    projections = projections,
+    scEx = scEx_log,
+    featureData = featureData,
+    minExpr = minExpr,
+    dbCluster = projectionVar,
+    coE_showPermutations = coE_showPermutations,
+    sampCol = sampCol,
+    ccols = ccols
+  )
+  retVal
+}
+```
+
+
+

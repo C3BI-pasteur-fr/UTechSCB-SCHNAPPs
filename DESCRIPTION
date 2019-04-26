@@ -1,0 +1,88 @@
+Package: SCHNAPPs
+Type: Package
+Title: Single Cell sHiny APP for analysing single cell transcriptomic data
+Version: 0.1.0
+Authors@R: c(person("Bernd", "Jagla", role = c("aut", "cre"), email = "bernd.jagla@pasteur.fr", comment = c(ORCID = "0000-0002-7696-0484")),
+    person("Milena", "Hasan", role="ctb", email="milena.hasan@pasteur.fr", comment = c(ORCID = '0000-0000-0000-0000')))
+Maintainer: Bernd Jagla <bernd.jagla@pasteur.fr>
+Description: R/Shiny based application to interact, manipulate, explore, and analyze single cell RNAseq experiments, including MARSeq and others.
+    The application is open and extendible. The main idea is to be able to run basic visualization and analyses, including normalization, clustering,...
+    on a defined subset of cells/genes. Key is, that all computations are based only on the cells that have been selected. Input can be a 
+    SingleCellExperiment object or csv files of the count matrix.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 2.10),
+Imports:
+    SummarizedExperiment, 
+    SingleCellExperiment,
+    shinycssloaders,
+    shinyjqui,
+    Matrix,
+    debugme,
+    methods,
+    BiocGenerics, 
+    S4Vectors,
+    utils,
+    stats,
+    shiny,
+    shinydashboard,
+    shinyAce,
+    shinyBS,
+    shinyTree,
+    shinythemes,
+    shinyjs,
+    shinyWidgets,
+    shinyMCE,
+    kohonen,
+    Rsomoclu,
+    DT, 
+    ggplot2,
+    plotly,
+    pheatmap,
+    colourpicker,
+    igraph,
+    threejs,
+    sm,
+    RColorBrewer,
+    mclust,
+    vipor,
+    mgcv,
+    scater,
+    kableExtra,
+    reshape2,
+    AnnotationDbi,
+    graphics,
+    grDevices,
+    viridisLite,
+    cowplot,
+    scales,
+    dplyr,
+    gtools,
+    shinytest,
+    scran,
+    callr,
+    htmltools,
+    magrittr,
+    TRONCO,
+    psych,
+    tibble,
+    pryr
+Exports:
+    clusterUI
+Suggests:
+    testthat,
+    BiocStyle,
+    knitr,
+    rmarkdown,
+    DelayedArray (>= 0.7.44),
+    Rtsne,
+    irlba,
+    viridis,
+    org.Mm.eg.db
+RoxygenNote: 6.1.1
+URL: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs
+BugReports: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues
+
+

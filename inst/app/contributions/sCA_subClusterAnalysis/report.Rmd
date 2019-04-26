@@ -1,0 +1,173 @@
+---
+title: "subclusterreport"
+output: html_document
+---
+
+# sub cluster analysis
+
+```{r dge, eval=TRUE, echo=TRUE, results='asis'}
+  
+if(DEBUG)cat(file=stderr(), "dge\n")
+
+if (is.null(input$db1) | is.null(input$db2)) {
+  knit_exit()
+}
+
+```
+
+
+## Plot 1
+
+  x1 = `r input$sCA_subscluster_x1`
+  
+  y1 = `r input$sCA_subscluster_y1`
+  
+  c1 = `r input$sCA_dgeClustersSelection`
+  
+  gn <- `r dim(groupNames$namesDF)`
+
+
+
+```{r sCA_selectedDge1, eval=TRUE, echo=TRUE}
+# TODO module?  
+  x1 = input$sCA_subscluster_x1
+  y1 = input$sCA_subscluster_y1
+  c1 = input$sCA_dgeClustersSelection
+  gn <- groupNames$namesDF
+
+  
+  xmin <- input$db1$xmin
+  xmax <- input$db1$xmax
+  ymin <- input$db1$ymin
+  ymax <- input$db1$ymax
+  
+  if (length(gn) > 0){
+    projections = cbind(projections, gn[rownames(projections),]*1)
+  }
+  subsetData <- subset(projections, dbCluster %in% c1)
+  p1 <-
+    ggplot(subsetData,
+           aes_string(x = x1, y = y1),
+           colour = "dbCluster") +
+    geom_point(aes(colour = dbCluster)) +
+    geom_point(shape = 1,
+               size = 4,
+               aes(colour = dbCluster)) +
+    annotate("rect",
+             xmin = xmin, xmax = xmax,
+             ymin = ymin, ymax = ymax,
+             fill = "palegreen", alpha = 0.2) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(
+        angle = 90,
+        size = 12,
+        vjust = 0.5
+      ),
+      axis.text.y = element_text(size = 12),
+      strip.text.x = element_text(size = 16),
+      strip.text.y = element_text(size = 14),
+      axis.title.x = element_text(face = "bold", size = 16),
+      axis.title.y = element_text(face = "bold", size = 16),
+      legend.position = "none"
+    ) +
+    ggtitle(c1)
+  p1
+  
+```
+
+## SUBCLUSTER DGE PLOT2 
+
+  gn <- `r dim(groupNames$namesDF)`
+  
+  inpCl1 <- `r input$sCA_dgeClustersSelection`
+
+
+```{r dgePlot2, echo=TRUE}
+
+  inpCl1 <- input$sCA_dgeClustersSelection
+  
+  xmin <- input$db2$xmin
+  xmax <- input$db2$xmax
+  ymin <- input$db2$ymin
+  ymax <- input$db2$ymax
+
+  subsetData <- subset(projections, dbCluster %in% inpCl1)
+  # save(file = "~/SCHNAPPsDebug/dge.Rmd.RData", list = c(ls(),ls(envir = globalenv())))
+  # load(file = "~/SCHNAPPsDebug/dge.Rmd.RData")
+  p1 <-
+    ggplot(subsetData,
+           aes_string(x = input$sCA_subscluster_x1, y = input$sCA_subscluster_y1),
+           color = "dbCluster") +
+    geom_point(aes(colour = dbCluster)) +
+    geom_point(shape = 1,
+               size = 4,
+               aes(colour = dbCluster)) +
+    annotate("rect",
+             xmin = xmin, xmax = xmax,
+             ymin = ymin, ymax = ymax,
+             fill = "palegreen", alpha = 0.2) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(
+        angle = 90,
+        size = 12,
+        vjust = 0.5
+      ),
+      axis.text.y = element_text(size = 12),
+      strip.text.x = element_text(size = 16),
+      strip.text.y = element_text(size = 14),
+      axis.title.x = element_text(face = "bold", size = 16),
+      axis.title.y = element_text(face = "bold", size = 16),
+      legend.position = "none"
+    ) +
+    ggtitle(input$sCA_dgeClustersSelection)
+  p1
+
+```
+
+## DGE table
+
+
+  gn <- `r dim(groupNames$namesDF)`
+  
+  cl1 = `r input$sCA_dgeClustersSelection`
+  
+  
+
+```{r DGETable, eval=TRUE, echo=TRUE}
+
+
+  cl1 <- input$sCA_dgeClustersSelection
+  db1 <- input$db1
+  db2 <- input$db2
+  method <- input$sCA_dgeRadioButton
+  methodIdx <- ceiling(which(unlist(diffExpFunctions)== method)/2)
+  dgeFunc <- diffExpFunctions[[methodIdx]][2]
+  gCells <- sCA_getCells(projections, cl1, db1, db2)
+  top.genes <- do.call(dgeFunc, args = list(scEx_log = scEx_log,
+                                         cells.1 = gCells$c1, cells.2 = gCells$c2))
+
+
+DT::datatable(top.genes,
+                  options = list(
+                    orderClasses = TRUE,
+                    lengthMenu = c(10, 30, 50),
+                    pageLength = 10
+                  ))
+
+
+```
+
+### download
+
+```{r}
+
+# save full table in tmp folder to be included in report
+  write.csv(top.genes, file = paste0(reportTempDir, "/DGE.csv"))
+
+```
+
+
+Full table can be found here: [DGE.csv](DGE.csv)
+
