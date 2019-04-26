@@ -1,0 +1,237 @@
+---
+title: "child report"
+output: html_document
+---
+
+# Data exploration
+
+```{r bj-DE-setup, echo=TRUE, warning=FALSE}
+if(exists("params")){
+  cat(file=stderr(), paste("Scater Plot report\n"))
+}else{
+  rm(list = ls())
+  load("~/SCHNAPPsDebug/report.RData")
+  cat(file=stderr(), getwd())
+  
+  require(shiny)
+  require(plotly)
+  require(shinythemes)
+  require(ggplot2)
+  require(DT)
+  require(pheatmap)
+  require(threejs)
+  require(sm)
+  require(RColorBrewer)
+  require(mclust)
+  require(reshape)
+  # require(cellrangerRkit)
+  # require(SCORPIUS)
+  require(ggplot2)
+  require(knitr)
+  require(kableExtra)
+  require(shinyWidgets)
+  require(scater)
+  
+  source("../../../serverFunctions.R")
+  source("../../../reactives.R", local = TRUE)
+  # source("reactives.R", local = TRUE)
+  
+  LOCALEXECUTION = TRUE # to know that we are debugging.
+  useCells = useCellsFunc(dataTables, 
+                          geneNames = input$minExpGenes,
+                          rmCells = input$cellsFiltersOut,
+                          rmPattern = input$cellPatternRM,
+                          keepCells = input$cellKeep,
+                          cellKeepOnly = input$cellKeepOnly)
+  ipIDs = input$selectIds
+  geneListSelection = input$geneListSelection
+  minGene <- input$minGenesGS
+  
+  useGenes = useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
+  featureDataReact = dataTables$featuredata[useGenes, ]
+  featureData = dataTables$featuredata[useGenes, ]
+  scEx = assays(dataTables$scEx)[[1]][useGenes, useCells]
+  scEx_log = assays(dataTables$scEx_log)[[1]][useGenes, useCells]
+  log2cpm = dataTables$log2cpm[useGenes, useCells]
+  
+}
+```
+
+
+## normalization
+
+Normalization method used: `r input$normalizationRadioButton` used.
+
+
+`r input$scaterGeneList`
+
+`r input$scaterGeneListRM`
+
+
+## Expression 
+
+2D plot 
+
+g_id <- `r input$DE_gene_id`
+
+geneNames <- `r input$"DE_expclusters-geneIds"`
+
+clId <- `r input$"DE_expclusters-clusters"`
+
+dimX <- `r input$"DE_expclusters-dimension_x"`
+
+dimY <- `r input$"DE_expclusters-dimension_y"`
+
+
+```{r bj-DE-2Dprojection, echo=TRUE, eval=TRUE}
+
+data2plot = projections
+gene_id <- input$DE_gene_id
+moduleName = "DE_expclusters"
+
+p2 <- twoDplotFromModule(twoDData = data2plot, moduleName = moduleName, input = input, projections = projections, g_id = gene_id) 
+
+# TODO selected cells
+
+p2
+
+```
+
+
+
+## VIOLIN PLOT 
+
+```{r bj-DE-DE_gene_vio_plot, eval=TRUE, echo=TRUE}
+
+  g_id <- input$DE_gene_id
+  ccols <- clusterCols$colPal
+
+  p1 <- DE_geneViolinFunc(scEx_log, g_id, projections, ccols)
+p1
+
+```
+
+## Panel plot
+output$DE_panelPlot <- renderPlot({
+
+input$DE_clusterSelectionPanelPlot : `r input$DE_clusterSelectionPanelPlot`
+
+input$DE_panelplotids : `r input$DE_panelplotids`
+
+input$DE_dim_x : `r input$DE_dim_x`
+
+input$DE_dim_y : `r input$DE_dim_y`
+
+```{r bj-DE-DE_panelPlot, eval=TRUE, echo=TRUE}
+
+  genesin <- input$DE_panelplotids
+  cl4 <- input$DE_clusterSelectionPanelPlot
+  dimx4 <- input$DE_dim_x
+  dimy4 <- input$DE_dim_y
+
+  genesin <- toupper(genesin)
+  genesin <- gsub(" ", "", genesin, fixed = TRUE)
+  genesin <- strsplit(genesin, ",")
+  genesin <- genesin[[1]]
+ 
+  featureData <- rowData(scEx_log)
+  featureData$symbol = toupper(featureData$symbol)
+  genesin <- genesin[which(genesin %in% featureData$symbol)]
+
+  par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
+  rbPal <- colorRampPalette(c("#f0f0f0", "red"))
+  ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
+  if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+    ymax <- 0
+    for (i in 1:length(genesin)) {
+      geneIdx <- which(featureData$symbol == genesin[i])
+      ymax <- max(ymax, max(Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])))
+    }
+    ylim <- c(0, ymax)
+  }
+  if (cl4 == "All") {
+    for (i in 1:length(genesin)) {
+      geneIdx <- which(featureData$symbol == genesin[i])
+      Col <- rbPal(10)[
+        as.numeric(
+          cut(
+            as.numeric(
+              assays(scEx_log)[[1]][
+                rownames(featureData[geneIdx, ]),
+              ]
+            ),
+            breaks = 10
+          )
+        )
+      ]
+      if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+        projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
+      }
+
+      plot(projections[, dimx4], projections[, dimy4],
+        col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
+      )
+      title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
+      if (DEBUG) cat(file = stderr(), genesin[i])
+    }
+  } else {
+    for (i in 1:length(genesin)) {
+      geneIdx <- which(featureData$symbol == genesin[i])
+      subsetTSNE <- subset(projections, dbCluster == cl4)
+
+      Col <- rbPal(10)[
+        as.numeric(
+          cut(
+            as.numeric(
+              assays(scEx_log)[[1]][
+                rownames(featureData[geneIdx, ]),
+              ]
+            ),
+            breaks = 10
+          )
+        )
+      ]
+
+      names(Col) <- rownames(projections)
+      plotCol <- Col[rownames(subsetTSNE)]
+      if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+        projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
+        subsetTSNE <- subset(projections, dbCluster == cl4)
+      }
+
+      plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
+        col = plotCol, pch = 16, frame.plot = TRUE,
+        ann = FALSE, ylim = ylim
+      )
+      title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
+      if (DEBUG) cat(file = stderr(), cl4)
+    }
+  }
+  
+ 
+```
+
+
+
+## 3D TSNE plot
+
+```{r bj-DE-DE_tsne_plt, eval=TRUE, echo=TRUE}
+
+  g_id <- input$DE_gene_id
+
+ DE_dataExpltSNEPlot(scEx_log, g_id, projections)
+
+```
+
+## scater QC
+
+```{r bj-DE-scater, eval=TRUE, echo=TRUE, warning=FALSE }
+library(png)
+img=DE_scaterPNG
+if (file.exists(img$src))
+  include_graphics(img$src)
+
+```
+
+
+

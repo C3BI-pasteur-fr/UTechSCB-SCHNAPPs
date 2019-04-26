@@ -1,0 +1,210 @@
+---
+title: "child report"
+output: html_document
+---
+
+# General QC
+
+
+
+```{r bj-gQC-setup, echo=TRUE, warning=FALSE, message=FALSE, error=FALSE, include=FALSE}
+if(exists("params")){
+  cat(file = stderr(), paste("Scater Plot report\n"))
+}else{
+  rm(list = ls())
+  load("~/SCHNAPPsDebug/report.RData")
+  cat(file=stderr(), getwd())
+  
+  require(shiny)
+  require(plotly)
+  require(shinythemes)
+  require(ggplot2)
+  require(DT)
+  require(pheatmap)
+  require(threejs)
+  require(sm)
+  require(RColorBrewer)
+  require(mclust)
+  require(reshape)
+  # require(cellrangerRkit)
+  # require(SCORPIUS)
+  require(ggplot2)
+  require(knitr)
+  require(kableExtra)
+  require(shinyWidgets)
+  require(scater)
+  
+  source("../../../serverFunctions.R")
+  source("../../../reactives.R", local = TRUE)
+  source("reactives.R", local = TRUE)
+  
+  LOCALEXECUTION = TRUE # to know that we are debugging.
+  useCells = useCellsFunc(dataTables, 
+                          geneNames = input$minExpGenes,
+                          rmCells = input$cellsFiltersOut,
+                          rmPattern = input$cellPatternRM,
+                          keepCells = input$cellKeep,
+                          cellKeepOnly = input$cellKeepOnly)
+  ipIDs = input$selectIds
+  geneListSelection = input$geneListSelection
+  minGene <- input$minGenesGS
+  
+  useGenes = useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
+  featureDataReact = dataTables$featuredata[useGenes, ]
+  featureData = dataTables$featuredata[useGenes, ]
+  scEx = dataTables$scEx[useGenes, useCells]
+  scEx_log = dataTables$scEx_log[useGenes, useCells]
+  log2cpm = dataTables$log2cpm[useGenes, useCells]
+  if(DEBUG)cat(file=stderr(), "pca\n")
+  
+  pca = pcaFunc(scEx_log)
+  if(DEBUG)cat(file=stderr(), "tsne\n")
+  seed=1
+  set.seed(seed = seed)
+  tsne = run_tsne(pca, dims = 3, perplexity = 30, theta = 0.5)
+  if(DEBUG)cat(file=stderr(), "tsne: done\n")
+  if(DEBUG)cat(file=stderr(), "tsne.data\n")
+  
+  if(DEBUG)cat(file=stderr(), "scran_Cluster\n")
+  clustering=list()
+  
+  kNr = 10
+  for(kNr in 2:10) {
+    set.seed(seed = seed)
+    km = run_kmeans_clustering(pca, k=kNr)
+    clustering[[paste0("kmeans_",kNr,"_clusters")]] = data.frame("Barcode" = rownames(data.frame(km$cluster)), "Cluster" = km$cluster)
+  }
+  
+  scran_Cluster = clustering
+  if(DEBUG)cat(file=stderr(), "scran_Cluster:done\n")
+  
+  
+  tsne.data = data.frame(tsne$Y)
+  colnames(tsne.data) = c("tsne1", "tsne2", "tsne3")
+  # tsne.data$dbCluster = clustering$kmeans_10_clusters$Cluster-1
+  tsne.data$dbCluster = clustering$kmeans_10_clusters$Cluster
+  rownames(tsne.data) = clustering$kmeans_10_clusters$Barcode
+  if(DEBUG)cat(file=stderr(), "tsne.data: done\n")
+  
+}
+
+
+```
+
+
+
+
+```{r bj-gQC-tsne3d, eval=FALSE, echo=TRUE}
+# TODO: not working because tsne.data is not available
+cat(file=stderr(),paste("bj-gQC-tsne3d: ", class(tsne.data)))
+  
+  tsne.data <- as.data.frame(tsne.data)
+  cat(file=stderr(),colnames(tsne.data)[1:5])
+  tsne.data$dbCluster <- as.factor(tsne.data$dbCluster)
+  
+  p <-
+    plotly::plot_ly(
+      tsne.data,
+      x = ~ tsne1,
+      y = ~ tsne2,
+      z = ~ tsne3,
+      type = "scatter3d",
+      color =  ~ dbCluster,
+      hoverinfo = "text",
+      text = paste('Cluster:', as.numeric(as.character(tsne.data$dbCluster))),
+      mode = 'markers',
+      marker =
+        list(
+          line = list(width = 0),
+          size = rep(10, nrow(tsne.data)),
+          sizeref = 3
+        )
+    )
+  if(DEBUG)cat(file=stderr(), "output$gQC_tsne_main: done\n")
+  layout(p)
+  
+
+
+```
+
+## UMI histogram
+
+
+```{r gQC_plotUmiHist, eval=TRUE, echo=TRUE}
+
+hist(Matrix::colSums(assays(scEx)[[1]]), breaks = 50, main="histogram of number of UMI per cell")
+```
+
+## Variances of PCs
+
+```{r gQC_variancePCA, eval=TRUE, echo=TRUE}
+# if(exists("pca$var_pcs")){
+  barplot(pca$var_pcs, main="Variance captured by first PCs")
+# }
+```
+
+## Histogram of samples
+
+
+```{r histSamples, eval=TRUE, echo=TRUE}
+if(DEBUGSAVE) 
+  save(file = "~/SCHNAPPsDebug/histSamples.RData", list = c(ls(),ls(envir = globalenv())))
+sampleInf <- sampleInfoFunc(scEx)
+scols = sampleCols$colPal
+ccols <- clusterCols$colPal
+
+gQC_sampleHistFunc(sampleInf, scols)
+```
+
+## TSNE plot
+
+```{r bj-GC-tsne, echo=TRUE}
+
+
+  dimX = input$gQC_dim3D_x
+  dimY = input$gQC_dim3D_y
+  dimZ = input$gQC_dim3D_z
+  dimCol = input$gQC_col3D
+  
+  
+  if (DEBUGSAVE) 
+    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls(),ls(envir = globalenv())))
+  # load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
+  
+  projections <- as.data.frame(projections)
+  
+  #cat(stderr(),colnames(projections)[1:5])
+  #TODO it can happen that dbCluster is not available (if the view hasn't been used)
+  projections$dbCluster <- as.factor(projections$dbCluster)
+  
+  p <-
+    plotly::plot_ly(
+      projections,
+      x = formula(paste("~ ", dimX)),
+      y = formula(paste("~ ", dimY)),
+      z = formula(paste("~ ", dimZ)),
+      type = "scatter3d",
+      color =  formula(paste("~ ", dimCol)),
+      hoverinfo = "text",
+      text = paste('Cluster:', as.numeric(as.character(projections$dbCluster))),
+      mode = 'markers',
+      marker =
+        list(
+          line = list(width = 0),
+          size = rep(10, nrow(projections)),
+          sizeref = 3
+        )
+    )
+ layout(p)
+```
+
+## Projections table
+
+```{r savegqcProj, echo=TRUE}
+
+# save full table in tmp folder to be included in report
+  write.csv(projections, file = paste0(reportTempDir, "/gqcProjections.csv"))
+
+```
+
+Full table can be found here: [gqcProjections.csv](gqcProjections.csv)
