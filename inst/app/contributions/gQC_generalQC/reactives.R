@@ -227,15 +227,15 @@ umapReact <- reactive({
   
   scEx_log <- scEx_log()
   myseed <- input$gQC_um_randSeed
-  xaxis <- input$um_xaxis
-  yaxis <- input$um_yaxis
-  cellT <- input$um_ct
-  inputCT <- input$um_inputCT
-  sampleRatio <- as.numeric(input$um_sampleRatio)
-  sampleIds <- input$um_sampleIds
-  InlevelOrd <- input$um_levelOrd
-  UMAP1 <- input$um_umap1
-  UMAP2 <- input$um_umap2
+  # xaxis <- input$um_xaxis
+  # yaxis <- input$um_yaxis
+  # cellT <- input$um_ct
+  # inputCT <- input$um_inputCT
+  # sampleRatio <- as.numeric(input$um_sampleRatio)
+  # sampleIds <- input$um_sampleIds
+  # InlevelOrd <- input$um_levelOrd
+  # UMAP1 <- input$um_umap1
+  # UMAP2 <- input$um_umap2
   runUMAP <- input$activateUMAP
   
   n_neighbors <- as.numeric(input$gQC_um_n_neighbors)
@@ -308,3 +308,54 @@ myHeavyCalculations <- list(
   c("scaterReads", "scaterReads"),
   c("tsne", "tsne")
 )
+
+
+#' tsnePlot
+#' function that plots in 3D the tsne projection
+tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
+  if (DEBUG) cat(file = stderr(), "tsnePlot started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "tsnePlot")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "tsnePlot")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("tsnePlot", id = "tsnePlot", duration = NULL)
+  }
+  
+  projections <- as.data.frame(projections)
+  projections$dbCluster <- as.factor(projections$dbCluster)
+  
+  if (dimCol == "sampleNames") {
+    myColors <- scols
+  } else {
+    myColors <- NULL
+  }
+  if (dimCol == "dbCluster") {
+    myColors <- ccols
+  }
+  
+  p <-
+    plotly::plot_ly(
+      projections,
+      x = formula(paste("~ ", dimX)),
+      y = formula(paste("~ ", dimY)),
+      z = formula(paste("~ ", dimZ)),
+      type = "scatter3d",
+      color = formula(paste("~ ", dimCol)),
+      colors = myColors,
+      hoverinfo = "text",
+      text = paste("Cluster:", as.numeric(as.character(projections$dbCluster))),
+      mode = "markers",
+      marker =
+        list(
+          line = list(width = 0),
+          size = rep(10, nrow(projections)),
+          sizeref = 3
+        )
+    )
+  return(p)
+}
+

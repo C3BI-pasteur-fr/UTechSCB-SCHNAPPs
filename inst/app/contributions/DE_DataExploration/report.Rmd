@@ -68,7 +68,20 @@ Normalization method used: `r input$normalizationRadioButton` used.
 `r input$scaterGeneListRM`
 
 
-## Expression 
+## Expression
+
+### 3D TSNE plot
+
+```{r bj-DE-DE_tsne_plt, eval=TRUE, echo=TRUE}
+
+  g_id <- input$DE_gene_id
+
+ DE_dataExpltSNEPlot(scEx_log, g_id, projections)
+
+```
+
+
+### 2D 
 
 2D plot 
 
@@ -99,7 +112,7 @@ p2
 
 
 
-## VIOLIN PLOT 
+### VIOLIN PLOT 
 
 ```{r bj-DE-DE_gene_vio_plot, eval=TRUE, echo=TRUE}
 
@@ -212,16 +225,6 @@ input$DE_dim_y : `r input$DE_dim_y`
 ```
 
 
-
-## 3D TSNE plot
-
-```{r bj-DE-DE_tsne_plt, eval=TRUE, echo=TRUE}
-
-  g_id <- input$DE_gene_id
-
- DE_dataExpltSNEPlot(scEx_log, g_id, projections)
-
-```
 
 ## scater QC
 

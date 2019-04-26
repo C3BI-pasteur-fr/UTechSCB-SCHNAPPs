@@ -1459,7 +1459,7 @@ reportFunction <- function(tmpPrjFile) {
 }
 
 # reacativeReport ----
-reacativeReport <- reactive({
+reacativeReport <- function() {
   if (DEBUG) cat(file = stderr(), "reacativeReport started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -1667,7 +1667,7 @@ reacativeReport <- reactive({
     cat(file = stderr(), "===Report:done", difftime(end.time, start.time, units = "min"), "\n")
   }
   return(outZipFile)
-})
+}
 
 consolidateScEx <- function(scEx, projections, scEx_log, pca, tsne) {
  

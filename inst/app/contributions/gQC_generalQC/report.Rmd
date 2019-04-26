@@ -97,32 +97,32 @@ if(exists("params")){
 ```{r bj-gQC-tsne3d, eval=FALSE, echo=TRUE}
 # TODO: not working because tsne.data is not available
 cat(file=stderr(),paste("bj-gQC-tsne3d: ", class(tsne.data)))
-  
-  tsne.data <- as.data.frame(tsne.data)
-  cat(file=stderr(),colnames(tsne.data)[1:5])
-  tsne.data$dbCluster <- as.factor(tsne.data$dbCluster)
-  
-  p <-
-    plotly::plot_ly(
-      tsne.data,
-      x = ~ tsne1,
-      y = ~ tsne2,
-      z = ~ tsne3,
-      type = "scatter3d",
-      color =  ~ dbCluster,
-      hoverinfo = "text",
-      text = paste('Cluster:', as.numeric(as.character(tsne.data$dbCluster))),
-      mode = 'markers',
-      marker =
-        list(
-          line = list(width = 0),
-          size = rep(10, nrow(tsne.data)),
-          sizeref = 3
-        )
-    )
-  if(DEBUG)cat(file=stderr(), "output$gQC_tsne_main: done\n")
-  layout(p)
-  
+
+tsne.data <- as.data.frame(tsne.data)
+cat(file=stderr(),colnames(tsne.data)[1:5])
+tsne.data$dbCluster <- as.factor(tsne.data$dbCluster)
+
+p <-
+  plotly::plot_ly(
+    tsne.data,
+    x = ~ tsne1,
+    y = ~ tsne2,
+    z = ~ tsne3,
+    type = "scatter3d",
+    color =  ~ dbCluster,
+    hoverinfo = "text",
+    text = paste('Cluster:', as.numeric(as.character(tsne.data$dbCluster))),
+    mode = 'markers',
+    marker =
+      list(
+        line = list(width = 0),
+        size = rep(10, nrow(tsne.data)),
+        sizeref = 3
+      )
+  )
+if(DEBUG)cat(file=stderr(), "output$gQC_tsne_main: done\n")
+layout(p)
+
 
 
 ```
@@ -132,23 +132,19 @@ cat(file=stderr(),paste("bj-gQC-tsne3d: ", class(tsne.data)))
 
 ```{r gQC_plotUmiHist, eval=TRUE, echo=TRUE}
 
-hist(Matrix::colSums(assays(scEx)[[1]]), breaks = 50, main="histogram of number of UMI per cell")
-```
+dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
+dat$sample <- colData(scEx)$sampleNames
+ggplot(data = dat, aes(counts, fill = sample)) +
+  geom_histogram(bins = 50) +
+  labs(title = "Histogram for raw counts", x = "count", y = "Frequency") +
+  scale_fill_manual(values = scols, aesthetics = "fill")
 
-## Variances of PCs
-
-```{r gQC_variancePCA, eval=TRUE, echo=TRUE}
-# if(exists("pca$var_pcs")){
-  barplot(pca$var_pcs, main="Variance captured by first PCs")
-# }
 ```
 
 ## Histogram of samples
 
 
 ```{r histSamples, eval=TRUE, echo=TRUE}
-if(DEBUGSAVE) 
-  save(file = "~/SCHNAPPsDebug/histSamples.RData", list = c(ls(),ls(envir = globalenv())))
 sampleInf <- sampleInfoFunc(scEx)
 scols = sampleCols$colPal
 ccols <- clusterCols$colPal
@@ -156,46 +152,46 @@ ccols <- clusterCols$colPal
 gQC_sampleHistFunc(sampleInf, scols)
 ```
 
+## Variances of PCs
+
+```{r gQC_variancePCA, eval=TRUE, echo=TRUE}
+# if(exists("pca$var_pcs")){
+barplot(pca$var_pcs, main="Variance captured by first PCs")
+# }
+```
+
+
 ## TSNE plot
+
+gQC_tsneDim : `r input$gQC_tsneDim`
+
+gQC_tsnePerplexity : `r input$gQC_tsnePerplexity`
+
+gQC_tsneTheta : `r input$gQC_tsneTheta`
+
+gQC_tsneSeed : `r input$gQC_tsneSeed`
+
+dimX : `r input$gQC_dim3D_x`
+
+dimY : `r input$gQC_dim3D_y`
+
+dimZ : `r input$gQC_dim3D_z`
+
+dimCol : `r input$gQC_col3D`
+
 
 ```{r bj-GC-tsne, echo=TRUE}
 
 
-  dimX = input$gQC_dim3D_x
-  dimY = input$gQC_dim3D_y
-  dimZ = input$gQC_dim3D_z
-  dimCol = input$gQC_col3D
-  
-  
-  if (DEBUGSAVE) 
-    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls(),ls(envir = globalenv())))
-  # load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
-  
-  projections <- as.data.frame(projections)
-  
-  #cat(stderr(),colnames(projections)[1:5])
-  #TODO it can happen that dbCluster is not available (if the view hasn't been used)
-  projections$dbCluster <- as.factor(projections$dbCluster)
-  
-  p <-
-    plotly::plot_ly(
-      projections,
-      x = formula(paste("~ ", dimX)),
-      y = formula(paste("~ ", dimY)),
-      z = formula(paste("~ ", dimZ)),
-      type = "scatter3d",
-      color =  formula(paste("~ ", dimCol)),
-      hoverinfo = "text",
-      text = paste('Cluster:', as.numeric(as.character(projections$dbCluster))),
-      mode = 'markers',
-      marker =
-        list(
-          line = list(width = 0),
-          size = rep(10, nrow(projections)),
-          sizeref = 3
-        )
-    )
- layout(p)
+dimX = input$gQC_dim3D_x
+dimY = input$gQC_dim3D_y
+dimZ = input$gQC_dim3D_z
+dimCol = input$gQC_col3D
+
+
+projections$dbCluster <- as.factor(projections$dbCluster)
+
+tsnePlot(projections, dimX, dimY, dimZ, dimCol, scols, ccols)
 ```
 
 ## Projections table
@@ -203,8 +199,118 @@ gQC_sampleHistFunc(sampleInf, scols)
 ```{r savegqcProj, echo=TRUE}
 
 # save full table in tmp folder to be included in report
-  write.csv(projections, file = paste0(reportTempDir, "/gqcProjections.csv"))
+write.csv(projections, file = paste0(reportTempDir, "/gqcProjections.csv"))
 
 ```
 
 Full table can be found here: [gqcProjections.csv](gqcProjections.csv)
+
+## UMAP
+
+myseed : `r input$gQC_um_randSeed`
+
+runUMAP : `r input$activateUMAP`
+
+n_neighbors : `r as.numeric(input$gQC_um_n_neighbors)`
+
+n_components : `r as.numeric(input$gQC_um_n_components)`
+
+n_epochs : `r as.numeric(input$gQC_um_n_epochs)`
+
+alpha : `r as.numeric(input$um_alpha)`
+
+init : `r input$gQC_um_init`
+
+min_dist : `r as.numeric(input$gQC_um_min_dist)`
+
+set_op_mix_ratio : `r as.numeric(input$gQC_um_set_op_mix_ratio)`
+
+local_connectivity : `r as.numeric(input$gQC_um_local_connectivity)`
+
+bandwidth : `r as.numeric(input$gQC_um_bandwidth)`
+
+gamma : `r as.numeric(input$um_gamma)`
+
+negative_sample_rate : `r as.numeric(input$gQC_um_negative_sample_rate)`
+
+metric : `r input$gQC_um_metric`
+
+spread : `r as.numeric(input$gQC_um_spread)`
+
+dimY : `r input$"gQC_umap_main-dimension_y"`
+
+dimX : `r input$"gQC_umap_main-dimension_x"`
+
+dimCol : `r input$"gQC_umap_main-dimension_col"`
+
+clId : `r input$"gQC_umap_main-clusters"`
+
+geneNames : `r input$"gQC_umap_main-geneIds"`
+
+geneNames2 : `r input$"gQC_umap_main-geneIds2"`
+
+logx : `r input$"gQC_umap_main-logX"`
+
+logy : `r input$"gQC_umap_main-logY"`
+
+divXBy : `r input$"gQC_umap_main-devideXBy"`
+
+divYBy : `r input$"gQC_umap_main-devideYBy"`
+
+scols : `r sampleCols$colPal`
+
+ccols : `r clusterCols$colPal`
+
+
+
+```{r gqc_UMAP, echo=TRUE}
+DEBUGSAVE <- FALSE
+grpNs <- groupNames$namesDF
+grpN <- make.names(input$groupName)
+
+dimY <- input$"gQC_umap_main-dimension_y"
+dimX <- input$"gQC_umap_main-dimension_x"
+dimCol <- input$"gQC_umap_main-dimension_col"
+clId <- input$"gQC_umap_main-clusters"
+g_id <- featureData$symbol
+geneNames <- input$"gQC_umap_main-geneIds"
+geneNames2 <- input$"gQC_umap_main-geneIds2"
+logx <- input$"gQC_umap_main-logX"
+logy <- input$"gQC_umap_main-logY"
+divXBy <- input$"gQC_umap_main-devideXBy"
+divYBy <- input$"gQC_umap_main-devideYBy"
+scols <- sampleCols$colPal
+ccols <- clusterCols$colPal
+legend.position <- "none"
+scCells <- `coE_selctedCluster-selectedCells`
+if (is.null(divXBy)) divXBy <- "None"
+if (is.null(divYBy)) divYBy <- "None"
+if (is.null(logx)) {logx=FALSE}
+if (is.null(logy)) {logy=FALSE}
+projections <- updateProjectionsWithUmiCount(
+  dimX = dimX, dimY = dimY,
+  geneNames = geneNames,
+  geneNames2 = geneNames2,
+  scEx = scEx_log, projections = projections
+)
+if (dimCol == "sampleNames") {
+  myColors <- scols
+} else {
+  myColors <- NULL
+}
+if (dimCol == "dbCluster") {
+  myColors <- ccols
+}
+
+# if (all(c("UMAP1", "UMAP2") %in% colnames(projections))) {
+  p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
+                         geneNames2, dimX, dimY, clId, grpN, legend.position,
+                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+  )
+  p1
+# }
+```
+
+
+
+

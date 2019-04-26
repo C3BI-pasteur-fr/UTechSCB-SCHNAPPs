@@ -111,55 +111,6 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   return(layout(retVal))
 })
 
-#' tsnePlot
-#' function that plots in 3D the tsne projection
-tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
-  if (DEBUG) cat(file = stderr(), "tsnePlot started.\n")
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "tsnePlot")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "tsnePlot")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("tsnePlot", id = "tsnePlot", duration = NULL)
-  }
-
-  projections <- as.data.frame(projections)
-  projections$dbCluster <- as.factor(projections$dbCluster)
-
-  if (dimCol == "sampleNames") {
-    myColors <- scols
-  } else {
-    myColors <- NULL
-  }
-  if (dimCol == "dbCluster") {
-    myColors <- ccols
-  }
-
-  p <-
-    plotly::plot_ly(
-      projections,
-      x = formula(paste("~ ", dimX)),
-      y = formula(paste("~ ", dimY)),
-      z = formula(paste("~ ", dimZ)),
-      type = "scatter3d",
-      color = formula(paste("~ ", dimCol)),
-      colors = myColors,
-      hoverinfo = "text",
-      text = paste("Cluster:", as.numeric(as.character(projections$dbCluster))),
-      mode = "markers",
-      marker =
-        list(
-          line = list(width = 0),
-          size = rep(10, nrow(projections)),
-          sizeref = 3
-        )
-    )
-  return(p)
-}
-
 # gQC_umap_main 2D plot ----
 callModule(
   clusterServer,
