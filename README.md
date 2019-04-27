@@ -31,5 +31,11 @@ A singleCellExperiment object is required, saved in a file RData object using
 save(file = "filename.RData", "singleCellExperiementObject")
 ```
 
+Load a small set of 200 cells and save to a file in the local directory
+```
+data("scEx", package = "SCHNAPPs")
+save(file = "scEx.Rdata", list = "scEx")
+```
+
 
 ## Extending SCHAPPs
