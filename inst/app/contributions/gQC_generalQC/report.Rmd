@@ -96,11 +96,11 @@ if(exists("params")){
 
 ```{r bj-gQC-tsne3d, eval=FALSE, echo=TRUE}
 # TODO: not working because tsne.data is not available
-cat(file=stderr(),paste("bj-gQC-tsne3d: ", class(tsne.data)))
+# cat(file=stderr(),paste("bj-gQC-tsne3d: ", class(tsne.data)))
 
-tsne.data <- as.data.frame(tsne.data)
+tsne.data <- as.data.frame(tsne)
 cat(file=stderr(),colnames(tsne.data)[1:5])
-tsne.data$dbCluster <- as.factor(tsne.data$dbCluster)
+tsne.data$dbCluster <- as.factor(projections$dbCluster)
 
 p <-
   plotly::plot_ly(

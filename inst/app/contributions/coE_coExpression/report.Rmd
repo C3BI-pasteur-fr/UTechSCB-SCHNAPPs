@@ -73,7 +73,7 @@ sampCol : `r sampleCols$colPal`
 ccols : `r clusterCols$colPal`
 
 
-```{r}
+```{r coExpHeatmapModule}
 genesin <- input$coE_heatmap_geneids
 sampCol <- sampleCols$colPal
 ccols <- clusterCols$colPal
@@ -86,8 +86,10 @@ heatmapData <- coE_heatmapFunc(
   sampCol = sampCol, ccols = ccols
 )
 
-moduleName <- "coExpHeatmapModule"
-heatmapPlotFromModule(heatmapData, moduleName, input, projections)
+if (nrow(heatmapData$mat)>0){
+  moduleName <- "coExpHeatmapModule"
+  heatmapPlotFromModule(heatmapData, moduleName, input, projections)
+}
 ```
 
 
@@ -358,7 +360,7 @@ if (is.null(projections)) {
   nSOM : `r input$coE_dimSOM`
 
 
-```{r}
+```{r coe_som}
   genesin <- input$coE_geneSOM
   nSOM <- input$coE_dimSOM
   sampCol <- sampleCols$colPal
@@ -400,9 +402,10 @@ if (is.null(projections)) {
   # system.time(do.call(TRONCO::pheatmap, retVal))
 
 
-
-moduleName <- "coE_heatmapSOM"
-heatmapPlotFromModule(retVal, moduleName, input, projections)
+if (nrow(retVal$mat) > 0) {
+  moduleName <- "coE_heatmapSOM"
+  heatmapPlotFromModule(retVal, moduleName, input, projections)
+}
 
 ```
 
