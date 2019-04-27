@@ -11,7 +11,7 @@ Shiny app for the analysis of single cell data
 ```
 if (!require("devtools"))
   install.packages("devtools")
-devtools::install_github("shinyMCE", "mul118")
+devtools::install_github("mul118/shinyMCE")
 install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
