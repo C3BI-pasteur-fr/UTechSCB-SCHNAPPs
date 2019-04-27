@@ -37,10 +37,10 @@ data("scEx", package = "SCHNAPPs")
 save(file = "scEx.Rdata", list = "scEx")
 ```
 
+
 ## Screen-shots
 
-Under the following link you can find some [scree-shots](inst/www/screen_shots.md)
-
+Under the following link you can find some [screen-shots](inst/www/screen_shots.md)
 
 
 ## Extending SCHAPPs
