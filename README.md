@@ -1,4 +1,4 @@
-<img src="inst/www/schnappsLogo.png" align="right" alt="" width="120" />
+<img src="inst/www/images/schnappsLogo.png" align="right" alt="" width="120" />
 
 # SCHNAPPs - Single Cell sHiNy APP(s)
 
@@ -30,6 +30,17 @@ A singleCellExperiment object is required, saved in a file RData object using
 ```
 save(file = "filename.RData", "singleCellExperiementObject")
 ```
+
+Load a small set of 200 cells and save to a file in the local directory
+```
+data("scEx", package = "SCHNAPPs")
+save(file = "scEx.Rdata", list = "scEx")
+```
+
+## Screen-shots
+
+Under the following link you can find some [scree-shots](inst/www/screen_shots.md)
+
 
 
 ## Extending SCHAPPs
