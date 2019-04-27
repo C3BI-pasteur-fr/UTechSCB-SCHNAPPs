@@ -4,7 +4,8 @@
 
 ## Overview
 
-Shiny app for the analysis of single cell data
+Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Pasteur Institute, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur.
+
 
 ## Installation
 
@@ -20,6 +21,7 @@ install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 To start the app:
 
 ```
+library(SCHNAPPs)
 schnapps()
 ```
 
@@ -32,16 +34,28 @@ save(file = "filename.RData", "singleCellExperiementObject")
 ```
 
 Load a small set of 200 cells and save to a file in the local directory
+
 ```
 data("scEx", package = "SCHNAPPs")
 save(file = "scEx.Rdata", list = "scEx")
 ```
 
-
-## Screen-shots
+## Screen-shots / walk-through
 
 Under the following link you can find some [screen-shots](inst/www/screen_shots.md)
 
 
+## FAQ
+
+The FAQ answers question on how specific questions can be handled witht SCHNAPPs.
+
+[FAQ](inst/www/faq.md)
+
+
 ## Extending SCHAPPs
 
+## Credits
+
+The original version of this app is based on CellView (https://github.com/mohanbolisetty/CellView), but it was substantially modified. It helped me get started.
+
+We are also greatful to all the members of the single cell working group at Pasteur Paris.
