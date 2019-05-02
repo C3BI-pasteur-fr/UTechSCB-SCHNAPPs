@@ -33,7 +33,32 @@ inputTab <- shinydashboard::tabItem(
     offset = 4,
     fileInput(
       "file1",
-      "Choose .Rds file to upload",
+      "Choose .RData file to upload",
+      accept = c(
+        ".Rds",".RData"
+      ),
+      multiple = TRUE
+    )
+  )),
+  br(),
+  br(),
+  fluidRow(column(
+    5,
+    offset = 4,
+    fileInput(
+      "csvFile",
+      "Choose .CSV file with count data to upload",
+      accept = c(
+        ".Rds",".RData"
+      ),
+      multiple = TRUE
+    )
+  )),fluidRow(column(
+    5,
+    offset = 4,
+    fileInput(
+      "annoFile",
+      "Choose .CSV file with annotation to upload",
       accept = c(
         ".Rds",".RData"
       ),
