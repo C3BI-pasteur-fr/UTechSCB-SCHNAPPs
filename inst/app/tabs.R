@@ -33,9 +33,9 @@ inputTab <- shinydashboard::tabItem(
     offset = 4,
     fileInput(
       "file1",
-      "Choose .RData file to upload",
+      "Choose .RData/.Rds file with singleCellExperiment object OR .txt/.csv file with count data to upload",
       accept = c(
-        ".Rds",".RData"
+        ".Rds",".RData", ".txt", ".csv"
       ),
       multiple = TRUE
     )
@@ -46,21 +46,10 @@ inputTab <- shinydashboard::tabItem(
     5,
     offset = 4,
     fileInput(
-      "csvFile",
-      "Choose .CSV file with count data to upload",
-      accept = c(
-        ".Rds",".RData"
-      ),
-      multiple = TRUE
-    )
-  )),fluidRow(column(
-    5,
-    offset = 4,
-    fileInput(
       "annoFile",
       "Choose .CSV file with annotation to upload",
       accept = c(
-        ".Rds",".RData"
+        ".txt",".csv", ".mtx"
       ),
       multiple = TRUE
     )
