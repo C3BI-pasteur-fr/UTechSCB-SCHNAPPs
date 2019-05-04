@@ -182,7 +182,7 @@ output$selectedGenesTable <- DT::renderDataTable({
 
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
+  dt <- fd[useGenes, c("symbol", "Description")]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   exportTestValues(selectedGenesTable = {
@@ -214,7 +214,7 @@ output$removedGenesTable <- DT::renderDataTable({
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
+  dt <- fd[useGenes, c("symbol", "Description")]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   exportTestValues(removedGenesTable = {
@@ -248,7 +248,7 @@ output$gsSelectedGenes <- renderText({
 
   # scEx <- as.matrix(exprs(dataTables$scEx))
   fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
+  dt <- fd[useGenes, c("symbol", "Description")]
   retVal <- paste0(dt$symbol[selectedGenesTable_rows_selected], ",")
   exportTestValues(gsSelectedGenes = {
     retVal
@@ -280,7 +280,7 @@ output$gsrmGenes <- renderText({
   useGenes <- !useGenes
   # scEx <- as.matrix(exprs(dataTables$scEx))
   fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
+  dt <- fd[useGenes, c("symbol", "Description")]
   if (DEBUG) {
     cat(file = stderr(), "gsrmGenes: done\n")
   }
