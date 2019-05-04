@@ -27,8 +27,6 @@ inputFile <- reactiveValues(inFile = "",
 # loads singleCellExperiment
 #   only counts, rowData, and colData are used. Everything else needs to be recomputed
 inputDataFunc <- function(inFile) {
-  "!DEBUG start shiny"
-  debugme::debug("plot render start", pkg = ".")
   if (DEBUG)
     cat(file = stderr(), "inputDataFunc started.\n")
   start.time <- base::Sys.time()
@@ -169,16 +167,13 @@ inputDataFunc <- function(inFile) {
     }
   }
   
-  if (!sum(c("symbol", "Gene.Biotype", "Description") %in% colnames(featuredata)) == 3) {
+  if (!sum(c("symbol",  "Description") %in% colnames(featuredata)) == 2) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
-        "featuredata - one of is missing: symbol, Gene.Biotype, Description)",
+        "featuredata - one of is missing: symbol,  Description)",
         duration = NULL,
         type = "error"
       )
-    }
-    if (!"Gene.Biotype" %in% colnames(featuredata)) {
-      featuredata$"Gene.Biotype" <- "not given"
     }
     if (!"Description" %in% colnames(featuredata)) {
       featuredata$"Description" <- "not given"
@@ -194,8 +189,47 @@ inputDataFunc <- function(inFile) {
   return(dataTables)
 }
 
-readCSV = function(filename) {
+readMM = function(inFile) {
+  data <- Matrix::readMM(file = inFile$datapath)
+  
   return (NULL)
+}
+
+# inFile$datapath="data/scEx.csv"
+# load("data/scEx.RData")
+# scMat = as.matrix(assays(scEx)[[1]])
+# write.file.csv(scMat, row.names=TRUE, file="data/scEx.csv" )
+
+readCSV = function(inFile) {
+  data <- psych::read.file.csv(file = inFile$datapath)
+  if (DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/readCSV.RData')
+  exAll <- as(as.matrix(data), "dgTMatrix")
+  rownames(exAll) <- rownames(data)
+  colnames(exAll) <- colnames(data)
+  scExnew <- SingleCellExperiment(
+    assay = list(counts = exAll),
+    colData = list(sampleNames = rep(tools::file_path_sans_ext(inFile$name), ncol(data)),
+                   barcode = colnames(data)),
+    rowData = list(id = rownames(data),
+                   Description =  rownames(data),
+                   symbol =  rownames(data))
+  )
+  dataTables <- list()
+  dataTables$scEx <- scExnew
+  dataTables$featuredata <- rowData(scExnew)
+  
+  stats <- tibble(.rows = length(inFile$datapath))
+  stats$names <- inFile$name
+  stats$nFeatures <- 0
+  stats$nCells <- 0
+  stats[1, "nFeatures"] <- nrow(data)
+  stats[1, "nCells"] <- ncol(data)
+  inputFileStats$stats <- stats
+  
+  return (dataTables)
 }
 
 
@@ -224,17 +258,17 @@ inputData <- reactive({
   }
   
   inFile   <- input$file1
-  csvFille <- input$csvFile
-  annFIle  <- input$annoFile
+  annFile  <- input$annoFile
   
   if (is.null(inFile)) {
     if (DEBUG)
       cat(file = stderr(), "inputData: NULL\n")
     return(NULL)
   }
-  if (!file.exists(inFile)) {
+  cat(file = stderr(), paste("inFile.",inFile$datapath[1], "\n"))
+  if (!file.exists(inFile$datapath[1])) {
     if (DEBUG)
-      cat(file = stderr(), "inputData: ", inFile, " doesn't exist\n")
+      cat(file = stderr(), "inputData: ", inFile$datapath[1], " doesn't exist\n")
     return(NULL)
   }
   if (DEBUGSAVE) {
@@ -242,31 +276,24 @@ inputData <- reactive({
   }
   # load(file='~/SCHNAPPsDebug/inputData.RData')
   
-  isolate({inputFile$inFile = inFile})
 
-  # We prefer RData
-  # inFile can be set to a file that doesn't contain any reqiured value to be
-  # deactivated
-  if (file.exists(inFile)) {
-    retVal <- inputDataFunc(inFile)
-  }else{
-    if (file.exists(csvFille)) {
-      retVal <- readCSV(csvFille)
+  fpExtension = tools::file_ext(inFile$datapath[1])
+   if (fpExtension %in% c("RData", "Rds")) {
+      retVal <- inputDataFunc(inFile)
+    }else{
+      retVal <- readCSV(inFile)
     }
-  }
-  
-  if (is.null(retVa)) {
+
+  if (is.null(retVal)) {
     return(NULL)
   }
   
-  if (! exists(retVal$scEx)) {
+  if (is.null(retVal[["scEx"]])) {
     return(NULL)
   }
-  
-  if (file.exists(annFille)) {
-    retVal <- appendAnnotation(retVal, annFile)
-  }
-  
+  inputFile$inFile  = inFile$name
+  inputFile$annFile = annFile$name
+    
   exportTestValues(inputData = {
     list(assays(retVal$scEx)[["counts"]],
          rowData(retVal$scEx),
@@ -1867,7 +1894,7 @@ reacativeReport <- function() {
     # save the outputfile name for others to use to save
     # params$outputFile <- file$datapath[1])
     
-    
+  )
     
     
     
