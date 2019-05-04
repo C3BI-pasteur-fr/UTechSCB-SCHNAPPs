@@ -27,8 +27,6 @@ inputFile <- reactiveValues(inFile = "",
 # loads singleCellExperiment
 #   only counts, rowData, and colData are used. Everything else needs to be recomputed
 inputDataFunc <- function(inFile) {
-  "!DEBUG start shiny"
-  debugme::debug("plot render start", pkg = ".")
   if (DEBUG)
     cat(file = stderr(), "inputDataFunc started.\n")
   start.time <- base::Sys.time()
@@ -169,16 +167,13 @@ inputDataFunc <- function(inFile) {
     }
   }
   
-  if (!sum(c("symbol", "Gene.Biotype", "Description") %in% colnames(featuredata)) == 3) {
+  if (!sum(c("symbol",  "Description") %in% colnames(featuredata)) == 2) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
-        "featuredata - one of is missing: symbol, Gene.Biotype, Description)",
+        "featuredata - one of is missing: symbol,  Description)",
         duration = NULL,
         type = "error"
       )
-    }
-    if (!"Gene.Biotype" %in% colnames(featuredata)) {
-      featuredata$"Gene.Biotype" <- "not given"
     }
     if (!"Description" %in% colnames(featuredata)) {
       featuredata$"Description" <- "not given"
@@ -194,17 +189,99 @@ inputDataFunc <- function(inFile) {
   return(dataTables)
 }
 
-readCSV = function(filename) {
+readMM = function(inFile) {
+  data <- Matrix::readMM(file = inFile$datapath)
+  
   return (NULL)
 }
 
+# inFile$datapath="data/scEx.csv"
+# load("data/scEx.RData")
+# scMat = as.matrix(assays(scEx)[[1]])
+# write.file.csv(scMat, row.names=TRUE, file="data/scEx.csv" )
 
+readCSV = function(inFile) {
+  data <- psych::read.file.csv(file = inFile$datapath)
+  if (DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/readCSV.RData')
+  exAll <- as(as.matrix(data), "dgTMatrix")
+  rownames(exAll) <- rownames(data)
+  colnames(exAll) <- colnames(data)
+  scExnew <- SingleCellExperiment(
+    assay = list(counts = exAll),
+    colData = list(sampleNames = as.factor(rep(tools::file_path_sans_ext(inFile$name), ncol(data))),
+                   barcode = colnames(data)),
+    rowData = list(id = rownames(data),
+                   Description =  rownames(data),
+                   symbol =  rownames(data))
+  )
+  dataTables <- list()
+  dataTables$scEx <- scExnew
+  dataTables$featuredata <- rowData(scExnew)
+  
+  stats <- tibble(.rows = length(inFile$datapath))
+  stats$names <- inFile$name
+  stats$nFeatures <- 0
+  stats$nCells <- 0
+  stats[1, "nFeatures"] <- nrow(data)
+  stats[1, "nCells"] <- ncol(data)
+  inputFileStats$stats <- stats
+  
+  
+  return (dataTables)
+}
+
+
+# inFile$datapath="data/scEx.csv"
+# load("data/scEx.RData")
+# write.file.csv(colData(scEx), row.names=TRUE, file="data/scExCells.csv" )
+# write.file.csv(rowData(scEx), row.names=TRUE, file="data/scExGenes.csv" )
 #' appendAnnotation
 #' 
 #' append annotation to singleCellExperiment object
 #' uses colData
-appendAnnotation = function(retVal, annFile) {
-  return (retVal)
+appendAnnotation = function(scEx, annFile) {
+  rDat <- rowData(scEx)
+  cDat <- colData(scEx)
+  
+  for (fpIdx in 1:length(annFile$datapath)) {
+    data <- psych::read.file.csv(file = annFile$datapath[fpIdx])
+    rownames(data) = make.names(rownames(data))
+    # feature data
+    if (all(rownames(data) %in% rownames(rDat))) {
+      # if any factor is already set we need to avoid having different levles
+      if (any(colnames(rDat) %in% colnames(data))) {
+        commonCols = colnames(rDat) %in% colnames(data)
+        for (cCol in colnames(rDat)[commonCols]) {
+          if (class(rDat[,cCol]) == "factor") {
+            rDat[,cCol] = factor(data[,cCol])
+          }
+        }
+        
+      }
+      rDat[rownames(data), colnames(data)] = data
+    }
+    # colData
+    if (all(rownames(data) %in% rownames(cDat))) {
+      # if any factor is already set we need to avoid having different levles
+      if (any(colnames(cDat) %in% colnames(data))) {
+        commonCols = colnames(cDat) %in% colnames(data)
+        for (cCol in colnames(cDat)[commonCols]) {
+          if (class(cDat[,cCol]) == "factor") {
+            cDat[,cCol] = factor(data[,cCol])
+          }
+        }
+         
+      }
+      cDat[rownames(data), colnames(data)] = data
+    }
+  }
+  cDat$sampleNames = factor(cDat$sampleNames)
+  colData(scEx) <- cDat
+  rowData(scEx) <- rDat
+  return (scEx)
 }
 
 # inputData ----
@@ -224,17 +301,17 @@ inputData <- reactive({
   }
   
   inFile   <- input$file1
-  csvFille <- input$csvFile
-  annFIle  <- input$annoFile
+  annFile  <- input$annoFile
   
   if (is.null(inFile)) {
     if (DEBUG)
       cat(file = stderr(), "inputData: NULL\n")
     return(NULL)
   }
-  if (!file.exists(inFile)) {
+  cat(file = stderr(), paste("inFile.",inFile$datapath[1], "\n"))
+  if (!file.exists(inFile$datapath[1])) {
     if (DEBUG)
-      cat(file = stderr(), "inputData: ", inFile, " doesn't exist\n")
+      cat(file = stderr(), "inputData: ", inFile$datapath[1], " doesn't exist\n")
     return(NULL)
   }
   if (DEBUGSAVE) {
@@ -242,30 +319,36 @@ inputData <- reactive({
   }
   # load(file='~/SCHNAPPsDebug/inputData.RData')
   
-  isolate({inputFile$inFile = inFile})
-
-  # We prefer RData
-  # inFile can be set to a file that doesn't contain any reqiured value to be
-  # deactivated
-  if (file.exists(inFile)) {
+  # inFile$datapath = "data/scEx.csv"
+  # annFile$datapath = "data/scExCells.csv"
+  fpExtension = tools::file_ext(inFile$datapath[1])
+  if (fpExtension %in% c("RData", "Rds")) {
     retVal <- inputDataFunc(inFile)
   }else{
-    if (file.exists(csvFille)) {
-      retVal <- readCSV(csvFille)
-    }
+    retVal <- readCSV(inFile)
   }
   
-  if (is.null(retVa)) {
+  if (is.null(retVal)) {
     return(NULL)
   }
   
-  if (! exists(retVal$scEx)) {
+  if (is.null(retVal[["scEx"]])) {
     return(NULL)
   }
   
-  if (file.exists(annFille)) {
-    retVal <- appendAnnotation(retVal, annFile)
+  if (!is.null(annFile)) {
+    if (file.exists(annFile$datapath[1])){
+      retVal$scEx <- appendAnnotation(scEx = retVal$scEx, annFile = annFile)
+     }
   }
+  
+  sampNames <- levels(colData(retVal$scEx)$sampleNames)
+  isolate({
+    sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+    names(sampleCols$colPal) <- sampNames
+  })
+  inputFile$inFile  = paste(inFile$name, collapse = ", ")
+  inputFile$annFile = paste(annFile$name, collapse = ", ")
   
   exportTestValues(inputData = {
     list(assays(retVal$scEx)[["counts"]],
@@ -1867,89 +1950,89 @@ reacativeReport <- function() {
     # save the outputfile name for others to use to save
     # params$outputFile <- file$datapath[1])
     
-    
-    
-    
-    
-    # for (idx in 1:length(names(input))) {
-    #   params[[inputNames[idx]]] <- input[[inputNames[idx]]]
-    # }
-    params[["reportTempDir"]] <- reportTempDir
-    
-    file.copy(paste0(packagePath,  "/report.Rmd"), tempReport, overwrite = TRUE)
-    
-    # read the template and replace parameters placeholder with list
-    # of paramters
-    x <- readLines(tempReport)
-    # x <- readLines("report.Rmd")
-    paramString <-
-      paste0("  ", names(params), ": NA", collapse = "\n")
-    y <- gsub("#__PARAMPLACEHOLDER__", paramString, x)
-    y <- gsub("__CHILDREPORTS__", pluginReportsString, y)
-    y <- gsub("__LOAD_REACTIVES__", LoadReactiveFiles, y)
-    # cat(y, file="tempReport.Rmd", sep="\n")
-    cat(y, file = tempReport, sep = "\n")
-    
-    if (DEBUG)
-      cat(file = stderr(), "output$report:scEx:\n")
-    if (DEBUG)
-      cat(file = stderr(), paste("\n", tempReport, "\n"))
-    # Knit the document, passing in the `params` list, and eval it in a
-    # child of the global environment (this isolates the code in the document
-    # from the code in this app)
-    if (DEBUG)
-      file.copy(tempReport, "~/SCHNAPPsDebug/tempReport.Rmd")
-    myparams <-
-      params # needed for saving as params is already taken by knitr
-    # if (DEBUGSAVE)
-    # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
-    # load(file = '~/SCHNAPPsDebug/tempReport.RData')
-    cat(file = stderr(), paste("workdir: ", getwd()))
-    require(callr)
-    # if (DEBUGSAVE)
-    # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)
-    
-    # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
-    # file.copy("contributions/gQC_generalQC//report.Rmd",
-    #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
-    r(
-      function(input, output_file, params, envir)
-        rmarkdown::render(
-          input = input,
-          output_file = output_file,
-          params = params,
-          envir = envir
-        ),
-      args = list(
-        input = tempReport,
-        output_file = "report.html",
+  )
+  
+  
+  
+  # for (idx in 1:length(names(input))) {
+  #   params[[inputNames[idx]]] <- input[[inputNames[idx]]]
+  # }
+  params[["reportTempDir"]] <- reportTempDir
+  
+  file.copy(paste0(packagePath,  "/report.Rmd"), tempReport, overwrite = TRUE)
+  
+  # read the template and replace parameters placeholder with list
+  # of paramters
+  x <- readLines(tempReport)
+  # x <- readLines("report.Rmd")
+  paramString <-
+    paste0("  ", names(params), ": NA", collapse = "\n")
+  y <- gsub("#__PARAMPLACEHOLDER__", paramString, x)
+  y <- gsub("__CHILDREPORTS__", pluginReportsString, y)
+  y <- gsub("__LOAD_REACTIVES__", LoadReactiveFiles, y)
+  # cat(y, file="tempReport.Rmd", sep="\n")
+  cat(y, file = tempReport, sep = "\n")
+  
+  if (DEBUG)
+    cat(file = stderr(), "output$report:scEx:\n")
+  if (DEBUG)
+    cat(file = stderr(), paste("\n", tempReport, "\n"))
+  # Knit the document, passing in the `params` list, and eval it in a
+  # child of the global environment (this isolates the code in the document
+  # from the code in this app)
+  if (DEBUG)
+    file.copy(tempReport, "~/SCHNAPPsDebug/tempReport.Rmd")
+  myparams <-
+    params # needed for saving as params is already taken by knitr
+  # if (DEBUGSAVE)
+  # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
+  # load(file = '~/SCHNAPPsDebug/tempReport.RData')
+  cat(file = stderr(), paste("workdir: ", getwd()))
+  require(callr)
+  # if (DEBUGSAVE)
+  # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)
+  
+  # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
+  # file.copy("contributions/gQC_generalQC//report.Rmd",
+  #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
+  r(
+    function(input, output_file, params, envir)
+      rmarkdown::render(
+        input = input,
+        output_file = output_file,
         params = params,
-        envir = new.env()
-      )
+        envir = envir
+      ),
+    args = list(
+      input = tempReport,
+      output_file = "report.html",
+      params = params,
+      envir = new.env()
     )
-    # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
-    #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
-    # rmarkdown::render(input = tempReport, output_file = "report.html",
-    #                   params = params, envir = new.env())
-    
-    tDir <- paste0(reportTempDir, "/")
-    base::file.copy(tmpPrjFile, paste0(reportTempDir, "/sessionData.RData"))
-    write.csv(as.matrix(assays(scEx_log)[[1]]),
-              file = paste0(reportTempDir, "/normalizedCounts.csv"))
-    base::save(
-      file = paste0(reportTempDir, "/inputUsed.Rds"),
-      list = c("scEx", "projections")
-    )
-    zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
-    zip(outZipFile, zippedReportFiles, flags = "-9Xj")
-    if (DEBUG) {
-      end.time <- Sys.time()
-      cat(file = stderr(),
-          "===Report:done",
-          difftime(end.time, start.time, units = "min"),
-          "\n")
-    }
-    return(outZipFile)
+  )
+  # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
+  #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
+  # rmarkdown::render(input = tempReport, output_file = "report.html",
+  #                   params = params, envir = new.env())
+  
+  tDir <- paste0(reportTempDir, "/")
+  base::file.copy(tmpPrjFile, paste0(reportTempDir, "/sessionData.RData"))
+  write.csv(as.matrix(assays(scEx_log)[[1]]),
+            file = paste0(reportTempDir, "/normalizedCounts.csv"))
+  base::save(
+    file = paste0(reportTempDir, "/inputUsed.Rds"),
+    list = c("scEx", "projections")
+  )
+  zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
+  zip(outZipFile, zippedReportFiles, flags = "-9Xj")
+  if (DEBUG) {
+    end.time <- Sys.time()
+    cat(file = stderr(),
+        "===Report:done",
+        difftime(end.time, start.time, units = "min"),
+        "\n")
+  }
+  return(outZipFile)
 }
 
 consolidateScEx <-
