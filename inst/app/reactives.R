@@ -211,11 +211,7 @@ readCSV = function(inFile) {
   colnames(exAll) <- colnames(data)
   scExnew <- SingleCellExperiment(
     assay = list(counts = exAll),
-<<<<<<< HEAD
     colData = list(sampleNames = as.factor(rep(tools::file_path_sans_ext(inFile$name), ncol(data))),
-=======
-    colData = list(sampleNames = rep(tools::file_path_sans_ext(inFile$name), ncol(data)),
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
                    barcode = colnames(data)),
     rowData = list(id = rownames(data),
                    Description =  rownames(data),
@@ -233,10 +229,6 @@ readCSV = function(inFile) {
   stats[1, "nCells"] <- ncol(data)
   inputFileStats$stats <- stats
   
-<<<<<<< HEAD
-  
-=======
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
   return (dataTables)
 }
 
@@ -326,7 +318,6 @@ inputData <- reactive({
   }
   # load(file='~/SCHNAPPsDebug/inputData.RData')
   
-<<<<<<< HEAD
   # inFile$datapath = "data/scEx.csv"
   # annFile$datapath = "data/scExCells.csv"
   fpExtension = tools::file_ext(inFile$datapath[1])
@@ -336,16 +327,6 @@ inputData <- reactive({
     retVal <- readCSV(inFile)
   }
   
-=======
-
-  fpExtension = tools::file_ext(inFile$datapath[1])
-   if (fpExtension %in% c("RData", "Rds")) {
-      retVal <- inputDataFunc(inFile)
-    }else{
-      retVal <- readCSV(inFile)
-    }
-
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
   if (is.null(retVal)) {
     return(NULL)
   }
@@ -353,8 +334,7 @@ inputData <- reactive({
   if (is.null(retVal[["scEx"]])) {
     return(NULL)
   }
-<<<<<<< HEAD
-  
+
   if (!is.null(annFile)) {
     if (file.exists(annFile$datapath[1])){
       retVal$scEx <- appendAnnotation(scEx = retVal$scEx, annFile = annFile)
@@ -369,11 +349,6 @@ inputData <- reactive({
   inputFile$inFile  = paste(inFile$name, collapse = ", ")
   inputFile$annFile = paste(annFile$name, collapse = ", ")
   
-=======
-  inputFile$inFile  = inFile$name
-  inputFile$annFile = annFile$name
-    
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
   exportTestValues(inputData = {
     list(assays(retVal$scEx)[["counts"]],
          rowData(retVal$scEx),

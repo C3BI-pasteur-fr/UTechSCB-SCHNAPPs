@@ -30,17 +30,10 @@ inputTab <- shinydashboard::tabItem(
     5,
     offset = 4,
     fileInput(
-<<<<<<< HEAD
       "annoFile",
       "(Not required): Choose .CSV file with annotation to upload",
       accept = c(
         ".txt",".csv", ".mtx"
-=======
-      "file1",
-      "Choose .RData/.Rds file with singleCellExperiment object OR .txt/.csv file with count data to upload",
-      accept = c(
-        ".Rds",".RData", ".txt", ".csv"
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
       ),
       multiple = TRUE
     )
@@ -51,17 +44,10 @@ inputTab <- shinydashboard::tabItem(
     5,
     offset = 4,
     fileInput(
-<<<<<<< HEAD
       "file1",
       "Choose .RData/.Rds file with singleCellExperiment object OR .txt/.csv file with count data to upload",
       accept = c(
         ".Rds",".RData", ".txt", ".csv"
-=======
-      "annoFile",
-      "Choose .CSV file with annotation to upload",
-      accept = c(
-        ".txt",".csv", ".mtx"
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
       ),
       multiple = TRUE
     )
