@@ -1950,8 +1950,7 @@ reacativeReport <- function() {
     # params$outputFile <- file$datapath[1])
     
   )
-<<<<<<< HEAD
-  
+
   
   
   # for (idx in 1:length(names(input))) {
@@ -2000,63 +1999,6 @@ reacativeReport <- function() {
       rmarkdown::render(
         input = input,
         output_file = output_file,
-=======
-    
-    
-    
-    # for (idx in 1:length(names(input))) {
-    #   params[[inputNames[idx]]] <- input[[inputNames[idx]]]
-    # }
-    params[["reportTempDir"]] <- reportTempDir
-    
-    file.copy(paste0(packagePath,  "/report.Rmd"), tempReport, overwrite = TRUE)
-    
-    # read the template and replace parameters placeholder with list
-    # of paramters
-    x <- readLines(tempReport)
-    # x <- readLines("report.Rmd")
-    paramString <-
-      paste0("  ", names(params), ": NA", collapse = "\n")
-    y <- gsub("#__PARAMPLACEHOLDER__", paramString, x)
-    y <- gsub("__CHILDREPORTS__", pluginReportsString, y)
-    y <- gsub("__LOAD_REACTIVES__", LoadReactiveFiles, y)
-    # cat(y, file="tempReport.Rmd", sep="\n")
-    cat(y, file = tempReport, sep = "\n")
-    
-    if (DEBUG)
-      cat(file = stderr(), "output$report:scEx:\n")
-    if (DEBUG)
-      cat(file = stderr(), paste("\n", tempReport, "\n"))
-    # Knit the document, passing in the `params` list, and eval it in a
-    # child of the global environment (this isolates the code in the document
-    # from the code in this app)
-    if (DEBUG)
-      file.copy(tempReport, "~/SCHNAPPsDebug/tempReport.Rmd")
-    myparams <-
-      params # needed for saving as params is already taken by knitr
-    # if (DEBUGSAVE)
-    # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
-    # load(file = '~/SCHNAPPsDebug/tempReport.RData')
-    cat(file = stderr(), paste("workdir: ", getwd()))
-    require(callr)
-    # if (DEBUGSAVE)
-    # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)
-    
-    # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
-    # file.copy("contributions/gQC_generalQC//report.Rmd",
-    #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
-    r(
-      function(input, output_file, params, envir)
-        rmarkdown::render(
-          input = input,
-          output_file = output_file,
-          params = params,
-          envir = envir
-        ),
-      args = list(
-        input = tempReport,
-        output_file = "report.html",
->>>>>>> 7ed3e3ebfe7fe8135db56b491bd13afb2dc93770
         params = params,
         envir = envir
       ),
