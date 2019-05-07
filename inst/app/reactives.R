@@ -1,5 +1,7 @@
 require(tibble)
 require(scran)
+require(irlba)
+
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(
   stats = NULL
