@@ -1,4 +1,4 @@
-
+require(tibble)
 require(scran)
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(
