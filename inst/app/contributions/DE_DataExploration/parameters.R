@@ -1,4 +1,4 @@
-
+require(Matrix)
 # normalization parameters
 
 # choice for the radio buttion
