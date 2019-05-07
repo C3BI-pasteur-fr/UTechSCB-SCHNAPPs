@@ -1,6 +1,7 @@
 source(paste0(packagePath,  "/reactives.R"))
 library(psych)
 library(magrittr)
+library(dplyr)
 
 #' clusterServer
 #'
@@ -777,7 +778,7 @@ tableSelectionServer <- function(input, output, session,
 
     maxCol <- min(20, ncol(dataTables))
     if (dim(dataTables)[1] > 1) {
-      numericCols <- colnames(dataTables %>% select_if(is.numeric))
+      numericCols <- colnames(dataTables %>% dplyr::select_if(is.numeric))
       nonNumericCols  <- which(!colnames(dataTables) %in% numericCols) # to keep non numeric columns...
       numericCols  <- which(colnames(dataTables) %in% numericCols)
       if (reorderCells &&  length(selectedRows) > 0) {
