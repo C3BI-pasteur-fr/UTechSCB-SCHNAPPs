@@ -73,6 +73,7 @@ Imports:
     DelayedArray (>= 0.7.44),
     Rtsne,
     uwot,
+    tidyverse,
     pryr
 Exports:
     clusterUI
