@@ -2125,8 +2125,6 @@ reacativeReport <- function() {
     # params$outputFile <- file$datapath[1])
   )
 
-
-
   # for (idx in 1:length(names(input))) {
   #   params[[inputNames[idx]]] <- input[[inputNames[idx]]]
   # }
