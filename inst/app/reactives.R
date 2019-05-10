@@ -209,9 +209,13 @@ readMM <- function(inFile) {
 
 readCSV <- function(inFile) {
   # check.names = T will change the rownames. Since this is not enforced for the singleExperiment we shouldn't do it here either.
-  data <- read.table(file = inFile$datapath, check.names = FALSE)
+  data <- read.table(file = inFile$datapath, check.names = FALSE, header = TRUE, sep = ",")
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
+    rownames(data) = data[,1]
+    data = data[,-1]
   }
   # load(file='~/SCHNAPPsDebug/readCSV.RData')
   exAll <- as(as.matrix(data), "dgTMatrix")
@@ -244,13 +248,14 @@ readCSV <- function(inFile) {
   return(dataTables)
 }
 
-
+# 
 # inFile$datapath="data/scEx.csv"
 # load("data/scEx.RData")
 # write.file.csv(colData(scEx), row.names=TRUE, file="data/scExCells.csv" )
 # write.file.csv(rowData(scEx), row.names=TRUE, file="data/scExGenes.csv" )
+# annFile$datapath="data/scExGenes.csv"
 #' appendAnnotation
-#'
+#' 
 #' append annotation to singleCellExperiment object
 #' uses colData
 appendAnnotation <- function(scEx, annFile) {
@@ -258,8 +263,15 @@ appendAnnotation <- function(scEx, annFile) {
   cDat <- colData(scEx)
 
   for (fpIdx in 1:length(annFile$datapath)) {
-    data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE)
-    rownames(data) <- make.names(rownames(data))
+    data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",")
+    if (DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls(), ls(envir = globalenv())))
+    }
+    # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
+    if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
+      rownames(data) = data[,1]
+      data = data[,-1]
+    }
     # feature data
     if (all(rownames(data) %in% rownames(rDat))) {
       # if any factor is already set we need to avoid having different levles
@@ -273,6 +285,34 @@ appendAnnotation <- function(scEx, annFile) {
       }
       rDat[rownames(data), colnames(data)] <- data
     }
+    # symbol used as row name
+    if (all(rownames(data) %in% rDat$symbol)) {
+      rowColfound = FALSE
+      for (cIdx in colnames(data)) {
+        if (all(data[,cIdx] %in% rownames(rData))) {
+          rowColfound = cIdx
+          break()
+        }
+      }
+      if (!rowColfound) {
+        cat(file = stderr(), paste("couldn't find column with rownames when symbols are used as rownames for ", annFile$name, "\n"))
+        break()
+      } else {
+        rownames(data) = data[,rowColfound]
+        data = data[, -which(colnames(data) == rowColfound)]
+      }
+      # if any factor is already set we need to avoid having different levles
+      if (any(colnames(rDat) %in% colnames(data))) {
+        commonCols <- colnames(rDat) %in% colnames(data)
+        for (cCol in colnames(rDat)[commonCols]) {
+          if (class(rDat[, cCol]) == "factor") {
+            rDat[, cCol] <- factor(data[, cCol])
+          }
+        }
+      }
+      rDat[rownames(data), colnames(data)] <- data
+    }
+    
     # colData
     if (all(rownames(data) %in% rownames(cDat))) {
       # if any factor is already set we need to avoid having different levles
