@@ -62,11 +62,11 @@ DE_logNormalizationfunc <- function(scEx, scalingFactor = 10000) {
     showNotification("DE_logNormalizationfunc", id = "DE_logNormalizationfunc", duration = NULL)
   }
   
-  use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "dgTMatrix"), 
-                                    "i")))
-  
-  bc_sums <- Matrix::colSums(assays(scEx)[[1]])
-  median_sum <- median(bc_sums)
+  # use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "dgTMatrix"), 
+  #                                   "i")))
+  # 
+  # bc_sums <- Matrix::colSums(assays(scEx)[[1]])
+  # median_sum <- median(bc_sums)
   A <- as(assays(scEx)[[1]], "dgCMatrix")
   assays(scEx)[[1]] = as(assays(scEx)[[1]], "dgTMatrix")
   A@x <- A@x / Matrix::colSums(A)[assays(scEx)[[1]]@j + 1L]
