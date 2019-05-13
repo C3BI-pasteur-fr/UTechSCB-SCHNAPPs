@@ -23,6 +23,7 @@ Imports:
     Matrix,
     debugme,
     methods,
+    reactlog,
     BiocGenerics, 
     S4Vectors,
     utils,

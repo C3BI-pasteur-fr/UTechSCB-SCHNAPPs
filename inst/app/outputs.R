@@ -112,7 +112,7 @@ output$summaryStatsSideBar <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
-  line0 <- paste(input$file1$name)
+  line0 <- paste(inputFile$inFile, " _ ", inputFile$annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
   line3 <- paste("Median UMIs per cell: ", medianUMI(), sep = "\t")
@@ -162,134 +162,165 @@ output$geneListSelection <- shinyTree::renderTree({
 # ONOFF TAB RENDER TABLE ALL CELLS
 # TODO module for DT this is part
 # of the basic functionality from this tools and thus, can stay in this file.
-output$selectedGenesTable <- DT::renderDataTable({
-  if (DEBUG) {
-    cat(file = stderr(), "output$selectedGenesTable\n")
-  }
-  dataTables <- inputData()
-  useGenes <- useGenes()
-  useCells <- useCells()
-  if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
-    return(NULL)
-  }
-  if (DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-    )
-  }
-  # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
-
-  scEx <- assays(dataTables$scEx)[[1]]
-  fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
-  dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
-  dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
-  exportTestValues(selectedGenesTable = {
-    as.data.frame(dt)
-  })
-  DT::datatable(as.data.frame(dt))
-})
+# output$selectedGenesTable <- DT::renderDataTable({
+#   if (DEBUG) {
+#     cat(file = stderr(), "output$selectedGenesTable\n")
+#   }
+#   dataTables <- inputData()
+#   useGenes <- useGenes()
+#   useCells <- useCells()
+#   minGenes <- input$minGenesGS
+#   
+#   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
+#     return(NULL)
+#   }
+#   if (DEBUGSAVE) {
+#     save(
+#       file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
+#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+#     )
+#   }
+#   # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
+# 
+#   scEx <- assays(dataTables$scEx)[[1]]
+#   fd <- rowData(dataTables$scEx)
+#   dt = fd[useGenes,]
+#   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
+#   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
+#   # get the order of the frist two columns correct
+#   firstCol = which(colnames(dt) == "symbol")
+#   firstCol = c(firstCol, which(colnames(dt) == "Description"))
+#   # those we created so we know they are there
+#   firstCol = firstCol = c(firstCol,which (colnames(dt) %in% c("rowSums", "rowSamples")))
+#   colOrder = c(firstCol, (1:ncol(dt))[-firstCol])
+#   dt <- dt[, colOrder]
+#   dt <- dt[dt$rowSums >= minGenes, ]
+#   exportTestValues(selectedGenesTable = {
+#     as.data.frame(dt)
+#   })
+#   DT::datatable(as.data.frame(dt),
+#                 options = list(scrollX = TRUE))
+# })
 
 # removedGenesTable --------------------------
 # TODO module for DT TODO move to were it belongs
-output$removedGenesTable <- DT::renderDataTable({
-  if (DEBUG) {
-    cat(file = stderr(), "output$removedGenesTable\n")
-  }
-  dataTables <- inputData()
-  useGenes <- useGenes()
-  useCells <- useCells()
-  if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
-    return(NULL)
-  }
-  useGenes <- !useGenes
-
-  if (DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/removedGenesTable.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-    )
-  }
-  # load("~/SCHNAPPsDebug/removedGenesTable.RData")
-  scEx <- assays(dataTables$scEx)[[1]]
-  fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
-  dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
-  dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
-  exportTestValues(removedGenesTable = {
-    as.data.frame(dt)
-  })
-  DT::datatable(as.data.frame(dt))
-})
+# output$removedGenesTable <- DT::renderDataTable({
+#   if (DEBUG) {
+#     cat(file = stderr(), "output$removedGenesTable\n")
+#   }
+#   dataTables <- inputData()
+#   useGenes <- useGenes()
+#   useCells <- useCells()
+#   minGenes <- input$minGenesGS
+# 
+#     if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
+#     return(NULL)
+#   }
+#   useGenes <- !useGenes
+# 
+#   if (DEBUGSAVE) {
+#     save(
+#       file = "~/SCHNAPPsDebug/removedGenesTable.RData",
+#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+#     )
+#   }
+#   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
+#   scEx <- assays(dataTables$scEx)[[1]]
+#   fd <- rowData(dataTables$scEx)
+#   dt <- fd[useGenes, c("symbol", "Description")]
+#   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
+#   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
+#   
+#   dt <- dt[dt$rowSums < minGenes, ]
+#   exportTestValues(removedGenesTable = {
+#     as.data.frame(dt)
+#   })
+#   DT::datatable(as.data.frame(dt))
+# })
 
 # gsSelectedGenes ---------------------------
 # TODO module of DT with selected names above Print names of selected genes for gene
 # selection above table
-output$gsSelectedGenes <- renderText({
-  if (DEBUG) {
-    cat(file = stderr(), "gsSelectedGenes\n")
-  }
-  dataTables <- inputData()
-  useGenes <- useGenes()
-  useCells <- useCells()
-  selectedGenesTable_rows_selected <-
-    input$selectedGenesTable_rows_selected
-  if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
-    return(NULL)
-  }
-  if (DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/gsSelectedGenes.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-    )
-  }
-  # load("~/SCHNAPPsDebug/gsSelectedGenes.RData")
 
-  # scEx <- as.matrix(exprs(dataTables$scEx))
-  fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
-  retVal <- paste0(dt$symbol[selectedGenesTable_rows_selected], ",")
-  exportTestValues(gsSelectedGenes = {
-    retVal
-  })
-  return(retVal)
-})
+# gsSelectedGenesMod ----
+callModule(
+  tableSelectionServer,
+  "gsSelectedGenesMod",
+  gsSelectedGenesTable
+)
+
+callModule(
+  tableSelectionServer,
+  "gsRMGenesMod",
+  gsRMGenesTable
+)
+
+
+
+# output$gsSelectedGenes <- renderText({
+#   if (DEBUG) {
+#     cat(file = stderr(), "gsSelectedGenes\n")
+#   }
+#   dataTables <- inputData()
+#   useGenes <- useGenes()
+#   useCells <- useCells()
+#   selectedGenesTable_rows_selected <-
+#     input$selectedGenesTable_rows_selected
+#   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
+#     return(NULL)
+#   }
+#   if (DEBUGSAVE) {
+#     save(
+#       file = "~/SCHNAPPsDebug/gsSelectedGenes.RData",
+#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+#     )
+#   }
+#   # load("~/SCHNAPPsDebug/gsSelectedGenes.RData")
+# 
+#   # scEx <- as.matrix(exprs(dataTables$scEx))
+#   fd <- rowData(dataTables$scEx)
+#   dt <- fd[useGenes, c("symbol", "Description")]
+#   retVal <- paste0(dt$symbol[selectedGenesTable_rows_selected], ",")
+#   exportTestValues(gsSelectedGenes = {
+#     retVal
+#   })
+#   return(retVal)
+# })
 
 # gsrmGenes -----------------
 # Print names of removed genes for gene selection
-output$gsrmGenes <- renderText({
-  if (DEBUG) {
-    cat(file = stderr(), "gsrmGenes\n")
-  }
-  dataTables <- inputData()
-  useGenes <- useGenes()
-  useCells <- useCells()
-  removedGenesTable_rows_selected <-
-    input$removedGenesTable_rows_selected
-  if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
-    return(NULL)
-  }
-  if (DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/gsrmGenes.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-    )
-  }
-  # load("~/SCHNAPPsDebug/gsrmGenes.RData")
-  useGenes <- !useGenes
-  # scEx <- as.matrix(exprs(dataTables$scEx))
-  fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Gene.Biotype", "Description")]
-  if (DEBUG) {
-    cat(file = stderr(), "gsrmGenes: done\n")
-  }
-  retVal <- paste0(dt$symbol[removedGenesTable_rows_selected], ",")
-  exportTestValues(gsrmGenes = {
-    retVal
-  })
-  return(retVal)
-})
+# output$gsrmGenes <- renderText({
+#   if (DEBUG) {
+#     cat(file = stderr(), "gsrmGenes\n")
+#   }
+#   dataTables <- inputData()
+#   useGenes <- useGenes()
+#   useCells <- useCells()
+#   removedGenesTable_rows_selected <-
+#     input$removedGenesTable_rows_selected
+#   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
+#     return(NULL)
+#   }
+#   if (DEBUGSAVE) {
+#     save(
+#       file = "~/SCHNAPPsDebug/gsrmGenes.RData",
+#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+#     )
+#   }
+#   # load("~/SCHNAPPsDebug/gsrmGenes.RData")
+#   useGenes <- !useGenes
+#   # scEx <- as.matrix(exprs(dataTables$scEx))
+#   fd <- rowData(dataTables$scEx)
+#   dt <- fd[useGenes, c("symbol", "Description")]
+#   if (DEBUG) {
+#     cat(file = stderr(), "gsrmGenes: done\n")
+#   }
+#   retVal <- paste0(dt$symbol[removedGenesTable_rows_selected], ",")
+#   exportTestValues(gsrmGenes = {
+#     retVal
+#   })
+#   return(retVal)
+# })
 
 # DEBUGSAVEstring ----
 output$DEBUGSAVEstring <- renderText({
