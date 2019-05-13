@@ -795,7 +795,8 @@ tableSelectionServer <- function(input, output, session,
                            selection = list(mode = 'multiple', selected = modSelectedRows),
                            options = list(
                              orderClasses = TRUE,
-                             autoWidth = TRUE
+                             autoWidth = TRUE,
+                             scrollX = TRUE
                            )
       ))
     } else {

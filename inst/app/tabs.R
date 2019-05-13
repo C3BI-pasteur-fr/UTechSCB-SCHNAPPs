@@ -90,7 +90,7 @@ geneSelectionTab <- shinydashboard::tabItem(
     ),
     column(
       2,
-      h4("Minoverall expression"),
+      h4("Min expression over all cells"),
       numericInput("minGenesGS", "Min # of UMIs over all cells", 2, min = 2, max = 1000000)
     )
   ),
@@ -107,13 +107,14 @@ geneSelectionTab <- shinydashboard::tabItem(
     h4("Selected genes"),
     column(12,
            offset = 0,
-           textOutput("gsSelectedGenes", inline = FALSE)
-    ),
-    br(),
-    column(10,
-           offset = 1,
-           DT::dataTableOutput("selectedGenesTable")
+           tableSelectionUi("gsSelectedGenesMod")
+           # textOutput("gsSelectedGenes", inline = FALSE)
     )
+    # ,br(),
+    # column(11,
+    #        offset = 1,
+    #        DT::dataTableOutput("selectedGenesTable", width = "100%")
+    # )
   ),
   br(),
   fluidRow(
@@ -123,9 +124,10 @@ geneSelectionTab <- shinydashboard::tabItem(
     textOutput("gsrmGenes", inline = FALSE)
   ), br(),
   fluidRow(
-    column(10,
+    column(11,
            offset = 1,
-           DT::dataTableOutput("removedGenesTable")
+           tableSelectionUi("gsRMGenesMod")
+           # DT::dataTableOutput("removedGenesTable")
     )
   )
 )
@@ -218,28 +220,27 @@ cellSelectionTab <- shinydashboard::tabItem(
     )
   ), br(),
   fluidRow(
-    column(6,
+    column(11,
            offset = 1,
            textInput("cellSelectionComment", "Comment for selection of cells")
     )
   ),
   fluidRow(
-    column(6,
+    column(5,
            offset = 1,
            shinyBS::tipify(textInput("cellPatternRM", "cells to be filtered out by pattern"),
                   title = "regular expression for cells to be removed (e.g. -1 will remove all cells from sample 1"
            )
+    ),
+    column(5,
+             offset = 0,
+             shinyBS::tipify(textInput("cellKeep", "cells to keep"),
+                             title = "comma separated list of cells (with min expression) that should be kept"
+             )
     )
-  ),
+  ), br(),
   fluidRow(
-    column(6,
-           offset = 1,
-           shinyBS::tipify(textInput("cellKeep", "cells to keep"),
-                  title = "comma separated list of cells (with min expression) that should be kept"
-           )
-    )
-  ), fluidRow(
-    column(6,
+    column(10,
            offset = 1,
            shinyBS::tipify(textInput("cellKeepOnly", "cells to keep; remove others"),
                   title = "comma separated list of cells (with min expression) that should be kept and anything else removed"
