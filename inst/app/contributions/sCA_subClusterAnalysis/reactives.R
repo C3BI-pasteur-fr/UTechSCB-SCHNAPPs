@@ -36,7 +36,7 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
 #' define different methods for calculating diff. expressed genes
 #' first entry is displayed in Radio box, second is function to be called.
 myDiffExpFunctions = list(
-  c("dge as per CellView", "sCA_dge_CellViewfunc"),
+  c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
   c("t-test", "sCA_dge_ttest")
 )
 
