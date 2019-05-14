@@ -1974,7 +1974,7 @@ reacativeReport <- function() {
   rectVals <- c()
   isolate({
     for (var in c(names(globalenv()), names(parent.env(environment())))) {
-      cat(file = stderr(), paste("var: ", var, "---", class(get(var)), "\n"))
+      cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
       if (var == "reacativeReport") {
         next()
       }
@@ -1985,9 +1985,9 @@ reacativeReport <- function() {
       } else if (class(get(var))[1] == "reactiveExpr") {
         cat(
           file = stderr(),
-          paste("is reactiveExpr: ", var, "--", class(get(var)), "\n")
+          paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
         )
-        # if ( var == "coE_selctedCluster-cluster")
+        # if ( var == "coE_selctedCluster")
         #   browser()
         rectVals <- c(rectVals, var)
         assign(var, eval(parse(text = paste0(
@@ -1997,21 +1997,21 @@ reacativeReport <- function() {
         # this has to be done manually (for the moment)
         # and is only required for clusterServer
         if (class(report.env[[var]])[1] == "reactivevalues") {
-          if (all(c("cluster", "selectedCells") %in% names(report.env[[var]]))) {
-            cat(
-              file = stderr(),
-              paste(
-                "is reactivevalues2: ",
-                paste0(var, "-cluster"),
-                "\n"
-              )
-            )
+          if (all(c("selectedCells") %in% names(report.env[[var]]))) {
+            # cat(
+            #   file = stderr(),
+            #   paste(
+            #     "is reactivevalues2: ",
+            #     paste0(var, "-cluster"),
+            #     "\n"
+            #   )
+            # )
             # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
             #   browser()
-            assign(paste0(var, "-cluster"),
-                   eval(report.env[[var]][["cluster"]]),
-                   envir = report.env
-            )
+            # assign(paste0(var, "-cluster"),
+                   # eval(report.env[[var]][["cluster"]]),
+                   # envir = report.env
+            # )
             tempVar <- report.env[[var]][["selectedCells"]]
             assign(paste0(var, "-selectedCells"),
                    eval(parse(text = "tempVar()")),
