@@ -110,7 +110,8 @@ coE_heatmapSelectedReactive <- reactive({
   projections <- projections()
   genesin <- input$coE_heatmapselected_geneids
   sc <- coE_selctedCluster()
-  scCL <- sc$cluster # "1" "2" "3" "4"
+  # scCL <- sc$cluster # "1" "2" "3" "4"
+  scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells() # [1] "AAACCTGAGACACTAA-1" "AAACCTGAGACGACGT-1" "AAACCTGAGTCAAGCG-1" "AAACCTGCAAGAAGAG-1" "AAACCTGCAGACAGGT-1" "AAACCTGCATACAGCT-1" "AAACCTGGTGTGACCC-1"
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
@@ -172,10 +173,12 @@ coE_topExpGenesTable <- reactive({
   }
   
   scEx_log <- scEx_log()
+  projections <- projections()
   coEtgPerc <- input$coEtgPerc
   coEtgminExpr <- input$coEtgMinExpr
   sc <- coE_selctedCluster()
-  scCL <- sc$cluster
+  # scCL <- sc$cluster
+  scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
   
   if (is.null(scEx_log) || is.null(scCells)) {

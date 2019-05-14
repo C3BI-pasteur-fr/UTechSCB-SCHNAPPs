@@ -48,9 +48,7 @@ geneName2Index <- function(g_id, featureData) {
   }
   
   geneid <- rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ])
-  if (DEBUG) {
-    cat(file = stderr(), paste("done: geneName2Index\n"))
-  }
+
   return(geneid)
 }
 
@@ -245,7 +243,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       add_trace(data = subsetData[selectedCells, ],
         x = x1[, 1], y = y1[, 1],
         marker = list(
-          color = rep("green", nrow(x1)),
+          color = rep("red", nrow(x1)),
           size = 5
         ),
         text = ~ paste(
