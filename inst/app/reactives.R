@@ -54,7 +54,9 @@ inputDataFunc <- function(inFile) {
   # fp ="scEx.Rds"
   # fp ="../SCHNAPPsData/patty1A.v2.Rds"
   # a bit of cleanup
-  rm(list = c("scEx", "scEx_log", "featureData"))
+  for (v in c("scEx", "scEx_log", "featureData")) {
+    if (exists(v)) rm(v)
+  }
   fpLs <- tryCatch(load(fp), error = function(e) {
     NULL
   })
@@ -112,7 +114,6 @@ inputDataFunc <- function(inFile) {
     rowData = fdAll
   )
   
-  cat(stderr(), "Loaded")
   dataTables <- list()
   featuredata <- rowData(scEx)
   # handle different extreme cases for the symbol column (already encountered)
@@ -371,7 +372,7 @@ inputData <- reactive({
     }
     return(NULL)
   }
-  cat(file = stderr(), paste("inFile.", inFile$datapath[1], "\n"))
+  if (DEBUG) cat(file = stderr(), paste("inFile.", inFile$datapath[1], "\n"))
   if (!file.exists(inFile$datapath[1])) {
     if (DEBUG) {
       cat(file = stderr(), "inputData: ", inFile$datapath[1], " doesn't exist\n")
@@ -1246,7 +1247,7 @@ pcaFunc <- function(scEx_log) {
     return(NULL)
   },
   finally = {
-    cat(file = stderr(), paste("pca done\n"))
+    if (DEBUG) cat(file = stderr(), paste("pca done\n"))
   }
   )
   if (is.null(scaterPCA)) {
@@ -1345,7 +1346,7 @@ scranCluster <- function(pca,
     return(NULL)
   },
   warning = function(e) {
-    cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
+    if (DEBUG) cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
     return(do.call("quickCluster", params))
   }
   )
