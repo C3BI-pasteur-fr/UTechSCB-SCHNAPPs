@@ -1674,9 +1674,7 @@ initializeGroupNames <- reactive({
         none = rep(FALSE, ncol(scEx))
       )
     rownames(df) <- colnames(scEx)
-    cat(file = stderr(), "initializeGroupNames2\n")
     groupNames[["namesDF"]] <- df
-    cat(file = stderr(), "initializeGroupNames3\n")
   })
 })
 
@@ -2281,7 +2279,7 @@ reacativeReport <- function() {
   # if (DEBUGSAVE)
   # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
   # load(file = '~/SCHNAPPsDebug/tempReport.RData')
-  cat(file = stderr(), paste("workdir: ", getwd()))
+  if (DEBUG) cat(file = stderr(), paste("workdir: ", getwd()))
   require(callr)
   # if (DEBUGSAVE)
   # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)
