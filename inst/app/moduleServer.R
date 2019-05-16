@@ -983,7 +983,7 @@ pHeatMapModule <- function(input, output, session,
     outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
     outfile <- normalizePath(outfile, mustWork = FALSE)
     heatmapData$filename <- outfile
-
+    # heatmapData$filename = NULL
     if (length(addColNames) > 0 & moreOptions) {
       heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
     }
@@ -1014,7 +1014,15 @@ pHeatMapModule <- function(input, output, session,
       )
       heatmapData$mat <- heatmapData$mat[1:100, ]
     }
-
+    if (nrow(heatmapData$mat) == 0) {
+      return(list(
+        src = "empty.png",
+        contentType = "image/png",
+        width = 96,
+        height = 96,
+        alt = "pHeatMapPlot should be here"
+      ))
+    }
     system.time(do.call(TRONCO::pheatmap, heatmapData))
 
     pixelratio <- session$clientData$pixelratio
