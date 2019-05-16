@@ -154,7 +154,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
   if (nrow(subsetData) == 0) return(NULL)
   # subsetData$shape = as.factor(1)
-  gtitle <- paste(toupper(g_id), clId, sep = "-Cluster", collapse = " ")
+  gtitle <- paste(g_id, clId, sep = "-Cluster", collapse = " ")
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }

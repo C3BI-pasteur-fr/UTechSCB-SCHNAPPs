@@ -24,9 +24,9 @@ gQC_scaterReadsFunc <- function(scEx) {
     assays(scEx)[["counts"]] = as(assays(scEx)[["counts"]], "dgCMatrix")
   }
   
-  ercc <- rownames(scEx)[grepl("ERCC-", rownames(scEx))]
-  
-  mt <- rownames(scEx)[grepl("^MT", rownames(scEx))]
+  # ercc <- rownames(scEx)[grepl("ERCC-", rownames(scEx), ignore.case = TRUE)]
+  # 
+  # mt <- rownames(scEx)[grepl("^MT", rownames(scEx), ignore.case = TRUE)]
   
   scEx <- scater::calculateQCMetrics(
     scEx

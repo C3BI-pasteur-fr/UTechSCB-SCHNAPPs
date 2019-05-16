@@ -108,6 +108,30 @@ inputDataFunc <- function(inFile) {
     }
   }
   exAll <- as(exAll, "dgTMatrix")
+  
+  
+  if ("sampleNames" %in% colnames(pdAll)) {
+    if (! (class(pdAll$sampleNames) == "factor"))
+      pdAll$sampleNames = factor(pdAll$sampleNames)
+    sampNames <- levels(pdAll$sampleNames)
+    isolate({
+      # sampleCols$colPal <- colorRampPalette(brewer.pal(
+      #   n = 6, name =
+      #     "PRGn"
+      # ))(length(sampNames))
+      sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+      names(sampleCols$colPal) <- sampNames
+    })
+  } else {
+    showNotification(
+      "scEx - colData doesn't contain sampleNames",
+      duration = NULL,
+      type = "error"
+    )
+    pdAll$sampleNames <- 1
+  }
+  
+  
   scEx <- SingleCellExperiment(
     assay = list(counts = exAll),
     colData = pdAll,
@@ -119,12 +143,12 @@ inputDataFunc <- function(inFile) {
   # handle different extreme cases for the symbol column (already encountered)
   if (is.factor(featuredata$symbol)) {
     if (levels(featuredata$symbol) == "NA") {
-      featuredata$symbol <- toupper(rownames(featuredata))
+      featuredata$symbol <- rownames(featuredata)
       rowData(scEx) <- featuredata
     }
   }
   if ("symbol" %in% colnames(featuredata)) {
-    featuredata$symbol <- toupper(featuredata$symbol)
+    featuredata$symbol <- featuredata$symbol
     rowData(scEx) <- featuredata
   }
   
@@ -147,23 +171,6 @@ inputDataFunc <- function(inFile) {
     return(NULL)
   }
   
-  if ("sampleNames" %in% names(colData(scEx))) {
-    sampNames <- levels(colData(scEx)$sampleNames)
-    isolate({
-      # sampleCols$colPal <- colorRampPalette(brewer.pal(
-      #   n = 6, name =
-      #     "PRGn"
-      # ))(length(sampNames))
-      sampleCols$colPal <- allowedColors[seq_along(sampNames)]
-      names(sampleCols$colPal) <- sampNames
-    })
-  } else {
-    showNotification(
-      "scEx - colData doesn't contain sampleNames",
-      duration = NULL,
-      type = "error"
-    )
-  }
   
   if (sum(c("id", "symbol") %in% colnames(rowData(scEx))) < 2) {
     if (!is.null(getDefaultReactiveDomain())) {
@@ -186,7 +193,7 @@ inputDataFunc <- function(inFile) {
     if (!"Description" %in% colnames(featuredata)) {
       featuredata$"Description" <- "not given"
     }
-    featuredata$symbol <- toupper(featuredata$symbol)
+    featuredata$symbol <- featuredata$symbol
     dataTables$featuredata <- featuredata
   }
   # if (is.null(rowData(dataTables$scEx)$symbol)){
@@ -594,7 +601,7 @@ useCellsFunc <-
     
     # remove cells by pattern
     if (nchar(rmPattern) > 0) {
-      goodCols[grepl(rmPattern, colnames(dataTables$scEx))] <- FALSE
+      goodCols[grepl(rmPattern, colnames(dataTables$scEx), ignore.case = TRUE)] <- FALSE
     }
     
     if (!length(cellKeep) == 0) {
@@ -710,19 +717,21 @@ useGenesFunc <-
     # load(file='~/SCHNAPPsDebug/useGenesFunc.Rdata')
     # regular expression with gene names to be removed
     if (nchar(ipIDs) > 0) {
-      keepIDs <- !grepl(ipIDs, dataTables$featuredata$symbol)
+      keepIDs <- !grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
     } else {
       keepIDs <- rep(TRUE, nrow(dataTables$scEx))
     }
+    # explicit list of genes to keep
     genesKeep <- toupper(genesKeep)
     genesKeep <- gsub(" ", "", genesKeep, fixed = TRUE)
     genesKeep <- strsplit(genesKeep, ",")
     genesKeep <- genesKeep[[1]]
     keepGeneIds <-
-      which(dataTables$featuredata$symbol %in% genesKeep)
+      which(toupper(dataTables$featuredata$symbol) %in% genesKeep)
     
     # dataTables$featuredata$symbol[keepIDs]
     # gene groups to be included
+    # work on the geneList tree
     if (!is.null(geneListSelection)) {
       selectedgeneList <- get_selected(geneListSelection)
       if (length(selectedgeneList) > 0) {
@@ -816,10 +825,11 @@ gsRMGenesTable <- reactive({
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   
-  dt <- dt[dt$rowSums < minGenes, ]
+  # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
   })
+  if (nrow(dt) == 0) { return(NULL) }
   rownames(dt) <- dt$symbol
   as.data.frame(dt)
   # DT::datatable(as.data.frame(dt))
@@ -861,7 +871,7 @@ beforeFilterCounts <- reactive({
   
   geneIDs <- NULL
   if (nchar(ipIDs) > 0) {
-    geneIDs <- grepl(ipIDs, dataTables$featuredata$symbol)
+    geneIDs <- grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
   }
   if (is.null(geneIDs)) {
     return(rep(0, nrow(dataTables$featuredata)))
@@ -1521,7 +1531,7 @@ projections <- reactive({
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv())))
   }
-  # load(file="~/SCHNAPPsDebug/projections.RData")
+  # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   
   projections <- data.frame(pca$x[, c(1, 2, 3)])
   pd <- colData(scEx)
@@ -1587,8 +1597,8 @@ projections <- reactive({
     }
   })
   # add a column for gene specific information that will be filled/updated on demand
-  projections$UmiCountPerGenes <- 0
-  projections$UmiCountPerGenes2 <- 0
+  # projections$UmiCountPerGenes <- 0
+  # projections$UmiCountPerGenes2 <- 0
   for (pdIdx in colnames(pd)) {
     if (!pdIdx %in% colnames(projections)) {
       projections[, pdIdx] <- pd[, pdIdx]
@@ -1601,6 +1611,8 @@ projections <- reactive({
   # remove columns with only one unique value
   rmC=c()
   for (cIdx in 1:ncol(projections)){
+    # ignore sampleNames
+    if (colnames(projections)[cIdx] == "sampleNames") next()
     if (length(unique(projections[,cIdx])) == 1) rmC = c(rmC, cIdx)
   }
   projections = projections[, -rmC]
