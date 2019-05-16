@@ -844,17 +844,10 @@ tableSelectionServer <- function(input, output, session,
 
     maxCol <- min(20, ncol(dataTables))
     if (dim(dataTables)[1] > 1) {
-<<<<<<< HEAD
       numericCols <- colnames(dataTables %>% dplyr::select_if(is.numeric))
       nonNumericCols  <- which(!colnames(dataTables) %in% numericCols) # to keep non numeric columns...
       numericCols  <- which(colnames(dataTables) %in% numericCols)
       if (reorderCells &&  length(selectedRows) > 0) {
-=======
-      numericCols <- colnames(dataTables %>% select_if(is.numeric))
-      nonNumericCols <- which(!colnames(dataTables) %in% numericCols) # to keep non numeric columns...
-      numericCols <- which(colnames(dataTables) %in% numericCols)
-      if (reorderCells && length(selectedRows) > 0) {
->>>>>>> prep4master
         csums <- colSums(dataTables[selectedRows, numericCols])
         cols2disp <- numericCols[order(csums, decreasing = TRUE)]
       } else {
@@ -1013,20 +1006,13 @@ pHeatMapModule <- function(input, output, session,
     heatmapData$fontsize <- 14
     # heatmapData$fontsize_row = 18
     # heatmapData$filename=NULL
-<<<<<<< HEAD
-    if ( nrow(heatmapData$mat) > 1000 ) {
-=======
     if (nrow(heatmapData$mat) > 100) {
->>>>>>> prep4master
       showNotification(
         "more than 1000 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
         id = "pHeatMapPlotWARNING",
         type = "warning",
         duration = 20
       )
-<<<<<<< HEAD
-      heatmapData$mat = heatmapData$mat[1:1000,]
-=======
       heatmapData$mat <- heatmapData$mat[1:100, ]
     }
     if (nrow(heatmapData$mat) == 0) {
@@ -1037,7 +1023,6 @@ pHeatMapModule <- function(input, output, session,
         height = 96,
         alt = "pHeatMapPlot should be here"
       ))
->>>>>>> prep4master
     }
     system.time(do.call(TRONCO::pheatmap, heatmapData))
 
