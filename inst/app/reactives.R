@@ -2010,16 +2010,16 @@ reacativeReport <- function() {
   rectVals <- c()
   isolate({
     for (var in c(names(globalenv()), names(parent.env(environment())))) {
-      cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
+      if (DEBUG) cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
       if (var == "reacativeReport") {
         next()
       }
       if (class(get(var))[1] == "reactivevalues") {
-        cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
+        if (DEBUG) cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
         rectVals <- c(rectVals, var)
         assign(var, reactiveValuesToList(get(var)), envir = report.env)
       } else if (class(get(var))[1] == "reactiveExpr") {
-        cat(
+        if (DEBUG) cat(
           file = stderr(),
           paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
         )
