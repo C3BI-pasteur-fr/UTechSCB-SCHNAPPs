@@ -547,7 +547,7 @@ returnNull <- function() {
 
 # forceCalc -----# handling expensive calcualtions
 forceCalc <- shiny::observe({
-  cat(file = stderr(), paste0("observe: goCalc\n"))
+  if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
   go <- input$goCalc
   start.time <- base::Sys.time()
   if (go) {
@@ -591,7 +591,7 @@ scranWarning <- function() {
 
 # handle long executions ----
 observeEvent(input$clusterMethod, {
-  cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
+  if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
   if (input$clusterMethod == "hclust") {
     showModal(scranWarning())
   } else {
@@ -600,7 +600,7 @@ observeEvent(input$clusterMethod, {
 })
 
 observeEvent(input$clusterSource, {
-  cat(file = stderr(), paste0("observe: input$clusterSource\n"))
+  if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterSource\n"))
   if (input$clusterSource == "normData") {
     showModal(scranWarning())
   } else {

@@ -35,7 +35,7 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                        defaultValueSingleGene = "CD52",
                        defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
                        defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
-                       DEBUG = TRUE,
+                       DEBUG = FALSE,
                        DEBUGSAVE = FALSE
 
                        ) {

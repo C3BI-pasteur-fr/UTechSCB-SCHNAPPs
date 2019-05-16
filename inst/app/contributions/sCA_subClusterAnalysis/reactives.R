@@ -36,7 +36,7 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
 #' define different methods for calculating diff. expressed genes
 #' first entry is displayed in Radio box, second is function to be called.
 myDiffExpFunctions = list(
-  c("dge as per CellView", "sCA_dge_CellViewfunc"),
+  c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
   c("t-test", "sCA_dge_ttest")
 )
 
@@ -53,7 +53,11 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dge_CellViewfunc", id = "sCA_dge_CellViewfunc", duration = NULL)
   }
-
+  if (DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
+  
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]),]
@@ -87,7 +91,11 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dge_ttest", id = "sCA_dge_ttest", duration = NULL)
   }
-
+  if (DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
+  
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]),]
