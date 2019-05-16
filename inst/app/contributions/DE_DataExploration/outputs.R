@@ -171,8 +171,8 @@ output$DE_panelPlot <- renderPlot({
   genesin <- genesin[[1]]
 
   featureData <- rowData(scEx_log)
-  featureData$symbol = toupper(featureData$symbol)
-  genesin <- genesin[which(genesin %in% featureData$symbol)]
+  # featureData$symbol = toupper(featureData$symbol)
+  genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
 
   par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
   rbPal <- colorRampPalette(c("#f0f0f0", "red"))
@@ -180,14 +180,14 @@ output$DE_panelPlot <- renderPlot({
   if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
     ymax <- 0
     for (i in 1:length(genesin)) {
-      geneIdx <- which(featureData$symbol == genesin[i])
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       ymax <- max(ymax, max(Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])))
     }
     ylim <- c(0, ymax)
   }
   if (cl4 == "All") {
     for (i in 1:length(genesin)) {
-      geneIdx <- which(featureData$symbol == genesin[i])
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       Col <- rbPal(10)[
         as.numeric(
           cut(
@@ -212,7 +212,7 @@ output$DE_panelPlot <- renderPlot({
     }
   } else {
     for (i in 1:length(genesin)) {
-      geneIdx <- which(featureData$symbol == genesin[i])
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       subsetTSNE <- subset(projections, dbCluster == cl4)
 
       Col <- rbPal(10)[
@@ -290,7 +290,7 @@ output$DE_tsne_plt <- plotly::renderPlotly({
 
   printTimeEnd(start.time, "DE_dataExpltSNEPlot")
   exportTestValues(DE_dataExpltSNEPlot = {str(retVal)})
-  return(retVal)
+  retVal
 })
 
 # download RDS ----
