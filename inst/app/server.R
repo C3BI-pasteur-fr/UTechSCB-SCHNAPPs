@@ -64,6 +64,7 @@ base::source(paste0(packagePath,  "/serverFunctions.R"))
 reportTempDir <<- base::tempdir()
 
 scShinyServer <- shinyServer(function(input, output, session) {
+  session$onSessionEnded(stopApp)
   # TODO needs to be an option
   seed <- 2
   localContributionDir <- .SCHNAPPs_locContributionDir

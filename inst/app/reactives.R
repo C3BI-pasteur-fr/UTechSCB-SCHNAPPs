@@ -65,11 +65,14 @@ inputDataFunc <- function(inFile) {
     if ("SingleCellExperiment" %in% class(get(varName))) {
       scEx <- get(varName)
       scExFound <- TRUE
+      break()
     }
   }
   if (!scExFound) {
     return(NULL)
   }
+  cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName ," as SingleCellExperiment.\n"))
+  
   fdAll <- rowData(scEx)
   pdAll <- colData(scEx)
   exAll <- assays(scEx)[["counts"]]
@@ -82,7 +85,16 @@ inputDataFunc <- function(inFile) {
       cat(file = stderr(), paste("reading", inFile$name[fpIdx], "\n"))
       fp <- inFile$datapath[fpIdx]
       fpLs <- load(fp)
-      if (!"scEx" %in% fpLs) {
+      scExFound <- FALSE
+      for (varName in fpLs) {
+        if ("SingleCellExperiment" %in% class(get(varName))) {
+          scEx <- get(varName)
+          scExFound <- TRUE
+          break()
+        }
+      }
+      cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "contains variable", varName ,"\n"))
+      if (!scExFound) {
         next()
       }
       fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
@@ -92,6 +104,10 @@ inputDataFunc <- function(inFile) {
       # fd <- featuredata[fdIdx, ]
       fdAll <- fdAll[fdIdx, ]
       pd1 <- colData(scEx)
+      if (!"counts" %in% names(assays(scEx))) {
+        cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName ,"didn't contain counts slot\n"))
+        next()
+      }
       ex1 <- assays(scEx)[["counts"]][fdIdx, ]
       if (sum(rownames(pdAll) %in% rownames(pd1)) > 0) {
         cat(file = stderr(), "Houston, there are cells with the same name\n")
@@ -1615,7 +1631,7 @@ projections <- reactive({
     if (colnames(projections)[cIdx] == "sampleNames") next()
     if (length(unique(projections[,cIdx])) == 1) rmC = c(rmC, cIdx)
   }
-  projections = projections[, -rmC]
+  if (length(rmC) > 0) projections = projections[, -rmC]
   
   exportTestValues(projections = {
     projections
@@ -1972,6 +1988,7 @@ reacativeReport <- function() {
   projections <- projections()
   scEx_log <- scEx_log()
   inputNames <- names(input)
+  # browser()
   
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -2007,7 +2024,7 @@ reacativeReport <- function() {
           paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
         )
         # if ( var == "coE_selctedCluster")
-        #   browser()
+          # browser()
         rectVals <- c(rectVals, var)
         assign(var, eval(parse(text = paste0(
           "\`", var, "\`()"

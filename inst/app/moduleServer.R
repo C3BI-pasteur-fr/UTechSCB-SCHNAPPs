@@ -725,7 +725,8 @@ tableSelectionServer <- function(input, output, session,
   if (DEBUG) cat(file = stderr(), paste("tableSelectionServer", session$ns("test"), "\n"))
   ns <- session$ns
   modSelectedRows <- c()
-
+  colOrder <- list()
+  
   output$cellSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
     start.time <- Sys.time()
@@ -804,6 +805,11 @@ tableSelectionServer <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_rows_selected\n")
     modSelectedRows <<- input$cellNameTable_rows_selected
   })
+  
+  observe({
+    if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
+    colOrder <<- input$cellNameTable_state$order
+  })
 
   output$cellNameTable <- DT::renderDT({
     if (DEBUG) cat(file = stderr(), "output$cellNameTable\n")
@@ -855,7 +861,9 @@ tableSelectionServer <- function(input, output, session,
         options = list(
           orderClasses = TRUE,
           autoWidth = TRUE,
-          scrollX = TRUE
+          scrollX = TRUE,
+          stateSave = TRUE,
+          order = colOrder
         )
       ))
     } else {
@@ -896,8 +904,9 @@ pHeatMapModule <- function(input, output, session,
   outfilePH <- NULL
 
   # pHeatMapModule - updateInput ----
-  updateInput <- reactive({
-    if (DEBUG) cat(file = stderr(), "updateInput started.\n")
+  # updateInput <- 
+    observe({
+    if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
     start.time <- base::Sys.time()
     on.exit({
       printTimeEnd(start.time, "updateInput")
