@@ -24,9 +24,9 @@ gQC_scaterReadsFunc <- function(scEx) {
     assays(scEx)[["counts"]] = as(assays(scEx)[["counts"]], "dgCMatrix")
   }
   
-  ercc <- rownames(scEx)[grepl("ERCC-", rownames(scEx))]
-  
-  mt <- rownames(scEx)[grepl("^MT", rownames(scEx))]
+  # ercc <- rownames(scEx)[grepl("ERCC-", rownames(scEx), ignore.case = TRUE)]
+  # 
+  # mt <- rownames(scEx)[grepl("^MT", rownames(scEx), ignore.case = TRUE)]
   
   scEx <- scater::calculateQCMetrics(
     scEx
@@ -273,7 +273,8 @@ umapReact <- reactive({
   set.seed(myseed)
   embedding <- uwot::umap(t(as.matrix(assays(scEx_log)[[1]])),
                           n_neighbors = n_neighbors,
-                          n_components = n_components, n_epochs = n_epochs,
+                          n_components = n_components,
+                          n_epochs = n_epochs,
                           # alpha = alpha,
                           init = init,
                           spread = spread,

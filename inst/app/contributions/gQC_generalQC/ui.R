@@ -52,15 +52,15 @@ tabList <- list(
       ),
       column(
         3,
-        numericInput("gQC_tsnePerplexity", "Tsne gQC_tsnePerplexity", 30, min = 1, max = 100)
+        numericInput("gQC_tsnePerplexity", "Perplexity", 30, min = 1, max = 100)
       ),
       column(
         3,
-        numericInput("gQC_tsneTheta", "Tsne gQC_tsneTheta", 0.5, min = 0.0, max = 1, step = 0.1)
+        numericInput("gQC_tsneTheta", "Theta", 0.5, min = 0.0, max = 1, step = 0.1)
       ),
       column(
         3,
-        numericInput("gQC_tsneSeed", "Tsne gQC_tsneSeed", 1, min = 1, max = 10000)
+        numericInput("gQC_tsneSeed", "Seed", 1, min = 1, max = 10000)
       )
     ),
     fluidRow(
@@ -142,7 +142,7 @@ tabList <- list(
         3,
         selectInput(
           "gQC_um_negative_sample_rate",
-          label = "negative_sample_rate",
+          label = "negative sample rate",
           choices = c(1:50), selected = "5"
         )
       )
@@ -161,7 +161,7 @@ tabList <- list(
         3,
         selectInput(
           "gQC_um_n_epochs",
-          label = "n_epochs",
+          label = "epochs",
           choices = c(1:1000), selected = "200"
         )
       ),
@@ -191,7 +191,7 @@ tabList <- list(
         3,
         selectInput(
           "gQC_um_min_dist",
-          label = "min_dist",
+          label = "min dist",
           choices = seq(0.05, 0.5, 0.01), selected = "0.01"
         )
       ),
@@ -199,7 +199,7 @@ tabList <- list(
         3,
         selectInput(
           "gQC_um_set_op_mix_ratio",
-          label = "set_op_mix_ratio",
+          label = "set op mix ratio",
           choices = seq(0, 1, 0.1), selected = "1"
         )
       ),
@@ -207,7 +207,7 @@ tabList <- list(
         3,
         selectInput(
           "gQC_um_local_connectivity",
-          label = "local_connectivity",
+          label = "local connectivity",
           choices = 1:20, selected = "1"
         )
       ),

@@ -36,17 +36,17 @@ sCA_dgeTableReac <- reactive({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls(envir = globalenv(), ls())))
+    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls(), ls(envir = globalenv())))
   }
-  # load(file="~/SCHNAPPsDebug/output_dge.RData")
+  # cp = load(file="~/SCHNAPPsDebug/output_dge.RData")
   featureData <- rowData(scEx)
 
   top.genes$symbol <-
     featureData[rownames(top.genes), "symbol"]
-  rownames(top.genes) <- make.unique(top.genes$symbol, sep="___")
   if ("Description" %in% colnames(featureData)) {
     top.genes$Description <- featureData[rownames(top.genes), "Description"]
   }
+  rownames(top.genes) <- make.unique(top.genes$symbol, sep="___")
   if (dim(top.genes)[1] > 0) {
     return(top.genes)
   } else {
