@@ -247,7 +247,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   genesin <- gsub(" ", "", genesin, fixed = TRUE)
   genesin <- strsplit(genesin, ",")[[1]]
   
-  map <- rownames(featureData[which(featureData$symbol %in% genesin), ])
+  map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
   
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls(), ls(envir = globalenv())))
