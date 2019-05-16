@@ -1598,6 +1598,12 @@ projections <- reactive({
   if (ncol(prjs) > 0 & nrow(prjs) == nrow(projections)) {
     projections <- cbind(projections, prjs)
   }
+  # remove columns with only one unique value
+  rmC=c()
+  for (cIdx in 1:ncol(projections)){
+    if (length(unique(projections[,cIdx])) == 1) rmC = c(rmC, cIdx)
+  }
+  projections = projections[, -rmC]
   
   exportTestValues(projections = {
     projections

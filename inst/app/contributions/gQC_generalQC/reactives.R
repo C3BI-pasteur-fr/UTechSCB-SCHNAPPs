@@ -273,7 +273,8 @@ umapReact <- reactive({
   set.seed(myseed)
   embedding <- uwot::umap(t(as.matrix(assays(scEx_log)[[1]])),
                           n_neighbors = n_neighbors,
-                          n_components = n_components, n_epochs = n_epochs,
+                          n_components = n_components,
+                          n_epochs = n_epochs,
                           # alpha = alpha,
                           init = init,
                           spread = spread,
