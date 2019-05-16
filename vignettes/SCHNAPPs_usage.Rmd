@@ -1,0 +1,39 @@
+---
+title: "SCHNAPPs usage"
+output: rmarkdown::html_vignette
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{SCHNAPPs_usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SCHNAPPs)
+```
+
+# Introduction
+Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Pasteur Institute, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur.
+
+The application is started from the command line in R using schnapps().
+Optional parameters:
+localContributionDir
+Additional functionally can be added using a vector with the paths to the contributions directories. See for example: (https://github.com/baj12/scShinyHubContributionsBJ)
+defaultValueSingleGene
+Some of the UI elements expect a single gene as input. This parameter can be preset with this value.
+defaultValueMultiGenes
+Some of the UI elements expect multiple genes as input. This parameter can be preset with this value.
+defaultValueRegExGene
+Default parameters for the regular expression used in the Gene selection tab (defaults to ^MT-|^RP|^MRP
+DEBUG
+If set to TRUE, debugging information will be displayed on the console
+DEBUGSAVE
+If set to TRUE, intermediate file will be written to disc. This delays calculation. It also creates a directory in the home folder called SCHNAPPsDEBUG, where all saved files are stored.
+

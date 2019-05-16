@@ -9,7 +9,7 @@ menuList <- list(
     tabName = "coexpression", startExpanded = FALSE,
     shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
     shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
-    shinydashboard::menuSubItem("Co-expression Violin plot", tabName = "CoExpressionViolin"),
+    shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
     shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )
