@@ -55,7 +55,9 @@ inputDataFunc <- function(inFile) {
   # fp ="scEx.Rds"
   # fp ="../SCHNAPPsData/patty1A.v2.Rds"
   # a bit of cleanup
-  rm(list = c("scEx", "scEx_log", "featureData"))
+  for (v in c("scEx", "scEx_log", "featureData")) {
+    if (exists(v)) rm(v)
+  }
   fpLs <- tryCatch(load(fp), error = function(e) {
     NULL
   })
@@ -64,11 +66,14 @@ inputDataFunc <- function(inFile) {
     if ("SingleCellExperiment" %in% class(get(varName))) {
       scEx <- get(varName)
       scExFound <- TRUE
+      break()
     }
   }
   if (!scExFound) {
     return(NULL)
   }
+  cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName ," as SingleCellExperiment.\n"))
+  
   fdAll <- rowData(scEx)
   pdAll <- colData(scEx)
   exAll <- assays(scEx)[["counts"]]
@@ -81,7 +86,16 @@ inputDataFunc <- function(inFile) {
       cat(file = stderr(), paste("reading", inFile$name[fpIdx], "\n"))
       fp <- inFile$datapath[fpIdx]
       fpLs <- load(fp)
-      if (!"scEx" %in% fpLs) {
+      scExFound <- FALSE
+      for (varName in fpLs) {
+        if ("SingleCellExperiment" %in% class(get(varName))) {
+          scEx <- get(varName)
+          scExFound <- TRUE
+          break()
+        }
+      }
+      cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "contains variable", varName ,"\n"))
+      if (!scExFound) {
         next()
       }
       fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
@@ -91,6 +105,10 @@ inputDataFunc <- function(inFile) {
       # fd <- featuredata[fdIdx, ]
       fdAll <- fdAll[fdIdx, ]
       pd1 <- colData(scEx)
+      if (!"counts" %in% names(assays(scEx))) {
+        cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName ,"didn't contain counts slot\n"))
+        next()
+      }
       ex1 <- assays(scEx)[["counts"]][fdIdx, ]
       if (sum(rownames(pdAll) %in% rownames(pd1)) > 0) {
         cat(file = stderr(), "Houston, there are cells with the same name\n")
@@ -107,24 +125,47 @@ inputDataFunc <- function(inFile) {
     }
   }
   exAll <- as(exAll, "dgTMatrix")
+  
+  
+  if ("sampleNames" %in% colnames(pdAll)) {
+    if (! (class(pdAll$sampleNames) == "factor"))
+      pdAll$sampleNames = factor(pdAll$sampleNames)
+    sampNames <- levels(pdAll$sampleNames)
+    isolate({
+      # sampleCols$colPal <- colorRampPalette(brewer.pal(
+      #   n = 6, name =
+      #     "PRGn"
+      # ))(length(sampNames))
+      sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+      names(sampleCols$colPal) <- sampNames
+    })
+  } else {
+    showNotification(
+      "scEx - colData doesn't contain sampleNames",
+      duration = NULL,
+      type = "error"
+    )
+    pdAll$sampleNames <- 1
+  }
+  
+  
   scEx <- SingleCellExperiment(
     assay = list(counts = exAll),
     colData = pdAll,
     rowData = fdAll
   )
   
-  cat(stderr(), "Loaded")
   dataTables <- list()
   featuredata <- rowData(scEx)
   # handle different extreme cases for the symbol column (already encountered)
   if (is.factor(featuredata$symbol)) {
     if (levels(featuredata$symbol) == "NA") {
-      featuredata$symbol <- toupper(rownames(featuredata))
+      featuredata$symbol <- rownames(featuredata)
       rowData(scEx) <- featuredata
     }
   }
   if ("symbol" %in% colnames(featuredata)) {
-    featuredata$symbol <- toupper(featuredata$symbol)
+    featuredata$symbol <- featuredata$symbol
     rowData(scEx) <- featuredata
   }
   
@@ -147,23 +188,6 @@ inputDataFunc <- function(inFile) {
     return(NULL)
   }
   
-  if ("sampleNames" %in% names(colData(scEx))) {
-    sampNames <- levels(colData(scEx)$sampleNames)
-    isolate({
-      # sampleCols$colPal <- colorRampPalette(brewer.pal(
-      #   n = 6, name =
-      #     "PRGn"
-      # ))(length(sampNames))
-      sampleCols$colPal <- allowedColors[seq_along(sampNames)]
-      names(sampleCols$colPal) <- sampNames
-    })
-  } else {
-    showNotification(
-      "scEx - colData doesn't contain sampleNames",
-      duration = NULL,
-      type = "error"
-    )
-  }
   
   if (sum(c("id", "symbol") %in% colnames(rowData(scEx))) < 2) {
     if (!is.null(getDefaultReactiveDomain())) {
@@ -186,7 +210,7 @@ inputDataFunc <- function(inFile) {
     if (!"Description" %in% colnames(featuredata)) {
       featuredata$"Description" <- "not given"
     }
-    featuredata$symbol <- toupper(featuredata$symbol)
+    featuredata$symbol <- featuredata$symbol
     dataTables$featuredata <- featuredata
   }
   # if (is.null(rowData(dataTables$scEx)$symbol)){
@@ -372,7 +396,7 @@ inputData <- reactive({
     }
     return(NULL)
   }
-  cat(file = stderr(), paste("inFile.", inFile$datapath[1], "\n"))
+  if (DEBUG) cat(file = stderr(), paste("inFile.", inFile$datapath[1], "\n"))
   if (!file.exists(inFile$datapath[1])) {
     if (DEBUG) {
       cat(file = stderr(), "inputData: ", inFile$datapath[1], " doesn't exist\n")
@@ -594,7 +618,7 @@ useCellsFunc <-
     
     # remove cells by pattern
     if (nchar(rmPattern) > 0) {
-      goodCols[grepl(rmPattern, colnames(dataTables$scEx))] <- FALSE
+      goodCols[grepl(rmPattern, colnames(dataTables$scEx), ignore.case = TRUE)] <- FALSE
     }
     
     if (!length(cellKeep) == 0) {
@@ -710,19 +734,21 @@ useGenesFunc <-
     # load(file='~/SCHNAPPsDebug/useGenesFunc.Rdata')
     # regular expression with gene names to be removed
     if (nchar(ipIDs) > 0) {
-      keepIDs <- !grepl(ipIDs, dataTables$featuredata$symbol)
+      keepIDs <- !grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
     } else {
       keepIDs <- rep(TRUE, nrow(dataTables$scEx))
     }
+    # explicit list of genes to keep
     genesKeep <- toupper(genesKeep)
     genesKeep <- gsub(" ", "", genesKeep, fixed = TRUE)
     genesKeep <- strsplit(genesKeep, ",")
     genesKeep <- genesKeep[[1]]
     keepGeneIds <-
-      which(dataTables$featuredata$symbol %in% genesKeep)
+      which(toupper(dataTables$featuredata$symbol) %in% genesKeep)
     
     # dataTables$featuredata$symbol[keepIDs]
     # gene groups to be included
+    # work on the geneList tree
     if (!is.null(geneListSelection)) {
       selectedgeneList <- get_selected(geneListSelection)
       if (length(selectedgeneList) > 0) {
@@ -816,10 +842,11 @@ gsRMGenesTable <- reactive({
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   
-  dt <- dt[dt$rowSums < minGenes, ]
+  # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
   })
+  if (nrow(dt) == 0) { return(NULL) }
   rownames(dt) <- dt$symbol
   as.data.frame(dt)
   # DT::datatable(as.data.frame(dt))
@@ -861,7 +888,7 @@ beforeFilterCounts <- reactive({
   
   geneIDs <- NULL
   if (nchar(ipIDs) > 0) {
-    geneIDs <- grepl(ipIDs, dataTables$featuredata$symbol)
+    geneIDs <- grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
   }
   if (is.null(geneIDs)) {
     return(rep(0, nrow(dataTables$featuredata)))
@@ -1247,7 +1274,7 @@ pcaFunc <- function(scEx_log) {
     return(NULL)
   },
   finally = {
-    cat(file = stderr(), paste("pca done\n"))
+    if (DEBUG) cat(file = stderr(), paste("pca done\n"))
   }
   )
   if (is.null(scaterPCA)) {
@@ -1346,7 +1373,7 @@ scranCluster <- function(pca,
     return(NULL)
   },
   warning = function(e) {
-    cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
+    if (DEBUG) cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
     return(do.call("quickCluster", params))
   }
   )
@@ -1521,7 +1548,7 @@ projections <- reactive({
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv())))
   }
-  # load(file="~/SCHNAPPsDebug/projections.RData")
+  # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   
   projections <- data.frame(pca$x[, c(1, 2, 3)])
   pd <- colData(scEx)
@@ -1587,8 +1614,8 @@ projections <- reactive({
     }
   })
   # add a column for gene specific information that will be filled/updated on demand
-  projections$UmiCountPerGenes <- 0
-  projections$UmiCountPerGenes2 <- 0
+  # projections$UmiCountPerGenes <- 0
+  # projections$UmiCountPerGenes2 <- 0
   for (pdIdx in colnames(pd)) {
     if (!pdIdx %in% colnames(projections)) {
       projections[, pdIdx] <- pd[, pdIdx]
@@ -1598,6 +1625,14 @@ projections <- reactive({
   if (ncol(prjs) > 0 & nrow(prjs) == nrow(projections)) {
     projections <- cbind(projections, prjs)
   }
+  # remove columns with only one unique value
+  rmC=c()
+  for (cIdx in 1:ncol(projections)){
+    # ignore sampleNames
+    if (colnames(projections)[cIdx] == "sampleNames") next()
+    if (length(unique(projections[,cIdx])) == 1) rmC = c(rmC, cIdx)
+  }
+  if (length(rmC) > 0) projections = projections[, -rmC]
   
   exportTestValues(projections = {
     projections
@@ -1640,9 +1675,7 @@ initializeGroupNames <- reactive({
         none = rep(FALSE, ncol(scEx))
       )
     rownames(df) <- colnames(scEx)
-    cat(file = stderr(), "initializeGroupNames2\n")
     groupNames[["namesDF"]] <- df
-    cat(file = stderr(), "initializeGroupNames3\n")
   })
 })
 
@@ -1954,6 +1987,7 @@ reacativeReport <- function() {
   projections <- projections()
   scEx_log <- scEx_log()
   inputNames <- names(input)
+  # browser()
   
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -1975,21 +2009,21 @@ reacativeReport <- function() {
   rectVals <- c()
   isolate({
     for (var in c(names(globalenv()), names(parent.env(environment())))) {
-      cat(file = stderr(), paste("var: ", var, "---", class(get(var)), "\n"))
+      if (DEBUG) cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
       if (var == "reacativeReport") {
         next()
       }
       if (class(get(var))[1] == "reactivevalues") {
-        cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
+        if (DEBUG) cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
         rectVals <- c(rectVals, var)
         assign(var, reactiveValuesToList(get(var)), envir = report.env)
       } else if (class(get(var))[1] == "reactiveExpr") {
-        cat(
+        if (DEBUG) cat(
           file = stderr(),
-          paste("is reactiveExpr: ", var, "--", class(get(var)), "\n")
+          paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
         )
-        # if ( var == "coE_selctedCluster-cluster")
-        #   browser()
+        # if ( var == "coE_selctedCluster")
+          # browser()
         rectVals <- c(rectVals, var)
         assign(var, eval(parse(text = paste0(
           "\`", var, "\`()"
@@ -1998,21 +2032,21 @@ reacativeReport <- function() {
         # this has to be done manually (for the moment)
         # and is only required for clusterServer
         if (class(report.env[[var]])[1] == "reactivevalues") {
-          if (all(c("cluster", "selectedCells") %in% names(report.env[[var]]))) {
-            cat(
-              file = stderr(),
-              paste(
-                "is reactivevalues2: ",
-                paste0(var, "-cluster"),
-                "\n"
-              )
-            )
+          if (all(c("selectedCells") %in% names(report.env[[var]]))) {
+            # cat(
+            #   file = stderr(),
+            #   paste(
+            #     "is reactivevalues2: ",
+            #     paste0(var, "-cluster"),
+            #     "\n"
+            #   )
+            # )
             # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
             #   browser()
-            assign(paste0(var, "-cluster"),
-                   eval(report.env[[var]][["cluster"]]),
-                   envir = report.env
-            )
+            # assign(paste0(var, "-cluster"),
+                   # eval(report.env[[var]][["cluster"]]),
+                   # envir = report.env
+            # )
             tempVar <- report.env[[var]][["selectedCells"]]
             assign(paste0(var, "-selectedCells"),
                    eval(parse(text = "tempVar()")),
@@ -2246,7 +2280,7 @@ reacativeReport <- function() {
   # if (DEBUGSAVE)
   # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
   # load(file = '~/SCHNAPPsDebug/tempReport.RData')
-  cat(file = stderr(), paste("workdir: ", getwd()))
+  if (DEBUG) cat(file = stderr(), paste("workdir: ", getwd()))
   require(callr)
   # if (DEBUGSAVE)
   # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)

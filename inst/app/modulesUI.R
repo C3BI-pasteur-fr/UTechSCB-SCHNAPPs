@@ -12,21 +12,21 @@ clusterUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(5,
-             offset = 1,
+      column(6,
+             offset = 0,
              textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = "")),
-      column(5,
+      column(6,
              offset = 0,
              textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes", value = "")
       )
     ),
     fluidRow(
+      # column(
+      #   3,
+      #   uiOutput(ns("clusters"))
+      # ),
       column(
-        3,
-        uiOutput(ns("clusters"))
-      ),
-      column(
-        3,
+        4,
         selectInput(
           ns("dimension_x"),
           label = "X",
@@ -35,7 +35,7 @@ clusterUI <- function(id) {
         )
       ),
       column(
-        3,
+        4,
         selectInput(
           ns("dimension_y"),
           label = "Y",
@@ -44,7 +44,7 @@ clusterUI <- function(id) {
         )
       ),
       column(
-        3,
+        4,
         selectInput(
           ns("dimension_col"),
           label = "color",

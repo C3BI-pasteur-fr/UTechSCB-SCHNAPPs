@@ -134,18 +134,43 @@ scShinyUI <- shinyUI(
         htmlOutput("summaryStatsSideBar"),
         "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ", "right"
       ),
-      downloadButton("report", "Generate report"),
+      
+      ### failed tests to change color of button text
+      
+      # <div id="scoped-content">
+      #   <style type="text/css" scoped>
+      #   h1 { color: red; } 
+      # </style>
+      #   
+      #   <h1>Hello</h1>
+      #   </div>
+      #   
+      # withTags({
+      #   div(id="scoped-content",
+      #       tags$style(type="text/css", scoped=NA, "downloadbutton a { color: red; }"),
+      #       tags$a(id = "report", class = paste("btn btn-default shiny-download-link ", "downloadbutton"), href = "", target = "_blank", download = NA, 
+      #              icon("download"), "Generate report"),
+      #       downloadButton("report", "Generate report", class="downloadbutton")
+      #   )
+      # }),
+      ## <div class="header" checked>
+      ##   <p>Ready to take the Shiny tutorial? If so</p>
+      ##   <a href="shiny.rstudio.com/tutorial">Click Here!</a>
+      ## </div> 
+      # tags$style(type="text/css", "downloadbutton a { color: #444; }"),
+      downloadButton("report", "Generate report", class="butt"),
+      tags$head(tags$style(".butt{color: black !important;}")), #  font color
       actionButton("goCalc", "Force Calculations"),
       # bookmarkButton(id = "bookmark1"),
       shinyBS::tipify(
-        downloadButton("countscsv", "Download counts.csv"),
+        downloadButton("countscsv", "Download counts.csv", class="butt"),
         "<h3>download current normalized count data as CSV file</h3>"
       ),
       shinyBS::tipify(
-        downloadButton("RDSsave", "Download Rds"),
+        downloadButton("RDSsave", "Download Rds", class="butt"),
         "<h3>download current cell/gene configuration for reimport to this app</h3>"
       ),
-      checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
+      if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring")
     ), # dashboard side bar
     shinydashboard::dashboardBody(

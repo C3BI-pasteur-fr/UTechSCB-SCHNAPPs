@@ -124,7 +124,7 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
         colors = "Greens"
       )
     )
-  layout(p, title = paste(toupper(featureData[geneid, "symbol"]), collapse = ", "))
+  layout(p, title = paste(featureData[geneid, "symbol"], collapse = ", "))
 }
 
 DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
@@ -174,7 +174,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
     ) +
     xlab("Cluster") +
     ylab("Expression") +
-    ggtitle(paste(toupper(featureData[geneid, "symbol"]), collapse = ", "))
+    ggtitle(paste(featureData[geneid, "symbol"], collapse = ", "))
   
   return(p1)
 }
