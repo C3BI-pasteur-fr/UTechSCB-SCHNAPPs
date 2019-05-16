@@ -7,7 +7,7 @@
 schnapps(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   defaultValueSingleGene = "CD52",
   defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
-  defaultValueRegExGene = "", DEBUG = TRUE, DEBUGSAVE = FALSE)
+  defaultValueRegExGene = "", DEBUG = FALSE, DEBUGSAVE = FALSE)
 }
 \arguments{
 \item{localContributionDir}{localContributionDir}
