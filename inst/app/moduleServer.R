@@ -105,24 +105,24 @@ clusterServer <- function(input, output, session,
     #                   selected = mod_cl1
     # )
     updateSelectInput(session, "dimension_x",
-      choices = colnames(projections),
+      choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
       selected = dim1
     )
     updateSelectInput(session, "dimension_y",
-      choices = colnames(projections),
+      choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
       selected = dim2
     )
     updateSelectInput(session, "dimension_col",
-      choices = colnames(projections),
+      choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
       selected = dimCol
     )
 
     updateSelectInput(session, "devideXBy",
-      choices = c("None", colnames(projections)),
+      choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
       selected = divXBy
     )
     updateSelectInput(session, "devideYBy",
-      choices = c("None", colnames(projections)),
+      choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
       selected = divYBy
     )
   })
@@ -363,7 +363,7 @@ clusterServer <- function(input, output, session,
     exportTestValues(clusterPlot = {
       p1
     })
-    return(p1)
+    p1
   })
 
   # observe({
@@ -535,33 +535,33 @@ clusterServer <- function(input, output, session,
 
   # clusterServer - output$nCellsAllSelected ----
   # display the number of cells that belong to the group, including the cells from non visible clusters
-  output$nCellsAllSelected <- renderText({
-    if (DEBUG) cat(file = stderr(), "nCellsAllSelected started.\n")
-    start.time <- base::Sys.time()
-    on.exit({
-      printTimeEnd(start.time, "nCellsAllSelected")
-      if (!is.null(getDefaultReactiveDomain())) {
-        removeNotification(id = "nCellsAllSelected")
-      }
-    })
-    # show in the app that this is running
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("nCellsAllSelected", id = "nCellsAllSelected", duration = NULL)
-    }
-
-    grpNs <- groupNames$namesDF
-    grpN <- make.names(input$groupName)
-    val <- 0
-    if (grpN %in% colnames(grpNs)) {
-      val <- sum(grpNs[, grpN])
-    }
-    retVal <- paste("number of cells in group over all cells", val)
-
-    exportTestValues(DummyReactive = {
-      retVal
-    })
-    return(retVal)
-  })
+  # output$nCellsAllSelected <- renderText({
+  #   if (DEBUG) cat(file = stderr(), "nCellsAllSelected started.\n")
+  #   start.time <- base::Sys.time()
+  #   on.exit({
+  #     printTimeEnd(start.time, "nCellsAllSelected")
+  #     if (!is.null(getDefaultReactiveDomain())) {
+  #       removeNotification(id = "nCellsAllSelected")
+  #     }
+  #   })
+  #   # show in the app that this is running
+  #   if (!is.null(getDefaultReactiveDomain())) {
+  #     showNotification("nCellsAllSelected", id = "nCellsAllSelected", duration = NULL)
+  #   }
+  # 
+  #   grpNs <- groupNames$namesDF
+  #   grpN <- make.names(input$groupName)
+  #   val <- 0
+  #   if (grpN %in% colnames(grpNs)) {
+  #     val <- sum(grpNs[, grpN])
+  #   }
+  #   retVal <- paste("number of cells in group over all cells", val)
+  # 
+  #   exportTestValues(DummyReactive = {
+  #     retVal
+  #   })
+  #   return(retVal)
+  # })
 
 
   # clusterServer - output$additionalOptions ----
@@ -581,7 +581,8 @@ clusterServer <- function(input, output, session,
 
     ns <- session$ns
     moreOptions <- input$moreOptions
-    groupNs <- groupNames$namesDF
+    # groupNs <- groupNames$namesDF
+    grpNs <- groupNames$namesDF
     if (!moreOptions) {
       if (DEBUG) cat(file = stderr(), "additionalOptions NULL\n")
       groupName <<- ""
@@ -641,11 +642,11 @@ clusterServer <- function(input, output, session,
       selectInput(
         ns("groupNames"),
         label = "group names",
-        choices = colnames(groupNs),
+        choices = colnames(grpNs),
         selected = selectedGroupName
       ),
       verbatimTextOutput(ns("nCellsVisibleSelected")),
-      verbatimTextOutput(ns("nCellsAllSelected")),
+      # verbatimTextOutput(ns("nCellsAllSelected")),
       actionButton(ns("changeGroups"), "change current selection"),
       checkboxInput(ns("showCells"), "show cell names", FALSE),
       verbatimTextOutput(ns("cellSelection"))

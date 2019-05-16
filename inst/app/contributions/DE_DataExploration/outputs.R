@@ -290,7 +290,7 @@ output$DE_tsne_plt <- plotly::renderPlotly({
 
   printTimeEnd(start.time, "DE_dataExpltSNEPlot")
   exportTestValues(DE_dataExpltSNEPlot = {str(retVal)})
-  return(retVal)
+  retVal
 })
 
 # download RDS ----
