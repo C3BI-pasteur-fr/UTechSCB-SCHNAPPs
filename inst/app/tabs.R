@@ -39,7 +39,6 @@ inputTab <- shinydashboard::tabItem(
     )
   )),
   br(),
-  br(),
   fluidRow(column(
     5,
     offset = 4,
@@ -47,12 +46,12 @@ inputTab <- shinydashboard::tabItem(
       "file1",
       "Choose .RData/.Rds file with singleCellExperiment object OR .txt/.csv file with count data to upload",
       accept = c(
-        ".Rds",".RData", ".txt", ".csv"
+        ".Rds",".RData", ".Rdata", ".txt", ".csv"
       ),
       multiple = TRUE
     )
   )),
-  br(),
+
   br(),
   fluidRow(column(6,
                   textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-|^RP|^MRP")
@@ -285,8 +284,10 @@ for (fp in parFiles) {
 parameterItems <- list(
   shinydashboard::menuSubItem("Normalization", tabName = "normalizations"),
   parameterContributions,
-  shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters")
-)
+  shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters"),
+  shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
+  shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
+  )
 
 
 

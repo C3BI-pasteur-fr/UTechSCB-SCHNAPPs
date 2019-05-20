@@ -73,14 +73,14 @@ tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(div(
-      h5("Selected cell names to be copied"),
+      h5("Selected itmes to be copied"),
       align = "left"
     )),
     fluidRow(
       verbatimTextOutput(ns("cellSelection"))
     ),
     fluidRow(
-      downloadButton(ns("download_cellNameTable"), "Download Table")
+      downloadButton(ns("download_cellNameTable"), "Download table")
     ),
     fluidRow(
       h4("Cells", offset = 1),
