@@ -545,35 +545,36 @@ returnNull <- function() {
   return(NULL)
 }
 
-# forceCalc -----# handling expensive calcualtions
-forceCalc <- shiny::observe({
-  if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
-  go <- input$goCalc
-  start.time <- base::Sys.time()
-  if (go) {
-    isolate({
-      if (DEBUG) {
-        base::cat(file = stderr(), "forceCalc\n")
-      }
-      # list of output variable and function name
-
-      withProgress(message = "Performing heavy calculations", value = 0, {
-        n <- length(heavyCalculations)
-        for (calc in heavyCalculations) {
-          shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
-          if (DEBUG) {
-            cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
-          }
-          assign(calc[1], eval(parse(text = base::paste0(
-            calc[2], "()"
-          ))))
-        }
-      })
-    })
-
-    printTimeEnd(start.time, "forceCalc")
-  }
-})
+# uncommented because it is corrently not used
+# # forceCalc -----# handling expensive calcualtions
+# forceCalc <- shiny::observe({
+#   if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
+#   go <- input$goCalc
+#   start.time <- base::Sys.time()
+#   if (go) {
+#     isolate({
+#       if (DEBUG) {
+#         base::cat(file = stderr(), "forceCalc\n")
+#       }
+#       # list of output variable and function name
+# 
+#       withProgress(message = "Performing heavy calculations", value = 0, {
+#         n <- length(heavyCalculations)
+#         for (calc in heavyCalculations) {
+#           shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
+#           if (DEBUG) {
+#             cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
+#           }
+#           assign(calc[1], eval(parse(text = base::paste0(
+#             calc[2], "()"
+#           ))))
+#         }
+#       })
+#     })
+# 
+#     printTimeEnd(start.time, "forceCalc")
+#   }
+# })
 
 scranWarning <- function() {
   cat(file = stderr(), paste0("scranWarning\n"))
