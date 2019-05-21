@@ -491,7 +491,7 @@ medianENSG <- reactive({
     return(0)
   }
   scEx_log <- assays(scEx_log)[[1]]
-  if (ncol(scEx_log) <= 1 | nrow(scEx_log) < 1) {
+  if (dim(scEx_log)[1] <= 1 | nrow(scEx_log) < 1) {
     return(0)
   }
   retVal <- medianENSGfunc(scEx_log)
@@ -586,7 +586,7 @@ useCellsFunc <-
       save(file = "~/SCHNAPPsDebug/useCellsFunc.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/useCellsFunc.Rdata')
-    goodCols <- rep(TRUE, ncol(dataTables$scEx))
+    goodCols <- rep(TRUE, dim(dataTables$scEx)[2])
     scEx <- assays(dataTables$scEx)[[1]]
     #### start: cells with genes expressed
     # take only cells where these genes are expressed with at least one read
@@ -735,7 +735,7 @@ useGenesFunc <-
     if (nchar(ipIDs) > 0) {
       keepIDs <- !grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
     } else {
-      keepIDs <- rep(TRUE, nrow(dataTables$scEx))
+      keepIDs <- rep(TRUE, dim(dataTables$scEx)[1])
     }
     # explicit list of genes to keep
     genesKeep <- toupper(genesKeep)
@@ -1205,7 +1205,7 @@ scExLogMatrixDisplay <- reactive({
   # load(file="~/SCHNAPPsDebug/scExLogMatrixDisplay.RData")
   
   # TODO
-  if (ncol(scEx_log) > 20000) {
+  if (dim(scEx_log)[1] > 20000) {
     
   }
   retVal <-
@@ -1223,7 +1223,7 @@ scExLogMatrixDisplay <- reactive({
   return(retVal)
 })
 
-pcaFunc <- function(scEx_log) {
+pcaFunc <- function(scEx_log, rank, center, scale) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1251,13 +1251,13 @@ pcaFunc <- function(scEx_log) {
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
-    scater::runPCA(
-      scEx_log,
-      ncomponents = 10,
-      method = "irlba",
-      ntop = 500,
-      exprs_values = "logcounts"
-    )
+    # TODO: scater changed: need to use BiocSingular runPCA/runSVD
+    BiocSingular::runPCA(
+      t(assays(scEx_log)[["logcounts"]]),
+      rank = rank,
+      center = center,
+      scale = scale
+     )
   },
   error = function(e) {
     cat(file = stderr(), paste("error in PCA:", e))
@@ -1272,8 +1272,10 @@ pcaFunc <- function(scEx_log) {
     cat(file = stderr(), "PCA FAILED!!!\n")
     return(NULL)
   },
-  finally = {
-    if (DEBUG) cat(file = stderr(), paste("pca done\n"))
+  warning = function(e) {
+    if (DEBUG) {
+      cat(file = stderr(), paste("runPCA created a warning:", e, "\n"))
+    }
   }
   )
   if (is.null(scaterPCA)) {
@@ -1282,12 +1284,15 @@ pcaFunc <- function(scEx_log) {
   # pca = reducedDim(scaterPCA, "PCA")
   # attr(pca,"percentVar")
   #
+  rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
-    x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    var_pcs = attr(
-      SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-      "percentVar"
-    )
+    x =  scaterPCA$x,
+    # x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    var_pcs = scaterPCA$sdev
+    # var_pcs = attr(
+    #   SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    #   "percentVar"
+    # )
   ))
 }
 
@@ -1306,6 +1311,9 @@ pca <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
+  rank = input$pcaRank
+  center = input$pcaCenter
+  scale = input$pcaScale
   
   scEx_log <- scEx_log()
   if (is.null(scEx_log)) {
@@ -1314,7 +1322,12 @@ pca <- reactive({
     }
     return(NULL)
   }
-  retVal <- pcaFunc(scEx_log)
+  
+  if (is.null(rank)) rank <- 10
+  if (is.null(center)) centr <- TRUE
+  if (is.null(scale)) scale <- FALSE
+  
+  retVal <- pcaFunc(scEx_log, rank, center, scale)
   
   printTimeEnd(start.time, "pca")
   exportTestValues(pca = {
@@ -1549,7 +1562,8 @@ projections <- reactive({
   }
   # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   
-  projections <- data.frame(pca$x[, c(1, 2, 3)])
+  
+  projections <- data.frame(pca$x[, seq(1,ncol(pca$x))])
   pd <- colData(scEx)
   if (ncol(pd) < 2) {
     cat(file = stderr(), "phenoData for scEx has less than 2 columns\n")
@@ -1565,6 +1579,7 @@ projections <- reactive({
       if (DEBUG) {
         cat(file = stderr(), paste("calculation projection:  ", proj[1], "\n"))
       }
+      cat(file = stderr(), paste("projection: ", proj[2] , "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
       if (DEBUGSAVE) {
         save(
@@ -1574,7 +1589,7 @@ projections <- reactive({
         iter <- iter + 1
       }
       # load(file="~/SCHNAPPsDebug/projections.1.RData")
-      
+      # browser()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (class(tmp) == "data.frame") {
         cn <- make.names(c(colnames(projections), colnames(tmp)))
@@ -1609,7 +1624,8 @@ projections <- reactive({
       }
       
       colnames(projections) <- cn
-      observe(proj[2], quoted = TRUE)
+      cat(file = stderr(), paste("observe this: ", proj[2] , "\n"))
+      # observe(proj[2], quoted = TRUE)
     }
   })
   # add a column for gene specific information that will be filled/updated on demand
@@ -1670,8 +1686,8 @@ initializeGroupNames <- reactive({
   isolate({
     df <-
       data.frame(
-        all = rep(TRUE, ncol(scEx)),
-        none = rep(FALSE, ncol(scEx))
+        all = rep(TRUE, dim(scEx)[1]),
+        none = rep(FALSE, dim(scEx)[1])
       )
     rownames(df) <- colnames(scEx)
     groupNames[["namesDF"]] <- df
@@ -1717,7 +1733,7 @@ sample <- reactive({
       retVal[, pdColName] <- factor(as.character(pd[, pdColName]))
     }
   }
-  
+  rownames(retVal) = rownames(pd)
   exportTestValues(sample = {
     retVal
   })

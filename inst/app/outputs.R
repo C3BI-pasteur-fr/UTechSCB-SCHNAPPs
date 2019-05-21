@@ -105,6 +105,11 @@ output$summaryStatsSideBar <- renderUI({
     }
     return(NULL)
   }
+  annFile <- inputFile$annFile
+  medianUMI <- medianUMI()
+  medianENSG <- medianENSG()
+  memoryUsed <- getMemoryUsed()
+  normalizationRadioButton <- input$normalizationRadioButton
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
@@ -112,17 +117,17 @@ output$summaryStatsSideBar <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
-  line0 <- paste(inputFile$inFile, " _ ", inputFile$annFile)
+  line0 <- paste(inputFile$inFile, " _ ", annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
-  line3 <- paste("Median UMIs per cell: ", medianUMI(), sep = "\t")
+  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
   line4 <-
-    paste("Median Genes with min 1 UMI: ", medianENSG(), sep = "\t")
+    paste("Median Genes with min 1 UMI: ", medianENSG, sep = "\t")
   line5 <-
     paste("Total number of reads: ", sum(assays(scEx)[["counts"]]))
-  line6 <- paste("Memory used:", getMemoryUsed())
+  line6 <- paste("Memory used:", memoryUsed)
   line7 <-
-    paste("Normalization used:", input$normalizationRadioButton)
+    paste("Normalization used:", normalizationRadioButton)
   htmlOut <- paste0(
     "Summary statistics of this dataset:",
     "<br/>",
