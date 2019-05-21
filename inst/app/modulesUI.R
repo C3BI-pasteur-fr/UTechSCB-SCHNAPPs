@@ -17,7 +17,7 @@ clusterUI <- function(id) {
              textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = "")),
       column(6,
              offset = 0,
-             textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes", value = "")
+             textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes2", value = "")
       )
     ),
     fluidRow(
