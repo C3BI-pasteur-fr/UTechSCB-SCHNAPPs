@@ -1273,7 +1273,9 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
       t(assays(scEx_log)[["logcounts"]]),
       rank = rank,
       center = center,
-      scale = scale
+      scale = scale,
+      BPPARAM = bpparam(),
+      BSPARAM = IrlbaParam()
      )
   },
   error = function(e) {
