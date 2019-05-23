@@ -1274,7 +1274,11 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
       rank = rank,
       center = center,
       scale = scale,
-      BPPARAM = bpparam(),
+      # BPPARAM = bpparam(),
+      # BPPARAM = SnowParam(workers = 3, type = "SOCK),
+      BPPARAM = SnowParam(
+        workers = ifelse(detectCores()>1, detectCores()-1, 1), 
+        type = "SOCK"),
       BSPARAM = IrlbaParam()
      )
   },
