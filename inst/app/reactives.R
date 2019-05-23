@@ -60,12 +60,20 @@ inputDataFunc <- function(inFile) {
   fpLs <- tryCatch(load(fp), error = function(e) {
     NULL
   })
+  
+  # in case we are loading from a report 
   scExFound <- FALSE
-  for (varName in fpLs) {
-    if ("SingleCellExperiment" %in% class(get(varName))) {
-      scEx <- get(varName)
-      scExFound <- TRUE
-      break()
+  if ("scEx" %in% fpLs) {
+    scExFound <- TRUE
+    varName <- "scEx"
+  } else {
+    scExFound <- FALSE
+    for (varName in fpLs) {
+      if ("SingleCellExperiment" %in% class(get(varName))) {
+        scEx <- get(varName)
+        scExFound <- TRUE
+        break()
+      }
     }
   }
   if (!scExFound) {
@@ -491,7 +499,7 @@ medianENSG <- reactive({
     return(0)
   }
   scEx_log <- assays(scEx_log)[[1]]
-  if (dim(scEx_log)[1] <= 1 | nrow(scEx_log) < 1) {
+  if (ncol(scEx_log) <= 1 | nrow(scEx_log) < 1) {
     return(0)
   }
   retVal <- medianENSGfunc(scEx_log)
@@ -557,6 +565,9 @@ medianUMI <- reactive({
   })
   return(retVal)
 })
+
+
+
 
 # for now we don't have a way to specifically select cells
 # we could cluster numbers or the like
@@ -675,11 +686,12 @@ useCells <- reactive({
   }
   
   dataTables <- inputData()
-  geneNames <- input$minExpGenes
-  rmCells <- input$cellsFiltersOut
-  rmPattern <- input$cellPatternRM
-  keepCells <- input$cellKeep
-  cellKeepOnly <- input$cellKeepOnly
+  cellSelectionValues <- cellSelectionValues()
+  geneNames <- cellSelectionValues$minExpGenes
+  rmCells <- cellSelectionValues$cellsFiltersOut
+  rmPattern <- cellSelectionValues$cellPatternRM
+  keepCells <- cellSelectionValues$cellKeep
+  cellKeepOnly <- cellSelectionValues$cellKeepOnly
   # useGenes = isolate(useGenes())
   if (!exists("dataTables") || is.null(dataTables)) {
     if (DEBUG) {
@@ -868,9 +880,9 @@ beforeFilterCounts <- reactive({
   }
   
   dataTables <- inputData()
-  ipIDs <-
-    input$selectIds # regular expression of genes to be removed
-  
+  geneSelectionValues <- geneSelectionValues()
+  # ipIDs <- input$selectIds # regular expression of genes to be removed
+  ipIDs <- geneSelectionValues$selectIds
   if (!exists("dataTables") |
       is.null(dataTables) |
       length(dataTables$featuredata$symbol) == 0) {
@@ -918,10 +930,14 @@ useGenes <- reactive({
   }
   
   dataTables <- inputData()
-  ipIDs <-
-    input$selectIds # regular expression of genes to be removed
-  genesKeep <- input$genesKeep
-  geneListSelection <- input$geneListSelection
+  geneSelectionValues <- geneSelectionValues()
+  # ipIDs <-
+  #   input$selectIds # regular expression of genes to be removed
+  ipIDs <- geneSelectionValues$selectIds
+  # genesKeep <- input$genesKeep
+  # geneListSelection <- input$geneListSelection
+  genesKeep <- geneSelectionValues$genesKeep
+  geneListSelection <- geneSelectionValues$geneListSelection
   
   if (!exists("dataTables") |
       is.null(dataTables) |
@@ -1686,8 +1702,8 @@ initializeGroupNames <- reactive({
   isolate({
     df <-
       data.frame(
-        all = rep(TRUE, dim(scEx)[1]),
-        none = rep(FALSE, dim(scEx)[1])
+        all = rep(TRUE, dim(scEx)[2]),
+        none = rep(FALSE, dim(scEx)[2])
       )
     rownames(df) <- colnames(scEx)
     groupNames[["namesDF"]] <- df
@@ -2316,7 +2332,9 @@ reacativeReport <- function() {
       output_file = "report.html",
       params = params,
       envir = new.env()
-    )
+    ),
+    stderr = stderr(),
+    stdout = stderr()
   )
   # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
   #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)

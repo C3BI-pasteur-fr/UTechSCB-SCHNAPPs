@@ -44,6 +44,7 @@ if (exists("params")) {
     keepCells = input$cellKeep,
     cellKeepOnly = input$cellKeepOnly
   )
+  
   ipIDs <- input$selectIds
   geneListSelection <- input$geneListSelection
   minGene <- input$minGenesGS
