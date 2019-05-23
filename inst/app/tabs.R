@@ -78,6 +78,9 @@ geneSelectionTab <- shinydashboard::tabItem(
     align = "center"
   )),
   fluidRow(
+    column(3, offset = 1, 
+           actionButton("updateGeneSelectionParameters", "apply changes"))),
+  fluidRow(
     column(3,
            offset = 1,
            textInput("selectIds", "regular expression for selection of genes to be removed", value = "^MT-|^RP|^MRP")
@@ -142,7 +145,11 @@ cellSelectionTab <- shinydashboard::tabItem(
       "Here we filter out cells"
     ),
     align = "center"
-  )), fluidRow(
+  )),
+  fluidRow(
+    column(3, offset = 1, 
+           actionButton("updateCellSelectionParameters", "apply changes"))),
+  fluidRow(
     column(6,
            offset = 1,
            shinyBS::tipify(textInput("minExpGenes", "List of genes with minimal expression", value = defaultValueRegExGene),
