@@ -105,6 +105,11 @@ output$summaryStatsSideBar <- renderUI({
     }
     return(NULL)
   }
+  annFile <- inputFile$annFile
+  medianUMI <- medianUMI()
+  medianENSG <- medianENSG()
+  memoryUsed <- getMemoryUsed()
+  normalizationRadioButton <- input$normalizationRadioButton
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
@@ -112,17 +117,17 @@ output$summaryStatsSideBar <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
-  line0 <- paste(inputFile$inFile, " _ ", inputFile$annFile)
+  line0 <- paste(inputFile$inFile, " _ ", annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
-  line3 <- paste("Median UMIs per cell: ", medianUMI(), sep = "\t")
+  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
   line4 <-
-    paste("Median Genes with min 1 UMI: ", medianENSG(), sep = "\t")
+    paste("Median Genes with min 1 UMI: ", medianENSG, sep = "\t")
   line5 <-
     paste("Total number of reads: ", sum(assays(scEx)[["counts"]]))
-  line6 <- paste("Memory used:", getMemoryUsed())
+  line6 <- paste("Memory used:", memoryUsed)
   line7 <-
-    paste("Normalization used:", input$normalizationRadioButton)
+    paste("Normalization used:", normalizationRadioButton)
   htmlOut <- paste0(
     "Summary statistics of this dataset:",
     "<br/>",
@@ -545,35 +550,36 @@ returnNull <- function() {
   return(NULL)
 }
 
-# forceCalc -----# handling expensive calcualtions
-forceCalc <- shiny::observe({
-  if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
-  go <- input$goCalc
-  start.time <- base::Sys.time()
-  if (go) {
-    isolate({
-      if (DEBUG) {
-        base::cat(file = stderr(), "forceCalc\n")
-      }
-      # list of output variable and function name
-
-      withProgress(message = "Performing heavy calculations", value = 0, {
-        n <- length(heavyCalculations)
-        for (calc in heavyCalculations) {
-          shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
-          if (DEBUG) {
-            cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
-          }
-          assign(calc[1], eval(parse(text = base::paste0(
-            calc[2], "()"
-          ))))
-        }
-      })
-    })
-
-    printTimeEnd(start.time, "forceCalc")
-  }
-})
+# uncommented because it is corrently not used
+# # forceCalc -----# handling expensive calcualtions
+# forceCalc <- shiny::observe({
+#   if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
+#   go <- input$goCalc
+#   start.time <- base::Sys.time()
+#   if (go) {
+#     isolate({
+#       if (DEBUG) {
+#         base::cat(file = stderr(), "forceCalc\n")
+#       }
+#       # list of output variable and function name
+# 
+#       withProgress(message = "Performing heavy calculations", value = 0, {
+#         n <- length(heavyCalculations)
+#         for (calc in heavyCalculations) {
+#           shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
+#           if (DEBUG) {
+#             cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
+#           }
+#           assign(calc[1], eval(parse(text = base::paste0(
+#             calc[2], "()"
+#           ))))
+#         }
+#       })
+#     })
+# 
+#     printTimeEnd(start.time, "forceCalc")
+#   }
+# })
 
 scranWarning <- function() {
   cat(file = stderr(), paste0("scranWarning\n"))

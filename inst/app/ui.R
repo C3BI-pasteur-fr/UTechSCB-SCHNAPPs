@@ -58,19 +58,19 @@ source(paste0(packagePath, "/parameters.R"), local = TRUE)
 allMenus <- list(
   shinydashboard::menuItem("input",
     # id="inputID",
-    tabName = "input", icon = icon("dashboard")
+    tabName = "input", icon = icon("folder")
   ),
-  shinydashboard::menuItem("Parametes",
+  shinydashboard::menuItem("Parameters",
     # id="parametersID",
-    tabName = "parameters", icon = icon("dashboard"), parameterItems
+    tabName = "parameters", icon = icon("gopuram"), parameterItems
   ),
-  shinydashboard::menuItem("Cell selection",
+  shinydashboard::menuItem(" Cell selection",
     # id="cellSelectionID",
-    tabName = "cellSelection", icon = icon("dashboard")
+    tabName = "cellSelection", icon = icon("ello")
   ),
   shinydashboard::menuItem("Gene selection",
     # id="geneSelectionID",
-    tabName = "geneSelection", icon = icon("dashboard")
+    tabName = "geneSelection", icon = icon("atom")
   )
 )
 
@@ -95,6 +95,21 @@ for (fp in uiFiles) {
     }
   }
 }
+
+
+mListNames <- c()
+for (menuListItem in 1:length(allMenus)) {
+  mListNames[menuListItem] = allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
+}
+sollOrder <- c("input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
+  "Data Exploration", "Subcluster analysis")
+sollOrderIdx = c()
+for (sIdx in 1:length(sollOrder)) {
+  sollOrderIdx[sIdx] = which(sollOrder[sIdx] == mListNames)
+}
+sollOrderIdx = c(sollOrderIdx, which(!1:length(allMenus) %in%  sollOrderIdx))
+
+allMenus <- allMenus[sollOrderIdx]
 
 # todo
 # parse all parameters.R files under contributions to include in application
@@ -160,7 +175,10 @@ scShinyUI <- shinyUI(
       # tags$style(type="text/css", "downloadbutton a { color: #444; }"),
       downloadButton("report", "Generate report", class="butt"),
       tags$head(tags$style(".butt{color: black !important;}")), #  font color
-      actionButton("goCalc", "Force Calculations"),
+      
+      # commentetd out because currently no-one is using it
+      # actionButton("goCalc", "Force Calculations"),
+      
       # bookmarkButton(id = "bookmark1"),
       shinyBS::tipify(
         downloadButton("countscsv", "Download counts.csv", class="butt"),
