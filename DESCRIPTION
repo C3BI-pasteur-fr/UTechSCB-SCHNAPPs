@@ -73,6 +73,9 @@ Imports:
     tibble,
     uwot,
     tidyverse,
+    Rtsne,
+    irlba,
+    viridis,
     pryr
 Exports:
     clusterUI
@@ -82,7 +85,6 @@ Suggests:
     knitr,
     rmarkdown,
     DelayedArray (>= 0.7.44),
-    Rtsne,
     irlba,
     viridis,
     org.Mm.eg.db
