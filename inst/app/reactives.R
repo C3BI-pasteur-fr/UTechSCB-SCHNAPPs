@@ -1,6 +1,7 @@
 
 
 require(scran)
+require(BiocSingular)
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
 

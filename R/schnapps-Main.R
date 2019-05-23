@@ -4,12 +4,12 @@
 #'
 #' @export schnapps
 #' 
-#' @param localContributionDir localContributionDir
-#' @param defaultValueSingleGene defaultValueSingleGene
-#' @param defaultValueMultiGenes defaultValueMultiGenes
-#' @param defaultValueRegExGene defaultValueRegExGene
-#' @param DEBUG DEBUG
-#' @param DEBUGSAVE DEBUGSAVE
+#' @param localContributionDir path to the directory(ies) that contain additional functionality
+#' @param defaultValueSingleGene single gene name to used as a default value.
+#' @param defaultValueMultiGenes comma separated list of gene names to be used as a default value.
+#' @param defaultValueRegExGene regular Expression used for gene selection 
+#' @param DEBUG TRUE/FALSE whether to show debugging information on the console
+#' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
 #' 
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
