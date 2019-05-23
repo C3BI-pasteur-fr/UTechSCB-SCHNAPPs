@@ -42,14 +42,14 @@ save(file = "scEx.Rdata", list = "scEx")
 
 ## Screen-shots / walk-through
 
-Under the following link you can find some [screen-shots](inst/www/screen_shots.md)
+Under the following link you can find some [screen-shots](www/screen_shots.md)
 
 
 ## FAQ
 
 The FAQ answers question on how specific questions can be handled witht SCHNAPPs.
 
-[FAQ](inst/www/faq.md)
+[FAQ](www/faq.md)
 
 
 ## Extending SCHAPPs
