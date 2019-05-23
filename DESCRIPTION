@@ -71,6 +71,8 @@ Imports:
     TRONCO,
     psych,
     tibble,
+    uwot,
+    tidyverse,
     pryr
 Exports:
     clusterUI

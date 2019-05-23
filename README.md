@@ -13,6 +13,9 @@ Shiny app for the exploration and analysis of single cell RNAseq data as it come
 if (!require("devtools"))
   install.packages("devtools")
 devtools::install_github("mul118/shinyMCE")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("BiocSingular")
 install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
