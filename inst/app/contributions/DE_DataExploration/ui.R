@@ -4,10 +4,9 @@ library(magrittr)
 menuList <- list(
   shinydashboard::menuItem("Data Exploration",
            # id="dataExplorationID",
-    tabName = "expore", startExpanded = FALSE,
+    tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
     shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
-    shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot"),
-    shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
+    shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
   )
 )
 
@@ -115,6 +114,7 @@ tabList <- list(
       tags$li(
         strong("Scater QC plots")
       ),
+      checkboxInput("runScater", "run scater plot", FALSE),
       fluidRow(
         column(
           10,

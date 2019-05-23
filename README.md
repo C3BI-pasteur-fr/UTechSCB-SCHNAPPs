@@ -54,6 +54,8 @@ The FAQ answers question on how specific questions can be handled witht SCHNAPPs
 
 ## Extending SCHAPPs
 
+See [SCHNAPPsContribution](https://github.com/baj12/SCHNAPPsContributions) for examples and dummy contributions on how add functionality.
+
 ## Credits
 
 The original version of this app is based on CellView (https://github.com/mohanbolisetty/CellView), but it was substantially modified. It helped me get started.
