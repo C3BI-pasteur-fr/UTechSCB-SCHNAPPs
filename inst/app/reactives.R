@@ -1,4 +1,6 @@
-
+if (DEBUG) {
+  cat(file = stderr(), "\n\nloading reactives.\n\n\n")
+}
 
 require(scran)
 require(BiocSingular)
@@ -1091,9 +1093,11 @@ scEx <- reactive({
   dataTables <- inputData()
   useCells <- useCells()
   useGenes <- useGenes()
-  minGene <- input$minGenesGS # min number of reads per gene
-  minG <- input$minGenes # min number of reads per cell
-  maxG <- input$maxGenes # max number of reads per cell
+  cellSelectionValues <- cellSelectionValues()
+  minGene <- cellSelectionValues$minGenesGS # min number of reads per gene
+  minG <- cellSelectionValues$minGenes # min number of reads per cell
+  maxG <- cellSelectionValues$maxGenes # max number of reads per cell
+  
   if (!exists("dataTables") |
       is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     if (DEBUG) {
@@ -1107,6 +1111,8 @@ scEx <- reactive({
   }
   # load(file="~/SCHNAPPsDebug/scEx.RData")
   
+  # TODO:??? should be keep the cell names from the projections?
+  # here we are just reinitializing.
   retVal <- scExFunc(
     scExOrg = dataTables$scEx,
     useCells = useCells,
@@ -2392,3 +2398,8 @@ consolidateScEx <-
     
     return(scEx)
   }
+
+
+if (DEBUG) {
+  cat(file = stderr(), "\n\ndone loading reactives.R.\n\n\n")
+}
