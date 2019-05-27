@@ -180,8 +180,13 @@ clusterServer <- function(input, output, session,
     )
 
     subsetData <- subset(projections, dbCluster %in% inpClusters)
-    cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
-
+    # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
+    # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
+    cells.names <- brushedPs$key
+    cells.names <- unique(cells.names[!is.na(cells.names)])
+    if (DEBUG) {
+      cat(file = stderr(), paste("curveNumbers:", unique(brushedPs$curveNumber), "\n"))
+    }
     printTimeEnd(start.time, "selectedCellNames")
     exportTestValues(selectedCellNames = {
       cells.names
