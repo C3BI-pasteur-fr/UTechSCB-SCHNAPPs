@@ -205,6 +205,21 @@ Variables that are used can be found here: **[variables.used.txt](variables.used
 
 __CHILDREPORTS__
 
+```{r variables, include=FALSE, results='asis', eval=TRUE}
+# cat(file = stderr(), paste(ls(), collapse = "\n"))
+# save(file = "~/SCHNAPPsDebug/report.vars.RData", list = ls())
+# load(file = "~/SCHNAPPsDebug/report.vars.RData")
+fileConn <- (paste0(reportTempDir, "/variables.used.txt"))
+printVars <- function(x, fileConn) {
+  for (varN in names(x)) {
+    # if (is.data.frame(x[[varN]])) {
+    cat(file = fileConn, x = paste(varN, "=", paste(x[[varN]], collapse = "\n"), collapse = "\n"), append = TRUE)
+    cat(file = fileConn, x = "\n\t", append = TRUE)
+  }
+}
+printVars(params, fileConn)
+# close(fileConn)
+```
 
 # Session information
 

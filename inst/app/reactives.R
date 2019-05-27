@@ -418,8 +418,9 @@ inputData <- reactive({
   
   # inFile$datapath = "data/scEx.RData"
   # annFile$datapath = "data/scExGenesRowNames.csv"
+  # TODO either multiple files with rdata/rds or single file of csv/other
   fpExtension <- tools::file_ext(inFile$datapath[1])
-  if (fpExtension %in% c("RData", "Rds")) {
+  if (toupper(fpExtension) %in% c("RDATA", "RDS")) {
     retVal <- inputDataFunc(inFile)
   } else {
     retVal <- readCSV(inFile)
@@ -2063,9 +2064,18 @@ reacativeReport <- function() {
         # if ( var == "coE_selctedCluster")
           # browser()
         rectVals <- c(rectVals, var)
-        assign(var, eval(parse(text = paste0(
+        tempVar <- tryCatch(eval(parse(text = paste0(
           "\`", var, "\`()"
-        ))), envir = report.env)
+        ))),
+        error = function(e){
+          cat(file = stderr, paste("error var", var, ":(",e,")\n"))
+          e
+        },
+        warning = function(e){
+          cat(file = stderr, paste("warning with var", var, ":(",e,")\n"))
+          e
+        })
+        assign(var, tempVar, envir = report.env)
         # for modules we have to take care of return values
         # this has to be done manually (for the moment)
         # and is only required for clusterServer

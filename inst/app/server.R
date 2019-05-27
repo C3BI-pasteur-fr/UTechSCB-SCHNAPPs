@@ -110,7 +110,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
 
   # files to be included in report
   # developers can add in outputs.R a variable called "myZippedReportFiles"
-  zippedReportFiles <- c("Readme.txt", "report.html", "sessionData.RData", "normalizedCounts.csv", "variables.used.txt", "inputUsed.RData")
+  zippedReportFiles <- c("Readme.txt", "report.html", "sessionData.RData", 
+                         "normalizedCounts.csv", "variables.used.txt")
 
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
 
