@@ -3,7 +3,6 @@ require(shiny)
 require(reactlog)
 require(shinyTree)
 require(tibble)
-require(shinyBS)
 require(plotly)
 require(shinythemes)
 require(ggplot2)
@@ -31,6 +30,7 @@ require(scran)
 require(callr)
 require(debugme)
 require(BiocSingular)
+require(shinyBS)
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {

@@ -6,18 +6,18 @@
 #
 
 
-# library(shiny)
-# library(shinydashboard)
-# library(shinyBS)
-# library(plotly)
-# library(shinythemes)
-# library(ggplot2)
-# library(DT)
-# library(edgeR)
-# library(pheatmap)
-# library(threejs)
-# library(shinyTree)
-# library(shinycssloaders)
+require(shiny)
+require(shinydashboard)
+require(plotly)
+require(shinythemes)
+require(ggplot2)
+require(DT)
+require(edgeR)
+require(pheatmap)
+require(threejs)
+require(shinyTree)
+require(shinycssloaders)
+require(shinyBS)
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -140,10 +140,10 @@ scShinyUI <- shinyUI(
         id = "sideBarID",
         allMenus
       ),
-      shinyBS::tipify(
-        checkboxInput("noStats", "don't display stats", FALSE),
-        "check this if you are working on the cell/gene selection to avoid certain calculations"
-      ),
+      # shinyBS::tipify(
+      #   checkboxInput("noStats", "don't display stats", FALSE),
+      #   "check this if you are working on the cell/gene selection to avoid certain calculations"
+      # ),
 
       shinyBS::tipify(
         htmlOutput("summaryStatsSideBar"),

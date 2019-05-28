@@ -143,12 +143,12 @@ output$summaryStatsSideBar <- renderUI({
     }
     return(NULL)
   }
-  if (input$noStats) {
-    if (DEBUG) {
-      cat(file = stderr(), "output$summaryStatsSideBar:off\n")
-    }
-    return(NULL)
-  }
+  # if (input$noStats) {
+  #   if (DEBUG) {
+  #     cat(file = stderr(), "output$summaryStatsSideBar:off\n")
+  #   }
+  #   return(NULL)
+  # }
   annFile <- inputFile$annFile
   medianUMI <- medianUMI()
   medianENSG <- medianENSG()

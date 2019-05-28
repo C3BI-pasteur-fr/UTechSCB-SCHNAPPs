@@ -1278,17 +1278,19 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
     BiocSingular::runPCA(
      # t(assays(scEx_log)[["logcounts"]]),
      scEx_log,
-     ncomponents = rank, 
+     ncomponents = rank,
+     ntop = 500,
+     exprs_values = "logcounts",
      # rank = rank,
      #  center = center,
-      scale = scale,
+      scale = scale
      # method = "irlba",
       # BPPARAM = bpparam(),
       # BPPARAM = SnowParam(workers = 3, type = "SOCK),
       # BPPARAM = SnowParam(
       #   workers = ifelse(detectCores()>1, detectCores()-1, 1), 
       #   type = "SOCK"),
-      BSPARAM = IrlbaParam()
+      # BSPARAM = IrlbaParam()
      )
   },
   error = function(e) {
@@ -1316,7 +1318,7 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
   # pca = reducedDim(scaterPCA, "PCA")
   # attr(pca,"percentVar")
   #
-  rownames(scaterPCA$x) = colnames(scEx_log)
+  # rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
     # x =  scaterPCA$x,
     x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
