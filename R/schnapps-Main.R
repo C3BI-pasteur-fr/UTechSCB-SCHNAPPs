@@ -13,7 +13,6 @@
 #' 
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
-#' @importFrom shinyBS tipify bsAlert
 #' @importFrom  shiny actionButton setBookmarkExclude observeEvent updateRadioButtons shinyUI
 #' checkboxInput htmlOutput downloadButton  tags withProgress
 #' renderPrint renderUI exportTestValues renderText isolate downloadHandler fluidRow fileInput textInput
@@ -26,6 +25,7 @@
 #' @importFrom DT DTOutput dataTableProxy
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom plotly event_data plot_ly
+#' @importFrom shinyBS tipify bsAlert
 #'
 #'
 #'

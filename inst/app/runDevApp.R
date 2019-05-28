@@ -16,8 +16,8 @@ assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = globalenv())
 
 devscShinyApp = TRUE
 packagePath = "inst/app"
-source(paste0(packagePath,  "/server.R"))
 source(paste0(packagePath,  "/ui.R"))
+source(paste0(packagePath,  "/server.R"))
 
 shinyApp(ui = scShinyUI, server = scShinyServer)
 

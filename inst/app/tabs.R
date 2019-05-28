@@ -1,5 +1,6 @@
-require(shinyMCE)
 require(shiny)
+require(shinyMCE)
+require(shinyBS)
 
 source(paste0(packagePath,  "/modulesUI.R"))
 # this is where the general tabs are defined:

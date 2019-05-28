@@ -2,7 +2,6 @@ require(shiny)
 require(reactlog)
 require(shinyTree)
 require(tibble)
-require(shinyBS)
 require(plotly)
 require(shinythemes)
 require(ggplot2)
@@ -29,6 +28,7 @@ require(shinytest)
 require(scran)
 require(callr)
 require(debugme)
+require(shinyBS)
 
 localContributionDir = ""
 defaultValueSingleGene = "CD52"

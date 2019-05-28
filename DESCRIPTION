@@ -32,7 +32,6 @@ Imports:
     shiny,
     shinydashboard,
     shinyAce,
-    shinyBS,
     shinyTree,
     shinythemes,
     shinyjs,
@@ -76,6 +75,7 @@ Imports:
     Rtsne,
     irlba,
     viridis,
+    shinyBS,
     pryr
 Exports:
     clusterUI
