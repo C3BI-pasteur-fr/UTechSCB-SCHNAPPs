@@ -13,7 +13,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: 
-    R (>= 2.10),
+    R (>= 3.6),
 Imports:
     SummarizedExperiment, 
     RJSONIO,
@@ -21,6 +21,7 @@ Imports:
     shinycssloaders,
     shinyjqui,
     Matrix,
+    BiocSingular,
     debugme,
     methods,
     reactlog,
@@ -31,7 +32,6 @@ Imports:
     shiny,
     shinydashboard,
     shinyAce,
-    shinyBS,
     shinyTree,
     shinythemes,
     shinyjs,
@@ -70,6 +70,12 @@ Imports:
     TRONCO,
     psych,
     tibble,
+    uwot,
+    tidyverse,
+    Rtsne,
+    irlba,
+    viridis,
+    shinyBS,
     pryr
 Exports:
     clusterUI
@@ -79,7 +85,6 @@ Suggests:
     knitr,
     rmarkdown,
     DelayedArray (>= 0.7.44),
-    Rtsne,
     irlba,
     viridis,
     org.Mm.eg.db
@@ -89,4 +94,4 @@ BugReports: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues
 biocViews: Visualization, GUI, DimensionReduction, 
     FeatureExtraction, Clustering, Transcription, 
     GeneExpression, Transcriptomics, SingleCell, CellBasedAssays
-
+VignetteBuilder: knitr

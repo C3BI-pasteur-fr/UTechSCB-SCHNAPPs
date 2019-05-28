@@ -1,6 +1,9 @@
-
+if (DEBUG) {
+  cat(file = stderr(), "\n\nloading reactives.\n\n\n")
+}
 
 require(scran)
+require(BiocSingular)
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
 
@@ -60,12 +63,20 @@ inputDataFunc <- function(inFile) {
   fpLs <- tryCatch(load(fp), error = function(e) {
     NULL
   })
+  
+  # in case we are loading from a report 
   scExFound <- FALSE
-  for (varName in fpLs) {
-    if ("SingleCellExperiment" %in% class(get(varName))) {
-      scEx <- get(varName)
-      scExFound <- TRUE
-      break()
+  if ("scEx" %in% fpLs) {
+    scExFound <- TRUE
+    varName <- "scEx"
+  } else {
+    scExFound <- FALSE
+    for (varName in fpLs) {
+      if ("SingleCellExperiment" %in% class(get(varName))) {
+        scEx <- get(varName)
+        scExFound <- TRUE
+        break()
+      }
     }
   }
   if (!scExFound) {
@@ -409,8 +420,9 @@ inputData <- reactive({
   
   # inFile$datapath = "data/scEx.RData"
   # annFile$datapath = "data/scExGenesRowNames.csv"
+  # TODO either multiple files with rdata/rds or single file of csv/other
   fpExtension <- tools::file_ext(inFile$datapath[1])
-  if (fpExtension %in% c("RData", "Rds")) {
+  if (toupper(fpExtension) %in% c("RDATA", "RDS")) {
     retVal <- inputDataFunc(inFile)
   } else {
     retVal <- readCSV(inFile)
@@ -558,6 +570,9 @@ medianUMI <- reactive({
   return(retVal)
 })
 
+
+
+
 # for now we don't have a way to specifically select cells
 # we could cluster numbers or the like
 # internal, should not be used by plug-ins
@@ -586,7 +601,7 @@ useCellsFunc <-
       save(file = "~/SCHNAPPsDebug/useCellsFunc.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/useCellsFunc.Rdata')
-    goodCols <- rep(TRUE, ncol(dataTables$scEx))
+    goodCols <- rep(TRUE, dim(dataTables$scEx)[2])
     scEx <- assays(dataTables$scEx)[[1]]
     #### start: cells with genes expressed
     # take only cells where these genes are expressed with at least one read
@@ -675,11 +690,12 @@ useCells <- reactive({
   }
   
   dataTables <- inputData()
-  geneNames <- input$minExpGenes
-  rmCells <- input$cellsFiltersOut
-  rmPattern <- input$cellPatternRM
-  keepCells <- input$cellKeep
-  cellKeepOnly <- input$cellKeepOnly
+  cellSelectionValues <- cellSelectionValues()
+  geneNames <- cellSelectionValues$minExpGenes
+  rmCells <- cellSelectionValues$cellsFiltersOut
+  rmPattern <- cellSelectionValues$cellPatternRM
+  keepCells <- cellSelectionValues$cellKeep
+  cellKeepOnly <- cellSelectionValues$cellKeepOnly
   # useGenes = isolate(useGenes())
   if (!exists("dataTables") || is.null(dataTables)) {
     if (DEBUG) {
@@ -735,7 +751,7 @@ useGenesFunc <-
     if (nchar(ipIDs) > 0) {
       keepIDs <- !grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
     } else {
-      keepIDs <- rep(TRUE, nrow(dataTables$scEx))
+      keepIDs <- rep(TRUE, dim(dataTables$scEx)[1])
     }
     # explicit list of genes to keep
     genesKeep <- toupper(genesKeep)
@@ -868,9 +884,9 @@ beforeFilterCounts <- reactive({
   }
   
   dataTables <- inputData()
-  ipIDs <-
-    input$selectIds # regular expression of genes to be removed
-  
+  geneSelectionValues <- geneSelectionValues()
+  # ipIDs <- input$selectIds # regular expression of genes to be removed
+  ipIDs <- geneSelectionValues$selectIds
   if (!exists("dataTables") |
       is.null(dataTables) |
       length(dataTables$featuredata$symbol) == 0) {
@@ -918,10 +934,14 @@ useGenes <- reactive({
   }
   
   dataTables <- inputData()
-  ipIDs <-
-    input$selectIds # regular expression of genes to be removed
-  genesKeep <- input$genesKeep
-  geneListSelection <- input$geneListSelection
+  geneSelectionValues <- geneSelectionValues()
+  # ipIDs <-
+  #   input$selectIds # regular expression of genes to be removed
+  ipIDs <- geneSelectionValues$selectIds
+  # genesKeep <- input$genesKeep
+  # geneListSelection <- input$geneListSelection
+  genesKeep <- geneSelectionValues$genesKeep
+  geneListSelection <- geneSelectionValues$geneListSelection
   
   if (!exists("dataTables") |
       is.null(dataTables) |
@@ -1073,9 +1093,11 @@ scEx <- reactive({
   dataTables <- inputData()
   useCells <- useCells()
   useGenes <- useGenes()
-  minGene <- input$minGenesGS # min number of reads per gene
-  minG <- input$minGenes # min number of reads per cell
-  maxG <- input$maxGenes # max number of reads per cell
+  cellSelectionValues <- cellSelectionValues()
+  minGene <- cellSelectionValues$minGenesGS # min number of reads per gene
+  minG <- cellSelectionValues$minGenes # min number of reads per cell
+  maxG <- cellSelectionValues$maxGenes # max number of reads per cell
+  
   if (!exists("dataTables") |
       is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     if (DEBUG) {
@@ -1089,6 +1111,8 @@ scEx <- reactive({
   }
   # load(file="~/SCHNAPPsDebug/scEx.RData")
   
+  # TODO:??? should be keep the cell names from the projections?
+  # here we are just reinitializing.
   retVal <- scExFunc(
     scExOrg = dataTables$scEx,
     useCells = useCells,
@@ -1205,7 +1229,7 @@ scExLogMatrixDisplay <- reactive({
   # load(file="~/SCHNAPPsDebug/scExLogMatrixDisplay.RData")
   
   # TODO
-  if (ncol(scEx_log) > 20000) {
+  if (dim(scEx_log)[1] > 20000) {
     
   }
   retVal <-
@@ -1223,7 +1247,7 @@ scExLogMatrixDisplay <- reactive({
   return(retVal)
 })
 
-pcaFunc <- function(scEx_log) {
+pcaFunc <- function(scEx_log, rank, center, scale) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1251,13 +1275,23 @@ pcaFunc <- function(scEx_log) {
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
-    scater::runPCA(
-      scEx_log,
-      ncomponents = 10,
-      method = "irlba",
-      ntop = 500,
-      exprs_values = "logcounts"
-    )
+    BiocSingular::runPCA(
+     # t(assays(scEx_log)[["logcounts"]]),
+     scEx_log,
+     ncomponents = rank,
+     ntop = 500,
+     exprs_values = "logcounts",
+     # rank = rank,
+     #  center = center,
+      scale = scale
+     # method = "irlba",
+      # BPPARAM = bpparam(),
+      # BPPARAM = SnowParam(workers = 3, type = "SOCK),
+      # BPPARAM = SnowParam(
+      #   workers = ifelse(detectCores()>1, detectCores()-1, 1), 
+      #   type = "SOCK"),
+      # BSPARAM = IrlbaParam()
+     )
   },
   error = function(e) {
     cat(file = stderr(), paste("error in PCA:", e))
@@ -1272,8 +1306,10 @@ pcaFunc <- function(scEx_log) {
     cat(file = stderr(), "PCA FAILED!!!\n")
     return(NULL)
   },
-  finally = {
-    if (DEBUG) cat(file = stderr(), paste("pca done\n"))
+  warning = function(e) {
+    if (DEBUG) {
+      cat(file = stderr(), paste("runPCA created a warning:", e, "\n"))
+    }
   }
   )
   if (is.null(scaterPCA)) {
@@ -1282,8 +1318,11 @@ pcaFunc <- function(scEx_log) {
   # pca = reducedDim(scaterPCA, "PCA")
   # attr(pca,"percentVar")
   #
+  # rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
+    # x =  scaterPCA$x,
     x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    # var_pcs = scaterPCA$sdev
     var_pcs = attr(
       SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
       "percentVar"
@@ -1306,6 +1345,9 @@ pca <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
+  rank = input$pcaRank
+  center = input$pcaCenter
+  scale = input$pcaScale
   
   scEx_log <- scEx_log()
   if (is.null(scEx_log)) {
@@ -1314,7 +1356,12 @@ pca <- reactive({
     }
     return(NULL)
   }
-  retVal <- pcaFunc(scEx_log)
+  
+  if (is.null(rank)) rank <- 10
+  if (is.null(center)) centr <- TRUE
+  if (is.null(scale)) scale <- FALSE
+  
+  retVal <- pcaFunc(scEx_log, rank, center, scale)
   
   printTimeEnd(start.time, "pca")
   exportTestValues(pca = {
@@ -1549,7 +1596,8 @@ projections <- reactive({
   }
   # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   
-  projections <- data.frame(pca$x[, c(1, 2, 3)])
+  
+  projections <- data.frame(pca$x[, seq(1,ncol(pca$x))])
   pd <- colData(scEx)
   if (ncol(pd) < 2) {
     cat(file = stderr(), "phenoData for scEx has less than 2 columns\n")
@@ -1565,6 +1613,7 @@ projections <- reactive({
       if (DEBUG) {
         cat(file = stderr(), paste("calculation projection:  ", proj[1], "\n"))
       }
+      cat(file = stderr(), paste("projection: ", proj[2] , "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
       if (DEBUGSAVE) {
         save(
@@ -1574,7 +1623,7 @@ projections <- reactive({
         iter <- iter + 1
       }
       # load(file="~/SCHNAPPsDebug/projections.1.RData")
-      
+      # browser()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (class(tmp) == "data.frame") {
         cn <- make.names(c(colnames(projections), colnames(tmp)))
@@ -1609,7 +1658,8 @@ projections <- reactive({
       }
       
       colnames(projections) <- cn
-      observe(proj[2], quoted = TRUE)
+      cat(file = stderr(), paste("observe this: ", proj[2] , "\n"))
+      # observe(proj[2], quoted = TRUE)
     }
   })
   # add a column for gene specific information that will be filled/updated on demand
@@ -1670,8 +1720,8 @@ initializeGroupNames <- reactive({
   isolate({
     df <-
       data.frame(
-        all = rep(TRUE, ncol(scEx)),
-        none = rep(FALSE, ncol(scEx))
+        all = rep(TRUE, dim(scEx)[2]),
+        none = rep(FALSE, dim(scEx)[2])
       )
     rownames(df) <- colnames(scEx)
     groupNames[["namesDF"]] <- df
@@ -1717,7 +1767,7 @@ sample <- reactive({
       retVal[, pdColName] <- factor(as.character(pd[, pdColName]))
     }
   }
-  
+  rownames(retVal) = rownames(pd)
   exportTestValues(sample = {
     retVal
   })
@@ -2024,9 +2074,18 @@ reacativeReport <- function() {
         # if ( var == "coE_selctedCluster")
           # browser()
         rectVals <- c(rectVals, var)
-        assign(var, eval(parse(text = paste0(
+        tempVar <- tryCatch(eval(parse(text = paste0(
           "\`", var, "\`()"
-        ))), envir = report.env)
+        ))),
+        error = function(e){
+          cat(file = stderr, paste("error var", var, ":(",e,")\n"))
+          e
+        },
+        warning = function(e){
+          cat(file = stderr, paste("warning with var", var, ":(",e,")\n"))
+          e
+        })
+        assign(var, tempVar, envir = report.env)
         # for modules we have to take care of return values
         # this has to be done manually (for the moment)
         # and is only required for clusterServer
@@ -2300,7 +2359,9 @@ reacativeReport <- function() {
       output_file = "report.html",
       params = params,
       envir = new.env()
-    )
+    ),
+    stderr = stderr(),
+    stdout = stderr()
   )
   # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
   #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
@@ -2341,3 +2402,8 @@ consolidateScEx <-
     
     return(scEx)
   }
+
+
+if (DEBUG) {
+  cat(file = stderr(), "\n\ndone loading reactives.R.\n\n\n")
+}

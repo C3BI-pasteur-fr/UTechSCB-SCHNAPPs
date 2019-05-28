@@ -23,7 +23,7 @@ if (exists("params")) {
   require(sm)
   require(RColorBrewer)
   require(mclust)
-  require(reshape)
+  require(reshape2)
   # require(cellrangerRkit)
   # require(SCORPIUS)
   require(ggplot2)
@@ -44,6 +44,7 @@ if (exists("params")) {
     keepCells = input$cellKeep,
     cellKeepOnly = input$cellKeepOnly
   )
+  
   ipIDs <- input$selectIds
   geneListSelection <- input$geneListSelection
   minGene <- input$minGenesGS

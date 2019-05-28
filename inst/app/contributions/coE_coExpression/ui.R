@@ -4,12 +4,12 @@ source(paste0(packagePath,  "/modulesUI.R"))
 
 # list of menu Items
 menuList <- list(
-  shinydashboard::menuItem("Co-expression",
+  shinydashboard::menuItem("Co-expression", icon = icon("dashboard"),
            # id="coexpressionID",
     tabName = "coexpression", startExpanded = FALSE,
     shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
     shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
-    shinydashboard::menuSubItem("Co-expression Violin plot", tabName = "CoExpressionViolin"),
+    shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
     shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )

@@ -41,7 +41,7 @@ library(threejs)
 library(sm)
 library(RColorBrewer)
 library(mclust)
-library(reshape)
+library(reshape2)
 library(ggplot2)
 library(knitr)
 library(kableExtra)
@@ -93,33 +93,11 @@ __LOAD_REACTIVES__
 
 # parameters
 
-```{r setup, include=TRUE, echo=TRUE, warning=FALSE, eval=FALSE}
-# not needed anymore
-# input <- params
-# print(str(input$file1$name))
-paste(inputFile$inFile, " _ ", inputFile$annFile)
-
-
-if (file.exists(input$file1$datapath)) {
-  load(input$file1$datapath)
-} else {
-  cat(file = stderr(), paste("Error input file not existing\n"))
-}
-# print(ls())
-# will be printed on console, for debugging purposes only
-cat(file = stderr(), paste("env:", ls(), "\n"))
-cat(file = stderr(), paste("input:", names(input), input, "\n"))
-# cat(file = stderr(), paste("dataTables:", names(dataTables),"\n"))
+```{r save, eval=TRUE}
+save(file = "~/report.RData", list = c(ls(), "params"))
+# load("~/report.RData")
 ```
 
-```{r save, eval=FALSE}
-save(file = "report.RData", list = c(ls(), "params"))
-```
-
-```{r loadata, eval=FALSE}
-load(file = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T/RtmpzXuS03/report.RData")
-
-```
 
 
 ```{r check Variables, include=FALSE, eval=TRUE}
@@ -170,208 +148,24 @@ dataTables <- inputData
 # }
 ```
 
-```{r useCells, echo=TRUE, eval=FALSE}
-# not needed anymore
-geneNames <- input$minExpGenes
-rmCells <- input$cellsFiltersOut
-rmPattern <- input$cellPatternRM
-keepCells <- input$cellKeep
-# cat(file = stderr(), paste("dataTables:", names(dataTables),"\n"))
-useCells <- useCellsFunc(dataTables,
-  geneNames = input$minExpGenes,
-  rmCells = input$cellsFiltersOut,
-  rmPattern = input$cellPatternRM,
-  keepCells = input$cellKeep,
-  cellKeepOnly = input$cellKeepOnly
-)
-```
-
-```{r useGenes, echo=TRUE, eval=FALSE}
-# not needed anymore
-# base::save(file = "~/SCHNAPPsDebug/report.useGenes.RData", list = ls())
-ipIDs <- input$selectIds
-genesKeep <- input$genesKeep
-geneListSelection <- input$geneListSelection
-
-
-useGenes <- useGenesFunc(dataTables, ipIDs, geneListSelection, genesKeep, geneLists)
-```
-
 
 ```{r featureDataReact, echo=TRUE, eval=TRUE}
 
 featureDataReact <- dataTables$featuredata[useGenes, ]
 featureData <- dataTables$featuredata[useGenes, ]
-```
 
-```{r scEx, echo=TRUE, eval=FALSE}
-# not needed anymore
-if (DEBUG) cat(file = stderr(), "scEx\n")
-minGene <- input$minGenesGS # min number of reads per gene
-minG <- input$minGenes # min number of reads per cell
-maxG <- input$maxGenes # max number of reads per cell
-
-scEx <- scExFunc(scExOrg = dataTables$scEx, useCells = useCells, useGenes = useGenes, minGene = minGene, minG = minG, maxG = maxG)
-
-if (DEBUG) cat(file = stderr(), "scEx:DONE\n")
-if (DEBUG) cat(file = stderr(), paste("scEx:", class(scEx), "\n"))
-```
-
-
-```{r medianENSG, echo=TRUE, eval=TRUE}
 medianENSG <- medianENSGfunc(as.matrix(assays(scEx)[[1]]))
-```
 
-
-```{r medianUMI, echo=TRUE, eval=TRUE}
 medianUMI <- medianUMIfunc(as.matrix(assays(scEx)[[1]]))
-```
-
-
-
-
-```{r scEx_matrix, include=FALSE, eval=TRUE}
 
 scEx_matrix <- as.matrix(assays(scEx)[[1]])
+
+log2cpm <- as.data.frame(as.matrix(assays(scEx_log)[[1]]))
+
 ```
 
-
-```{r rawNormalization, include=FALSE, eval=FALSE}
-# not needed anymore
-rawNormalization <- scEx
-```
-
-```{r scExLogMatrixDisplay, include=FALSE, eval=FALSE}
-# not needed anymore
-retVal <- as.data.frame(as.matrix(assays(scEx_log)[[1]]))
-rownames(retVal) <- make.names(rowData(scEx_log)$symbol, unique = TRUE)
-
-scExLogMatrixDisplay <- retVal
-```
-
-
-```{r pca, eval=TRUE, echo=TRUE, eval=FALSE}
-# not needed anymore
-if (DEBUG) cat(file = stderr(), "pca\n")
-
-pca <- pcaFunc(scEx_log)
-```
-
-
-```{r scran_Cluster, echo=TRUE, eval=FALSE}
-# not needed anymore output is dbCluster
-if (DEBUG) cat(file = stderr(), "scran_Cluster\n")
-  geneSelectionClustering <- input$geneSelectionClustering
-  seed <- input$seed
-  kNr <- input$kNr
-  clusterSource <- input$clusterSource
-  geneSelectionClustering <- input$geneSelectionClustering
-  minClusterSize <- input$minClusterSize
-  clusterMethod <- input$clusterMethod
-
-#save(file = "~/SCHNAPPsDebug/scran_cluster.report.RData", list = c(ls()))
-# load("~/SCHNAPPsDebug/scran_cluster.report.RData")
-
-  # retVal <- scran_ClusterFunc(pca, seed = seed, kNr = kNr)
-  retVal <- scranCluster(
-    pca, scEx_log, seed, clusterSource,
-    geneSelectionClustering, minClusterSize, clusterMethod, 
-    featureData
-  )
-
-if (DEBUG) cat(file = stderr(), "scran_Cluster:done\n")
-```
 
 Creating `r input$gQC_tsneDim` tSNE clusters.
-
-```{r tsne, echo=TRUE, eval=FALSE}
-#not needed anymore 
-if (DEBUG) cat(file = stderr(), "tsne\n")
-gQC_tsneDim <- input$gQC_tsneDim
-gQC_tsnePerplexity <- input$gQC_tsnePerplexity
-gQC_tsneTheta <- input$gQC_tsneTheta
-gQC_tsneSeed <- input$gQC_tsneSeed
-set.seed(seed = gQC_tsneSeed)
-tsne <- run_tsne(pca,
-  dims = gQC_tsneDim,
-  perplexity = gQC_tsnePerplexity,
-  theta = gQC_tsneTheta, check_duplicates = FALSE
-)
-
-if (DEBUG) cat(file = stderr(), "tsne: done\n")
-```
-
-
-
-```{r projections, include=FALSE, eval=FALSE}
-# not needed anynmore
-
-# TODO not working with current projection model and debugging.
-# the correct projections are used via saving/loading of variables during report creation in server.R
-#     base::save(file = tmpPrjFile, list = c("projections", "scEx_log", "gNames"))
-#     reactiveFiles <- paste0(reactiveFiles, "load(file=\"", tmpPrjFile, "\")\n", collapse = "\n")
-
-if (DEBUG) cat(file = stderr(), "projections\n")
-clustering <- scran_Cluster
-projections <- data.frame(tsne$Y)
-colnames(projections) <- paste0("tsne", c(1:ncol(projections)))
-# projections$dbCluster <- factor(clustering$kmeans_10_clusters$Cluster - 1)
-projections$dbCluster <- factor(clustering$kmeans_10_clusters$Cluster )
-
-projections <- cbind(projections, data.frame(pca$x[, c(1, 2, 3)]))
-
-rownames(projections) <- clustering$kmeans_10_clusters$Barcode
-samp <- gsub(".*-(.*)", "\\1", rownames(projections))
-if (length(levels(as.factor(samp))) > 1) {
-  projections$sample <- samp
-} else {
-  projections$sample <- "1"
-}
-
-n <- length(projectionFunctions)
-for (proj in projectionFunctions) {
-  if (DEBUG) cat(file = stderr(), paste("forceCalc ", proj[1], "\n"))
-  assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
-  cn <- make.names(c(colnames(projections), make.names(proj[1])))
-  if (length(tmp) == 0) {
-    next()
-  }
-  if (ncol(projections) == 0) {
-    projections <- data.frame(tmp = tmp)
-  } else {
-    if (nrow(projections) == length(tmp)) {
-      projections <- cbind(projections, tmp)
-    }
-  }
-  colnames(projections) <- cn
-}
-projections$UmiCountPerGenes <- 0
-projections$UmiCountPerGenes2 <- 0
-
-if (DEBUG) cat(file = stderr(), "projections: done\n")
-```
-
-```{r sampleInfo, include=FALSE, eval=FALSE}
-# not needed anymore
-sampleInfo <- sampleInfoFunc(scEx)
-```
-
-```{r inputSample, include=FALSE, eval=FALSE}
-# not needed anymore
-sampInf <- gsub(".*-(.*)", "\\1", dataTables$scEx$barcode)
-inputSample <- data.frame(
-  cellName = colnames(dataTables$scEx),
-  sample = sampInf,
-  ncells = colSums(as.matrix(assays(dataTables$scEx)[[1]]))
-)
-```
-
-
-```{r log2cpm, include=FALSE, eval=TRUE}
-if (DEBUG) cat(file = stderr(), "log2cpm\n")
-log2cpm <- as.data.frame(as.matrix(assays(scEx_log)[[1]]))
-if (DEBUG) cat(file = stderr(), "log2cpm:Done\n")
-```
 
 
 ```{r summaryStats, include=TRUE, eval=TRUE}
@@ -411,7 +205,7 @@ Variables that are used can be found here: **[variables.used.txt](variables.used
 
 __CHILDREPORTS__
 
-```{r variables, include=FALSE, results='asis', eval=FALSE}
+```{r variables, include=FALSE, results='asis', eval=TRUE}
 # cat(file = stderr(), paste(ls(), collapse = "\n"))
 # save(file = "~/SCHNAPPsDebug/report.vars.RData", list = ls())
 # load(file = "~/SCHNAPPsDebug/report.vars.RData")

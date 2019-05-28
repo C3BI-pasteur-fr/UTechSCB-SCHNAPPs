@@ -1,8 +1,9 @@
 library(magrittr)
 menuList <- list(
-  shinydashboard::menuItem("Subcluster analysis",
+  shinydashboard::menuItem("Subcluster analysis", 
+                           icon = icon("bar-chart-o"),
            # id = 'subclusterID',
-    tabName = "subcluster", startExpanded = FALSE,
+           tabName = "subcluster", startExpanded = FALSE,
     shinydashboard::menuSubItem("DGE analysis", tabName = "sCA_dge")
   )
 )

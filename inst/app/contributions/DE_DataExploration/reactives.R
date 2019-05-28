@@ -18,6 +18,16 @@ DE_scaterPNG <- reactive({
   }
   if (DEBUG) cat(file = stderr(), "DE_scaterPNG\n")
 
+  runScater <- input$runScater
+  if (!runScater) {
+    return(list(
+      src = "",
+      contentType = "image/png",
+      width = 10,
+      height = 10,
+      alt = "Scater plot will be here when 'run scater' is checked"
+    ))
+  }
   scaterReads <- scaterReads()
   if (is.null(scaterReads)) {
     return(NULL)
