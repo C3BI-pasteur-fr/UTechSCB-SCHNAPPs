@@ -1269,17 +1269,19 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
-    # TODO: scater changed: need to use BiocSingular runPCA/runSVD
     BiocSingular::runPCA(
-      t(assays(scEx_log)[["logcounts"]]),
-      rank = rank,
-      center = center,
+     # t(assays(scEx_log)[["logcounts"]]),
+     scEx_log,
+     ncomponents = rank, 
+     # rank = rank,
+     #  center = center,
       scale = scale,
+     # method = "irlba",
       # BPPARAM = bpparam(),
       # BPPARAM = SnowParam(workers = 3, type = "SOCK),
-      BPPARAM = SnowParam(
-        workers = ifelse(detectCores()>1, detectCores()-1, 1), 
-        type = "SOCK"),
+      # BPPARAM = SnowParam(
+      #   workers = ifelse(detectCores()>1, detectCores()-1, 1), 
+      #   type = "SOCK"),
       BSPARAM = IrlbaParam()
      )
   },
@@ -1310,13 +1312,13 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
   #
   rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
-    x =  scaterPCA$x,
-    # x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    var_pcs = scaterPCA$sdev
-    # var_pcs = attr(
-    #   SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    #   "percentVar"
-    # )
+    # x =  scaterPCA$x,
+    x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    # var_pcs = scaterPCA$sdev
+    var_pcs = attr(
+      SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+      "percentVar"
+    )
   ))
 }
 
