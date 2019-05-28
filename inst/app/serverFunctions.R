@@ -205,7 +205,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   }
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
-  p1 <- plotly::plot_ly(data = subsetData, source = "subset") %>%
+  # subsetData$"__key__" = rownames(subsetData)
+  p1 <- plotly::plot_ly(data = subsetData, source = "subset",
+                        key = rownames(subsetData)) %>%
     add_trace(x = ~ get(dimX)
               ,y = ~ get(dimY),  
               type = "scatter" ,mode = "markers"
@@ -252,7 +254,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         ),
         type = "scatter",
         mode = "markers",
-        name = "selected"
+        name = "selected",
+        key = rownames(subsetData[selectedCells, ])
       )
   }
   p1

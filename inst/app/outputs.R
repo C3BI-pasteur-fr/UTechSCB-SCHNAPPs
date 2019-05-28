@@ -69,7 +69,7 @@ output$normalizationsParametersDynamic <- renderUI({
     return(NULL)
   }
   selectedChoice <- input$normalizationRadioButton
-
+  
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
@@ -78,12 +78,56 @@ output$normalizationsParametersDynamic <- renderUI({
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
   do.call("switch",
-    args = c(
-      selectedChoice,
-      normaliztionParameters,
-      h3("no parameters provided")
-    )
+          args = c(
+            selectedChoice,
+            normaliztionParameters,
+            h3("no parameters provided")
+          )
   )
+})
+
+
+cellSelectionValues <- reactiveVal(
+  list(
+    minExpGenes = defaultValueRegExGene,
+    minGenes = "",
+    maxGenes = 1000000,
+    cellPatternRM = "",
+    cellKeep = "",
+    cellKeepOnly = "",
+    cellsFiltersOut = ""
+  )
+)
+geneSelectionValues <- reactiveVal(
+  list(
+    selectIds = "^MT-|^RP|^MRP",
+    geneListSelection = NULL,
+    minGenesGS = 2,
+    genesKeep = ""
+  )
+)
+
+observeEvent(input$updateCellSelectionParameters, {
+  cellSelectionValues(  list(
+    minExpGenes = input$minExpGenes,
+    minGenes = input$minGenes,
+    maxGenes = input$maxGenes,
+    cellPatternRM = input$cellPatternRM,
+    cellKeep = input$cellKeep,
+    cellKeepOnly = input$cellKeepOnly,
+    cellsFiltersOut = input$cellsFiltersOut
+  )
+  )
+  cat(file = stderr(), "\nCellSelectionValues\n")
+})
+
+observeEvent(input$updateGeneSelectionParameters, {
+  geneSelectionValues( list( selectIds = input$selectIds,
+                             geneListSelection = input$geneListSelection,
+                             minGenesGS = input$minGenesGS,
+                             genesKeep = input$genesKeep
+  ))
+  cat(file = stderr(), "\ngeneSelectionValues\n")
 })
 
 
@@ -99,12 +143,17 @@ output$summaryStatsSideBar <- renderUI({
     }
     return(NULL)
   }
-  if (input$noStats) {
-    if (DEBUG) {
-      cat(file = stderr(), "output$summaryStatsSideBar:off\n")
-    }
-    return(NULL)
-  }
+  # if (input$noStats) {
+  #   if (DEBUG) {
+  #     cat(file = stderr(), "output$summaryStatsSideBar:off\n")
+  #   }
+  #   return(NULL)
+  # }
+  annFile <- inputFile$annFile
+  medianUMI <- medianUMI()
+  medianENSG <- medianENSG()
+  memoryUsed <- getMemoryUsed()
+  normalizationRadioButton <- input$normalizationRadioButton
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
@@ -112,17 +161,17 @@ output$summaryStatsSideBar <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
-  line0 <- paste(inputFile$inFile, " _ ", inputFile$annFile)
+  line0 <- paste(inputFile$inFile, " _ ", annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
-  line3 <- paste("Median UMIs per cell: ", medianUMI(), sep = "\t")
+  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
   line4 <-
-    paste("Median Genes with min 1 UMI: ", medianENSG(), sep = "\t")
+    paste("Median Genes with min 1 UMI: ", medianENSG, sep = "\t")
   line5 <-
     paste("Total number of reads: ", sum(assays(scEx)[["counts"]]))
-  line6 <- paste("Memory used:", getMemoryUsed())
+  line6 <- paste("Memory used:", memoryUsed)
   line7 <-
-    paste("Normalization used:", input$normalizationRadioButton)
+    paste("Normalization used:", normalizationRadioButton)
   htmlOut <- paste0(
     "Summary statistics of this dataset:",
     "<br/>",
@@ -146,7 +195,7 @@ output$summaryStatsSideBar <- renderUI({
   exportTestValues(summaryStatsSideBar = {
     htmlOut
   })
-
+  
   HTML(htmlOut)
 })
 
@@ -350,7 +399,7 @@ output$descriptOfWorkOutput <- renderPrint({
 output$sampleColorSelection <- renderUI({
   scEx <- scEx()
   sampCol <- sampleCols$colPal
-
+  
   if (is.null(scEx)) {
     return(NULL)
   }
@@ -361,10 +410,10 @@ output$sampleColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
-
+  
   lev <- levels(colData(scEx)$sampleNames)
   # cols <- gg_fill_hue(length(lev))
-
+  
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -384,7 +433,7 @@ output$clusterColorSelection <- renderUI({
   scEx <- scEx()
   projections <- projections()
   clusterCol <- clusterCols$colPal
-
+  
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
@@ -395,10 +444,10 @@ output$clusterColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
-
+  
   lev <- levels(projections$dbCluster)
   # cols <- gg_fill_hue(length(lev))
-
+  
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -419,16 +468,16 @@ observeEvent(input$updateColors, {
   cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
   scExx <- scEx()
   projections <- projections()
-
+  
   if (is.null(scExx) || is.null(projections)) {
     return(NULL)
   }
   # sample colors
   scols <- sampleCols$colPal
-
+  
   inCols <- list()
   lev <- levels(colData(scExx)$sampleNames)
-
+  
   inCols <- lapply(seq_along(lev), function(i) {
     input[[paste0("sampleNamecol", lev[i])]]
   })
@@ -438,17 +487,17 @@ observeEvent(input$updateColors, {
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors.RData")
-
+  
   # isolate({
   sampleCols$colPal <- unlist(inCols)
   # })
-
+  
   # cluster colors
   ccols <- clusterCols$colPal
-
+  
   inCols <- list()
   lev <- levels(projections$dbCluster)
-
+  
   inCols <- lapply(seq_along(lev), function(i) {
     input[[paste0("clusterNamecol", lev[i])]]
   })
@@ -458,7 +507,7 @@ observeEvent(input$updateColors, {
     cat(file = stderr(), paste0("observeEvent 2 save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors2.RData")
-
+  
   # isolate({
   clusterCols$colPal <- unlist(inCols)
   # })
@@ -504,13 +553,13 @@ output$RDSsave <- downloadHandler(
     if (DEBUG) {
       cat(file = stderr(), paste("RDSsave: \n"))
     }
-
+    
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
     tsne <- tsne()
-
+    
     if (is.null(scEx)) {
       return(NULL)
     }
@@ -518,14 +567,14 @@ output$RDSsave <- downloadHandler(
       save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
-
+    
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
-
+    
     save(file = file, list = c("scEx"))
     if (DEBUG) {
       cat(file = stderr(), paste("RDSsave:done \n"))
     }
-
+    
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
@@ -533,7 +582,7 @@ output$RDSsave <- downloadHandler(
 # Report creation ------------------------------------------------------------------
 output$report <- downloadHandler(
   filename = "report.zip",
-
+  
   content = function(outZipFile) {
     outrepFile <- reacativeReport()
     file.copy(from = outrepFile, to = outZipFile)
@@ -545,35 +594,36 @@ returnNull <- function() {
   return(NULL)
 }
 
-# forceCalc -----# handling expensive calcualtions
-forceCalc <- shiny::observe({
-  if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
-  go <- input$goCalc
-  start.time <- base::Sys.time()
-  if (go) {
-    isolate({
-      if (DEBUG) {
-        base::cat(file = stderr(), "forceCalc\n")
-      }
-      # list of output variable and function name
-
-      withProgress(message = "Performing heavy calculations", value = 0, {
-        n <- length(heavyCalculations)
-        for (calc in heavyCalculations) {
-          shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
-          if (DEBUG) {
-            cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
-          }
-          assign(calc[1], eval(parse(text = base::paste0(
-            calc[2], "()"
-          ))))
-        }
-      })
-    })
-
-    printTimeEnd(start.time, "forceCalc")
-  }
-})
+# uncommented because it is corrently not used
+# # forceCalc -----# handling expensive calcualtions
+# forceCalc <- shiny::observe({
+#   if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
+#   go <- input$goCalc
+#   start.time <- base::Sys.time()
+#   if (go) {
+#     isolate({
+#       if (DEBUG) {
+#         base::cat(file = stderr(), "forceCalc\n")
+#       }
+#       # list of output variable and function name
+# 
+#       withProgress(message = "Performing heavy calculations", value = 0, {
+#         n <- length(heavyCalculations)
+#         for (calc in heavyCalculations) {
+#           shiny::incProgress(1 / n, detail = base::paste("Creating ", calc[1]))
+#           if (DEBUG) {
+#             cat(file = stderr(), base::paste("forceCalc ", calc[1], "\n"))
+#           }
+#           assign(calc[1], eval(parse(text = base::paste0(
+#             calc[2], "()"
+#           ))))
+#         }
+#       })
+#     })
+# 
+#     printTimeEnd(start.time, "forceCalc")
+#   }
+# })
 
 scranWarning <- function() {
   cat(file = stderr(), paste0("scranWarning\n"))
@@ -610,10 +660,10 @@ observeEvent(input$clusterSource, {
 
 observeEvent(input$scranWarning_cancel, {
   updateSelectInput(session, "clusterMethod",
-    selected = "igraph"
+                    selected = "igraph"
   )
   updateSelectInput(session, "clusterSource",
-    selected = "PCA"
+                    selected = "PCA"
   )
   removeModal()
 })

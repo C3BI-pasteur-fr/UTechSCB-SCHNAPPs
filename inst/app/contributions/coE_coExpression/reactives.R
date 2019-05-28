@@ -497,7 +497,7 @@ coE_heatmapSOMReactive <- reactive({
                   "Cluster" = ccols)
   
   retVal <- list(
-    mat = scEx_matrix[geneNames, ],
+    mat = scEx_matrix[geneNames, ,drop = FALSE],
     cluster_rows = TRUE,
     cluster_cols = TRUE,
     # scale = "row",

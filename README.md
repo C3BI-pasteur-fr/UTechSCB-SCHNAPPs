@@ -13,6 +13,9 @@ Shiny app for the exploration and analysis of single cell RNAseq data as it come
 if (!require("devtools"))
   install.packages("devtools")
 devtools::install_github("mul118/shinyMCE")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("BiocSingular")
 install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
@@ -42,17 +45,19 @@ save(file = "scEx.Rdata", list = "scEx")
 
 ## Screen-shots / walk-through
 
-Under the following link you can find some [screen-shots](inst/www/screen_shots.md)
+Under the following link you can find some [screen-shots](www/screen_shots.md)
 
 
 ## FAQ
 
 The FAQ answers question on how specific questions can be handled witht SCHNAPPs.
 
-[FAQ](inst/www/faq.md)
+[FAQ](www/faq.md)
 
 
 ## Extending SCHAPPs
+
+See [SCHNAPPsContribution](https://github.com/baj12/SCHNAPPsContributions) for examples and dummy contributions on how add functionality.
 
 ## Credits
 

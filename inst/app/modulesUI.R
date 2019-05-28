@@ -17,7 +17,7 @@ clusterUI <- function(id) {
              textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = "")),
       column(6,
              offset = 0,
-             textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes", value = "")
+             textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes2", value = "")
       )
     ),
     fluidRow(
@@ -73,14 +73,14 @@ tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(div(
-      h5("Selected cell names to be copied"),
+      h5("Selected itmes to be copied"),
       align = "left"
     )),
     fluidRow(
       verbatimTextOutput(ns("cellSelection"))
     ),
     fluidRow(
-      downloadButton(ns("download_cellNameTable"), "Download Table")
+      downloadButton(ns("download_cellNameTable"), "Download table")
     ),
     fluidRow(
       h4("Cells", offset = 1),

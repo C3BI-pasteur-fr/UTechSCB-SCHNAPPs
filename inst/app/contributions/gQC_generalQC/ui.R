@@ -1,13 +1,15 @@
-library(magrittr)
+require(magrittr)
 menuList <- list(
   shinydashboard::menuItem("General QC",
            # id="generalQCID",
-    tabName = "generalQC", startExpanded = FALSE,
+    tabName = "generalQC", icon = icon("thumbs-up"), startExpanded = FALSE,
     shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
     shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
     shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
-    shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
-    shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
+    shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
+    # ,
+    # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
+    # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
   )
 )
 
@@ -48,11 +50,17 @@ tabList <- list(
     fluidRow(
       column(
         3,
-        numericInput("gQC_tsneDim", "Tsne dimensions", 3, min = 3, max = 3)
-      ),
+        shinyBS::tipify(
+          numericInput("gQC_tsneDim", "Tsne dimensions", 3, min = 3, max = 3),
+          "<h3>Dimensions for tSNE, currently fixed to 3</h3>"
+        )
+       ),
       column(
         3,
-        numericInput("gQC_tsnePerplexity", "Perplexity", 30, min = 1, max = 100)
+        shinyBS::tipify(
+        numericInput("gQC_tsnePerplexity", "Perplexity", 30, min = 1, max = 100),
+        "<h3>Perplexity parameter (should not be bigger than 3 * perplexity < nrow(X) - 1, see details Rtsne for further information) default = 30</h3>"
+        )
       ),
       column(
         3,

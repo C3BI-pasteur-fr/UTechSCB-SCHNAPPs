@@ -5,7 +5,7 @@ localContributionDir = "~/Rstudio/shHubgit/Dummy/"
 defaultValueSingleGene = "CD52"
 defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
-DEBUG = FALSE
+DEBUG = TRUE
 DEBUGSAVE = FALSE
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = globalenv())
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = globalenv())
@@ -16,8 +16,8 @@ assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = globalenv())
 
 devscShinyApp = TRUE
 packagePath = "inst/app"
-source(paste0(packagePath,  "/server.R"))
 source(paste0(packagePath,  "/ui.R"))
+source(paste0(packagePath,  "/server.R"))
 
 shinyApp(ui = scShinyUI, server = scShinyServer)
 
