@@ -1,3 +1,7 @@
+if (DEBUG) {
+  cat(file = stderr(), "\n\nloading Module server.\n\n\n")
+}
+
 source(paste0(packagePath, "/reactives.R"))
 library(psych)
 library(magrittr)
@@ -465,6 +469,8 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "done save: changeGroups\n")
     }
     # load(file="~/SCHNAPPsDebug/changeGroups.RData")
+    # in case the cell selection has changed
+    grpNs <- grpNs[colnames(scEx),]
     if (!grpN %in% colnames(grpNs)) {
       grpNs[, grpN] <- FALSE
     }
@@ -483,6 +489,8 @@ clusterServer <- function(input, output, session,
     )
 
     if (ncol(prjs) > 0) {
+      # make sure we are working with the correct cells. This might change when cells were removed.
+      prjs = prjs[colnames(scEx),]
       # didn't find a way to easily overwrite columns
       for (cn in colnames(grpNs)) {
         if (cn %in% colnames(prjs)) {
@@ -694,10 +702,10 @@ clusterServer <- function(input, output, session,
       return("")
     }
     if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/clustercellSelection", list = c(ls(envir = globalenv()), ls()))
+      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls(envir = globalenv()), ls()))
     }
     # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection", "ns", ".RData", collapse = "."))
-    # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection"))
+    # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
     inpClusters <- levels(projections$dbCluster)
     featureData <- rowData(scEx_log)
     subsetData <- subset(projections, dbCluster %in% inpClusters)
@@ -710,6 +718,7 @@ clusterServer <- function(input, output, session,
     )
 
     cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
+    cells.names <- cells.names[!is.na(cells.names)]
     retVal <- paste(cells.names, collapse = ", ")
 
     exportTestValues(ClusterCellSelection = {
@@ -767,6 +776,7 @@ tableSelectionServer <- function(input, output, session,
     # remove this here
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ])
+      retVal <- retVal[!is.na(retVal)]
       retVal <- sub("(.*)___.*", "\\1", retVal)
       retVal <- unique(retVal)
       retVal <- paste0(retVal, collapse = ", ")
@@ -1158,4 +1168,8 @@ pHeatMapModule <- function(input, output, session,
       zip(file, zippedReportFiles, flags = "-9Xj")
     }
   )
+}
+
+if (DEBUG) {
+  cat(file = stderr(), "\n\ndone loading Module server.\n\n\n")
 }
