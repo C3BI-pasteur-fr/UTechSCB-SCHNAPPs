@@ -1023,7 +1023,7 @@ pHeatMapModule <- function(input, output, session,
     # heatmapData$filename=NULL
         if (nrow(heatmapData$mat) > 100) {
           showNotification(
-            "more than 1000 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
+            "more than 100 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
             id = "pHeatMapPlotWARNING",
             type = "warning",
             duration = 20
@@ -1039,7 +1039,7 @@ pHeatMapModule <- function(input, output, session,
           alt = "pHeatMapPlot should be here"
         ))
       }
-      system.time(do.call(TRONCO::pheatmap, heatmapData))
+      do.call(TRONCO::pheatmap, heatmapData)
       
       pixelratio <- session$clientData$pixelratio
       if (is.null(pixelratio)) pixelratio <- 1
