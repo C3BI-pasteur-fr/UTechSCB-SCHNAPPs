@@ -110,7 +110,8 @@ coE_heatmapSelectedReactive <- reactive({
   projections <- projections()
   genesin <- input$coE_heatmapselected_geneids
   sc <- coE_selctedCluster()
-  scCL <- sc$cluster # "1" "2" "3" "4"
+  # scCL <- sc$cluster # "1" "2" "3" "4"
+  scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells() # [1] "AAACCTGAGACACTAA-1" "AAACCTGAGACGACGT-1" "AAACCTGAGTCAAGCG-1" "AAACCTGCAAGAAGAG-1" "AAACCTGCAGACAGGT-1" "AAACCTGCATACAGCT-1" "AAACCTGGTGTGACCC-1"
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
@@ -172,10 +173,12 @@ coE_topExpGenesTable <- reactive({
   }
   
   scEx_log <- scEx_log()
+  projections <- projections()
   coEtgPerc <- input$coEtgPerc
   coEtgminExpr <- input$coEtgMinExpr
   sc <- coE_selctedCluster()
-  scCL <- sc$cluster
+  # scCL <- sc$cluster
+  scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
   
   if (is.null(scEx_log) || is.null(scCells)) {
@@ -244,7 +247,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   genesin <- gsub(" ", "", genesin, fixed = TRUE)
   genesin <- strsplit(genesin, ",")[[1]]
   
-  map <- rownames(featureData[which(featureData$symbol %in% genesin), ])
+  map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
   
   if (DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls(), ls(envir = globalenv())))
@@ -279,7 +282,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
       comb <- combinations(xPerm, r, genesin)
       for (cIdx in 1:nrow(comb)) {
         map <-
-          rownames(featureData[which(featureData$symbol %in% comb[cIdx, ]), ])
+          rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
         # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
         
         permIdx <- Matrix::colSums(assays(scEx)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, ])
@@ -494,7 +497,7 @@ coE_heatmapSOMReactive <- reactive({
                   "Cluster" = ccols)
   
   retVal <- list(
-    mat = scEx_matrix[geneNames, ],
+    mat = scEx_matrix[geneNames, ,drop = FALSE],
     cluster_rows = TRUE,
     cluster_cols = TRUE,
     # scale = "row",

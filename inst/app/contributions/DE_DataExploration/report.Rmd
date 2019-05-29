@@ -6,13 +6,13 @@ output: html_document
 # Data exploration
 
 ```{r bj-DE-setup, echo=TRUE, warning=FALSE}
-if(exists("params")){
-  cat(file=stderr(), paste("Scater Plot report\n"))
-}else{
+if (exists("params")) {
+  cat(file = stderr(), paste("Scater Plot report\n"))
+} else {
   rm(list = ls())
   load("~/SCHNAPPsDebug/report.RData")
-  cat(file=stderr(), getwd())
-  
+  cat(file = stderr(), getwd())
+
   require(shiny)
   require(plotly)
   require(shinythemes)
@@ -31,29 +31,30 @@ if(exists("params")){
   require(kableExtra)
   require(shinyWidgets)
   require(scater)
-  
+
   source("../../../serverFunctions.R")
   source("../../../reactives.R", local = TRUE)
   # source("reactives.R", local = TRUE)
+
+  LOCALEXECUTION <- TRUE # to know that we are debugging.
+  useCells <- useCellsFunc(dataTables,
+    geneNames = input$minExpGenes,
+    rmCells = input$cellsFiltersOut,
+    rmPattern = input$cellPatternRM,
+    keepCells = input$cellKeep,
+    cellKeepOnly = input$cellKeepOnly
+  )
   
-  LOCALEXECUTION = TRUE # to know that we are debugging.
-  useCells = useCellsFunc(dataTables, 
-                          geneNames = input$minExpGenes,
-                          rmCells = input$cellsFiltersOut,
-                          rmPattern = input$cellPatternRM,
-                          keepCells = input$cellKeep,
-                          cellKeepOnly = input$cellKeepOnly)
-  ipIDs = input$selectIds
-  geneListSelection = input$geneListSelection
+  ipIDs <- input$selectIds
+  geneListSelection <- input$geneListSelection
   minGene <- input$minGenesGS
-  
-  useGenes = useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
-  featureDataReact = dataTables$featuredata[useGenes, ]
-  featureData = dataTables$featuredata[useGenes, ]
-  scEx = assays(dataTables$scEx)[[1]][useGenes, useCells]
-  scEx_log = assays(dataTables$scEx_log)[[1]][useGenes, useCells]
-  log2cpm = dataTables$log2cpm[useGenes, useCells]
-  
+
+  useGenes <- useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
+  featureDataReact <- dataTables$featuredata[useGenes, ]
+  featureData <- dataTables$featuredata[useGenes, ]
+  scEx <- assays(dataTables$scEx)[[1]][useGenes, useCells]
+  scEx_log <- assays(dataTables$scEx_log)[[1]][useGenes, useCells]
+  log2cpm <- dataTables$log2cpm[useGenes, useCells]
 }
 ```
 
@@ -74,10 +75,9 @@ Normalization method used: `r input$normalizationRadioButton` used.
 
 ```{r bj-DE-DE_tsne_plt, eval=TRUE, echo=TRUE}
 
-  g_id <- input$DE_gene_id
+g_id <- input$DE_gene_id
 
- DE_dataExpltSNEPlot(scEx_log, g_id, projections)
-
+DE_dataExpltSNEPlot(scEx_log, g_id, projections)
 ```
 
 
@@ -98,16 +98,15 @@ dimY <- `r input$"DE_expclusters-dimension_y"`
 
 ```{r bj-DE-2Dprojection, echo=TRUE, eval=TRUE}
 
-data2plot = projections
+data2plot <- projections
 gene_id <- input$DE_gene_id
-moduleName = "DE_expclusters"
+moduleName <- "DE_expclusters"
 
-p2 <- twoDplotFromModule(twoDData = data2plot, moduleName = moduleName, input = input, projections = projections, g_id = gene_id) 
+p2 <- twoDplotFromModule(twoDData = data2plot, moduleName = moduleName, input = input, projections = projections, g_id = gene_id)
 
 # TODO selected cells
 
 p2
-
 ```
 
 
@@ -116,12 +115,11 @@ p2
 
 ```{r bj-DE-DE_gene_vio_plot, eval=TRUE, echo=TRUE}
 
-  g_id <- input$DE_gene_id
-  ccols <- clusterCols$colPal
+g_id <- input$DE_gene_id
+ccols <- clusterCols$colPal
 
-  p1 <- DE_geneViolinFunc(scEx_log, g_id, projections, ccols)
+p1 <- DE_geneViolinFunc(scEx_log, g_id, projections, ccols)
 p1
-
 ```
 
 ## Panel plot
@@ -137,19 +135,19 @@ input$DE_dim_y : `r input$DE_dim_y`
 
 ```{r bj-DE-DE_panelPlot, eval=TRUE, echo=TRUE}
 
-  genesin <- input$DE_panelplotids
-  cl4 <- input$DE_clusterSelectionPanelPlot
-  dimx4 <- input$DE_dim_x
-  dimy4 <- input$DE_dim_y
+genesin <- input$DE_panelplotids
+cl4 <- input$DE_clusterSelectionPanelPlot
+dimx4 <- input$DE_dim_x
+dimy4 <- input$DE_dim_y
 
-  genesin <- toupper(genesin)
-  genesin <- gsub(" ", "", genesin, fixed = TRUE)
-  genesin <- strsplit(genesin, ",")
-  genesin <- genesin[[1]]
- 
-  featureData <- rowData(scEx_log)
-  featureData$symbol = toupper(featureData$symbol)
-  genesin <- genesin[which(genesin %in% featureData$symbol)]
+genesin <- toupper(genesin)
+genesin <- gsub(" ", "", genesin, fixed = TRUE)
+genesin <- strsplit(genesin, ",")
+genesin <- genesin[[1]]
+
+featureData <- rowData(scEx_log)
+# featureData$symbol = toupper(featureData$symbol)
+genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
 if (length(genesin) > 0) {
   par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
   rbPal <- colorRampPalette(c("#f0f0f0", "red"))
@@ -157,14 +155,14 @@ if (length(genesin) > 0) {
   if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
     ymax <- 0
     for (i in 1:length(genesin)) {
-      geneIdx <- which(featureData$symbol == genesin[i])
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       ymax <- max(ymax, max(Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])))
     }
     ylim <- c(0, ymax)
   }
   if (cl4 == "All") {
     for (i in 1:length(genesin)) {
-      geneIdx <- which(featureData$symbol == genesin[i])
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       Col <- rbPal(10)[
         as.numeric(
           cut(
@@ -189,7 +187,7 @@ if (length(genesin) > 0) {
     }
   } else {
     for (i in 1:length(genesin)) {
-      geneIdx <- which(featureData$symbol == genesin[i])
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       subsetTSNE <- subset(projections, dbCluster == cl4)
 
       Col <- rbPal(10)[
@@ -220,7 +218,6 @@ if (length(genesin) > 0) {
       if (DEBUG) cat(file = stderr(), cl4)
     }
   }
-  
 }
 ```
 
@@ -230,10 +227,10 @@ if (length(genesin) > 0) {
 
 ```{r bj-DE-scater, eval=TRUE, echo=TRUE, warning=FALSE }
 library(png)
-img=DE_scaterPNG
-if (file.exists(img$src))
+img <- DE_scaterPNG
+if (file.exists(img$src)) {
   include_graphics(img$src)
-
+}
 ```
 
 

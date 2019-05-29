@@ -16,6 +16,13 @@ assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = globalenv())
 
 devscShinyApp = TRUE
 packagePath = "inst/app"
-source(paste0(packagePath,  "/server.R"))
 source(paste0(packagePath,  "/ui.R"))
+source(paste0(packagePath,  "/server.R"))
+
 shinyApp(ui = scShinyUI, server = scShinyServer)
+
+# sctkEx = SCtkExperiment(assays=list(counts=as.matrix(assays(scEx)[['counts']]), 
+#                                     logcounts = as.matrix(assays(scEx)[['logcounts']])),
+#                         colData = colData(scEx),
+#                         rowData = rowData(scEx))
+# singleCellTK(inSCE = sctkEx)

@@ -18,6 +18,16 @@ DE_scaterPNG <- reactive({
   }
   if (DEBUG) cat(file = stderr(), "DE_scaterPNG\n")
 
+  runScater <- input$runScater
+  if (!runScater) {
+    return(list(
+      src = "",
+      contentType = "image/png",
+      width = 10,
+      height = 10,
+      alt = "Scater plot will be here when 'run scater' is checked"
+    ))
+  }
   scaterReads <- scaterReads()
   if (is.null(scaterReads)) {
     return(NULL)
@@ -124,7 +134,7 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
         colors = "Greens"
       )
     )
-  layout(p, title = paste(toupper(featureData[geneid, "symbol"]), collapse = ", "))
+  layout(p, title = paste(featureData[geneid, "symbol"], collapse = ", "))
 }
 
 DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
@@ -174,7 +184,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
     ) +
     xlab("Cluster") +
     ylab("Expression") +
-    ggtitle(paste(toupper(featureData[geneid, "symbol"]), collapse = ", "))
+    ggtitle(paste(featureData[geneid, "symbol"], collapse = ", "))
   
   return(p1)
 }

@@ -49,6 +49,7 @@ library(magrittr)
                            keepCells = input$cellKeep,
                            cellKeepOnly = input$cellKeepOnly
   )
+  
   ipIDs <- input$selectIds
   geneListSelection <- input$geneListSelection
   minGene <- input$minGenesGS
@@ -290,7 +291,7 @@ if (is.null(scEx_log) || is.null(scCells)) {
   }
   
   maxCol <- min(20, ncol(dataTables))
-  if (dim(dataTables)[1] > 1) {
+  if (dim(dataTables)[2] > 1) {
     DT::datatable(dataTables[, 1:maxCol],
                   rownames = F, filter = "top",
                   options = list(
@@ -380,7 +381,7 @@ if (is.null(projections)) {
                   "Cluster" = ccols)
   
   retVal <- list(
-    mat = scEx_matrix[geneNames, ],
+    mat = scEx_matrix[geneNames, ,drop = FALSE],
     cluster_rows = TRUE,
     cluster_cols = TRUE,
     # scale = "row",
@@ -402,7 +403,7 @@ if (is.null(projections)) {
   # system.time(do.call(TRONCO::pheatmap, retVal))
 
 
-if (nrow(retVal$mat) > 0) {
+if (nrow(retVal$mat) > 1) {
   moduleName <- "coE_heatmapSOM"
   heatmapPlotFromModule(retVal, moduleName, input, projections)
 }

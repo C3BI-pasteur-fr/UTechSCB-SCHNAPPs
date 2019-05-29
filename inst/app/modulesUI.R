@@ -12,21 +12,21 @@ clusterUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(5,
-             offset = 1,
-             textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = "")),
-      column(5,
+      column(6,
              offset = 0,
-             textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes", value = "")
+             textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = "")),
+      column(6,
+             offset = 0,
+             textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes2", value = "")
       )
     ),
     fluidRow(
+      # column(
+      #   3,
+      #   uiOutput(ns("clusters"))
+      # ),
       column(
-        3,
-        uiOutput(ns("clusters"))
-      ),
-      column(
-        3,
+        4,
         selectInput(
           ns("dimension_x"),
           label = "X",
@@ -35,7 +35,7 @@ clusterUI <- function(id) {
         )
       ),
       column(
-        3,
+        4,
         selectInput(
           ns("dimension_y"),
           label = "Y",
@@ -44,7 +44,7 @@ clusterUI <- function(id) {
         )
       ),
       column(
-        3,
+        4,
         selectInput(
           ns("dimension_col"),
           label = "color",
@@ -73,14 +73,14 @@ tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(div(
-      h5("Selected cell names to be copied"),
+      h5("Selected itmes to be copied"),
       align = "left"
     )),
     fluidRow(
       verbatimTextOutput(ns("cellSelection"))
     ),
     fluidRow(
-      downloadButton(ns("download_cellNameTable"), "Download Table")
+      downloadButton(ns("download_cellNameTable"), "Download table")
     ),
     fluidRow(
       h4("Cells", offset = 1),
