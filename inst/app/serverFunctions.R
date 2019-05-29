@@ -48,9 +48,7 @@ geneName2Index <- function(g_id, featureData) {
   }
   
   geneid <- rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ])
-  if (DEBUG) {
-    cat(file = stderr(), paste("done: geneName2Index\n"))
-  }
+
   return(geneid)
 }
 
@@ -156,7 +154,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
   if (nrow(subsetData) == 0) return(NULL)
   # subsetData$shape = as.factor(1)
-  gtitle <- paste(toupper(g_id), clId, sep = "-Cluster", collapse = " ")
+  gtitle <- paste(g_id, clId, sep = "-Cluster", collapse = " ")
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
@@ -207,7 +205,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   }
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
-  p1 <- plotly::plot_ly(data = subsetData, source = "subset") %>%
+  # subsetData$"__key__" = rownames(subsetData)
+  p1 <- plotly::plot_ly(data = subsetData, source = "subset",
+                        key = rownames(subsetData)) %>%
     add_trace(x = ~ get(dimX)
               ,y = ~ get(dimY),  
               type = "scatter" ,mode = "markers"
@@ -245,7 +245,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       add_trace(data = subsetData[selectedCells, ],
         x = x1[, 1], y = y1[, 1],
         marker = list(
-          color = rep("green", nrow(x1)),
+          color = rep("red", nrow(x1)),
           size = 5
         ),
         text = ~ paste(
@@ -254,7 +254,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         ),
         type = "scatter",
         mode = "markers",
-        name = "selected"
+        name = "selected",
+        key = rownames(subsetData[selectedCells, ])
       )
   }
   p1

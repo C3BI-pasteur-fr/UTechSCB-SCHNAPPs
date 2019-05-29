@@ -45,9 +45,12 @@ if(exists("params")){
                           rmPattern = input$cellPatternRM,
                           keepCells = input$cellKeep,
                           cellKeepOnly = input$cellKeepOnly)
+  
+  geneSelectionValues <- geneSelectionValues()
   ipIDs = input$selectIds
   geneListSelection = input$geneListSelection
   minGene <- input$minGenesGS
+  
   
   useGenes = useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
   featureDataReact = dataTables$featuredata[useGenes, ]
@@ -57,7 +60,7 @@ if(exists("params")){
   log2cpm = dataTables$log2cpm[useGenes, useCells]
   if(DEBUG)cat(file=stderr(), "pca\n")
   
-  pca = pcaFunc(scEx_log)
+  pca = pcaFunc(scEx_log, input$pcaRank, input$pcaCenter, input$pcaScale)
   if(DEBUG)cat(file=stderr(), "tsne\n")
   seed=1
   set.seed(seed = seed)
@@ -282,7 +285,6 @@ divYBy <- input$"gQC_umap_main-devideYBy"
 scols <- sampleCols$colPal
 ccols <- clusterCols$colPal
 legend.position <- "none"
-scCells <- `coE_selctedCluster-selectedCells`
 if (is.null(divXBy)) divXBy <- "None"
 if (is.null(divYBy)) divYBy <- "None"
 if (is.null(logx)) {logx=FALSE}

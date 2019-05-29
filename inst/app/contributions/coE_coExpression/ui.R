@@ -4,12 +4,12 @@ source(paste0(packagePath,  "/modulesUI.R"))
 
 # list of menu Items
 menuList <- list(
-  shinydashboard::menuItem("Co-expression",
+  shinydashboard::menuItem("Co-expression", icon = icon("dashboard"),
            # id="coexpressionID",
     tabName = "coexpression", startExpanded = FALSE,
     shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
     shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
-    shinydashboard::menuSubItem("Co-expression Violin plot", tabName = "CoExpressionViolin"),
+    shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
     shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )
@@ -37,11 +37,9 @@ tabList <- list(
 
   coexpressionSelectedTab = shinydashboard::tabItem(
     "coexpressionSelected",
-    tags$ul(
-      tags$li(
-        strong("Subclustering"),
-        ":Select a group of cells in plot1 based based on a single gene expression. Enter multiple gene ids to assess the co-expression of genes in these cells"
-      )
+    tags$p(
+        strong("2D plot for selecting cells"),
+        "some explaination.... (Vale?)"
     ),
     fluidRow(
       # column(
@@ -59,11 +57,11 @@ tabList <- list(
 
       textInput("coE_heatmapselected_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
     )),
-    fluidRow(column(
-      12,
-      offset = 1,
-      uiOutput("coE_heatmapNull")
-    )),
+    # fluidRow(column(
+    #   12,
+    #   offset = 1,
+    #   uiOutput("coE_heatmapNull")
+    # )),
     fluidRow(column(
       12,
       offset = 0,
@@ -107,8 +105,7 @@ tabList <- list(
     fluidRow(
       column(
         3,
-
-        textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
+       textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
       ),
       column(
         3,

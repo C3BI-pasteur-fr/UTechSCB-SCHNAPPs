@@ -7,20 +7,20 @@
 schnapps(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   defaultValueSingleGene = "CD52",
   defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
-  defaultValueRegExGene = "", DEBUG = TRUE, DEBUGSAVE = FALSE)
+  defaultValueRegExGene = "", DEBUG = FALSE, DEBUGSAVE = FALSE)
 }
 \arguments{
-\item{localContributionDir}{localContributionDir}
+\item{localContributionDir}{path to the directory(ies) that contain additional functionality}
 
-\item{defaultValueSingleGene}{defaultValueSingleGene}
+\item{defaultValueSingleGene}{single gene name to used as a default value.}
 
-\item{defaultValueMultiGenes}{defaultValueMultiGenes}
+\item{defaultValueMultiGenes}{comma separated list of gene names to be used as a default value.}
 
-\item{defaultValueRegExGene}{defaultValueRegExGene}
+\item{defaultValueRegExGene}{regular Expression used for gene selection}
 
-\item{DEBUG}{DEBUG}
+\item{DEBUG}{TRUE/FALSE whether to show debugging information on the console}
 
-\item{DEBUGSAVE}{DEBUGSAVE}
+\item{DEBUGSAVE}{TRUE/FALSE where or not save internal data (very time consuming)}
 }
 \description{
 shiny server relevant functions

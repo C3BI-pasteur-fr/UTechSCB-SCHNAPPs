@@ -6,18 +6,18 @@
 #
 
 
-# library(shiny)
-# library(shinydashboard)
-# library(shinyBS)
-# library(plotly)
-# library(shinythemes)
-# library(ggplot2)
-# library(DT)
-# library(edgeR)
-# library(pheatmap)
-# library(threejs)
-# library(shinyTree)
-# library(shinycssloaders)
+require(shiny)
+require(shinydashboard)
+require(plotly)
+require(shinythemes)
+require(ggplot2)
+require(DT)
+require(edgeR)
+require(pheatmap)
+require(threejs)
+require(shinyTree)
+require(shinycssloaders)
+require(shinyBS)
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -58,19 +58,19 @@ source(paste0(packagePath, "/parameters.R"), local = TRUE)
 allMenus <- list(
   shinydashboard::menuItem("input",
     # id="inputID",
-    tabName = "input", icon = icon("dashboard")
+    tabName = "input", icon = icon("folder")
   ),
-  shinydashboard::menuItem("Parametes",
+  shinydashboard::menuItem("Parameters",
     # id="parametersID",
-    tabName = "parameters", icon = icon("dashboard"), parameterItems
+    tabName = "parameters", icon = icon("gopuram"), parameterItems
   ),
-  shinydashboard::menuItem("Cell selection",
+  shinydashboard::menuItem(" Cell selection",
     # id="cellSelectionID",
-    tabName = "cellSelection", icon = icon("dashboard")
+    tabName = "cellSelection", icon = icon("ello")
   ),
   shinydashboard::menuItem("Gene selection",
     # id="geneSelectionID",
-    tabName = "geneSelection", icon = icon("dashboard")
+    tabName = "geneSelection", icon = icon("atom")
   )
 )
 
@@ -95,6 +95,21 @@ for (fp in uiFiles) {
     }
   }
 }
+
+
+mListNames <- c()
+for (menuListItem in 1:length(allMenus)) {
+  mListNames[menuListItem] = allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
+}
+sollOrder <- c("input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
+  "Data Exploration", "Subcluster analysis")
+sollOrderIdx = c()
+for (sIdx in 1:length(sollOrder)) {
+  sollOrderIdx[sIdx] = which(sollOrder[sIdx] == mListNames)
+}
+sollOrderIdx = c(sollOrderIdx, which(!1:length(allMenus) %in%  sollOrderIdx))
+
+allMenus <- allMenus[sollOrderIdx]
 
 # todo
 # parse all parameters.R files under contributions to include in application
@@ -125,27 +140,55 @@ scShinyUI <- shinyUI(
         id = "sideBarID",
         allMenus
       ),
-      shinyBS::tipify(
-        checkboxInput("noStats", "don't display stats", FALSE),
-        "check this if you are working on the cell/gene selection to avoid certain calculations"
-      ),
+      # shinyBS::tipify(
+      #   checkboxInput("noStats", "don't display stats", FALSE),
+      #   "check this if you are working on the cell/gene selection to avoid certain calculations"
+      # ),
 
       shinyBS::tipify(
         htmlOutput("summaryStatsSideBar"),
         "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ", "right"
       ),
-      downloadButton("report", "Generate report"),
-      actionButton("goCalc", "Force Calculations"),
+      
+      ### failed tests to change color of button text
+      
+      # <div id="scoped-content">
+      #   <style type="text/css" scoped>
+      #   h1 { color: red; } 
+      # </style>
+      #   
+      #   <h1>Hello</h1>
+      #   </div>
+      #   
+      # withTags({
+      #   div(id="scoped-content",
+      #       tags$style(type="text/css", scoped=NA, "downloadbutton a { color: red; }"),
+      #       tags$a(id = "report", class = paste("btn btn-default shiny-download-link ", "downloadbutton"), href = "", target = "_blank", download = NA, 
+      #              icon("download"), "Generate report"),
+      #       downloadButton("report", "Generate report", class="downloadbutton")
+      #   )
+      # }),
+      ## <div class="header" checked>
+      ##   <p>Ready to take the Shiny tutorial? If so</p>
+      ##   <a href="shiny.rstudio.com/tutorial">Click Here!</a>
+      ## </div> 
+      # tags$style(type="text/css", "downloadbutton a { color: #444; }"),
+      downloadButton("report", "Generate report", class="butt"),
+      tags$head(tags$style(".butt{color: black !important;}")), #  font color
+      
+      # commentetd out because currently no-one is using it
+      # actionButton("goCalc", "Force Calculations"),
+      
       # bookmarkButton(id = "bookmark1"),
       shinyBS::tipify(
-        downloadButton("countscsv", "Download counts.csv"),
+        downloadButton("countscsv", "Download counts.csv", class="butt"),
         "<h3>download current normalized count data as CSV file</h3>"
       ),
       shinyBS::tipify(
-        downloadButton("RDSsave", "Download Rds"),
+        downloadButton("RDSsave", "Download Rds", class="butt"),
         "<h3>download current cell/gene configuration for reimport to this app</h3>"
       ),
-      checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
+      if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring")
     ), # dashboard side bar
     shinydashboard::dashboardBody(

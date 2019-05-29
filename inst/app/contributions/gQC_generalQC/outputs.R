@@ -108,7 +108,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   exportTestValues(tsnePlot = {
     str(retVal)
   })
-  return(layout(retVal))
+  layout(retVal)
 })
 
 # gQC_umap_main 2D plot ----
