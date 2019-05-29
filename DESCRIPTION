@@ -57,7 +57,6 @@ Imports:
     AnnotationDbi,
     graphics,
     grDevices,
-    viridisLite,
     cowplot,
     scales,
     dplyr,
@@ -73,7 +72,7 @@ Imports:
     uwot,
     tidyverse,
     Rtsne,
-    irlba,
+    viridisLite,
     viridis,
     shinyBS,
     pryr
@@ -85,9 +84,7 @@ Suggests:
     knitr,
     rmarkdown,
     DelayedArray (>= 0.7.44),
-    irlba,
-    viridis,
-    org.Mm.eg.db
+    irlba
 RoxygenNote: 6.1.1
 URL: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs
 BugReports: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues
