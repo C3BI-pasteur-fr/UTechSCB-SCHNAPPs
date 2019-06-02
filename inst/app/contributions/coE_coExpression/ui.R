@@ -38,8 +38,7 @@ tabList <- list(
   coexpressionSelectedTab = shinydashboard::tabItem(
     "coexpressionSelected",
     tags$p(
-        strong("2D plot for selecting cells"),
-        "some explaination.... (Vale?)"
+        strong("2D plot for selecting cells")
     ),
     fluidRow(
       # column(
