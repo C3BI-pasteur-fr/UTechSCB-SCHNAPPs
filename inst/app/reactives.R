@@ -2077,11 +2077,11 @@ reacativeReport <- function() {
           "\`", var, "\`()"
         ))),
         error = function(e){
-          cat(file = stderr, paste("error var", var, ":(",e,")\n"))
+          cat(file = stderr(), paste("error var", var, ":(",e,")\n"))
           e
         },
         warning = function(e){
-          cat(file = stderr, paste("warning with var", var, ":(",e,")\n"))
+          cat(file = stderr(), paste("warning with var", var, ":(",e,")\n"))
           e
         })
         assign(var, tempVar, envir = report.env)
