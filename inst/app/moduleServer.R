@@ -1174,4 +1174,3 @@ pHeatMapModule <- function(input, output, session,
   if (DEBUG) {
     cat(file = stderr(), "\n\ndone loading Module server.\n\n\n")
   }
-  

@@ -71,7 +71,9 @@ inputDataFunc <- function(inFile) {
   } else {
     scExFound <- FALSE
     for (varName in fpLs) {
-      if ("SingleCellExperiment" %in% class(get(varName))) {
+      # if ("SingleCellExperiment" %in% class(get(varName))) {
+        if ( is(get(varName), "SingleCellExperiment") ) {
+          
         scEx <- get(varName)
         scExFound <- TRUE
         break()
@@ -97,7 +99,8 @@ inputDataFunc <- function(inFile) {
       fpLs <- load(fp)
       scExFound <- FALSE
       for (varName in fpLs) {
-        if ("SingleCellExperiment" %in% class(get(varName))) {
+        # if ("SingleCellExperiment" %in% class(get(varName))) {
+        if ( is(get(varName), "SingleCellExperiment") ) {
           scEx <- get(varName)
           scExFound <- TRUE
           break()
@@ -137,7 +140,7 @@ inputDataFunc <- function(inFile) {
   
   
   if ("sampleNames" %in% colnames(pdAll)) {
-    if (! (class(pdAll$sampleNames) == "factor"))
+    if (! is(pdAll$sampleNames, "factor") )
       pdAll$sampleNames = factor(pdAll$sampleNames)
     sampNames <- levels(pdAll$sampleNames)
     isolate({
@@ -312,7 +315,7 @@ appendAnnotation <- function(scEx, annFile) {
       if (any(colnames(rDat) %in% colnames(data))) {
         commonCols <- colnames(rDat) %in% colnames(data)
         for (cCol in colnames(rDat)[commonCols]) {
-          if (class(rDat[, cCol]) == "factor") {
+          if (is(rDat[, cCol], "factor")) {
             rDat[, cCol] <- factor(data[, cCol])
           }
         }
@@ -342,7 +345,7 @@ appendAnnotation <- function(scEx, annFile) {
       if (any(colnames(rDat) %in% colnames(data))) {
         commonCols <- colnames(rDat) %in% colnames(data)
         for (cCol in colnames(rDat)[commonCols]) {
-          if (class(rDat[, cCol]) == "factor") {
+          if (is(rDat[, cCol], "factor")) {
             rDat[, cCol] <- factor(data[, cCol])
           }
         }
@@ -356,14 +359,14 @@ appendAnnotation <- function(scEx, annFile) {
       if (any(colnames(cDat) %in% colnames(data))) {
         commonCols <- colnames(cDat) %in% colnames(data)
         for (cCol in colnames(cDat)[commonCols]) {
-          if (class(cDat[, cCol]) == "factor") {
+          if (is(cDat[, cCol], "factor")) {
             cDat[, cCol] <- factor(data[, cCol])
           }
         }
       }
       # a vector with less than 20 levels (unique values) will be converted in a factor
       for (cn in colnames(data)) {
-        if (class(data[, cn]) == "factor") next()
+        if (is(data[, cn], "factor")) next()
         lv <- levels(factor(data[, cn]))
         if (length(lv) <= 20) {
           data[, cn] <- factor(data[, cn])
@@ -1062,7 +1065,7 @@ scExFunc <-
       if (colN == "barcode") {
         next()
       }
-      if (class(pD[, colN]) %in% c("character")) {
+      if (is(pD[, colN], "character")) {
         pD[, colN] <- factor(as.character(pD[, colN]))
       }
     }
@@ -1270,7 +1273,7 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
   scaterPCA <- tryCatch({
     # not sure, but this works on another with dgTMatrix
-    if (class(assays(scEx_log)[["logcounts"]]) == "dgTMatrix") {
+    if (is(assays(scEx_log)[["logcounts"]], "dgTMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
@@ -1624,7 +1627,7 @@ projections <- reactive({
       # load(file="~/SCHNAPPsDebug/projections.1.RData")
       # browser()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
-      if (class(tmp) == "data.frame") {
+      if (is(tmp, "data.frame")) {
         cn <- make.names(c(colnames(projections), colnames(tmp)))
       } else {
         cn <- make.names(c(colnames(projections), make.names(proj[1])))

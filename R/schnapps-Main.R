@@ -68,14 +68,3 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
 # schnapps(localContributionDir = "~/Rstudio/__shHubgit/bjContributions",  defaultValueSingleGene = "cd52", defaultValueMultiGenes = "S100A4, CD52, S100A9, S100A8,")
 
 
-#' Example data for schnapps app
-#'
-#' A dataset containing the prices and other attributes of almost 54,000
-#' diamonds. The variables are as follows:
-#'
-#' * `scEx`: singlecellExperiment object
-#'
-#' @format A data frame with 53940 rows and 10 variables
-#' @source <http://www.diamondse.info/>
-"scEx"
-#> [1] "scEx"
