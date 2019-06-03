@@ -1,4 +1,4 @@
-library(magrittr)
+suppressMessages(library(magrittr))
 
 printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
@@ -148,7 +148,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     subsetData$shape <- as.numeric(as.factor(subsetData$sample))
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(ls(), "legend.position", ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(ls(), "legend.position",
+                                                              ls(envir = globalenv()), ls(.schnappsEnv)))
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
@@ -159,7 +160,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
   
-  require(plotly)
+  suppressMessages(require(plotly))
   f <- list(
     family = "Courier New, monospace",
     size = 18,

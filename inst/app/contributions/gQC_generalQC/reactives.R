@@ -1,6 +1,6 @@
-require(uwot)
-require(tidyverse)
-require(SingleCellExperiment)
+suppressMessages(require(uwot))
+suppressMessages(require(tidyverse))
+suppressMessages(require(SingleCellExperiment))
 
 # here we define reactive values/variables
 
@@ -120,7 +120,7 @@ projectionTable <- reactive({
   }
 
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file = "~/SCHNAPPsDebug/projectionTable.RData")
   
@@ -185,11 +185,11 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   
   set.seed(seed = gQC_tsneSeed)
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file='~/SCHNAPPsDebug/tsne.RData')
-  require(parallel)
-  require(Rtsne)
+  suppressMessages(require(parallel))
+  suppressMessages(require(Rtsne))
   np = dim(pca$x)[2]
   tsne <- tryCatch({
     Rtsne::Rtsne(
@@ -257,7 +257,7 @@ umapReact <- reactive({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/umap_react.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/umap_react.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load("~/SCHNAPPsDebug/umap_react.RData")
   if (!runUMAP) {

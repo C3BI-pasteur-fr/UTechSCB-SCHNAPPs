@@ -1,6 +1,6 @@
-library(magrittr)
+suppressMessages(library(magrittr))
 
-source(paste0(packagePath,  "/modulesUI.R"))
+source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 
 # list of menu Items
 menuList <- list(

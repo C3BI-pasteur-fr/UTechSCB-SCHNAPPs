@@ -1,4 +1,4 @@
-require(shinyTree)
+suppressMessages(require(shinyTree))
 
 # SUMMARY STATS ----------------------------------------------------------------
 source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
@@ -12,7 +12,7 @@ output$normalizationRadioButtonValue <- renderPrint({
 })
 
 normaliztionParameters <- list(raw = "no Parameters needed")
-localContributionDir <- .SCHNAPPs_locContributionDir
+# localContributionDir <- .SCHNAPPs_locContributionDir
 parFiles <-
   dir(
     path = c(paste0(packagePath, "/contributions"), localContributionDir),
@@ -26,7 +26,7 @@ for (fp in parFiles) {
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParameters.RData')
@@ -73,7 +73,7 @@ output$normalizationsParametersDynamic <- renderUI({
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
@@ -157,7 +157,7 @@ output$summaryStatsSideBar <- renderUI({
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
@@ -406,7 +406,7 @@ output$sampleColorSelection <- renderUI({
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
@@ -440,7 +440,7 @@ output$clusterColorSelection <- renderUI({
   if (DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
@@ -483,7 +483,7 @@ observeEvent(input$updateColors, {
   })
   names(inCols) <- lev
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors.RData")
@@ -503,7 +503,7 @@ observeEvent(input$updateColors, {
   })
   names(inCols) <- lev
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     cat(file = stderr(), paste0("observeEvent 2 save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors2.RData")
@@ -520,7 +520,7 @@ output$Nclusters <- renderText({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/Nclusters.RData")
@@ -564,7 +564,7 @@ output$RDSsave <- downloadHandler(
       return(NULL)
     }
     if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
     
@@ -651,29 +651,30 @@ observeEvent(input$clusterMethod, {
 
 observeEvent(input$clusterSource, {
   if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterSource\n"))
-  if (input$clusterSource == "normData") {
-    showModal(scranWarning())
-  } else {
-    clusterMethodReact$clusterSource <- "PCA"
-  }
+  # if (input$clusterSource == "logcounts") {
+  #   showModal(scranWarning())
+  # } else {
+  #   clusterMethodReact$clusterSource <- "counts"
+  # }
+  clusterMethodReact$clusterSource = input$clusterSource
 })
 
 observeEvent(input$scranWarning_cancel, {
   updateSelectInput(session, "clusterMethod",
                     selected = "igraph"
   )
-  updateSelectInput(session, "clusterSource",
-                    selected = "PCA"
-  )
+  # updateSelectInput(session, "clusterSource",
+  #                   selected = "counts"
+  # )
   removeModal()
 })
 observeEvent(input$scranWarning_ok, {
   if (input$clusterMethod == "hclust") {
     clusterMethodReact$clusterMethod <- "hclust"
   }
-  if (input$clusterSource == "normData") {
-    clusterMethodReact$clusterSource <- "normData"
-  }
+  # if (input$clusterSource == "normData") {
+  #   clusterMethodReact$clusterSource <- "normData"
+  # }
   removeModal()
 })
 

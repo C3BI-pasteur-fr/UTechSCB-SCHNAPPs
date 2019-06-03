@@ -1,4 +1,4 @@
-require(magrittr)
+suppressMessages(require(magrittr))
 menuList <- list(
   shinydashboard::menuItem("General QC",
            # id="generalQCID",

@@ -3,7 +3,7 @@ if (DEBUG) cat(file = stderr(), paste("parameters:", length(allTabs), " ", "\n")
 
 normaliztionChoices <- list(rawNormalization = "rawNormalization")
 # parameterContributions = list()
-localContributionDir <- .SCHNAPPs_locContributionDir
+# localContributionDir <- .SCHNAPPs_locContributionDir
 parFiles <- dir(path = c(paste0(packagePath,  "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
 for (fp in parFiles) {
   if (DEBUG) {

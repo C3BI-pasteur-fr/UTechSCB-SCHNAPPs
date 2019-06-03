@@ -70,7 +70,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
 

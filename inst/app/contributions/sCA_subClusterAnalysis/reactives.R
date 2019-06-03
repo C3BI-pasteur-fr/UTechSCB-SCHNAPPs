@@ -54,7 +54,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
     showNotification("sCA_dge_CellViewfunc", id = "sCA_dge_CellViewfunc", duration = NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
   
@@ -92,7 +92,7 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
     showNotification("sCA_dge_ttest", id = "sCA_dge_ttest", duration = NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
   
@@ -134,7 +134,7 @@ sCA_dge <- reactive({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
 
@@ -214,7 +214,7 @@ updateInputSubclusterAxes <- reactive({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file="~/SCHNAPPsDebug/updateInputSubclusterAxes.RData")
   # if (length(gn) > 0) {

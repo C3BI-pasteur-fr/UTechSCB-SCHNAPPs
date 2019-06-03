@@ -1,4 +1,4 @@
-require(Matrix)
+suppressMessages(require(Matrix))
 # normalization parameters
 
 # choice for the radio buttion
@@ -39,7 +39,7 @@ DE_logGeneNormalization <- reactive({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_logGeneNormalization.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_logGeneNormalization.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file="~/SCHNAPPsDebug/DE_logGeneNormalization.RData")
   
@@ -117,7 +117,7 @@ DE_logNormalization <- reactive({
     return(NULL)
   }
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
   

@@ -2,10 +2,10 @@ if (DEBUG) {
   cat(file = stderr(), "\n\nloading Module server.\n\n\n")
 }
 
-source(paste0(packagePath, "/reactives.R"))
-library(psych)
-library(magrittr)
-library(dplyr)
+source(paste0(packagePath, "/reactives.R"), local = TRUE)
+suppressMessages(library(psych))
+suppressMessages(library(magrittr))
+suppressMessages(library(dplyr))
 
 #' clusterServer
 #'
@@ -146,7 +146,7 @@ clusterServer <- function(input, output, session,
       showNotification("selectedCellNames", id = "selectedCellNames", duration = NULL)
     }
     
-    brushedPs <- plotly::event_data("plotly_selected", source = "subset")
+    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
     projections <- projections()
     dimY <- input$dimension_y
     dimX <- input$dimension_x
@@ -164,7 +164,7 @@ clusterServer <- function(input, output, session,
     
     if (DEBUGSAVE) {
       if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: saving\n")
-      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position", ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position", ls(envir = globalenv()), ls(.schnappsEnv)))
     }
     # load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
     
@@ -228,7 +228,7 @@ clusterServer <- function(input, output, session,
       
       if (DEBUGSAVE) {
         cat(file = stderr(), paste("selectedCell: saving\n"))
-        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls(), ls(envir = globalenv())))
+        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
       }
       # load(file="~/SCHNAPPsDebug/clusterServerreturnValues.RData")
       featureData <- rowData(scEx_log)
@@ -335,7 +335,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving\n"))
       save(
         file = paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."),
-        list = c(ls(envir = globalenv()), ls(), "legend.position")
+        list = c(ls(envir = globalenv()), ls(.schnappsEnv), ls(), "legend.position")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
@@ -373,7 +373,7 @@ clusterServer <- function(input, output, session,
     exportTestValues(clusterPlot = {
       p1
     })
-    p1
+    suppressMessages(p1)
   })
   
   # observe({
@@ -466,7 +466,7 @@ clusterServer <- function(input, output, session,
     }
     if (DEBUGSAVE) {
       cat(file = stderr(), "save: changeGroups\n")
-      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
       cat(file = stderr(), "done save: changeGroups\n")
     }
     # load(file="~/SCHNAPPsDebug/changeGroups.RData")
@@ -533,7 +533,7 @@ clusterServer <- function(input, output, session,
       return(NULL)
     }
     if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     }
     # load(file="~/SCHNAPPsDebug/nCellsVisibleSelected.RData")
     inpClusters <- levels(projections$dbCluster)
@@ -618,7 +618,7 @@ clusterServer <- function(input, output, session,
     }
     
     if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     }
     # load(file="~/SCHNAPPsDebug/additionalOptions.RData")
     
@@ -683,7 +683,7 @@ clusterServer <- function(input, output, session,
     }
     
     ns <- session$ns
-    brushedPs <- plotly::event_data("plotly_selected", source = "subset")
+    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
     projections <- projections()
     # inpClusters <- (input$clusters)
     myshowCells <- (input$showCells)
@@ -703,7 +703,7 @@ clusterServer <- function(input, output, session,
       return("")
     }
     if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls(envir = globalenv()), ls()))
+      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls(envir = globalenv()), ls(.schnappsEnv), ls()))
     }
     # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection", "ns", ".RData", collapse = "."))
     # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
@@ -768,7 +768,7 @@ tableSelectionServer <- function(input, output, session,
     if (DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()))
+        list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv))
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."))
@@ -803,7 +803,7 @@ tableSelectionServer <- function(input, output, session,
     if (DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()))
+        list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv))
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."))
@@ -851,7 +851,7 @@ tableSelectionServer <- function(input, output, session,
     if (DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()))
+        list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv))
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."))
@@ -981,7 +981,7 @@ pHeatMapModule <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
     if (DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
-      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), ls(envir = globalenv()), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
+      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
     }
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
@@ -1085,7 +1085,7 @@ pHeatMapModule <- function(input, output, session,
     
     
     if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/heatMapadditionalOptions.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/heatMapadditionalOptions.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
     }
     # load(file="~/SCHNAPPsDebug/heatMapadditionalOptions.RData")
     
@@ -1134,7 +1134,9 @@ pHeatMapModule <- function(input, output, session,
       groupNs <- groupNames$namesDF
       proje <- projections()
       if (DEBUGSAVE) {
-        save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c("outfilePH", ls(), ls(envir = globalenv())))
+        save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c("outfilePH", ls(), 
+                                                                          ls(envir = globalenv()), 
+                                                                          ls(.schnappsEnv)))
       }
       # load("~/SCHNAPPsDebug/download_pHeatMapUI.RData")
       dfilename <- paste0(reportTempDir, "/sessionData.RData")

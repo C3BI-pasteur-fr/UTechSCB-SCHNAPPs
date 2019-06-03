@@ -1,16 +1,16 @@
-require(shiny)
+suppressMessages(require(shiny))
 # require(shinyMCE)
-require(shinyBS)
+suppressMessages(require(shinyBS))
 
-source(paste0(packagePath,  "/modulesUI.R"))
+source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 # this is where the general tabs are defined:
 
-localContributionDir <- .SCHNAPPs_locContributionDir
-defaultValueSingleGene <- .SCHNAPPs_defaultValueSingleGene
-defaultValueMultiGenes <- .SCHNAPPs_defaultValueMultiGenes
-defaultValueRegExGene <- .SCHNAPPs_defaultValueRegExGene
-DEBUG <- .SCHNAPPs_DEBUG
-DEBUGSAVE <- .SCHNAPPs_DEBUGSAVE
+# localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
+# defaultValueSingleGene <- get(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)
+# defaultValueMultiGenes <- get(".SCHNAPPs_defaultValueMultiGenes", envir = .schnappsEnv)
+# defaultValueRegExGene <- get(".SCHNAPPs_defaultValueRegExGene", envir = .schnappsEnv)
+# DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
+# DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
 
 # inputTab ----
@@ -195,7 +195,7 @@ cellSelectionTab <- shinydashboard::tabItem(
   fluidRow(
     column(10,
            offset = 1,
-           shinyBS::tipify(textInput("cellKeepOnly", "cells to keep; remove others"),
+           shinyBS::tipify(textInput("cellKeepOnly", "cells to keep (remove others)"),
                   title = "comma separated list of cells (with min expression) that should be kept and anything else removed"
            )
     )
@@ -219,7 +219,7 @@ cellSelectionTab <- shinydashboard::tabItem(
 # parse all parameters.R files under contributions to include in application
 # allTabs holds all tabs regardsless of their location in the GUI
 parameterContributions <- list()
-localContributionDir <- .SCHNAPPs_locContributionDir
+# localContributionDir <- .SCHNAPPs_locContributionDir
 parFiles <- dir(path = c(paste0(packagePath,  "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
 for (fp in parFiles) {
   myPparameters <- list()
@@ -268,12 +268,15 @@ generalParametersTab <- shinydashboard::tabItem(
     #        numericInput("kNr", "Number of clusters", 10, min = 2, max = 30)
     # ),
     column(2, offset = 0,
-           selectInput("clusterSource", "use PCA or normalized data?", choices = c("PCA", "normData"), selected = "PCA")),
+           selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = "counts")),
     column(2, offset = 0,
            numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2)),
     column(2, offset = 0,
-           selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph"))
-  ),
+           selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph")),
+    column(2, offset = 0,
+           selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE"))
+    
+    ),
   fluidRow(
     column(10, offset = 1,
            textInput("geneSelectionClustering", "Genes to be used for clustering")

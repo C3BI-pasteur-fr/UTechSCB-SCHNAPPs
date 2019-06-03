@@ -1,72 +1,74 @@
 # # LIBRARIES -----------------------------------------------------------------
-require(shiny)
-require(reactlog)
-require(shinyTree)
-require(tibble)
-require(plotly)
-require(shinythemes)
-require(ggplot2)
-require(DT)
-require(pheatmap)
-require(threejs)
-require(sm)
-require(RColorBrewer)
-require(mclust)
-require(reshape2)
-require(ggplot2)
-require(knitr)
-require(kableExtra)
-require(shinyWidgets)
-require(scater)
-require(shinyMCE)
-require(kohonen)
-require(Rsomoclu)
-require(gtools)
-require(SingleCellExperiment)
-require(Matrix)
-require(colourpicker)
-require(shinytest)
-require(scran)
-require(callr)
-require(debugme)
-require(BiocSingular)
-require(shinyBS)
+suppressMessages(require(shiny))
+suppressMessages(require(reactlog))
+suppressMessages(require(shinyTree))
+suppressMessages(require(tibble))
+suppressMessages(require(plotly))
+suppressMessages(require(shinythemes))
+suppressMessages(require(ggplot2))
+suppressMessages(require(DT))
+suppressMessages(require(pheatmap))
+suppressMessages(require(threejs))
+suppressMessages(require(sm))
+suppressMessages(require(RColorBrewer))
+suppressMessages(require(mclust))
+suppressMessages(require(reshape2))
+suppressMessages(require(ggplot2))
+suppressMessages(require(knitr))
+suppressMessages(require(kableExtra))
+suppressMessages(require(shinyWidgets))
+suppressMessages(require(scater))
+suppressMessages(require(kohonen))
+suppressMessages(require(Rsomoclu))
+suppressMessages(require(gtools))
+suppressMessages(require(SingleCellExperiment))
+suppressMessages(require(Matrix))
+suppressMessages(require(colourpicker))
+suppressMessages(require(shinytest))
+suppressMessages(require(scran))
+suppressMessages(require(callr))
+suppressMessages(require(debugme))
+suppressMessages(require(BiocSingular))
+suppressMessages(require(shinyBS))
+
+if (!exists(".schnappsEnv")) {
+  .schnappsEnv <- new.env(parent=emptyenv())
+}
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
     packagePath <- "inst/app"
   }
 } else {
-  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE)
-  packagePath <- paste0(packagePath, "/app/")
+  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 }
-if (exists(".SCHNAPPs_locContributionDir")) {
-  localContributionDir <- .SCHNAPPs_locContributionDir
+if (exists(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)) {
+  localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
 } else {
   localContributionDir <- NULL
 }
-if (exists(".SCHNAPPs_defaultValueSingleGene")) {
-  defaultValueSingleGene <- .SCHNAPPs_defaultValueSingleGene
+if (exists(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)) {
+  defaultValueSingleGene <- get(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)
 } else {
   defaultValueSingleGene <- "CD52"
 }
-if (exists(".SCHNAPPs_defaultValueMultiGenes")) {
-  defaultValueMultiGenes <- .SCHNAPPs_defaultValueMultiGenes
+if (exists(".SCHNAPPs_defaultValueMultiGenes", envir = .schnappsEnv)) {
+  defaultValueMultiGenes <- get(".SCHNAPPs_defaultValueMultiGenes", envir = .schnappsEnv)
 } else {
   defaultValueMultiGenes <- "CD52, S100A4, S100A9, S100A8"
 }
-if (exists(".SCHNAPPs_defaultValueRegExGene")) {
-  defaultValueRegExGene <- .SCHNAPPs_defaultValueRegExGene
+if (exists(".SCHNAPPs_defaultValueRegExGene", envir = .schnappsEnv)) {
+  defaultValueRegExGene <- get(".SCHNAPPs_defaultValueRegExGene", envir = .schnappsEnv)
 } else {
   defaultValueRegExGene <- "^MT-|^RP|^MRP"
 }
-if (exists(".SCHNAPPs_DEBUG")) {
-  DEBUG <- .SCHNAPPs_DEBUG
+if (exists(".SCHNAPPs_DEBUG", envir = .schnappsEnv)) {
+  DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
 } else {
   DEBUG <- FALSE
 }
-if (exists(".SCHNAPPs_DEBUGSAVE")) {
-  DEBUGSAVE <- .SCHNAPPs_DEBUGSAVE
+if (exists(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)) {
+  DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 } else {
   DEBUGSAVE <- FALSE
 }
@@ -81,8 +83,8 @@ if (!exists("allowedColors")) {
     "#fddbc7", "#e0e0e0", "#999999", "#4d4d4d"
   ))
 }
-Sys.setenv(DEBUGME = ".")
-base::source(paste0(packagePath, "/serverFunctions.R"))
+# Sys.setenv(DEBUGME = ".")
+base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 
 
 # enableBookmarking(store = "server")
@@ -94,7 +96,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   session$onSessionEnded(stopApp)
   # TODO needs to be an option
   seed <- 2
-  localContributionDir <- .SCHNAPPs_locContributionDir
+  # localContributionDir <- .SCHNAPPs_locContributionDir
   # cat(file = stderr(), paste("bernd2", str(environment())), "\n")
   # cat(file = stderr(), paste("bernd2", str(parent.env(environment()))), "\n")
   # cat(file = stderr(), paste("bernd2", str(parent.env(parent.env(environment())))), "\n")
@@ -108,6 +110,13 @@ scShinyServer <- shinyServer(function(input, output, session) {
     # TODO ??? clean directory??
   }
 
+  if (exists("devscShinyApp")) {
+    if (devscShinyApp) {
+      packagePath <- "inst/app"
+    }
+  } else {
+    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+  }
   # files to be included in report
   # developers can add in outputs.R a variable called "myZippedReportFiles"
   zippedReportFiles <- c("Readme.txt", "report.html", "sessionData.RData", 

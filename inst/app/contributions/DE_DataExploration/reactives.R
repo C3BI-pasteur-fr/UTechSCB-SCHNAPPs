@@ -1,4 +1,4 @@
-require(ggplot2)
+suppressMessages(require(ggplot2))
 
 # DE_scaterPNG ----
 #' DE_scaterPNG 
@@ -38,7 +38,7 @@ DE_scaterPNG <- reactive({
   height <- session$clientData$output_plot_height
 
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
   }
   # load(file='~/SCHNAPPsDebug/scater.Rmd')
 

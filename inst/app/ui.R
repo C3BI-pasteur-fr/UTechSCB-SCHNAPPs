@@ -6,33 +6,32 @@
 #
 
 
-require(shiny)
-require(shinydashboard)
-require(plotly)
-require(shinythemes)
-require(ggplot2)
-require(DT)
-require(edgeR)
-require(pheatmap)
-require(threejs)
-require(shinyTree)
-require(shinycssloaders)
-require(shinyBS)
+suppressMessages(require(shiny))
+suppressMessages(require(shinydashboard))
+suppressMessages(require(plotly))
+suppressMessages(require(shinythemes))
+suppressMessages(require(ggplot2))
+suppressMessages(require(DT))
+suppressMessages(require(edgeR))
+suppressMessages(require(pheatmap))
+suppressMessages(require(threejs))
+suppressMessages(require(shinyTree))
+suppressMessages(require(shinycssloaders))
+suppressMessages(require(shinyBS))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
     packagePath <- "inst/app"
   }
 } else {
-  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE)
-  packagePath <- paste0(packagePath, "/app/")
+  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 }
-localContributionDir <- .SCHNAPPs_locContributionDir
-defaultValueSingleGene <- .SCHNAPPs_defaultValueSingleGene
-defaultValueMultiGenes <- .SCHNAPPs_defaultValueMultiGenes
-defaultValueRegExGene <- .SCHNAPPs_defaultValueRegExGene
-DEBUG <- .SCHNAPPs_DEBUG
-DEBUGSAVE <- .SCHNAPPs_DEBUGSAVE
+localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
+defaultValueSingleGene <- get(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)
+defaultValueMultiGenes <- get(".SCHNAPPs_defaultValueMultiGenes", envir = .schnappsEnv)
+defaultValueRegExGene <- get(".SCHNAPPs_defaultValueRegExGene", envir = .schnappsEnv)
+DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
+DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
 # source(paste0(packagePath,  "/ui.R"))
 
@@ -42,7 +41,7 @@ DEBUGSAVE <- .SCHNAPPs_DEBUGSAVE
 # }
 # input, cell/gene selection tabs
 # source('tabs.R',  local = TRUE)
-source(paste0(packagePath, "/tabs.R"), local = FALSE)
+source(paste0(packagePath, "/tabs.R"), local = TRUE)
 
 # general tabs
 allTabs <- list(

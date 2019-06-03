@@ -1,4 +1,4 @@
-library(magrittr)
+suppressMessages(library(magrittr))
 menuList <- list(
   shinydashboard::menuItem("Subcluster analysis", 
                            icon = icon("bar-chart-o"),

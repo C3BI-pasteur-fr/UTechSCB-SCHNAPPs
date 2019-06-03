@@ -1,5 +1,5 @@
-require(shinyjqui)
-library(magrittr)
+suppressMessages(require(shinyjqui))
+suppressMessages(library(magrittr))
 
 # clusterUI -----------
 # to select clusters from the list of available knn clusters
