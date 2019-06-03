@@ -1,0 +1,48 @@
+---
+title: "Frequently asked questions for common tasks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FAQs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+library(SCHNAPPs)
+```
+
+
+## Identify Dead cells
+
+Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.
+
+
+
+## Identify cells from violin plot
+
+The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected
+
+## Can MARSeq data be analyzed?
+
+Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information. 
+
+## How to normalize by ribosomal proteins?
+
+
+
+What is the best representation to use to compare gene expression level ( UMI/gene) ? 
+Gene/UMI expression can be visualized in different plots:
+The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells.
+Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.
+
+## How to identify cells in a cluster of a Tsne plot and list them ? 
+
+
+## What are the different heat maps that can be generated and how many genes could be listed  by cluster ?

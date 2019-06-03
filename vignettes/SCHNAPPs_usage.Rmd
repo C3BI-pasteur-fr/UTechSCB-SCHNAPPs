@@ -236,7 +236,7 @@ Quickcluster from the scran package is used for clustering of cells.
 knitr::include_graphics('images/parametersTSNE.png')
 ```
 
-Place to change the parameters for the tSNE calculations (Wrapper for the C++ implementation of Barnes-Hut t-Distributed Stochastic Neighbor Embedding. t-SNE is a method for constructing a low dimensional embedding of high-dimensional data, distances or similarities. Exact t-SNE can be computed by setting theta=0.0.) . Rtsne package is used. All PCA components available are used for the calculations. Since there are 10 components calculated currently this is set to 10. 
+Place to change the parameters for the tSNE calculations (Wrapper for the C++ implementation of Barnes-Hut t-Distributed Stochastic Neighbor Embedding. t-SNE is a method for constructing a low dimensional embedding of high-dimensional data, distances or similarities. Exact t-SNE can be computed by setting theta=0.0.) . Rtsne package is used. All PCA components available are used for the calculations. The number of PCs calculated is set under Parameters - General Parameters. 
 
 The 3D display is not limited to the tsne projections and thus can be used to
 
