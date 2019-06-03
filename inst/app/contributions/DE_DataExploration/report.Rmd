@@ -12,7 +12,7 @@ if (exists("params")) {
   rm(list = ls())
   load("~/SCHNAPPsDebug/report.RData")
   cat(file = stderr(), getwd())
-
+  
   require(shiny)
   require(plotly)
   require(shinythemes)
@@ -31,24 +31,24 @@ if (exists("params")) {
   require(kableExtra)
   require(shinyWidgets)
   require(scater)
-
+  
   source("../../../serverFunctions.R")
   source("../../../reactives.R", local = TRUE)
   # source("reactives.R", local = TRUE)
-
+  
   LOCALEXECUTION <- TRUE # to know that we are debugging.
   useCells <- useCellsFunc(dataTables,
-    geneNames = input$minExpGenes,
-    rmCells = input$cellsFiltersOut,
-    rmPattern = input$cellPatternRM,
-    keepCells = input$cellKeep,
-    cellKeepOnly = input$cellKeepOnly
+                           geneNames = input$minExpGenes,
+                           rmCells = input$cellsFiltersOut,
+                           rmPattern = input$cellPatternRM,
+                           keepCells = input$cellKeep,
+                           cellKeepOnly = input$cellKeepOnly
   )
   
   ipIDs <- input$selectIds
   geneListSelection <- input$geneListSelection
   minGene <- input$minGenesGS
-
+  
   useGenes <- useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
   featureDataReact <- dataTables$featuredata[useGenes, ]
   featureData <- dataTables$featuredata[useGenes, ]
@@ -152,7 +152,7 @@ if (length(genesin) > 0) {
   par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
   rbPal <- colorRampPalette(c("#f0f0f0", "red"))
   ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
-  if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+  if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
     ymax <- 0
     for (i in 1:length(genesin)) {
       geneIdx <- which(toupper(featureData$symbol) == genesin[i])
@@ -169,18 +169,18 @@ if (length(genesin) > 0) {
             as.numeric(
               assays(scEx_log)[[1]][
                 rownames(featureData[geneIdx, ]),
-              ]
+                ]
             ),
             breaks = 10
           )
         )
-      ]
-      if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+        ]
+      if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
         projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
       }
-
+      
       plot(projections[, dimx4], projections[, dimy4],
-        col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
+           col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
       )
       title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
       if (DEBUG) cat(file = stderr(), genesin[i])
@@ -189,30 +189,30 @@ if (length(genesin) > 0) {
     for (i in 1:length(genesin)) {
       geneIdx <- which(toupper(featureData$symbol) == genesin[i])
       subsetTSNE <- subset(projections, dbCluster == cl4)
-
+      
       Col <- rbPal(10)[
         as.numeric(
           cut(
             as.numeric(
               assays(scEx_log)[[1]][
                 rownames(featureData[geneIdx, ]),
-              ]
+                ]
             ),
             breaks = 10
           )
         )
-      ]
-
+        ]
+      
       names(Col) <- rownames(projections)
       plotCol <- Col[rownames(subsetTSNE)]
-      if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+      if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
         projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
         subsetTSNE <- subset(projections, dbCluster == cl4)
       }
-
+      
       plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
-        col = plotCol, pch = 16, frame.plot = TRUE,
-        ann = FALSE, ylim = ylim
+           col = plotCol, pch = 16, frame.plot = TRUE,
+           ann = FALSE, ylim = ylim
       )
       title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
       if (DEBUG) cat(file = stderr(), cl4)
