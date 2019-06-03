@@ -20,7 +20,6 @@
 #' radioButtons verbatimTextOutput wellPanel
 #' @importFrom htmltools HTML br
 #' @importFrom shinyTree renderTree shinyTree
-#' @importFrom shinyMCE  tinyMCE
 #' @importFrom magrittr %>%
 #' @importFrom DT DTOutput dataTableProxy
 #' @importFrom shinycssloaders withSpinner

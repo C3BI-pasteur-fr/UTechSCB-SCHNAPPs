@@ -1,5 +1,5 @@
 require(shiny)
-require(shinyMCE)
+# require(shinyMCE)
 require(shinyBS)
 
 source(paste0(packagePath,  "/modulesUI.R"))
@@ -287,10 +287,13 @@ generalParametersTab <- shinydashboard::tabItem(
   br(),
   fluidRow(div(h3("Comments"), align = "left")),
   fluidRow(
-    tinyMCE(
-      "descriptionOfWork",
-      "Please describe your work. This will be included in the report."
-    )
+    if ("shinyMCE" %in% rownames(installed.packages()))
+           shinyMCE::tinyMCE(
+             "descriptionOfWork",
+             "Please describe your work. This will be included in the report."
+           ) else 
+      textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
+           
   ),
   br(),
   fluidRow(div(h3("Colors"), align = "left")),
