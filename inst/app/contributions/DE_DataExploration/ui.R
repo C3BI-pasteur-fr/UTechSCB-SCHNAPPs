@@ -1,4 +1,4 @@
-library(magrittr)
+suppressMessages(library(magrittr))
 
 # list of menu Items
 menuList <- list(
@@ -10,7 +10,7 @@ menuList <- list(
   )
 )
 
-source(paste0(packagePath,  "/modulesUI.R"))
+source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 # list of tab Items
 tabList <- list(
   expressionTab = shinydashboard::tabItem(

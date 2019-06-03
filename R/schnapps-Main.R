@@ -1,8 +1,13 @@
+#' .schnappsEnv 
+#' Environment for package
+.schnappsEnv <- new.env(parent=emptyenv())
+
+
+
 #' shiny server relevant functions
 #'
 #' @details Shiny app for the analysis of single cell data
 #'
-#' @export schnapps
 #' 
 #' @param localContributionDir path to the directory(ies) that contain additional functionality
 #' @param defaultValueSingleGene single gene name to used as a default value.
@@ -25,10 +30,10 @@
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom plotly event_data plot_ly
 #' @importFrom shinyBS tipify bsAlert
+#' @importFrom shiny shinyApp runApp
 #'
+#' @export schnapps
 #'
-#'
-
 
 schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                        defaultValueSingleGene = "CD52",
@@ -38,27 +43,27 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                        DEBUGSAVE = FALSE
 
                        ) {
-  on.exit({
-    rm(list = c(".SCHNAPPs_locContributionDir",
-         ".SCHNAPPs_defaultValueSingleGene",
-         ".SCHNAPPs_defaultValueMultiGenes",
-         ".SCHNAPPs_defaultValueRegExGene",
-         ".SCHNAPPs_DEBUG",
-         ".SCHNAPPs_DEBUGSAVE"),
-       envir = globalenv())
-  })
-  # I still don't understand how to pass a variable to a shinyApp without going through the globalenv.
-  assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = globalenv())
-  assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = globalenv())
-  assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = globalenv())
-  assign(".SCHNAPPs_defaultValueRegExGene", defaultValueRegExGene, envir = globalenv())
-  assign(".SCHNAPPs_DEBUG", DEBUG, envir = globalenv())
-  assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = globalenv())
-
-  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE)
-  packagePath <- paste0(packagePath,"/app/")
-  source(paste0(packagePath,  "/server.R"))
-  source(paste0(packagePath,  "/ui.R"))
+  # on.exit({
+  #   rm(list = c(".SCHNAPPs_locContributionDir",
+  #        ".SCHNAPPs_defaultValueSingleGene",
+  #        ".SCHNAPPs_defaultValueMultiGenes",
+  #        ".SCHNAPPs_defaultValueRegExGene",
+  #        ".SCHNAPPs_DEBUG",
+  #        ".SCHNAPPs_DEBUGSAVE"),
+  #      envir = .schnappsEnv)
+  # })
+  assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
+  assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
+  assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
+  assign(".SCHNAPPs_defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
+  assign(".SCHNAPPs_DEBUG", DEBUG, envir = .schnappsEnv)
+  assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+  # will be set during sourcing, but we need to define them, otherwise there will be a warning
+  scShinyUI <- NULL
+  scShinyServer <- NULL
+  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+  source(paste0(packagePath,  "/server.R"), local = TRUE)
+  source(paste0(packagePath,  "/ui.R"), local = TRUE)
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
   runApp(app)
 }
@@ -78,4 +83,4 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
 #' @format A data frame with 53940 rows and 10 variables
 #' @source <http://www.diamondse.info/>
 "scEx"
-#> [1] "scEx"
+
