@@ -976,6 +976,7 @@ pHeatMapModule <- function(input, output, session,
     orderColNames <- input$orderNames
     moreOptions <- input$moreOptions
     colTree <- input$showColTree
+    scale <- input$normRow
     
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
@@ -996,10 +997,19 @@ pHeatMapModule <- function(input, output, session,
       ))
     }
     
+    if (is.null(scale)) {
+      heatmapData$scale = "none"
+    } else {
+      heatmapData$scale = scale
+    }
+    
     outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
     outfile <- normalizePath(outfile, mustWork = FALSE)
     heatmapData$filename <- outfile
     # heatmapData$filename = NULL
+    if (length(addColNames) > 0 & moreOptions) {
+      heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+    }
     if (length(addColNames) > 0 & moreOptions) {
       heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
     }
@@ -1039,6 +1049,7 @@ pHeatMapModule <- function(input, output, session,
           alt = "pHeatMapPlot should be here"
         ))
       }
+    
       do.call(TRONCO::pheatmap, heatmapData)
       
       pixelratio <- session$clientData$pixelratio
@@ -1091,6 +1102,12 @@ pHeatMapModule <- function(input, output, session,
     
     tagList(
       checkboxInput(ns("showColTree"), label = "Show tree for cells", value = FALSE),
+      selectInput(
+        ns("normRow"),
+        label = "normalize by row (for color)",
+        choices = c("row", "column", "none"),
+        selected = "none"
+      ),
       selectInput(
         ns("ColNames"),
         label = "group names",
