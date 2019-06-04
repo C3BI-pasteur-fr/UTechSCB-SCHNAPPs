@@ -11,8 +11,10 @@ Description: Single Cell sHiny APPlication (SCHNAPPs) is a R/Shiny based applica
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+OS_type: unix
 Depends: 
     R (>= 3.6),
+    BiocParallel (>= 1.17.0)
     SummarizedExperiment, 
     SingleCellExperiment,
     parallel,
