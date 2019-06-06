@@ -6,25 +6,25 @@ myZippedReportFiles <- c("gqcProjections.csv")
 
 
 
-gQC_X1 <<- "tsne1"
-gQC_X2 <<- "tsne2"
-gQC_X3 <<- "tsne3"
-gQC_col <<- "sampleNames"
+.schnappsEnv$gQC_X1 <- "tsne1"
+.schnappsEnv$gQC_X2 <- "tsne2"
+.schnappsEnv$gQC_X3 <- "tsne3"
+.schnappsEnv$gQC_col <- "sampleNames"
 observe({
   if (DEBUG) cat(file = stderr(), "observe: gQC_dim3D_x\n")
-  gQC_X1 <<- input$gQC_dim3D_x
+  .schnappsEnv$gQC_X1 <- input$gQC_dim3D_x
 })
 observe({
   if (DEBUG) cat(file = stderr(), "observe: gQC_dim3D_y\n")
-  gQC_X2 <<- input$gQC_dim3D_y
+  .schnappsEnv$gQC_X2 <- input$gQC_dim3D_y
 })
 observe({
   if (DEBUG) cat(file = stderr(), "observe: gQC_dim3D_z\n")
-  gQC_X3 <<- input$gQC_dim3D_z
+  .schnappsEnv$gQC_X3 <- input$gQC_dim3D_z
 })
 observe({
   if (DEBUG) cat(file = stderr(), "observe: gQC_col3D\n")
-  gQC_col <<- input$gQC_col3D
+  .schnappsEnv$gQC_col <- input$gQC_col3D
 })
 
 # gQC_update3DInput ----
@@ -54,20 +54,20 @@ gQC_update3DInput <- reactive({
   # Can also set the label and select items
   updateSelectInput(session, "gQC_dim3D_x",
     choices = choices,
-    selected = gQC_X1
+    selected = .schnappsEnv$gQC_X1
   )
 
   updateSelectInput(session, "gQC_dim3D_y",
     choices = choices,
-    selected = gQC_X2
+    selected = .schnappsEnv$gQC_X2
   )
   updateSelectInput(session, "gQC_dim3D_z",
     choices = choices,
-    selected = gQC_X3
+    selected = .schnappsEnv$gQC_X3
   )
   updateSelectInput(session, "gQC_col3D",
     choices = colnames(projections),
-    selected = gQC_col
+    selected = .schnappsEnv$gQC_col
   )
 })
 

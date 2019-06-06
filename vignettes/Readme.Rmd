@@ -1,0 +1,27 @@
+---
+title: "Readme"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Readme}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, warning=FALSE, message=FALSE, error=FALSE}
+library(SCHNAPPs)
+```
+
+To start the application use
+
+` schnapps()`
+
+Please see [GitHub](https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs) for further documentation on how to use schnapps.
+
+Please see [GitHub Contributions](https://github.com/baj12/SCHNAPPsContributions) for additional tools, not directly part of the SCHNAPPs pacakage.

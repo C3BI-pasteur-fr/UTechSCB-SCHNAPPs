@@ -1156,7 +1156,7 @@ pHeatMapModule <- function(input, output, session,
                                                                           ls(.schnappsEnv)))
       }
       # load("~/SCHNAPPsDebug/download_pHeatMapUI.RData")
-      dfilename <- paste0(reportTempDir, "/sessionData.RData")
+      dfilename <- paste0(.schnappsEnv$reportTempDir, "/sessionData.RData")
       base::save(
         file = dfilename, list =
           c("heatmapData", "addColNames", "orderColNames", "moreOptions", "proje", "groupNs")
