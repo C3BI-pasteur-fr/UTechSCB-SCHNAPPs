@@ -6,8 +6,5 @@ logo.png
 ^docs$
 inst/develo
 inst/prep4master.R
-<<<<<<< HEAD
 2
 pkgdown
-=======
->>>>>>> 50913a8ca3d74743b2040c7ef62a9b1804bcb497
