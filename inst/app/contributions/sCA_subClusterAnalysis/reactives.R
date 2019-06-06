@@ -21,10 +21,10 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
 
     dbCluster = projections$dbCluster
   subsetData <- subset(projections, dbCluster %in% cl1)
-  if (class(subsetData[,db1$mapping$x]) == "logical") {
+  if (is(subsetData[,db1$mapping$x], "logical")) {
     subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
   }
-  if (class(subsetData[,db1$mapping$y]) == "logical") {
+  if (is(subsetData[,db1$mapping$y], "logical")) {
     subsetData[,db1$mapping$y] = as.numeric(subsetData[,db1$mapping$y]) + 1
   }
   cells.1 <- rownames(shiny::brushedPoints(subsetData, db1))
