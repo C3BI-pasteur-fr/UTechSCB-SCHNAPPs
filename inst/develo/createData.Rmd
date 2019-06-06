@@ -1,0 +1,193 @@
+---
+title: "gbm2Rds"
+output: html_document
+---
+df
+
+
+```{r}
+cat(file = stderr(), "test")
+```
+
+
+```{r nsetup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  echo = FALSE,
+  include = TRUE
+)
+# rm(list=ls())
+# library(cellrangerRkit)
+# packageVersion("cellrangerRkit")
+# library(SCORPIUS)
+library(ggplot2)
+library(dplyr)
+library(SingleCellExperiment)
+
+suppressMessages(library(biomaRt))
+```
+
+dfd
+
+
+```{r}
+# function to retrieve annotation from biomart
+# used with different versions to ensure the correct ids are used.
+# version = 0 => current
+library(ggplot2)
+library(dplyr)
+library(SingleCellExperiment)
+suppressMessages(library(biomaRt))
+require(Seurat)
+
+getFeatureDataSummary <- function(ver = 0, dataset = "mmusculus_gene_ensembl", gbmMat = gbmMat) {
+  if (ver > 0) {
+    ensemblOld <- useEnsembl(biomart = "ensembl", version = ver, dataset = dataset)
+  } else {
+    ensemblOld <- useEnsembl(biomart = "ensembl", dataset = dataset)
+  }
+  
+  if (!startsWith(rownames(gbmMat)[1], "ENS")) {
+    vals <- rownames(gbmMat)
+    filters <- "external_gene_name"
+  } else {
+    vals <- rownames(gbmMat)
+    filters <- "ensembl_gene_id"
+  }
+  featureData <- tryCatch(
+    getBM(
+      attributes = c(
+        "ensembl_gene_id",
+        "external_gene_name",
+        "description",
+        "chromosome_name",
+        "genomic_coding_start",
+        "genomic_coding_end",
+        "gene_biotype"
+      ),
+      filters = filters,
+      values = vals,
+      mart = ensemblOld
+    ),
+    error = function(cond) {
+      return("biomart connection error")
+    },
+    warning = function(cond) {
+      return("Biomart warning")
+    }
+  )
+  featureData$genomic_coding_start[is.na(featureData$genomic_coding_start)] <- 0
+  featureData$genomic_coding_end[is.na(featureData$genomic_coding_end)] <- 0
+  featureData_summary <- featureData %>%
+    group_by(ensembl_gene_id, external_gene_name, description, chromosome_name, gene_biotype) %>%
+    summarize(
+      min_genomic_coding_start = min(genomic_coding_start, na.rm = TRUE),
+      max_genomic_coding_end = max(genomic_coding_end, na.rm = TRUE)
+    )
+  featureData_summary <- as.data.frame(featureData_summary)
+  rownames(featureData_summary) <- featureData_summary$ensembl_gene_id
+  featureData_summary <- featureData_summary[, -1]
+  
+  colnames(featureData_summary) <- c(
+    "Associated.Gene.Name",
+    "Description",
+    "Chromosome.Name",
+    "Gene.Biotype",
+    "Gene.Start..bp.",
+    "Gene.End..bp."
+  )
+  featureData_summary <- featureData_summary[, c(
+    "Description",
+    "Chromosome.Name",
+    "Gene.Start..bp.",
+    "Gene.End..bp.",
+    "Associated.Gene.Name",
+    "Gene.Biotype"
+  )]
+  return(featureData_summary)
+}
+
+read10X <- function(run, sampleName = 1) {
+  # run = dirname(pipestance_paths[1])
+  if (!grepl("\\/$", run)) {
+    run <- paste(run, "/", sep = "")
+  }
+  barcode.loc <- paste0(run, "barcodes.tsv")
+  gene.loc <- paste0(run, "features.tsv")
+  matrix.loc <- paste0(run, "matrix.mtx")
+  if (!file.exists(barcode.loc)) {
+    stop("Barcode file missing")
+  }
+  if (!file.exists(gene.loc)) {
+    stop("Gene name file missing")
+  }
+  if (!file.exists(matrix.loc)) {
+    stop("Expression matrix file missing")
+  }
+  data <- readMM(file = matrix.loc)
+  cell.names <- readLines(barcode.loc)
+  gene.names <- read.csv2(gene.loc, header = FALSE,sep = "\t", stringsAsFactors = F)
+  rownames(data) = gene.names[,1]
+  # rownames(x = data) <- make.unique(names = as.character(x = sapply(
+  #   X = gene.names,
+  #   FUN = ExtractField, field = 1, delim = "\\t"
+  # )))
+  cell.names <- paste0(sub("(.*)-1", "\\1", cell.names), "-", sampleName)
+  
+  colnames(x = data) <- cell.names
+  data
+}
+```
+
+
+```{r scCourse v2}
+
+path = "/Volumes/collanto/scRNAseq/bernd/scCourse2019/HN00106004_10x_RawData_Outs/HYK53CCXY/fastq_path/HYK53CCXY/"
+runs = dir(path = path, pattern = "cnt$", full.names = TRUE, recursive = FALSE)
+outfile = "scCourse2019.RData"
+run = runs[1]
+library(Matrix)
+# alldata = new("dgTMatrix")
+run = runs[1]
+sampleName = basename(run)
+run = paste0(run, "/outs/filtered_feature_bc_matrix/")
+
+alldata = read10X(run, sampleName)
+runs = runs[-1]
+for (run in runs) {
+  print(run)
+  sampleName = basename(run)
+  run = paste0(run, "/outs/filtered_feature_bc_matrix/")
+  
+  alldata = cbind(alldata, read10X(run, sampleName))
+}
+dim(alldata)
+
+listEnsembl()$version
+featureData_summary93 <- getFeatureDataSummary(ver = 93, dataset = "hsapiens_gene_ensembl", gbmMat = alldata)
+
+featureData_summary = featureData_summary93
+length(rownames(alldata)[!rownames(alldata) %in% rownames(featureData_summary) ])
+
+featuredata <- featureData_summary[rownames(alldata), ]
+pd = data.frame(barcodes = sub("(.*)-(.*)", "\\1", colnames(alldata)),
+                sampleNames = sub(".*-(.*)", "\\1", colnames(alldata))
+)
+pd$barcodes = as.character(pd$barcodes)
+pd
+counts <- as(alldata, "dgCMatrix")
+scEx = SingleCellExperiment(assay = list(counts=counts),
+                            colData = pd,
+                            rowData = featuredata)
+
+save(file = outfile, list = c("scEx"))
+
+for (samp in levels(colData(scEx)[,"sampleNames"])) {
+  scExSub = scEx[,colData(scEx)[,"sampleNames"] == samp]
+  save(file = paste0(samp,".RData"), list = c("scExSub"))
+}
+
+```
+
+
