@@ -2,9 +2,10 @@
 ^\.Rproj\.user$
 ^doc$
 ^Meta$
-logo.png
+^logo.png$
 ^docs$
-inst/develo
-inst/prep4master.R
-2
-pkgdown
+^2$
+^pkgdown$
+^inst/develo
+^inst/prep4master.R
+^vignettes/pkdown$

@@ -90,7 +90,7 @@ base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 # enableBookmarking(store = "server")
 
 # global variable with directory where to store files to be included in reports
-reportTempDir <<- base::tempdir()
+.schnappsEnv$reportTempDir <- base::tempdir()
 
 scShinyServer <- shinyServer(function(input, output, session) {
   session$onSessionEnded(stopApp)
@@ -145,17 +145,19 @@ scShinyServer <- shinyServer(function(input, output, session) {
 
   # base projections
   # display name, reactive to calculate projections
-  projectionFunctions <<- list(
+  projectionFunctions <- list(
     c("sampleNames", "sample"),
     c("Gene count", "geneCount"),
     c("UMI count", "umiCount"),
     c("before filter", "beforeFilterPrj")
   )
-
+  .schnappsEnv$projectionFunctions <- projectionFunctions
+  
   # differential expression functions
   # used in subcluster analysis
-  diffExpFunctions <<- list()
-
+  .schnappsEnv$diffExpFunctions <- list()
+  diffExpFunctions <- list()
+  
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
   base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
@@ -209,8 +211,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     session = session, inputId = "sCA_dgeRadioButton",
     choices = dgeChoices
   )
-  # make variable global
-  diffExpFunctions <<- diffExpFunctions
+  .schnappsEnv$diffExpFunctions <- diffExpFunctions
 
   # load contribution outputs ----
   # parse all outputs.R files under contributions to include in application
@@ -225,9 +226,10 @@ scShinyServer <- shinyServer(function(input, output, session) {
     myZippedReportFiles <- c()
     base::source(fp, local = TRUE)
     heavyCalculations <- append2list(myHeavyCalculations, heavyCalculations)
-    projectionFunctions <<- append2list(myProjections, projectionFunctions)
+    projectionFunctions <- append2list(myProjections, projectionFunctions)
     zippedReportFiles <- c(zippedReportFiles, myZippedReportFiles)
   }
+  .schnappsEnv$projectionFunctions <- projectionFunctions
 }) # END SERVER
 
 # shiny::showReactLog()

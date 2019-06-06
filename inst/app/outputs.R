@@ -118,7 +118,7 @@ observeEvent(input$updateCellSelectionParameters, {
     cellsFiltersOut = input$cellsFiltersOut
   )
   )
-  cat(file = stderr(), "\nCellSelectionValues\n")
+  if (DEBUG) cat(file = stderr(), "\nCellSelectionValues\n")
 })
 
 observeEvent(input$updateGeneSelectionParameters, {
@@ -127,7 +127,7 @@ observeEvent(input$updateGeneSelectionParameters, {
                              minGenesGS = input$minGenesGS,
                              genesKeep = input$genesKeep
   ))
-  cat(file = stderr(), "\ngeneSelectionValues\n")
+  if (DEBUG) cat(file = stderr(), "\ngeneSelectionValues\n")
 })
 
 
@@ -374,7 +374,7 @@ callModule(
 # DEBUGSAVEstring ----
 output$DEBUGSAVEstring <- renderText({
   if (DEBUG) {
-    DEBUGSAVE <<- input$DEBUGSAVE
+    .schnappsEnv$DEBUGSAVE <- input$DEBUGSAVE
   } else {
     NULL
   }

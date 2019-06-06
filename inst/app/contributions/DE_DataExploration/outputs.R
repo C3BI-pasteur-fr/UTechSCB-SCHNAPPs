@@ -17,15 +17,15 @@ callModule(
 #' update x/y coordinates that can be chosen based on available
 #' projections
 
-DE_X1 <<- "tsne1"
+.schnappsEnv$DE_X1 <- "tsne1"
+.schnappsEnv$DE_Y1 <- "tsne1"
 observe({
   if (DEBUG) cat(file = stderr(), "observe: DE_dim_x\n")
-  DE_X1 <<- input$DE_dim_x
+  .schnappsEnv$DE_X1 <- input$DE_dim_x
 })
-DE_Y1 <<- "tsne1"
 observe({
   if (DEBUG) cat(file = stderr(), "observe: DE_dim_y\n")
-  DE_Y1 <<- input$DE_dim_y
+  .schnappsEnv$DE_Y1 <- input$DE_dim_y
 })
 
 DE_updateInputExpPanel <- reactive({
@@ -50,13 +50,13 @@ DE_updateInputExpPanel <- reactive({
   # Can also set the label and select items
   updateSelectInput(session, "DE_dim_x",
     choices = colnames(projections),
-    selected = DE_X1
+    selected = .schnappsEnv$DE_X1
   )
 
   # Can also set the label and select items
   updateSelectInput(session, "DE_dim_y",
     choices = colnames(projections),
-    selected = DE_Y1
+    selected = .schnappsEnv$DE_Y1
   )
   return(TRUE)
 })
@@ -110,10 +110,10 @@ output$DE_gene_vio_plot <- renderPlot({
 #' since we allow also "all" we have to have a different strategy for the input
 #' it is debateable whether this is usefull to have a different strategy, but for now
 #' we leave it as it.
-DE_cl1 <<- "All"
+.schnappsEnv$DE_cl1 <- "All"
 observe({
   if (DEBUG) cat(file = stderr(), "observe: DE_clusterSelectionPanelPlot\n")
-  DE_cl1 <<- input$DE_clusterSelectionPanelPlot
+  .schnappsEnv$DE_cl1 <- input$DE_clusterSelectionPanelPlot
 })
 output$DE_clusterSelectionPanelPlot <- renderUI({
   if (DEBUG) cat(file = stderr(), "output$DE_clusterSelectionPanelPlot\n")
@@ -127,7 +127,7 @@ output$DE_clusterSelectionPanelPlot <- renderUI({
       "DE_clusterSelectionPanelPlot",
       label = "Cluster",
       choices = c(c("All"), noOfClusters),
-      selected = DE_cl1
+      selected = .schnappsEnv$DE_cl1
     )
   }
 })

@@ -267,13 +267,13 @@ generalParametersTab <- shinydashboard::tabItem(
     #        offset = 1,
     #        numericInput("kNr", "Number of clusters", 10, min = 2, max = 30)
     # ),
-    column(2, offset = 0,
+    column(2, offset = 1,
            selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = "counts")),
-    column(2, offset = 0,
+    column(2, 
            numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2)),
-    column(2, offset = 0,
+    column(2, 
            selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph")),
-    column(2, offset = 0,
+    column(2, 
            selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE"))
     
     ),
