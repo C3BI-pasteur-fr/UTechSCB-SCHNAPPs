@@ -177,7 +177,7 @@ output$DE_panelPlot <- renderPlot({
   par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
   rbPal <- colorRampPalette(c("#f0f0f0", "red"))
   ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
-  if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+  if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
     ymax <- 0
     for (i in 1:length(genesin)) {
       geneIdx <- which(toupper(featureData$symbol) == genesin[i])
@@ -200,7 +200,7 @@ output$DE_panelPlot <- renderPlot({
           )
         )
       ]
-      if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+      if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
         projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
       }
 
@@ -230,7 +230,7 @@ output$DE_panelPlot <- renderPlot({
 
       names(Col) <- rownames(projections)
       plotCol <- Col[rownames(subsetTSNE)]
-      if (class(projections[, dimx4]) == "factor" & dimy4 == "UMI.count") {
+      if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
         projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
         subsetTSNE <- subset(projections, dbCluster == cl4)
       }

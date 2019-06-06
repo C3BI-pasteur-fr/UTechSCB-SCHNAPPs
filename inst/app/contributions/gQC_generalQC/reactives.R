@@ -20,7 +20,7 @@ gQC_scaterReadsFunc <- function(scEx) {
     showNotification("gQC_scaterReadsFunc", id = "gQC_scaterReadsFunc", duration = NULL)
   }
   
-  if (class(assays(scEx)[[1]]) == "dgTMatrix") {
+  if (is(assays(scEx)[[1]], "dgTMatrix")) {
     assays(scEx)[["counts"]] = as(assays(scEx)[["counts"]], "dgCMatrix")
   }
   
