@@ -4,3 +4,5 @@
 ^Meta$
 logo.png
 ^docs$
+inst/develo
+inst/prep4master.R
