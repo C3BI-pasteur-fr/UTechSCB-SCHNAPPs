@@ -4,3 +4,7 @@
 ^Meta$
 logo.png
 ^docs$
+inst/develo
+inst/prep4master.R
+2
+pkgdown
