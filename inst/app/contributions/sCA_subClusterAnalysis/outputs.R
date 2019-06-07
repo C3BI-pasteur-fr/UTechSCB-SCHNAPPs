@@ -35,8 +35,8 @@ sCA_dgeTableReac <- reactive({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # cp = load(file="~/SCHNAPPsDebug/output_dge.RData")
   featureData <- rowData(scEx)
@@ -79,7 +79,7 @@ output$sCA_dgeClustersSelection <- renderUI({
   up1 <- updateInputSubclusterAxes()
 
   if (DEBUG) cat(file = stderr(), "output$sCA_dgeClustersSelection\n")
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(envir = globalenv(), ls(), ls(envir = .schnappsEnv))))
   }
   # load(file="~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData")

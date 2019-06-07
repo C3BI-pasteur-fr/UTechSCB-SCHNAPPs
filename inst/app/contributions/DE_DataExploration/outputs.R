@@ -88,8 +88,8 @@ output$DE_gene_vio_plot <- renderPlot({
     if (DEBUG) cat(file = stderr(), "output$DE_gene_vio_plot:NULL\n")
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_gene_vio_plot.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/DE_gene_vio_plot.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
 
@@ -160,8 +160,8 @@ output$DE_panelPlot <- renderPlot({
   if (is.null(scEx_log) | is.null(projections) | is.null(cl4)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
 
@@ -281,8 +281,8 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   if (is.null(scEx_log) | is.null(projections)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
 
@@ -308,8 +308,8 @@ output$DE_downloadPanel <- downloadHandler(
     if (is.null(scEx)) {
       return(NULL)
     }
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
 

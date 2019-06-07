@@ -58,6 +58,8 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   assign(".SCHNAPPs_defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
   assign(".SCHNAPPs_DEBUG", DEBUG, envir = .schnappsEnv)
   assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+  assign("DEBUG", DEBUG, envir = .schnappsEnv)
+  assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL
   scShinyServer <- NULL

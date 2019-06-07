@@ -4,7 +4,7 @@ suppressMessages(require(shinyTree))
 source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
 source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
-
+DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # normalizationRadioButtonValue --------------------------------
 # Parameters / normalization
 output$normalizationRadioButtonValue <- renderPrint({
@@ -23,10 +23,10 @@ parFiles <-
 for (fp in parFiles) {
   myNormalizationParameters <- list()
   source(fp, local = TRUE)
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParameters.RData')
@@ -70,10 +70,10 @@ output$normalizationsParametersDynamic <- renderUI({
   }
   selectedChoice <- input$normalizationRadioButton
   
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
@@ -154,10 +154,10 @@ output$summaryStatsSideBar <- renderUI({
   medianENSG <- medianENSG()
   memoryUsed <- getMemoryUsed()
   normalizationRadioButton <- input$normalizationRadioButton
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
@@ -223,7 +223,7 @@ output$geneListSelection <- shinyTree::renderTree({
 #   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
 #     return(NULL)
 #   }
-#   if (DEBUGSAVE) {
+#   if (.schnappsEnv$DEBUGSAVE) {
 #     save(
 #       file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
 #       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
@@ -267,7 +267,7 @@ output$geneListSelection <- shinyTree::renderTree({
 #   }
 #   useGenes <- !useGenes
 # 
-#   if (DEBUGSAVE) {
+#   if (.schnappsEnv$DEBUGSAVE) {
 #     save(
 #       file = "~/SCHNAPPsDebug/removedGenesTable.RData",
 #       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
@@ -318,7 +318,7 @@ callModule(
 #   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
 #     return(NULL)
 #   }
-#   if (DEBUGSAVE) {
+#   if (.schnappsEnv$DEBUGSAVE) {
 #     save(
 #       file = "~/SCHNAPPsDebug/gsSelectedGenes.RData",
 #       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
@@ -350,7 +350,7 @@ callModule(
 #   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
 #     return(NULL)
 #   }
-#   if (DEBUGSAVE) {
+#   if (.schnappsEnv$DEBUGSAVE) {
 #     save(
 #       file = "~/SCHNAPPsDebug/gsrmGenes.RData",
 #       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
@@ -375,6 +375,7 @@ callModule(
 output$DEBUGSAVEstring <- renderText({
   if (DEBUG) {
     .schnappsEnv$DEBUGSAVE <- input$DEBUGSAVE
+    DEBUGSAVE <- input$DEBUGSAVE
   } else {
     NULL
   }
@@ -403,10 +404,10 @@ output$sampleColorSelection <- renderUI({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
@@ -437,10 +438,10 @@ output$clusterColorSelection <- renderUI({
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
@@ -482,8 +483,8 @@ observeEvent(input$updateColors, {
     input[[paste0("sampleNamecol", lev[i])]]
   })
   names(inCols) <- lev
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv())))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors.RData")
@@ -502,8 +503,8 @@ observeEvent(input$updateColors, {
     input[[paste0("clusterNamecol", lev[i])]]
   })
   names(inCols) <- lev
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv())))
     cat(file = stderr(), paste0("observeEvent 2 save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors2.RData")
@@ -519,8 +520,8 @@ output$Nclusters <- renderText({
   if (is.null(scran_Cluster)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls(), ls(envir = globalenv())))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/Nclusters.RData")
@@ -563,8 +564,8 @@ output$RDSsave <- downloadHandler(
     if (is.null(scEx)) {
       return(NULL)
     }
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
     

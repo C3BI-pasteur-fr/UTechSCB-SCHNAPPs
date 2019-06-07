@@ -143,8 +143,8 @@ if (is.null(input$db1) | is.null(input$db2)) {
   db1 <- input$db1
   db2 <- input$db2
   method <- input$sCA_dgeRadioButton
-  methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions)== method)/2)
-  dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
+  methodIdx <- ceiling(which(unlist(diffExpFunctions)== method)/2)
+  dgeFunc <- diffExpFunctions[[methodIdx]][2]
   gCells <- sCA_getCells(projections, cl1, db1, db2)
   top.genes <- do.call(dgeFunc, args = list(scEx_log = scEx_log,
                                          cells.1 = gCells$c1, cells.2 = gCells$c2))

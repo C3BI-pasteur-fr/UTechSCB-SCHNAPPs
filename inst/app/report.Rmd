@@ -65,7 +65,7 @@ if (exists("params") & is.list(params)) {
   cat(file = stderr(), paste("params:", params$calledFromShiny, "\n"))
   cat(file = stderr(), paste("params exists:", "calledFromShiny" %in% names(params), "\n"))
   LOCALEXECUTION <- FALSE
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     base::save(file = "~/SCHNAPPsDebug/tempReport-rmd.RData", list = c(ls()))
   }
 } else {

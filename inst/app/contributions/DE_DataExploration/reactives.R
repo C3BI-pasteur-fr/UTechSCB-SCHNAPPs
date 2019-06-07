@@ -37,8 +37,8 @@ DE_scaterPNG <- reactive({
   width <- session$clientData$output_plot_width
   height <- session$clientData$output_plot_height
 
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/scater.Rmd')
 

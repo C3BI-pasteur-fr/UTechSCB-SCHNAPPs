@@ -11,8 +11,8 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_heatmapFunc", id = "coE_heatmapFunc", duration = NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData")
   
@@ -132,8 +132,8 @@ coE_heatmapSelectedReactive <- reactive({
   # else {
     # output$coE_heatmapNull = NULL
   # }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/selectedHeatmap.RData")
   
@@ -141,8 +141,8 @@ coE_heatmapSelectedReactive <- reactive({
   scEx_matrix <- assays(scEx_log)[[1]]
   featureData <- rowData(scEx_log)
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/selectedHeatmap.RData")
   
@@ -184,8 +184,8 @@ coE_topExpGenesTable <- reactive({
   if (is.null(scEx_log) || is.null(scCells)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
   
@@ -249,8 +249,8 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   
   map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
   
@@ -412,8 +412,8 @@ coE_somFunction <- function(iData, nSom, geneName) {
     scaleCooling = "linear"
   )
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
   rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
@@ -461,8 +461,8 @@ coE_heatmapSOMReactive <- reactive({
     )
   }
 
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData")
 
@@ -615,8 +615,8 @@ coE_heatmapReactive <- reactive({
     ))
   }
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/heatmap.RData")
 

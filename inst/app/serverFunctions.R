@@ -8,12 +8,12 @@ printTimeEnd <- function(start.time, messtr) {
 }
 
 
-
+# some comments removed because they cause too much traffic
 geneName2Index <- function(g_id, featureData) {
-  if (DEBUG) cat(file = stderr(), "geneName2Index started.\n")
-  start.time <- base::Sys.time()
+  # if (DEBUG) cat(file = stderr(), "geneName2Index started.\n")
+  # start.time <- base::Sys.time()
   on.exit({
-    printTimeEnd(start.time, "geneName2Index")
+    # printTimeEnd(start.time, "geneName2Index")
     if (!is.null(getDefaultReactiveDomain()))
       removeNotification(id = "geneName2Index")
   })
@@ -147,9 +147,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   } else {
     subsetData$shape <- as.numeric(as.factor(subsetData$sample))
   }
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(ls(), "legend.position",
-                                                              ls(envir = globalenv()), ls(.schnappsEnv)))
+                                                              ls(envir = globalenv())))
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")

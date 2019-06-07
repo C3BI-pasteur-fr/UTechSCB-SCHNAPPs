@@ -32,7 +32,7 @@ suppressMessages(require(BiocSingular))
 suppressMessages(require(shinyBS))
 
 if (!exists(".schnappsEnv")) {
-  .schnappsEnv <- new.env(parent=emptyenv())
+  .schnappsEnv <- new.env(parent = emptyenv())
 }
 
 if (exists("devscShinyApp")) {
@@ -97,9 +97,10 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # TODO needs to be an option
   seed <- 2
   # localContributionDir <- .SCHNAPPs_locContributionDir
-  # cat(file = stderr(), paste("bernd2", str(environment())), "\n")
+  cat(file = stderr(), paste("bernd2", str(environment())), "\n")
   # cat(file = stderr(), paste("bernd2", str(parent.env(environment()))), "\n")
-  # cat(file = stderr(), paste("bernd2", str(parent.env(parent.env(environment())))), "\n")
+  cat(file = stderr(), paste("bernd2", str(.schnappsEnv), "\n"))
+  cat(file = stderr(), paste("bernd2", ls(.schnappsEnv), "\n"))
   # cat(file = stderr(), paste("bernd2", localContributionDir, "\n"))
   base::set.seed(seed)
   # check that directory is availabl, otherwise create it
@@ -119,8 +120,10 @@ scShinyServer <- shinyServer(function(input, output, session) {
   }
   # files to be included in report
   # developers can add in outputs.R a variable called "myZippedReportFiles"
-  zippedReportFiles <- c("Readme.txt", "report.html", "sessionData.RData", 
-                         "normalizedCounts.csv", "variables.used.txt")
+  zippedReportFiles <- c(
+    "Readme.txt", "report.html", "sessionData.RData",
+    "normalizedCounts.csv", "variables.used.txt"
+  )
 
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
 
@@ -152,12 +155,12 @@ scShinyServer <- shinyServer(function(input, output, session) {
     c("before filter", "beforeFilterPrj")
   )
   .schnappsEnv$projectionFunctions <- projectionFunctions
-  
+
   # differential expression functions
   # used in subcluster analysis
   .schnappsEnv$diffExpFunctions <- list()
   diffExpFunctions <- list()
-  
+
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
   base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
