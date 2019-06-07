@@ -19,6 +19,7 @@ clusterCols <- reactiveValues(colPal = allowedColors)
 # are not possible to precalculate.
 sessionProjections <- reactiveValues(prjs = data.frame())
 
+DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
 # Input file either rdata file or csv file
 
@@ -247,8 +248,8 @@ readMM <- function(inFile) {
 readCSV <- function(inFile) {
   # check.names = T will change the rownames. Since this is not enforced for the singleExperiment we shouldn't do it here either.
   data <- read.table(file = inFile$datapath, check.names = FALSE, header = TRUE, sep = ",")
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv())))
   }
   if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
     rownames(data) = data[,1]
@@ -301,8 +302,8 @@ appendAnnotation <- function(scEx, annFile) {
   
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
@@ -415,8 +416,8 @@ inputData <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/inputData.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/inputData.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/inputData.RData')
   
@@ -559,8 +560,8 @@ medianUMI <- reactive({
     }
     return(0)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/medianUMI.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/medianUMI.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/medianUMI.RData')
   scEx <- assays(scEx)[["counts"]]
@@ -599,7 +600,7 @@ useCellsFunc <-
       showNotification("useCellsFunc", id = "useCellsFunc", duration = NULL)
     }
     
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/useCellsFunc.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/useCellsFunc.Rdata')
@@ -745,8 +746,8 @@ useGenesFunc <-
     
     gList <-
       geneLists # global variable, assigning it locally ensures that it will be saved
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/useGenesFunc.Rdata", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/useGenesFunc.Rdata", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file='~/SCHNAPPsDebug/useGenesFunc.Rdata')
     # regular expression with gene names to be removed
@@ -800,10 +801,10 @@ gsSelectedGenesTable <- reactive({
   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
@@ -846,10 +847,10 @@ gsRMGenesTable <- reactive({
   }
   useGenes <- !useGenes
   
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/removedGenesTable.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
@@ -898,8 +899,8 @@ beforeFilterCounts <- reactive({
     return(NULL)
   }
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/beforeFilterCounts.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/beforeFilterCounts.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/beforeFilterCounts.RData")
   
@@ -1108,8 +1109,8 @@ scEx <- reactive({
     return(NULL)
   }
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scEx.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scEx.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scEx.RData")
   
@@ -1180,8 +1181,8 @@ scEx_log <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scEx_log.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scEx_log.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scEx_log.RData")
   
@@ -1225,8 +1226,8 @@ scExLogMatrixDisplay <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scExLogMatrixDisplay.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scExLogMatrixDisplay.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scExLogMatrixDisplay.RData")
   
@@ -1267,8 +1268,8 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
     removeNotification(id = "pcawarning")
   }
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
   scaterPCA <- tryCatch({
@@ -1285,12 +1286,13 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
      exprs_values = "logcounts",
      # rank = rank,
      #  center = center,
-      scale = scale,
+      scale = scale
+     # ,
      # method = "irlba",
       # BPPARAM = bpparam(),
       # BPPARAM = SnowParam(workers = 3, type = "SOCK),
-      BPPARAM = MulticoreParam(
-        workers = ifelse(detectCores()>1, detectCores()-1, 1))
+      # BPPARAM = MulticoreParam(
+      #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
       # BSPARAM = IrlbaParam()
      )
   },
@@ -1404,9 +1406,10 @@ scranCluster <- function(pca,
     min.size = minClusterSize,
     method = clusterMethod,
     use.ranks = useRanks,
-    d = ncol(pca$x),
-    BPPARAM = MulticoreParam(
-      workers = ifelse(detectCores()>1, detectCores()-1, 1))
+    d = ncol(pca$x)
+    # ,
+    # BPPARAM = MulticoreParam(
+    #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
   )
   if (clusterSource == "counts") {
     reducedDims(scEx) <- SimpleList(PCA=pca$x)
@@ -1437,7 +1440,7 @@ scranCluster <- function(pca,
     Barcode = colData(scEx_log)$barcode,
     Cluster = retVal
   )
-  rownames(retVal) <- retVal$Barcode
+  rownames(retVal) <- rownames(colData(scEx_log))
   return(retVal)
 }
 
@@ -1480,8 +1483,8 @@ scran_Cluster <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scran_Cluster.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scran_Cluster.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scran_Cluster.RData")
   
@@ -1536,8 +1539,8 @@ dbCluster <- reactive({
   # kNr <- input$kNr
   clustering <- scran_Cluster()
   
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/dbCluster.RData")
   
@@ -1606,8 +1609,8 @@ projections <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   
@@ -1630,7 +1633,7 @@ projections <- reactive({
       }
       if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2] , "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
-      if (DEBUGSAVE) {
+      if (.schnappsEnv$DEBUGSAVE) {
         save(
           file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
           list = c("tmp")
@@ -1728,8 +1731,8 @@ initializeGroupNames <- reactive({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
   isolate({
@@ -1766,8 +1769,8 @@ sample <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sample.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sample.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/sample.RData")
   
@@ -1810,8 +1813,8 @@ geneCount <- reactive({
   if (is.null(scEx_log)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/geneCount.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/geneCount.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/geneCount.RData")
   
@@ -1845,8 +1848,8 @@ beforeFilterPrj <- reactive({
   if (is.null(scEx) | is.null(bfc)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/beforeFilterPrj.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/beforeFilterPrj.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/beforeFilterPrj.RData")
   
@@ -1880,8 +1883,8 @@ umiCount <- reactive({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/umiCount.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/umiCount.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/umiCount.RData")
   
@@ -1924,8 +1927,8 @@ sampleInfo <- reactive({
     }
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/sampleInfo.RData")
   
@@ -1963,8 +1966,8 @@ inputSample <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("inputSample", id = "inputSample", duration = NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/inputSample.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/inputSample.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/inputSample.RData')
   
@@ -2150,7 +2153,7 @@ reacativeReport <- function() {
   userDataEnv <-
     as.environment(as.list(session$userData, all.names = TRUE))
   # browser()
-  if (DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/tempReport.1.RData",
       list = c("session", "report.env", "file", ls(), ls(envir = globalenv()))
@@ -2350,12 +2353,12 @@ reacativeReport <- function() {
   }
   myparams <-
     params # needed for saving as params is already taken by knitr
-  # if (DEBUGSAVE)
+  # if (.schnappsEnv$DEBUGSAVE)
   # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
   # load(file = '~/SCHNAPPsDebug/tempReport.RData')
   if (DEBUG) cat(file = stderr(), paste("workdir: ", getwd()))
   suppressMessages(require(callr))
-  # if (DEBUGSAVE)
+  # if (.schnappsEnv$DEBUGSAVE)
   # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)
   
   # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"

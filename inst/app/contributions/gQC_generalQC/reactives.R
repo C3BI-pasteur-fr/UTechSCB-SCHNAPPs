@@ -119,8 +119,8 @@ projectionTable <- reactive({
     return(NULL)
   }
 
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/projectionTable.RData")
   
@@ -184,8 +184,8 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   }
   
   set.seed(seed = gQC_tsneSeed)
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/tsne.RData')
   suppressMessages(require(parallel))
@@ -256,8 +256,8 @@ umapReact <- reactive({
     if (DEBUG) cat(file = stderr(), "output$umap_react:NULL\n")
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/umap_react.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/umap_react.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load("~/SCHNAPPsDebug/umap_react.RData")
   if (!runUMAP) {

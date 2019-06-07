@@ -2,13 +2,13 @@
 #'
 #'
 
-if (!exists(".schnappsEnv")) {
+# if (!exists(".schnappsEnv")) {
   .schnappsEnv <- new.env(parent=emptyenv())
-}
+# }
 
 localContributionDir = "~/Rstudio/shHubgit/Dummy/"
-defaultValueSingleGene = "CD52"
-defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8"
+defaultValueSingleGene = "LYZ"
+defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
 DEBUGSAVE = FALSE
@@ -19,17 +19,25 @@ assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schn
 assign(".SCHNAPPs_defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
 assign(".SCHNAPPs_DEBUG", DEBUG, envir = .schnappsEnv)
 assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+assign("localContributionDir", localContributionDir, envir = .schnappsEnv)
+assign("defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
+assign("defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
+assign("defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
+assign("DEBUG", DEBUG, envir = .schnappsEnv)
+assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+ls(.schnappsEnv)
 
 devscShinyApp = TRUE
 packagePath <<- "inst/app"
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
-shinyApp(ui = scShinyUI, server = scShinyServer)
+app <- shinyApp(ui = scShinyUI, server = scShinyServer)
+runApp(app)
 
 # schnapps(
-# defaultValueMultiGenes = "CD3e, CD3d, CD4, IL7R, CD8, CD8a,GNLY, NKG7, CD14, LYZ, MS4A1, CD79A, CD74, CST3, FCER1A",
-# defaultValueSingleGene = "IL7R", DEBUG=TRUE
+# defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP",
+# defaultValueSingleGene = "MS4A1", DEBUG=TRUE
 # )
 
 

@@ -98,8 +98,8 @@ output$gQC_tsne_main <- plotly::renderPlotly({
     if (DEBUG) cat(file = stderr(), "output$gQC_tsne_main:NULL\n")
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
 
@@ -145,8 +145,8 @@ output$gQC_plotUmiHist <- renderPlot({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData")
 
@@ -177,8 +177,8 @@ output$gQC_plotSampleHist <- renderPlot({
   if (is.null(sampleInf)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/sampleHist.RData")
   gQC_sampleHistFunc(sampleInf, scols)

@@ -1,0 +1,36 @@
+system("if [ -L contributions/bjContributions ] ; then 
+echo 'it is here' ; 
+rm contributions/bjContributions ;else echo 'it is not here'; 
+ln -s ../bjContributions contributions/bjContributions
+       fi")
+
+nn = c("scaterReadsFunc",
+"um_spread",
+"um_min_dist",
+"um_set_op_mix_ratio",
+"um_local_connectivity",
+"um_bandwidth",
+"umap_main")
+
+oldname = "if (DEBUGSAVE)"
+for (oldname in nn){
+newName = paste0("sCA_", oldname)
+system(paste0("find . -name \"*.R\"  -exec sed -i '' -e 's/", oldname, "/", newName,"/g' {} +"))
+system(paste0("find . -name \"*.Rmd\"  -exec sed -i '' -e 's/", oldname, "/", newName,"/g' {} +"))
+}
+
+oldname = "dge_ttest"
+  newName = paste0("sCA_", oldname)
+  system(paste0("find . -name \"*.R\"  -exec sed -i '' -e 's/", oldname, "/", newName,"/g' {} +"))
+  system(paste0("find . -name \"*.Rmd\"  -exec sed -i '' -e 's/", oldname, "/", newName,"/g' {} +"))
+
+
+
+
+oldname = "if (DEBUGSAVE)"
+newName = "if (.schnappsEnv$DEBUGSAVE)"
+system(paste0("find . -name \"*.R\"  -exec sed -i '' -e 's/", oldname, "/", newName,"/g' {} +"))
+system(paste0("find . -name \"*.Rmd\"  -exec sed -i '' -e 's/", oldname, "/", newName,"/g' {} +"))
+
+de_dim_x
+de_dim_y

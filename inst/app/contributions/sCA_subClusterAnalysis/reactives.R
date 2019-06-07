@@ -53,8 +53,8 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dge_CellViewfunc", id = "sCA_dge_CellViewfunc", duration = NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
   
@@ -91,8 +91,8 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dge_ttest", id = "sCA_dge_ttest", duration = NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
   
@@ -133,8 +133,8 @@ sCA_dge <- reactive({
   if (is.null(scEx_log) | is.null(projections)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
 
@@ -213,8 +213,8 @@ updateInputSubclusterAxes <- reactive({
   if (is.null(projections)) {
     return(NULL)
   }
-  if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/updateInputSubclusterAxes.RData")
   # if (length(gn) > 0) {
@@ -260,7 +260,7 @@ subCluster2Dplot <- function() {
     if (is.null(projections)) {
       return(NULL)
     }
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/sCA_dge_plot2.RData", list = c(ls(envir = globalenv(), ls())))
     }
     # load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")

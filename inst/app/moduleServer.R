@@ -81,13 +81,17 @@ clusterServer <- function(input, output, session,
   # if we manually select a group from the list we update the name group field
   observe({
     if (DEBUG) cat(file = stderr(), "observe input$groupNames \n")
-    input$groupNames # dropdown list with names of cell groups
-    isolate({
-      updateTextInput(
-        session = session, inputId = "groupName",
-        value = input$groupNames
-      )
-    })
+    if (!is.null(input$groupNames)){
+      if (input$groupNames == "plot") {
+        
+      } else {
+        isolate({
+          updateTextInput(
+            session = session, inputId = "groupName",
+            value = input$groupNames
+          )
+        })
+      }}
   })
   
   
@@ -135,7 +139,7 @@ clusterServer <- function(input, output, session,
   # clusterServer - selectedCellNames ----
   selectedCellNames <- reactive({
     start.time <- base::Sys.time()
-    if (DEBUG) cat(file = stderr(), "+++cluster: selectedCellNames\n")
+    if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames\n")
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
         removeNotification(id = "selectedCellNames")
@@ -154,6 +158,8 @@ clusterServer <- function(input, output, session,
     geneNames2 <- input$geneIds2
     scEx_log <- scEx_log()
     namedGroup <- input$groupNames
+    grpN <- make.names(input$groupName)
+    grpNs <- groupNames$namesDF
     
     if (is.null(projections) | is.null(brushedPs)) {
       if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: brush null\n")
@@ -162,18 +168,11 @@ clusterServer <- function(input, output, session,
     # inpClusters <- input$clusters
     inpClusters <- levels(projections$dbCluster)
     
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: saving\n")
-      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position", ls(envir = globalenv()), ls(.schnappsEnv)))
+      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position", ls(envir = globalenv())))
     }
     # load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
-    
-    if (!is.null(namedGroup)) {
-      if (namedGroup == "none") {
-        if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: namedGroup none\n")
-        return(NULL)
-      }
-    }
     
     featureData <- rowData(scEx_log)
     geneid <- geneName2Index(geneNames, featureData)
@@ -183,6 +182,22 @@ clusterServer <- function(input, output, session,
       geneNames2 = geneNames2,
       scEx = scEx_log, projections = projections
     )
+    
+    if (!is.null(namedGroup)) {
+      if (namedGroup == "none") {
+        if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: namedGroup none\n")
+        return(NULL)
+      }
+      if (!namedGroup == "plot") {
+        if (namedGroup %in% colnames(grpNs)){
+          return(rownames(grpNs[grpNs[,namedGroup],]))
+        }else{
+          return(NULL)
+        }
+      }
+    }
+    
+    
     
     subsetData <- subset(projections, dbCluster %in% inpClusters)
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
@@ -213,6 +228,7 @@ clusterServer <- function(input, output, session,
         retVal <- NULL
       }
       grpN <- make.names(input$groupName)
+      grpSelected <- make.names(input$groupNames)
       grpNs <- groupNames$namesDF
       if (length(grpN) == 0 | length(grpNs) == 0) {
         if (DEBUG) cat(file = stderr(), "reactiveValues: grpN empty\n")
@@ -226,14 +242,14 @@ clusterServer <- function(input, output, session,
       geneNames2 <- input$geneIds2
       scEx_log <- scEx_log()
       
-      if (DEBUGSAVE) {
+      if (.schnappsEnv$DEBUGSAVE) {
         cat(file = stderr(), paste("selectedCell: saving\n"))
-        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls(), ls(envir = globalenv())))
       }
       # load(file="~/SCHNAPPsDebug/clusterServerreturnValues.RData")
       featureData <- rowData(scEx_log)
       inpClusters <- levels(projections$dbCluster)
-      if (!is.null(projections) & moreOptions) {
+      if (!is.null(projections) & moreOptions & !grpSelected == "plot") {
         projections <- updateProjectionsWithUmiCount(
           dimX = dimX, dimY = dimY,
           geneNames = geneNames,
@@ -331,16 +347,16 @@ clusterServer <- function(input, output, session,
     clId <- levels(projections$dbCluster)
     
     featureData <- rowData(scEx_log)
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), paste("cluster plot saving\n"))
       save(
         file = paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."),
-        list = c(ls(envir = globalenv()), ls(.schnappsEnv), ls(), "legend.position")
+        list = c(ls(envir = globalenv()), ls(), "legend.position")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
     
-    # load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."));DEBUGSAVE=FALSE
+    # load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."));.schnappsEnv$DEBUGSAVE=FALSE
     if (is.null(g_id) || nchar(g_id) == 0) {
       g_id <- featureData$symbol
     }
@@ -449,7 +465,9 @@ clusterServer <- function(input, output, session,
       # brushedPs <- plotly::event_data("plotly_selected", source = "subset")
       # scEx <- scEx()
       # inpClusters <- input$clusters
-      grpN <- make.names(input$groupName)
+      
+      # this used to be make.names(input$groupName) which created a column called "X"
+      grpN <- input$groupName
       grpNs <- groupNames$namesDF
       cells.names <- selectedCellNames()
       visibleCells <- visibleCellNames()
@@ -461,12 +479,12 @@ clusterServer <- function(input, output, session,
         return(NULL)
       }
     })
-    if (length(grpN) == 0) {
+    if (length(grpN) == 0 || nchar(grpN) == 0) {
       return(NULL)
     }
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "save: changeGroups\n")
-      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv())))
       cat(file = stderr(), "done save: changeGroups\n")
     }
     # load(file="~/SCHNAPPsDebug/changeGroups.RData")
@@ -481,7 +499,7 @@ clusterServer <- function(input, output, session,
     grpNs[cells.names, grpN] <- TRUE
     groupNames$namesDF <- grpNs
     updateSelectInput(session, ns("groupNames"),
-                      choices = colnames(grpNs),
+                      choices = c("plot",colnames(grpNs)),
                       selected = grpN
     )
     updateTextInput(
@@ -532,8 +550,8 @@ clusterServer <- function(input, output, session,
     if (is.null(projections)) {
       return(NULL)
     }
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file="~/SCHNAPPsDebug/nCellsVisibleSelected.RData")
     inpClusters <- levels(projections$dbCluster)
@@ -602,26 +620,27 @@ clusterServer <- function(input, output, session,
       groupName <<- ""
       # this doesn't seem to work... cannot set to NULL after it has been initialized
       updateSelectInput(session, ns("groupNames"),
-                        choices = colnames(grpNs),
-                        selected = NULL
+                        choices = c("plot",colnames(grpNs)),
+                        selected = "plot"
       )
       updateTextInput(
         session = session, inputId = ns("groupName"),
         value = "none"
       )
-      updateTextInput(
-        session = session, inputId = "groupName",
-        value = "none"
-      )
+      # updateTextInput(
+      #   session = session, inputId = "groupName",
+      #   value = "none"
+      # )
       
       return("")
     }
     
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file="~/SCHNAPPsDebug/additionalOptions.RData")
     
+
     tagList(
       fluidRow(
         column(
@@ -656,7 +675,7 @@ clusterServer <- function(input, output, session,
       selectInput(
         ns("groupNames"),
         label = "group names",
-        choices = colnames(grpNs),
+        choices = c("plot",colnames(grpNs)),
         selected = selectedGroupName
       ),
       verbatimTextOutput(ns("nCellsVisibleSelected")),
@@ -692,6 +711,12 @@ clusterServer <- function(input, output, session,
     dimY <- input$dimension_y
     dimX <- input$dimension_x
     scEx_log <- scEx_log()
+    moreOptions <- input$moreOptions
+    retVal <- selectedCellNames()
+    grpN <- make.names(input$groupName)
+    grpSelected <- make.names(input$groupNames)
+    grpNs <- groupNames$namesDF
+    
     
     if (!myshowCells) {
       return("")
@@ -699,28 +724,25 @@ clusterServer <- function(input, output, session,
     if (is.null(projections)) {
       return("")
     }
-    if (is.null(brushedPs)) {
-      return("")
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls(envir = globalenv()), ls()))
     }
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls(envir = globalenv()), ls(.schnappsEnv), ls()))
-    }
-    # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection", "ns", ".RData", collapse = "."))
     # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
-    inpClusters <- levels(projections$dbCluster)
-    featureData <- rowData(scEx_log)
-    subsetData <- subset(projections, dbCluster %in% inpClusters)
-    geneid <- geneName2Index(geneNames, featureData)
-    subsetData <- updateProjectionsWithUmiCount(
-      dimX = dimX, dimY = dimY,
-      geneNames = geneNames,
-      geneNames2 = geneNames2,
-      scEx = scEx_log, projections = projections
-    )
     
-    cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
-    cells.names <- cells.names[!is.na(cells.names)]
-    retVal <- paste(cells.names, collapse = ", ")
+    # inpClusters <- levels(projections$dbCluster)
+    # featureData <- rowData(scEx_log)
+    # subsetData <- subset(projections, dbCluster %in% inpClusters)
+    # geneid <- geneName2Index(geneNames, featureData)
+    # subsetData <- updateProjectionsWithUmiCount(
+    #   dimX = dimX, dimY = dimY,
+    #   geneNames = geneNames,
+    #   geneNames2 = geneNames2,
+    #   scEx = scEx_log, projections = projections
+    # )
+    # 
+    # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
+    # cells.names <- cells.names[!is.na(cells.names)]
+    retVal <- paste(retVal, collapse = ", ")
     
     exportTestValues(ClusterCellSelection = {
       retVal
@@ -765,10 +787,10 @@ tableSelectionServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("cellSelection", id = "cellSelection", duration = NULL)
     }
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+        list = c(ls(), ls(envir = globalenv()))
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."))
@@ -800,10 +822,10 @@ tableSelectionServer <- function(input, output, session,
     # prox <- proxy
     allrows <- input$cellNameTable_rows_all
     
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+        list = c(ls(), ls(envir = globalenv()))
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."))
@@ -848,10 +870,10 @@ tableSelectionServer <- function(input, output, session,
     if (is.null(dataTables)) {
       return(NULL)
     }
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv))
+        list = c(ls(), ls(envir = globalenv()))
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."))
@@ -980,9 +1002,9 @@ pHeatMapModule <- function(input, output, session,
     
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
-    if (DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
-      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
+      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), ls(envir = globalenv()), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
     }
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
@@ -1031,46 +1053,46 @@ pHeatMapModule <- function(input, output, session,
     heatmapData$fontsize <- 14
     # heatmapData$fontsize_row = 18
     # heatmapData$filename=NULL
-        if (nrow(heatmapData$mat) > 100) {
-          showNotification(
-            "more than 100 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
-            id = "pHeatMapPlotWARNING",
-            type = "warning",
-            duration = 20
-          )
-            heatmapData$mat <- heatmapData$mat[1:100, ]
-        }
-      if (nrow(heatmapData$mat) == 0) {
-        return(list(
-          src = "empty.png",
-          contentType = "image/png",
-          width = 96,
-          height = 96,
-          alt = "pHeatMapPlot should be here"
-        ))
-      }
-    
-      do.call(TRONCO::pheatmap, heatmapData)
-      
-      pixelratio <- session$clientData$pixelratio
-      if (is.null(pixelratio)) pixelratio <- 1
-      # width <- session$clientData$output_plot_width
-      # height <- session$clientData$output_plot_height
-      # if (is.null(width)) {
-      #   width <- 96 * 7
-      # } # 7x7 inch output
-      # if (is.null(height)) {
-      #   height <- 96 * 7
-      # }
-      outfilePH <<- outfile
+    if (nrow(heatmapData$mat) > 100) {
+      showNotification(
+        "more than 100 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
+        id = "pHeatMapPlotWARNING",
+        type = "warning",
+        duration = 20
+      )
+      heatmapData$mat <- heatmapData$mat[1:100, ]
+    }
+    if (nrow(heatmapData$mat) == 0) {
       return(list(
-        src = outfilePH,
+        src = "empty.png",
         contentType = "image/png",
-        width = "100%",
-        height = "100%",
-        alt = "heatmap should be here"
+        width = 96,
+        height = 96,
+        alt = "pHeatMapPlot should be here"
       ))
-    })
+    }
+    
+    do.call(TRONCO::pheatmap, heatmapData)
+    
+    pixelratio <- session$clientData$pixelratio
+    if (is.null(pixelratio)) pixelratio <- 1
+    # width <- session$clientData$output_plot_width
+    # height <- session$clientData$output_plot_height
+    # if (is.null(width)) {
+    #   width <- 96 * 7
+    # } # 7x7 inch output
+    # if (is.null(height)) {
+    #   height <- 96 * 7
+    # }
+    outfilePH <<- outfile
+    return(list(
+      src = outfilePH,
+      contentType = "image/png",
+      width = "100%",
+      height = "100%",
+      alt = "heatmap should be here"
+    ))
+  })
   
   # pHeatMapModule - additionalOptions ----
   output$additionalOptions <- renderUI({
@@ -1095,8 +1117,8 @@ pHeatMapModule <- function(input, output, session,
     }
     
     
-    if (DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/heatMapadditionalOptions.RData", list = c(ls(), ls(envir = globalenv()), ls(.schnappsEnv)))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/heatMapadditionalOptions.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file="~/SCHNAPPsDebug/heatMapadditionalOptions.RData")
     
@@ -1150,7 +1172,7 @@ pHeatMapModule <- function(input, output, session,
       moreOptions <- input$moreOptions
       groupNs <- groupNames$namesDF
       proje <- projections()
-      if (DEBUGSAVE) {
+      if (.schnappsEnv$DEBUGSAVE) {
         save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c("outfilePH", ls(), 
                                                                           ls(envir = globalenv()), 
                                                                           ls(.schnappsEnv)))
@@ -1188,8 +1210,8 @@ pHeatMapModule <- function(input, output, session,
       zip(file, zippedReportFiles, flags = "-9Xj")
     }
   )
-  }
-  
-  if (DEBUG) {
-    cat(file = stderr(), "\n\ndone loading Module server.\n\n\n")
-  }
+}
+
+if (DEBUG) {
+  cat(file = stderr(), "\n\ndone loading Module server.\n\n\n")
+}
