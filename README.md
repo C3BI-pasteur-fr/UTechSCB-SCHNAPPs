@@ -44,6 +44,11 @@ save(file = "scEx.Rdata", list = "scEx")
 ```
 
 
+Please see [GitHub](https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs) for further documentation on how to use schnapps.
+
+Please see [GitHub Contributions](https://github.com/baj12/SCHNAPPsContributions) for additional tools, not directly part of the SCHNAPPs pacakage.
+
+
 
 ## Extending SCHAPPs
 

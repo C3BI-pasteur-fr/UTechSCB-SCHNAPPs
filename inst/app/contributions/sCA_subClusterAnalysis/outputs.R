@@ -80,7 +80,7 @@ output$sCA_dgeClustersSelection <- renderUI({
 
   if (DEBUG) cat(file = stderr(), "output$sCA_dgeClustersSelection\n")
   if (DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(envir = globalenv(), ls(), "subClusterClusters")))
+    save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(envir = globalenv(), ls(), ls(envir = .schnappsEnv))))
   }
   # load(file="~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData")
 
@@ -94,7 +94,7 @@ output$sCA_dgeClustersSelection <- renderUI({
       "sCA_dgeClustersSelection",
       label = "Cluster",
       choices = noOfClusters,
-      selected = subClusterClusters,
+      selected = .schnappsEnv$subClusterClusters,
       multiple = TRUE
     )
   }
