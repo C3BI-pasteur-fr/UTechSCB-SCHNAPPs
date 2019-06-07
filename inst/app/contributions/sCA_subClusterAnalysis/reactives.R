@@ -138,7 +138,7 @@ sCA_dge <- reactive({
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
 
-  methodIdx <- ceiling(which(unlist(diffExpFunctions)== method)/2)
+  methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions)== method)/2)
   dgeFunc <- diffExpFunctions[[methodIdx]][2]
   gCells <- sCA_getCells(projections, cl1, db1, db2)
   retVal <- do.call(dgeFunc, args = list(scEx_log = scEx_log,
@@ -158,18 +158,18 @@ sCA_dge <- reactive({
 })
 
 # using these global variables allows us to store a set values even when the projections are changing
-subClusterDim1 <- "PC1"
-subClusterDim2 <- "PC2"
-subClusterClusters <<- NULL
+.schnappsEnv$subClusterDim1 <- "PC1"
+.schnappsEnv$subClusterDim2 <- "PC2"
+.schnappsEnv$subClusterClusters <- NULL
 
 observe({
   if (DEBUG) cat(file = stderr(), "observe: sCA_subscluster_x1\n")
-  subClusterDim1 <<- input$sCA_subscluster_x1
+  .schnappsEnv$subClusterDim1 <- input$sCA_subscluster_x1
 })
 
 observe({
   if (DEBUG) cat(file = stderr(), "observe: sCA_subscluster_y1\n")
-  subClusterDim2 <<- input$sCA_subscluster_y1
+  .schnappsEnv$subClusterDim2 <- input$sCA_subscluster_y1
 })
 
 #' TODO
@@ -180,15 +180,15 @@ observe({
   if (!is.null(projections)) {
     noOfClusters <- levels(as.factor(projections$dbCluster))
     # noOfClusters <- max(as.numeric(as.character(projections$dbCluster)))
-    if (is.null(subClusterClusters)){
-       subClusterClusters <<- noOfClusters
+    if (is.null(.schnappsEnv$subClusterClusters)){
+      .schnappsEnv$subClusterClusters <- noOfClusters
     }
   }
 })
 
 observe({
   if (DEBUG) cat(file = stderr(), "observe: sCA_dgeClustersSelection\n")
-  subClusterClusters <<- input$sCA_dgeClustersSelection
+  .schnappsEnv$subClusterClusters <- input$sCA_dgeClustersSelection
 })
 
 
@@ -223,12 +223,12 @@ updateInputSubclusterAxes <- reactive({
   # Can also set the label and select items
   updateSelectInput(session, "sCA_subscluster_x1",
                     choices = colnames(projections),
-                    selected = subClusterDim1
+                    selected = .schnappsEnv$subClusterDim1
   )
 
   updateSelectInput(session, "sCA_subscluster_y1",
                     choices = colnames(projections),
-                    selected = subClusterDim2
+                    selected = .schnappsEnv$subClusterDim2
   )
 })
 

@@ -526,10 +526,10 @@ coE_heatmapSOMReactive <- reactive({
 #' coE_updateInputXviolinPlot
 #' Update x/y axis selection possibilities for violin plot
 #' could probably be an observer, but it works like this as well...
-coE_vioGrp <<- "sampleNames"
+.schnappsEnv$coE_vioGrp <- "sampleNames"
 observe({
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
-  coE_vioGrp <<- input$coE_dimension_xVioiGrp
+  .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
 })
 
 coE_updateInputXviolinPlot <- reactive({
@@ -579,7 +579,7 @@ coE_updateInputXviolinPlot <- reactive({
     session,
     "coE_dimension_xVioiGrp",
     choices = choices,
-    selected = coE_vioGrp
+    selected = .schnappsEnv$coE_vioGrp
   )
 })
 

@@ -1620,9 +1620,9 @@ projections <- reactive({
   }
   
   withProgress(message = "Performing projections", value = 0, {
-    n <- length(projectionFunctions)
+    n <- length(.schnappsEnv$projectionFunctions)
     iter <- 1
-    for (proj in projectionFunctions) {
+    for (proj in .schnappsEnv$projectionFunctions) {
       start.time1 <- Sys.time()
       incProgress(1 / n, detail = paste("Creating ", proj[1]))
       if (DEBUG) {
@@ -2063,7 +2063,7 @@ reacativeReport <- function() {
   tmpPrjFile <-
     tempfile(
       pattern = "file",
-      tmpdir = reportTempDir,
+      tmpdir = .schnappsEnv$reportTempDir,
       fileext = ".RData"
     )
   
@@ -2136,7 +2136,7 @@ reacativeReport <- function() {
   tsne <- tsne()
   
   scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
-  
+  reportTempDir <- get("reportTempDir", envir = .schnappsEnv)
   base::save(
     file = tmpPrjFile,
     list = c(
@@ -2158,7 +2158,7 @@ reacativeReport <- function() {
   }
   # load('~/SCHNAPPsDebug/tempReport.1.RData')
   
-  outZipFile <- paste0(reportTempDir, "/report.zip")
+  outZipFile <- paste0(.schnappsEnv$reportTempDir, "/report.zip")
   
   reactiveFiles <- ""
   
@@ -2166,7 +2166,7 @@ reacativeReport <- function() {
   tmpFile <-
     tempfile(
       pattern = "file",
-      tmpdir = reportTempDir,
+      tmpdir = .schnappsEnv$reportTempDir,
       fileext = ".RData"
     )
   file.copy(paste0(packagePath, "/geneLists.RData"),
@@ -2174,7 +2174,7 @@ reacativeReport <- function() {
             overwrite = TRUE
   )
   file.copy(paste0(packagePath, "/Readme.txt"),
-            reportTempDir,
+            .schnappsEnv$reportTempDir,
             overwrite = TRUE
   )
   reactiveFiles <-
@@ -2189,7 +2189,7 @@ reacativeReport <- function() {
   tmpFile <-
     tempfile(
       pattern = "file",
-      tmpdir = reportTempDir,
+      tmpdir = .schnappsEnv$reportTempDir,
       fileext = ".RData"
     )
   save(file = tmpFile, list = c("allowedColors"))
@@ -2231,7 +2231,7 @@ reacativeReport <- function() {
     tmpFile <-
       tempfile(
         pattern = "file",
-        tmpdir = reportTempDir,
+        tmpdir = .schnappsEnv$reportTempDir,
         fileext = ".R"
       )
     file.copy(fp, tmpFile, overwrite = TRUE)
@@ -2285,7 +2285,7 @@ reacativeReport <- function() {
     tmpFile <-
       tempfile(
         pattern = "file",
-        tmpdir = reportTempDir,
+        tmpdir = .schnappsEnv$reportTempDir,
         fileext = ".Rmd"
       )
     file.copy(fp, tmpFile, overwrite = TRUE)
@@ -2303,9 +2303,9 @@ reacativeReport <- function() {
   # Copy the report file to a temporary directory before processing it, in
   # case we don't have write permissions to the current working dir (which
   # can happen when deployed).
-  tempReport <- file.path(reportTempDir, "report.Rmd")
+  tempReport <- file.path(.schnappsEnv$reportTempDir, "report.Rmd")
   
-  # tempServerFunctions <- file.path(reportTempDir, "serverFunctions.R")
+  # tempServerFunctions <- file.path(.schnappsEnv$reportTempDir, "serverFunctions.R")
   # file.copy("serverFunctions.R", tempServerFunctions, overwrite = TRUE)
   
   # create a new list of all parameters that can be passed to the markdown doc.
@@ -2320,7 +2320,7 @@ reacativeReport <- function() {
   # for (idx in 1:length(names(input))) {
   #   params[[inputNames[idx]]] <- input[[inputNames[idx]]]
   # }
-  params[["reportTempDir"]] <- reportTempDir
+  params[["reportTempDir"]] <- .schnappsEnv$reportTempDir
   
   file.copy(paste0(packagePath, "/report.Rmd"), tempReport, overwrite = TRUE)
   
@@ -2384,13 +2384,13 @@ reacativeReport <- function() {
   # rmarkdown::render(input = tempReport, output_file = "report.html",
   #                   params = params, envir = new.env())
   
-  tDir <- paste0(reportTempDir, "/")
-  base::file.copy(tmpPrjFile, paste0(reportTempDir, "/sessionData.RData"))
+  tDir <- paste0(.schnappsEnv$reportTempDir, "/")
+  base::file.copy(tmpPrjFile, paste0(.schnappsEnv$reportTempDir, "/sessionData.RData"))
   write.csv(as.matrix(assays(scEx_log)[[1]]),
-            file = paste0(reportTempDir, "/normalizedCounts.csv")
+            file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")
   )
   base::save(
-    file = paste0(reportTempDir, "/inputUsed.Rds"),
+    file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.Rds"),
     list = c("scEx", "projections")
   )
   zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
