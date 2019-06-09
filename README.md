@@ -24,7 +24,7 @@ devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 
 ## create sample data set
 
-Load a small set of 200 cells and save to a file in the local directory
+Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.
 
 ```
 data("scEx", package = "SCHNAPPs")
@@ -41,7 +41,7 @@ library(SCHNAPPs)
 schnapps()
 ```
 
-### load data
+### generate data files
 
 A singleCellExperiment object is required, saved in a file RData object using 
 
@@ -51,7 +51,7 @@ save(file = "filename.RData", "singleCellExperiementObject")
 
 
 
-Please see [GitHub](https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs) for further documentation on how to use schnapps.
+Please see [GitHub](https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/) for further documentation on how to use schnapps.
 
 Please see [GitHub Contributions](https://github.com/baj12/SCHNAPPsContributions) for additional tools, not directly part of the SCHNAPPs pacakage.
 

@@ -20,36 +20,37 @@ inputTab <- shinydashboard::tabItem(
   br(),
   fluidRow(div(
     h5(
-      "This app is designed for exploratory data analysis of processed RNA-Seq data of single cell experiments.
-      Multiple files can be selected using certain browsers (E.g. chrome). This is not working when running in RStudio as a window.
-      RData files are R data files generated using base::save(). They contain two objects, scEx that hold raw counts in a sparse matrix
-      and annotation in a data frame."
+      "This app is designed for exploratory data analysis of processed RNA-Seq data of single cell experiments.<br/>
+      Multiple files can be selected when using RData files with SingleCellExpression objects.<br/>
+      RData files are R data files generated using base::save()."
     ),
     align = "center"
   )),
   fluidRow(column(
     5,
-    offset = 4,
+    offset = 3,
     fileInput(
       "annoFile",
       "(Not required): Choose .CSV file with annotation to upload",
       accept = c(
         ".txt",".csv", ".mtx"
       ),
-      multiple = TRUE
+      multiple = TRUE,
+      width = '50%'
     )
   )),
   br(),
   fluidRow(column(
     5,
-    offset = 4,
+    offset = 3,
     fileInput(
       "file1",
-      "Choose .RData/.Rds file with singleCellExperiment object OR .txt/.csv file with count data to upload",
+      "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
       accept = c(
         ".Rds",".RData", ".Rdata", ".txt", ".csv"
       ),
-      multiple = TRUE
+      multiple = TRUE,
+      width = '50%'
     )
   )),
 

@@ -35,7 +35,7 @@ allTabs[[length(allTabs) + 1]] <- list(
     "normalizations",
     list(
       tags$h3("Parameters for normalization to be used"),
-      tags$p("SCHNAPPs generally uses normalized data (unless stated otherwise). Here, the specific method can be set. Raw means that no normalization will be performed."),
+      tags$p("SCHNAPPs uses normalized data for plots and calculations (unless stated otherwise). Here, the specific method can be set. rawNormalization means that no normalization will be performed."),
       tags$p("A table containing the first 20 cells and the normalized values is shown."),
       fluidRow(column(
         10,
