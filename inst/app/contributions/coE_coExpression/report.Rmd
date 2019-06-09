@@ -122,8 +122,8 @@ geneNames <- input$"coE_selected-geneIds"
 geneNames2 <- input$"coE_selected-geneIds2"
 logx <- input$"coE_selected-logX"
 logy <- input$"coE_selected-logY"
-divXBy <- input$"coE_selected-devideXBy"
-divYBy <- input$"coE_selected-devideYBy"
+divXBy <- input$"coE_selected-divideXBy"
+divYBy <- input$"coE_selected-divideYBy"
 scols <- sampleCols$colPal
 ccols <- clusterCols$colPal
 legend.position <- "none"

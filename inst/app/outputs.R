@@ -95,7 +95,8 @@ cellSelectionValues <- reactiveVal(
     cellPatternRM = "",
     cellKeep = "",
     cellKeepOnly = "",
-    cellsFiltersOut = ""
+    cellsFiltersOut = "",
+    minNonExpGenes = ""
   )
 )
 geneSelectionValues <- reactiveVal(
@@ -115,7 +116,8 @@ observeEvent(input$updateCellSelectionParameters, {
     cellPatternRM = input$cellPatternRM,
     cellKeep = input$cellKeep,
     cellKeepOnly = input$cellKeepOnly,
-    cellsFiltersOut = input$cellsFiltersOut
+    cellsFiltersOut = input$cellsFiltersOut,
+    minNonExpGenes = input$minNonExpGenes
   )
   )
   if (DEBUG) cat(file = stderr(), "\nCellSelectionValues\n")
@@ -549,7 +551,7 @@ output$countscsv <- downloadHandler(
 
 # download RDS ----
 output$RDSsave <- downloadHandler(
-  filename = paste0("project.", Sys.Date(), ".Rds"),
+  filename = paste0("project.", Sys.Date(), ".RData"),
   content = function(file) {
     if (DEBUG) {
       cat(file = stderr(), paste("RDSsave: \n"))

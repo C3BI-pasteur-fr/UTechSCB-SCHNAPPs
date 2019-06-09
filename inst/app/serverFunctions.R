@@ -368,8 +368,8 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   geneNames2 <- input[[paste0(moduleName,"-geneIds2")]]
   logx <- input[[paste0(moduleName,"-logX")]]
   logy <- input[[paste0(moduleName,"-logY")]]
-  divXBy <- input[[paste0(moduleName,"-devideXBy")]]
-  divYBy <- input[[paste0(moduleName,"-devideYBy")]]
+  divXBy <- input[[paste0(moduleName,"-divideXBy")]]
+  divYBy <- input[[paste0(moduleName,"-divideYBy")]]
   scols <- sampleCols$colPal
   ccols <- clusterCols$colPal
   

@@ -40,7 +40,7 @@ clusterServer <- function(input, output, session,
   subsetData <- NULL
   selectedGroupName <- ""
   groupName <- ""
-  addToGroupValue <- FALSE
+  .schnappsEnv$addToGroupValue <- FALSE
   
   
   # dim1 <- defaultValues[1]
@@ -58,23 +58,35 @@ clusterServer <- function(input, output, session,
   
   observe({
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
-    dim1 <<- input$dimension_x
+    .schnappsEnv$dim1 <- input$dimension_x
   })
   observe({
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_y\n"))
-    dim2 <<- input$dimension_y
+    .schnappsEnv$dim2 <- input$dimension_y
   })
   observe({
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_col\n"))
-    dimCol <<- input$dimension_col
+    .schnappsEnv$dimCol <- input$dimension_col
   })
   observe({
-    if (DEBUG) cat(file = stderr(), paste0("observe: devideXBy\n"))
-    divXBy <<- input$devideXBy
+    if (DEBUG) cat(file = stderr(), paste0("observe: divideXBy\n"))
+    .schnappsEnv$divXBy <- input$divideXBy
   })
   observe({
-    if (DEBUG) cat(file = stderr(), paste0("observe: devideYBy\n"))
-    divYBy <<- input$devideYBy
+    if (DEBUG) cat(file = stderr(), paste0("observe: divideYBy\n"))
+    .schnappsEnv$divYBy <- input$divideYBy
+  })
+  observe({
+    if (DEBUG) cat(file = stderr(), paste0("observe: logX\n"))
+    .schnappsEnv$logX <- input$logX
+  })
+  observe({
+    if (DEBUG) cat(file = stderr(), paste0("observe: logY\n"))
+    .schnappsEnv$logY <- input$logY
+  })
+  observe({
+    if (DEBUG) cat(file = stderr(), paste0("observe: showCells\n"))
+    .schnappsEnv$showCells <- input$showCells
   })
   
   # clusterServer - observe input$groupNames ----
@@ -115,24 +127,33 @@ clusterServer <- function(input, output, session,
     # )
     updateSelectInput(session, "dimension_x",
                       choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = dim1
+                      selected = .schnappsEnv$dim1
     )
     updateSelectInput(session, "dimension_y",
                       choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = dim2
+                      selected = .schnappsEnv$dim2
     )
     updateSelectInput(session, "dimension_col",
                       choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = dimCol
+                      selected = .schnappsEnv$dimCol
     )
     
-    updateSelectInput(session, "devideXBy",
+    updateSelectInput(session, "divideXBy",
                       choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = divXBy
+                      selected = .schnappsEnv$divXBy
     )
-    updateSelectInput(session, "devideYBy",
+    updateSelectInput(session, "divideYBy",
                       choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = divYBy
+                      selected = .schnappsEnv$divYBy
+    )
+    updateCheckboxInput(session, "logX",
+                        value = .schnappsEnv$logX
+    )
+    updateCheckboxInput(session, "logY",
+                        value = .schnappsEnv$logY
+    )
+    updateCheckboxInput(session, "showCells",
+                        value = .schnappsEnv$showCells
     )
   })
   
@@ -333,8 +354,8 @@ clusterServer <- function(input, output, session,
     geneNames2 <- input$geneIds2
     logx <- input$logX
     logy <- input$logY
-    divXBy <- input$devideXBy
-    divYBy <- input$devideYBy
+    divXBy <- input$divideXBy
+    divYBy <- input$divideYBy
     scols <- sampleCols$colPal
     ccols <- clusterCols$colPal
     moreOptions <- input$moreOptions
@@ -431,9 +452,9 @@ clusterServer <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), "observe input$addToGroup \n")
     if (!is.null(input$addToGroup)) {
       if (input$addToGroup) {
-        addToGroupValue <<- TRUE
+        .schnappsEnv$addToGroupValue <- TRUE
       } else {
-        addToGroupValue <<- FALSE
+        .schnappsEnv$addToGroupValue <- FALSE
       }
     }
   })
@@ -454,7 +475,7 @@ clusterServer <- function(input, output, session,
     
     ns <- session$ns
     input$changeGroups # action button
-    addToSelection <- addToGroupValue
+    addToSelection <- .schnappsEnv$addToGroupValue
     
     # we isolate here because we only want to change if the button is clicked.
     # TODO what happens if new file is loaded??? => problem!
@@ -654,8 +675,8 @@ clusterServer <- function(input, output, session,
         column(
           3,
           selectInput(
-            ns("devideXBy"),
-            label = "Devide X by",
+            ns("divideXBy"),
+            label = "Divide X by",
             choices = c("None", "Gene.Count", "UMI.Count"),
             selected = "None"
           )
@@ -663,14 +684,14 @@ clusterServer <- function(input, output, session,
         column(
           3,
           selectInput(
-            ns("devideYBy"),
-            label = "Devide Y by",
+            ns("divideYBy"),
+            label = "Divide Y by",
             choices = c("None", "Gene.Count", "UMI.Count"),
             selected = "None"
           )
         )
       ),
-      checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", addToGroupValue),
+      checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", .schnappsEnv$addToGroupValue),
       textInput(ns(id = "groupName"), label = "name group", value = groupName),
       selectInput(
         ns("groupNames"),
@@ -943,6 +964,7 @@ pHeatMapModule <- function(input, output, session,
   
   # pHeatMapModule - updateInput ----
   # updateInput <- 
+  # this is calling projections during loading of data
   observe({
     if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
     start.time <- base::Sys.time()
