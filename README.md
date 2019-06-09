@@ -10,14 +10,27 @@ Shiny app for the exploration and analysis of single cell RNAseq data as it come
 ## Installation
 
 ```
+update.packages()
 if (!require("devtools"))
   install.packages("devtools")
 devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
+# update bioconductor packages if required
+BiocManager::install()
 BiocManager::install("BiocSingular")
-install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
+
+## create sample data set
+
+Load a small set of 200 cells and save to a file in the local directory
+
+```
+data("scEx", package = "SCHNAPPs")
+save(file = "scEx.Rdata", list = "scEx")
+```
+
 
 ## Running schnapps
 
@@ -36,12 +49,6 @@ A singleCellExperiment object is required, saved in a file RData object using
 save(file = "filename.RData", "singleCellExperiementObject")
 ```
 
-Load a small set of 200 cells and save to a file in the local directory
-
-```
-data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")
-```
 
 
 Please see [GitHub](https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs) for further documentation on how to use schnapps.
