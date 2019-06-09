@@ -101,9 +101,12 @@
 
     
     
-<div id="nothing-happens" class="section level2">
+<div id="common-problems" class="section level2">
 <h2 class="hasAnchor">
-<a href="#nothing-happens" class="anchor"></a>Nothing happens!!!!!</h2>
+<a href="#common-problems" class="anchor"></a>Common problems</h2>
+<div id="nothing-happens" class="section level3">
+<h3 class="hasAnchor">
+<a href="#nothing-happens" class="anchor"></a>Nothing happens!!!!!</h3>
 <p>Patience, please. There are quite a few occasions when the user has to wait. Specifically, when opening the app on a fresh start. There are some 100 packages or so to be loaded. This takes time.</p>
 <p>Other places that take long waiting times are after loading data (then most calculations will be initialized), changing the parameters for normalization, PCA, … (everything that touches the normalized data and projections).</p>
 <p>UMAP is notoriously slow, that is why there is to check box to activate it.</p>
@@ -111,38 +114,78 @@
 <p>There is no clean way stopping a running task other than killing it.</p>
 <p>Reports take even longer. Wait times of an hour or more are not uncommon. Then after a screen for saving the file appears and Ok is pressed the same time will be used again to redo the report. I haven’t found a way yet to overcome this. Any ideas are welcome.</p>
 </div>
-<div id="new-windows-pop-up" class="section level2">
-<h2 class="hasAnchor">
-<a href="#new-windows-pop-up" class="anchor"></a>New windows pop up</h2>
+<div id="new-windows-pop-up" class="section level3">
+<h3 class="hasAnchor">
+<a href="#new-windows-pop-up" class="anchor"></a>New windows pop up</h3>
 <p>When saving files or generating a report Shiny opens a new window and doesn’t close it. You can safely close it after the operation is completed.</p>
 </div>
-<div id="identify-dead-cells" class="section level2">
+</div>
+<div id="scientific-questions" class="section level2">
 <h2 class="hasAnchor">
-<a href="#identify-dead-cells" class="anchor"></a>Identify Dead cells</h2>
+<a href="#scientific-questions" class="anchor"></a>Scientific questions</h2>
+<div id="identify-dead-cells" class="section level3">
+<h3 class="hasAnchor">
+<a href="#identify-dead-cells" class="anchor"></a>Identify Dead cells</h3>
 <p>Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.</p>
 </div>
-<div id="identify-cells-from-violin-plot" class="section level2">
-<h2 class="hasAnchor">
-<a href="#identify-cells-from-violin-plot" class="anchor"></a>Identify cells from violin plot</h2>
+<div id="identify-cells-from-violin-plot" class="section level3">
+<h3 class="hasAnchor">
+<a href="#identify-cells-from-violin-plot" class="anchor"></a>Identify cells from violin plot</h3>
 <p>The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected</p>
 </div>
-<div id="can-mars-seq-data-be-analyzed" class="section level2">
-<h2 class="hasAnchor">
-<a href="#can-mars-seq-data-be-analyzed" class="anchor"></a>Can MARS-Seq data be analyzed?</h2>
+<div id="can-mars-seq-data-be-analyzed" class="section level3">
+<h3 class="hasAnchor">
+<a href="#can-mars-seq-data-be-analyzed" class="anchor"></a>Can MARS-Seq data be analyzed?</h3>
 <p>Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information.</p>
 </div>
-<div id="how-to-normalize-by-ribosomal-proteins" class="section level2">
-<h2 class="hasAnchor">
-<a href="#how-to-normalize-by-ribosomal-proteins" class="anchor"></a>How to normalize by ribosomal proteins?</h2>
+<div id="how-to-normalize-by-ribosomal-proteins" class="section level3">
+<h3 class="hasAnchor">
+<a href="#how-to-normalize-by-ribosomal-proteins" class="anchor"></a>How to normalize by ribosomal proteins?</h3>
 <p>What is the best representation to use to compare gene expression level ( UMI/gene) ? Gene/UMI expression can be visualized in different plots: The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells. Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.</p>
 </div>
-<div id="how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="section level2">
-<h2 class="hasAnchor">
-<a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="anchor"></a>How to identify cells in a cluster of a Tsne plot and list them ?</h2>
+<div id="how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="section level3">
+<h3 class="hasAnchor">
+<a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="anchor"></a>How to identify cells in a cluster of a Tsne plot and list them ?</h3>
 </div>
-<div id="what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster" class="section level2">
-<h2 class="hasAnchor">
-<a href="#what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster" class="anchor"></a>What are the different heat maps that can be generated and how many genes could be listed by cluster ?</h2>
+<div id="what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster" class="anchor"></a>What are the different heat maps that can be generated and how many genes could be listed by cluster ?</h3>
+<p>Cells in the cluster can be selected on the 2D plot and cell names are shown after checking “show more options” followed by checking “show cell names”;</p>
+</div>
+<div id="what-is-the-best-representation-to-use-to-compare-gene-expression-level" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-is-the-best-representation-to-use-to-compare-gene-expression-level" class="anchor"></a>What is the best representation to use to compare gene expression level</h3>
+<p>Gene/UMI expression can be visualized in different plots: The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells. Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.</p>
+</div>
+<div id="can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how" class="section level3">
+<h3 class="hasAnchor">
+<a href="#can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how" class="anchor"></a>Can the analysis be performed on a subset of selected cells and how?</h3>
+<p>NOTE: If I understand one of the key points of this app is to be able to perform the analysis on selected cells of interest what other apps do not allow</p>
+<p>Analysis can be narrowed to a selection of cells copying cell names in the tab “Cell selection - Cells to keep, remove others”. The number of cells will be updated in the summary statistics on the sidebar and clicking on “apply changes” will apply cell selection (will generate the cell subset for further analysis?).</p>
+</div>
+<div id="how-to-identify-signature-genes-with-same-distribution-as-a-given-marker-gene" class="section level3">
+<h3 class="hasAnchor">
+<a href="#how-to-identify-signature-genes-with-same-distribution-as-a-given-marker-gene" class="anchor"></a>How to identify signature genes with same distribution as a given marker gene?</h3>
+<p>(Vale) NOTE: I do not know exactly how to phrase it, tell me if it is not clear what I mean: I do not know how to do yet</p>
+</div>
+<div id="what-are-the-possible-trajectory-inferences-approaches-that-could-be-used" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-are-the-possible-trajectory-inferences-approaches-that-could-be-used" class="anchor"></a>What are the possible trajectory inferences approaches that could be used ?</h3>
+<p>Contributions for trajectory inference already available are SCORPIUS, ElPiGraph.R, and DCA</p>
+</div>
+<div id="to-display-a-developmental-pathway-according-to-time-of-expression-of-genes-from-an-input-involving-several-datasets" class="section level3">
+<h3 class="hasAnchor">
+<a href="#to-display-a-developmental-pathway-according-to-time-of-expression-of-genes-from-an-input-involving-several-datasets" class="anchor"></a>To display a developmental pathway according to time of expression of genes from an input involving several datasets ?</h3>
+</div>
+<div id="to-display-a-biological-process-from-a-single-dataset" class="section level3">
+<h3 class="hasAnchor">
+<a href="#to-display-a-biological-process-from-a-single-dataset" class="anchor"></a>To display a biological process from a single dataset ?</h3>
+</div>
+<div id="can-new-packages-be-implemented" class="section level3">
+<h3 class="hasAnchor">
+<a href="#can-new-packages-be-implemented" class="anchor"></a>Can new packages be implemented ?</h3>
+<p>The software architecture of the application makes it easy for the bioinformatician to integrate new visualizations and analyses. please see <a href="https://github.com/baj12/SCHNAPPsContributions" class="uri">https://github.com/baj12/SCHNAPPsContributions</a></p>
+</div>
 </div>
   </div>
 
@@ -151,14 +194,8 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#nothing-happens">Nothing happens!!!!!</a></li>
-      <li><a href="#new-windows-pop-up">New windows pop up</a></li>
-      <li><a href="#identify-dead-cells">Identify Dead cells</a></li>
-      <li><a href="#identify-cells-from-violin-plot">Identify cells from violin plot</a></li>
-      <li><a href="#can-mars-seq-data-be-analyzed">Can MARS-Seq data be analyzed?</a></li>
-      <li><a href="#how-to-normalize-by-ribosomal-proteins">How to normalize by ribosomal proteins?</a></li>
-      <li><a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them">How to identify cells in a cluster of a Tsne plot and list them ?</a></li>
-      <li><a href="#what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster">What are the different heat maps that can be generated and how many genes could be listed by cluster ?</a></li>
+<li><a href="#common-problems">Common problems</a></li>
+      <li><a href="#scientific-questions">Scientific questions</a></li>
       </ul>
 </div>
       </div>
