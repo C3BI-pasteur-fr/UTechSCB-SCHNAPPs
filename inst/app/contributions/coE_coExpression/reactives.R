@@ -240,7 +240,7 @@ finner <- function(xPerm, r, genesin, featureData, scEx_log, perms) {
       rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx,]), ])
     # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
     
-    permIdx <- Matrix::colSums(assays(scEx_log)[[1]][map, , drop = FALSE] >= 1) == length(comb[cIdx,  1:ncol(comb)])
+    permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= 1) == length(comb[cIdx,  1:ncol(comb)])
     perms[permIdx] <- paste0(comb[cIdx,  1:ncol(comb)], collapse = "+")
   }
   perms
