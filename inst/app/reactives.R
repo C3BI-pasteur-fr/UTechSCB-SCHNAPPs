@@ -131,7 +131,7 @@ inputDataFunc <- function(inFile) {
       } else {
         pdAll <- rbind(pdAll, pd1)
       }
-      stats[fpIdx, "nFeatures"] <- nrow(fd)
+      # stats[fpIdx, "nFeatures"] <- nrow(fd)
       stats[fpIdx, "nCells"] <- nrow(pd1)
       
       exAll <- Matrix::cbind2(exAll[fdIdx, ], ex1)
