@@ -4,8 +4,8 @@
 ^Meta$
 ^logo.png$
 ^docs$
-^2$
-^pkgdown$
 ^inst/develo
 ^inst/prep4master.R
-^vignettes/pkdown$
+^2$
+^pkgdown$
+^images2$
