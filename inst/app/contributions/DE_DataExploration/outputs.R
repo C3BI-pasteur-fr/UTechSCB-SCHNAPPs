@@ -252,6 +252,14 @@ output$DE_panelPlot <- renderPlot({
 
 # Scater QC ----
 output$DE_scaterQC <- renderImage({
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain()))
+      removeNotification(id = "DE_scaterQC")
+  )
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_scaterQC", id = "DE_scaterQC", duration = NULL)
+  }
   if (DEBUG) cat(file = stderr(), "output$DE_scaterQC\n")
   scaterReads <- scaterReads()
   if (is.null(scaterReads)) {

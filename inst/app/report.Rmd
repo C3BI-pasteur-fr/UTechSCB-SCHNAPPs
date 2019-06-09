@@ -141,7 +141,7 @@ if (is.null(input$geneSelectionClustering)) {
 # if ( !exists("dataTables")) {# needed when working with ~/SCHNAPPsDebug/reports.Data
 cat(file = stderr(), paste("loading dataTables\n"))
 # in case the file is not in the root directory is has to be manually loaded during debugging
-# input$file1 = data.frame("datapath" = dir(path = "~/Rstudio/shHubgit/", pattern="scEx.Rds", full.names = T), stringsAsFactors = F)
+# input$file1 = data.frame("datapath" = dir(path = "~/Rstudio/shHubgit/", pattern="scEx.RData", full.names = T), stringsAsFactors = F)
 # inFile = input$file1
 dataTables <- inputData
 # }

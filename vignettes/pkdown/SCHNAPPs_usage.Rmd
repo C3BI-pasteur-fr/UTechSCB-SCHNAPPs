@@ -127,7 +127,7 @@ knitr::include_graphics('images/overview.png')
 
     Download the normalized data as a CSV file.
 
-* Download Rds
+* Download Rdata
 
     Download an RData file with the scEx object that can be reloaded in SCHNAPPs or other applications (e.g. iSEE).
 

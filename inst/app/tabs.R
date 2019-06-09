@@ -22,7 +22,7 @@ inputTab <- shinydashboard::tabItem(
     h5(
       "This app is designed for exploratory data analysis of processed RNA-Seq data of single cell experiments.
       Multiple files can be selected using certain browsers (E.g. chrome). This is not working when running in RStudio as a window.
-      Rds files are R data files generated using base::save(). They contain two objects, scEx that hold raw counts in a sparse matrix
+      RData files are R data files generated using base::save(). They contain two objects, scEx that hold raw counts in a sparse matrix
       and annotation in a data frame."
     ),
     align = "center"
@@ -154,11 +154,23 @@ cellSelectionTab <- shinydashboard::tabItem(
     column(6,
            offset = 1,
            shinyBS::tipify(textInput("minExpGenes", "List of genes with minimal expression", value = defaultValueRegExGene),
-                  title = "<h3>Cells must have one or more</h3> <ul><li>These cells must have at least one of those genes expressed</li> </ul> ",
-                  options = list(
-                    "width" = "300px", "placement" = "right", "max-width" = "350px",
-                    "data-container" = "body", container = "body"
-                  )
+                           title = "<h3>Cells must have one or more</h3> <ul><li>These cells must have at least one of those genes expressed</li> </ul> ",
+                           options = list(
+                             "width" = "300px", "placement" = "right", "max-width" = "350px",
+                             "data-container" = "body", container = "body"
+                           )
+           ) # tool tip: '^CD7$|^KIT$
+    )
+  ),
+  fluidRow(
+    column(6,
+           offset = 1,
+           shinyBS::tipify(textInput("minNonExpGenes", "List of genes that should not be expressed", value = ""),
+                           title = "<h3>Cells must have NOT one or more</h3> <ul><li>These cells must NOT have at least one of those genes expressed</li> </ul> ",
+                           options = list(
+                             "width" = "300px", "placement" = "right", "max-width" = "350px",
+                             "data-container" = "body", container = "body"
+                           )
            ) # tool tip: '^CD7$|^KIT$
     )
   ),

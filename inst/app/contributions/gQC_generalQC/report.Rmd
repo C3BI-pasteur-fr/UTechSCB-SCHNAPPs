@@ -256,9 +256,9 @@ logx : `r input$"gQC_umap_main-logX"`
 
 logy : `r input$"gQC_umap_main-logY"`
 
-divXBy : `r input$"gQC_umap_main-devideXBy"`
+divXBy : `r input$"gQC_umap_main-divideXBy"`
 
-divYBy : `r input$"gQC_umap_main-devideYBy"`
+divYBy : `r input$"gQC_umap_main-divideYBy"`
 
 scols : `r sampleCols$colPal`
 
@@ -280,8 +280,8 @@ geneNames <- input$"gQC_umap_main-geneIds"
 geneNames2 <- input$"gQC_umap_main-geneIds2"
 logx <- input$"gQC_umap_main-logX"
 logy <- input$"gQC_umap_main-logY"
-divXBy <- input$"gQC_umap_main-devideXBy"
-divYBy <- input$"gQC_umap_main-devideYBy"
+divXBy <- input$"gQC_umap_main-divideXBy"
+divYBy <- input$"gQC_umap_main-divideYBy"
 scols <- sampleCols$colPal
 ccols <- clusterCols$colPal
 legend.position <- "none"

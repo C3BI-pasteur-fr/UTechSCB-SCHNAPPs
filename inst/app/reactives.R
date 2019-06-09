@@ -54,8 +54,8 @@ inputDataFunc <- function(inFile) {
   #
   cat(file = stderr(), paste("reading", inFile$name[1], "\n"))
   fp <- inFile$datapath[1]
-  # fp ="scEx.Rds"
-  # fp ="../SCHNAPPsData/patty1A.v2.Rds"
+  # fp ="scEx.RData"
+  # fp ="../SCHNAPPsData/patty1A.v2.RData"
   # a bit of cleanup
   for (v in c("scEx", "scEx_log", "featureData")) {
     if (exists(v)) rm(v)
@@ -585,7 +585,8 @@ useCellsFunc <-
            rmCells,
            rmPattern,
            keepCells,
-           cellKeepOnly) {
+           cellKeepOnly,
+           geneNamesNEG) {
     if (DEBUG) {
       cat(file = stderr(), "useCellsFunc started.\n")
     }
@@ -662,6 +663,33 @@ useCellsFunc <-
       goodCols <- goodCols & selCols
     }
     
+    # genes that should NOT be expressed.
+    genesin <- toupper(geneNamesNEG)
+    genesin <- gsub(" ", "", genesin, fixed = TRUE)
+    genesin <- strsplit(genesin, ",")
+    genesin <- genesin[[1]]
+    
+    selCols <- rep(FALSE, length(goodCols))
+    if (!length(genesin) == 0) {
+      ids <- which(toupper(dataTables$featuredata$symbol) %in% genesin)
+      if (length(ids) == 1) {
+        selCols <- scEx[ids, ] > 0
+      } else if (length(ids) == 0) {
+        showNotification(
+          "not enough cells for NonExpGenes, check gene names for min coverage",
+          type = "error",
+          duration = NULL
+        )
+        return(NULL)
+      } else {
+        selCols <- Matrix::colSums(scEx[ids, ]) > 0
+      }
+      # now the cells that should be removed are set to T
+      # we inverse this and then keep only the ones that are not found
+      selCols <- !selCols
+      goodCols <- goodCols & selCols
+    }
+    
     if (!length(cellKeepOnly) == 0) {
       goodCols[c(1:length(goodCols))] <- FALSE
       ids <-
@@ -695,6 +723,7 @@ useCells <- reactive({
   dataTables <- inputData()
   cellSelectionValues <- cellSelectionValues()
   geneNames <- cellSelectionValues$minExpGenes
+  geneNamesNEG <- cellSelectionValues$minNonExpGenes
   rmCells <- cellSelectionValues$cellsFiltersOut
   rmPattern <- cellSelectionValues$cellPatternRM
   keepCells <- cellSelectionValues$cellKeep
@@ -713,7 +742,8 @@ useCells <- reactive({
     rmCells,
     rmPattern,
     keepCells,
-    cellKeepOnly
+    cellKeepOnly,
+    geneNamesNEG
   )
   
   exportTestValues(useCells = {
@@ -1574,6 +1604,12 @@ clusterMethodReact <- reactiveValues(
   clusterSource = "counts"
 )
 
+observe({
+  if (DEBUG) cat(file = stderr(), "observe: projections\n")
+  prj <- projections()
+  if (DEBUG) cat(file = stderr(), paste("=====colnames ",paste0( colnames(prj), collapse = " ") , "\n"))
+})
+
 # projections ----
 #' projections
 #' each column is of length of number of cells
@@ -1662,20 +1698,10 @@ projections <- reactive({
         } else {
           stop("error: ", proj[1], "didn't produce a result")
         }
-        if (DEBUG) {
-          end.time <- Sys.time()
-          cat(
-            file = stderr(),
-            "===",
-            proj[1],
-            ":done",
-            difftime(end.time, start.time1, units = "min"),
-            "\n"
-          )
-        }
-      }
+       }
       
       colnames(projections) <- cn
+      if (DEBUG) cat(file = stderr(), paste("colnames ",paste0( colnames(projections), collapse = " ") , "\n"))
       if (DEBUG) cat(file = stderr(), paste("observe this: ", proj[2] , "\n"))
       # observe(proj[2], quoted = TRUE)
     }
@@ -1777,6 +1803,8 @@ sample <- reactive({
   pd <- colData(scEx)
   retVal <- NULL
   for (pdColName in colnames(pd)) {
+    # in case dbCluster is already in the colData this would create dbCluster.1 later on
+    if(pdColName == "dbCluster") next()
     if (length(levels(factor(pd[, pdColName]))) < 100) {
       if (is.null(retVal)) {
         retVal <- data.frame(pd[, pdColName])
@@ -2364,6 +2392,7 @@ reacativeReport <- function() {
   # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
   # file.copy("contributions/gQC_generalQC//report.Rmd",
   #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
+  tryCatch(
   r(
     function(input, output_file, params, envir)
       rmarkdown::render(
@@ -2381,6 +2410,9 @@ reacativeReport <- function() {
     # ,
     # stderr = stderr(),
     # stdout = stderr()
+  ), error = function(e){
+    cat(file = stderr(), paste("==== An error occurred during the creation of the report\n"))
+  }
   )
   # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
   #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
@@ -2393,7 +2425,7 @@ reacativeReport <- function() {
             file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")
   )
   base::save(
-    file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.Rds"),
+    file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.RData"),
     list = c("scEx", "projections")
   )
   zippedReportFiles <- c(paste0(tDir, zippedReportFiles))

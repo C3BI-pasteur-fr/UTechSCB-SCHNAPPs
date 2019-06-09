@@ -222,6 +222,29 @@ coE_topExpGenesTable <- reactive({
   return(retVal)
 })
 
+combinePermutations <- function(perm1, perm2){
+  perms <- rep("", length(perm1))
+  for (cIdx in 1:length(perm1)){
+    if (perm2[cIdx] == ""){
+      perms[cIdx] = perm1[cIdx]
+    } else {
+      perms[cIdx] = perm2[cIdx]
+    }
+  }
+  perms
+}
+finner <- function(xPerm, r, genesin, featureData, scEx_log, perms) {
+  comb <- combinations(xPerm, r, genesin)
+  for (cIdx in 1:nrow(comb)) {
+    map <-
+      rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx,]), ])
+    # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
+    
+    permIdx <- Matrix::colSums(assays(scEx_log)[[1]][map, , drop = FALSE] >= 1) == length(comb[cIdx,  1:ncol(comb)])
+    perms[permIdx] <- paste0(comb[cIdx,  1:ncol(comb)], collapse = "+")
+  }
+  perms
+}    
 
 
 #' coE_geneGrp_vioFunc
@@ -278,16 +301,21 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
       warning("reducing number of permutations to 10")
     }
     # cat(file = stderr(), paste("===violin-", vIdx,"-", difftime(Sys.time(), start.time, units = "min"), " min\n")); vIdx = vIdx+1;start.time <- Sys.time()
-    for (r in 1:xPerm) {
-      comb <- combinations(xPerm, r, genesin)
-      for (cIdx in 1:nrow(comb)) {
-        map <-
-          rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
-        # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
-        
-        permIdx <- Matrix::colSums(assays(scEx)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, ])
-        perms[permIdx] <- paste0(comb[cIdx, ], collapse = "+")
-      }
+    # for (r in 1:xPerm) {
+    #   comb <- combinations(xPerm, r, genesin)
+    #   for (cIdx in 1:nrow(comb)) {
+    #     map <-
+    #       rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
+    #     # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
+    #     
+    #     permIdx <- Matrix::colSums(assays(scEx)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, ])
+    #     perms[permIdx] <- paste0(comb[cIdx, ], collapse = "+")
+    #   }
+    # }
+    x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData,  scEx, perms))
+    
+    for (idx in 1:length(x)) {
+      perms = combinePermutations(perms, x[[idx]])
     }
     # cat(file = stderr(), paste("===violin-", vIdx,"-", difftime(Sys.time(), start.time, units = "min"), " min\n")); vIdx = vIdx+1;start.time <- Sys.time()
     perms <- factor(perms)

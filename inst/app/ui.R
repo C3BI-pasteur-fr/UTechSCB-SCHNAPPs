@@ -184,7 +184,7 @@ scShinyUI <- shinyUI(
         "<h3>download current normalized count data as CSV file</h3>"
       ),
       shinyBS::tipify(
-        downloadButton("RDSsave", "Download Rds", class="butt"),
+        downloadButton("RDSsave", "Download RData", class="butt"),
         "<h3>download current cell/gene configuration for reimport to this app</h3>"
       ),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),

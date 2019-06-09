@@ -74,6 +74,8 @@ if (exists(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)) {
 }
 
 # list available colors for samples and clusters, other colors are defined independantly.
+# Sys.setenv(DEBUGME = ".")
+base::source(paste0(packagePath, "/defaultValues.R"), local = TRUE)
 if (!exists("allowedColors")) {
   allowedColors <- unique(c(
     "#8c510a", "#d8b365", "#f6e8c3", "#c7eae5", "#5ab4ac", "#01665e", "#c51b7d", "#e9a3c9",
