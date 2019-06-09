@@ -24,7 +24,7 @@ devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 
 ## create sample data set
 
-Load a small set of 200 cells and save to a file in the local directory
+Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.
 
 ```
 data("scEx", package = "SCHNAPPs")
