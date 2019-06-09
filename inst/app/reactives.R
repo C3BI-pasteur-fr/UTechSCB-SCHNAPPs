@@ -1604,12 +1604,6 @@ clusterMethodReact <- reactiveValues(
   clusterSource = "counts"
 )
 
-observe({
-  if (DEBUG) cat(file = stderr(), "observe: projections\n")
-  prj <- projections()
-  if (DEBUG) cat(file = stderr(), paste("=====colnames ",paste0( colnames(prj), collapse = " ") , "\n"))
-})
-
 # projections ----
 #' projections
 #' each column is of length of number of cells
