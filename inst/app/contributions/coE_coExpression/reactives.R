@@ -234,7 +234,7 @@ combinePermutations <- function(perm1, perm2){
   perms
 }
 finner <- function(xPerm, r, genesin, featureData, scEx_log, perms) {
-  comb <- combinations(xPerm, r, genesin)
+  comb <- gtools::combinations(xPerm, r, genesin)
   for (cIdx in 1:nrow(comb)) {
     map <-
       rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx,]), ])

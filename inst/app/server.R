@@ -99,11 +99,6 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # TODO needs to be an option
   seed <- 2
   # localContributionDir <- .SCHNAPPs_locContributionDir
-  cat(file = stderr(), paste("bernd2", str(environment())), "\n")
-  # cat(file = stderr(), paste("bernd2", str(parent.env(environment()))), "\n")
-  cat(file = stderr(), paste("bernd2", str(.schnappsEnv), "\n"))
-  cat(file = stderr(), paste("bernd2", ls(.schnappsEnv), "\n"))
-  # cat(file = stderr(), paste("bernd2", localContributionDir, "\n"))
   base::set.seed(seed)
   # check that directory is availabl, otherwise create it
   if (DEBUG) {
