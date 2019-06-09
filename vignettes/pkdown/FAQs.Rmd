@@ -18,8 +18,9 @@ knitr::opts_chunk$set(
 library(SCHNAPPs)
 ```
 
+## Common problems
 
-## Nothing happens!!!!!
+### Nothing happens!!!!!
 
 Patience, please. There are quite a few occasions when the user has to wait. Specifically, when opening the app on a fresh start. There are some 100 packages or so to be loaded. This takes time.
 
@@ -33,26 +34,28 @@ There is no clean way stopping a running task other than killing it.
 
 Reports take even longer. Wait times of an hour or more are not uncommon. Then after a screen for saving the file appears and Ok is pressed the same time will be used again to redo the report. I haven't found a way yet to overcome this. Any ideas are welcome.
 
-## New windows pop up
+### New windows pop up
 
 When saving files or generating a report Shiny opens a new window and doesn't close it. You can safely close it after the operation is completed.
 
 
-## Identify Dead cells
+## Scientific questions
+
+### Identify Dead cells
 
 Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.
 
 
 
-## Identify cells from violin plot
+### Identify cells from violin plot
 
 The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected
 
-## Can MARS-Seq data be analyzed?
+### Can MARS-Seq data be analyzed?
 
 Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information. 
 
-## How to normalize by ribosomal proteins?
+### How to normalize by ribosomal proteins?
 
 
 
@@ -61,7 +64,44 @@ Gene/UMI expression can be visualized in different plots:
 The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells.
 Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.
 
-## How to identify cells in a cluster of a Tsne plot and list them ? 
+### How to identify cells in a cluster of a Tsne plot and list them ? 
 
 
-## What are the different heat maps that can be generated and how many genes could be listed  by cluster ?
+### What are the different heat maps that can be generated and how many genes could be listed  by cluster ?
+
+Cells in the cluster can be selected on the 2D plot and cell names are shown after checking “show more options” followed by checking “show cell names”; 
+
+
+### What is the best representation to use to compare gene expression level
+
+Gene/UMI expression can be visualized in different plots:
+The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells.
+Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.
+
+### Can the analysis be performed on a subset of selected cells and how?
+
+ NOTE: If I understand one of the key points of this app is to be able to perform the analysis on selected cells of interest what other apps do not allow
+
+Analysis can be narrowed to a selection of cells copying cell names in the tab  “Cell selection - Cells to keep, remove others”. The number of cells will be updated in the summary statistics on the sidebar and clicking on  “apply changes”  will apply cell selection (will generate the cell subset for further analysis?). 
+
+
+### How to identify signature genes with same distribution as a given marker gene? 
+
+
+(Vale) NOTE: I do not know exactly how to phrase it, tell me if it is not clear what I mean: I do not know how to do yet
+
+
+### What are the possible trajectory inferences approaches  that could be used ?
+
+Contributions for trajectory inference already available are SCORPIUS, ElPiGraph.R, and DCA
+
+
+### To display a developmental pathway according to time of expression of genes from an input involving several datasets ?
+
+
+### To display a biological  process from a single dataset ?
+
+### Can new packages be implemented ?
+
+The software architecture  of the application makes it easy for the bioinformatician to integrate new visualizations and analyses. 
+please see https://github.com/baj12/SCHNAPPsContributions 
