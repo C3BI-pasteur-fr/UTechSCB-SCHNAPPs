@@ -19,6 +19,25 @@ library(SCHNAPPs)
 ```
 
 
+## Nothing happens!!!!!
+
+Patience, please. There are quite a few occasions when the user has to wait. Specifically, when opening the app on a fresh start. There are some 100 packages or so to be loaded. This takes time.
+
+Other places that take long waiting times are after loading data (then most calculations will be initialized), changing the parameters for normalization, PCA, ... (everything that touches the normalized data and projections). 
+
+UMAP is notoriously slow, that is why there is to check box to activate it.
+
+Please see if the processors on your computer related to R are active, this usually means that you should wait.
+
+There is no clean way stopping a running task other than killing it.
+
+Reports take even longer. Wait times of an hour or more are not uncommon. Then after a screen for saving the file appears and Ok is pressed the same time will be used again to redo the report. I haven't found a way yet to overcome this. Any ideas are welcome.
+
+## New windows pop up
+
+When saving files or generating a report Shiny opens a new window and doesn't close it. You can safely close it after the operation is completed.
+
+
 ## Identify Dead cells
 
 Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.
@@ -29,7 +48,7 @@ Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNA
 
 The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected
 
-## Can MARSeq data be analyzed?
+## Can MARS-Seq data be analyzed?
 
 Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information. 
 

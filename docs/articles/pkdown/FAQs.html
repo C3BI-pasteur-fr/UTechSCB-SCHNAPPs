@@ -101,6 +101,21 @@
 
     
     
+<div id="nothing-happens" class="section level2">
+<h2 class="hasAnchor">
+<a href="#nothing-happens" class="anchor"></a>Nothing happens!!!!!</h2>
+<p>Patience, please. There are quite a few occasions when the user has to wait. Specifically, when opening the app on a fresh start. There are some 100 packages or so to be loaded. This takes time.</p>
+<p>Other places that take long waiting times are after loading data (then most calculations will be initialized), changing the parameters for normalization, PCA, … (everything that touches the normalized data and projections).</p>
+<p>UMAP is notoriously slow, that is why there is to check box to activate it.</p>
+<p>Please see if the processors on your computer related to R are active, this usually means that you should wait.</p>
+<p>There is no clean way stopping a running task other than killing it.</p>
+<p>Reports take even longer. Wait times of an hour or more are not uncommon. Then after a screen for saving the file appears and Ok is pressed the same time will be used again to redo the report. I haven’t found a way yet to overcome this. Any ideas are welcome.</p>
+</div>
+<div id="new-windows-pop-up" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-windows-pop-up" class="anchor"></a>New windows pop up</h2>
+<p>When saving files or generating a report Shiny opens a new window and doesn’t close it. You can safely close it after the operation is completed.</p>
+</div>
 <div id="identify-dead-cells" class="section level2">
 <h2 class="hasAnchor">
 <a href="#identify-dead-cells" class="anchor"></a>Identify Dead cells</h2>
@@ -111,9 +126,9 @@
 <a href="#identify-cells-from-violin-plot" class="anchor"></a>Identify cells from violin plot</h2>
 <p>The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected</p>
 </div>
-<div id="can-marseq-data-be-analyzed" class="section level2">
+<div id="can-mars-seq-data-be-analyzed" class="section level2">
 <h2 class="hasAnchor">
-<a href="#can-marseq-data-be-analyzed" class="anchor"></a>Can MARSeq data be analyzed?</h2>
+<a href="#can-mars-seq-data-be-analyzed" class="anchor"></a>Can MARS-Seq data be analyzed?</h2>
 <p>Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information.</p>
 </div>
 <div id="how-to-normalize-by-ribosomal-proteins" class="section level2">
@@ -136,9 +151,11 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#identify-dead-cells">Identify Dead cells</a></li>
+<li><a href="#nothing-happens">Nothing happens!!!!!</a></li>
+      <li><a href="#new-windows-pop-up">New windows pop up</a></li>
+      <li><a href="#identify-dead-cells">Identify Dead cells</a></li>
       <li><a href="#identify-cells-from-violin-plot">Identify cells from violin plot</a></li>
-      <li><a href="#can-marseq-data-be-analyzed">Can MARSeq data be analyzed?</a></li>
+      <li><a href="#can-mars-seq-data-be-analyzed">Can MARS-Seq data be analyzed?</a></li>
       <li><a href="#how-to-normalize-by-ribosomal-proteins">How to normalize by ribosomal proteins?</a></li>
       <li><a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them">How to identify cells in a cluster of a Tsne plot and list them ?</a></li>
       <li><a href="#what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster">What are the different heat maps that can be generated and how many genes could be listed by cluster ?</a></li>
