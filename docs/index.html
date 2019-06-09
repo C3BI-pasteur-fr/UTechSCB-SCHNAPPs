@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
       </span>
     </div>
 
@@ -64,10 +64,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/FAQs.html">Frequently asked questions for common tasks</a>
+      <a href="articles/Readme.html">Readme</a>
     </li>
     <li>
-      <a href="articles/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
+      <a href="articles/pkdown/FAQs.html">Frequently asked questions for common tasks</a>
+    </li>
+    <li>
+      <a href="articles/pkdown/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
     </li>
   </ul>
 </li>
@@ -103,13 +106,23 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<pre><code>if (!require("devtools"))
+<pre><code><a href="https://rdrr.io/r/utils/update.packages.html">update.packages()
+if (!require("devtools"))
   install.packages("devtools")
 devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
+# update bioconductor packages if required
+BiocManager::install()
 BiocManager::install("BiocSingular")
-install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</code></pre>
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</a></code></pre>
+</div>
+<div id="create-sample-data-set" class="section level2">
+<h2 class="hasAnchor">
+<a href="#create-sample-data-set" class="anchor"></a>create sample data set</h2>
+<p>Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.</p>
+<pre><code><a href="https://rdrr.io/r/utils/data.html">data("scEx", package = "SCHNAPPs")
+save(file = "scEx.Rdata", list = "scEx")</a></code></pre>
 </div>
 <div id="running-schnapps" class="section level2">
 <h2 class="hasAnchor">
@@ -117,14 +130,13 @@ install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</code></pre>
 <p>To start the app:</p>
 <pre><code><a href="https://rdrr.io/r/base/library.html">library(SCHNAPPs)
 schnapps()</a></code></pre>
-<div id="load-data" class="section level3">
+<div id="generate-data-files" class="section level3">
 <h3 class="hasAnchor">
-<a href="#load-data" class="anchor"></a>load data</h3>
+<a href="#generate-data-files" class="anchor"></a>generate data files</h3>
 <p>A singleCellExperiment object is required, saved in a file RData object using</p>
 <pre><code><a href="https://rdrr.io/r/base/save.html">save(file = "filename.RData", "singleCellExperiementObject")</a></code></pre>
-<p>Load a small set of 200 cells and save to a file in the local directory</p>
-<pre><code><a href="https://rdrr.io/r/utils/data.html">data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")</a></code></pre>
+<p>Please see <a href="https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/">GitHub</a> for further documentation on how to use schnapps.</p>
+<p>Please see <a href="https://github.com/baj12/SCHNAPPsContributions">GitHub Contributions</a> for additional tools, not directly part of the SCHNAPPs pacakage.</p>
 </div>
 </div>
 <div id="extending-schapps" class="section level2">

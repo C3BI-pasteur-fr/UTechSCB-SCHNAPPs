@@ -2,6 +2,7 @@ pandoc: '2.4'
 pkgdown: 1.3.0.9100
 pkgdown_sha: 79c337426d2c25e04b66802accd86da24b75ceaf
 articles:
-  FAQs: FAQs.html
-  SCHNAPPs_usage: SCHNAPPs_usage.html
+  Readme: Readme.html
+  FAQs: pkdown/FAQs.html
+  SCHNAPPs_usage: pkdown/SCHNAPPs_usage.html
 
