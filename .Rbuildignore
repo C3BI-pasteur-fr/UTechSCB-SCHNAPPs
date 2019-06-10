@@ -9,3 +9,4 @@
 ^2$
 ^pkgdown$
 ^images2$
+^_pkgdown.yml$

@@ -1466,8 +1466,14 @@ scranCluster <- function(pca,
     return(suppressMessages(do.call("quickCluster", params)))
   }
   )
+  if("barcode" %in% colnames(colData(scEx_log))) {
+    barCode = colData(scEx_log)$barcode
+  }else{
+    barCode = rownames(colData(scEx_log))
+  }
+  
   retVal <- data.frame(
-    Barcode = colData(scEx_log)$barcode,
+    Barcode = barCode,
     Cluster = retVal
   )
   rownames(retVal) <- rownames(colData(scEx_log))
