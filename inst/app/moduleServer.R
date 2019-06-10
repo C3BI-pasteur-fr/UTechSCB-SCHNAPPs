@@ -286,10 +286,12 @@ clusterServer <- function(input, output, session,
         }
       }
       
+      retVal = retVal[retVal %in% rownames(scEx_log)]
       printTimeEnd(start.time, "clusterServerReturnVal")
       exportTestValues(clusterServerReturnVal = {
         retVal
       })
+      if (length(retVal) == 0) return (NULL)
       return(retVal)
     })
   )
@@ -492,8 +494,9 @@ clusterServer <- function(input, output, session,
       grpNs <- groupNames$namesDF
       cells.names <- selectedCellNames()
       visibleCells <- visibleCellNames()
+      initializeGroupNames()
+      
       if (ncol(grpNs) == 0) {
-        initializeGroupNames()
         grpNs <- groupNames$namesDF
       }
       if (is.null(scEx)) {

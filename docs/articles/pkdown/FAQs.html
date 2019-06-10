@@ -101,6 +101,150 @@
 
     
     
+<div id="scientific-questions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#scientific-questions" class="anchor"></a>Scientific questions</h2>
+<div id="identify-dead-cells" class="section level3">
+<h3 class="hasAnchor">
+<a href="#identify-dead-cells" class="anchor"></a>Identify Dead cells</h3>
+<p>Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.</p>
+<div id="before-removing-genes" class="section level4">
+<h4 class="hasAnchor">
+<a href="#before-removing-genes" class="anchor"></a>before removing genes</h4>
+<div class="figure" style="text-align: center">
+<img src="images/beforeFilter.png" alt="Set before-Filter variable" width="90%"><p class="caption">
+Set before-Filter variable
+</p>
+</div>
+<p>The regular expression in the image above is used to count UMIs in the original non-normalized data before any filters are applied. Then we have this count for the cells that have not been removed and can use this in a 2D plot:</p>
+<div class="figure" style="text-align: center">
+<img src="images/beforeFilterApplied.png" alt="Before filter applied" width="90%"><p class="caption">
+Before filter applied
+</p>
+</div>
+<p>Here, we show the UMI count on the x-axis and the before filter on the y-axis. We also devide the UMI count by the before filter column, which emphasises the effect and allows us to clearly identify dying cells. In this case the dying cells fall into clusters 1, 2, and 3. So we can select those clusters and copy/paste the cells in the “cells to be removed field”.</p>
+<div class="figure" style="text-align: center">
+<img src="images/beforeFilterCellSelect.png" alt="Select cells for copy/paste" width="90%"><p class="caption">
+Select cells for copy/paste
+</p>
+</div>
+<div class="figure" style="text-align: center">
+<img src="images/beforeFilterCellsRM.png" alt="remove cells" width="90%"><p class="caption">
+remove cells
+</p>
+</div>
+<p>Don’t forget to click on apply changes!</p>
+</div>
+</div>
+<div id="identify-cells-from-violin-plot" class="section level3">
+<h3 class="hasAnchor">
+<a href="#identify-cells-from-violin-plot" class="anchor"></a>Identify cells from violin plot</h3>
+<p>The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected</p>
+</div>
+<div id="can-mars-seq-data-be-analyzed" class="section level3">
+<h3 class="hasAnchor">
+<a href="#can-mars-seq-data-be-analyzed" class="anchor"></a>Can MARS-Seq data be analyzed?</h3>
+<p>Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information.</p>
+<p>Use</p>
+<blockquote>
+<p>colData(scEx) &lt;- myAdditionalInformation</p>
+</blockquote>
+<p>to set the relevant information.</p>
+</div>
+<div id="how-to-normalize-by-ribosomal-proteins" class="section level3">
+<h3 class="hasAnchor">
+<a href="#how-to-normalize-by-ribosomal-proteins" class="anchor"></a>How to normalize by ribosomal proteins?</h3>
+<p>Once you have identified the gene names you want to use this list of genes can be used under Parameters - Normalization - gene_norm:</p>
+<div class="figure" style="text-align: center">
+<img src="images/normByRP.png" alt="normalize by ribosomal proteins" width="90%"><p class="caption">
+normalize by ribosomal proteins
+</p>
+</div>
+<p>You can get this list by temporarily setting the regular expression for selection of genes to be removed. Then click apply changes.</p>
+<div class="figure" style="text-align: center">
+<img src="images/geneSelectionRegEx.png" alt="regular expression for selecting ribosomal/mitochondrial genes" width="90%"><p class="caption">
+regular expression for selecting ribosomal/mitochondrial genes
+</p>
+</div>
+<p>Then, in the lower area of the same screen the genes that have been removed are shown:</p>
+<div class="figure" style="text-align: center">
+<img src="images/geneSelectionRMGenes.png" alt="table of removed genes" width="90%"><p class="caption">
+table of removed genes
+</p>
+</div>
+</div>
+<div id="what-is-the-best-representation-to-use-to-compare-gene-expression-level-umigene" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-is-the-best-representation-to-use-to-compare-gene-expression-level-umigene" class="anchor"></a>What is the best representation to use to compare gene expression level ( UMI/gene) ?</h3>
+<p>Gene/UMI expression can be visualized in different plots:</p>
+<ul>
+<li>The <b>panel plot</b> gives an overview of which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells.</li>
+</ul>
+<div class="figure" style="text-align: center">
+<img src="images/DataexplorationPanel.png" alt="Panel plot" width="90%"><p class="caption">
+Panel plot
+</p>
+</div>
+<ul>
+<li>Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.</li>
+</ul>
+<p>The figure below shows the combined expression of marker genes for B and T cells in an PBMC experiment. Note that the first gene name is B-cells:, This will allow you to annotate the selection. It will give rise to a warning, but that will disappear after a few seconds.</p>
+<div class="figure" style="text-align: center">
+<img src="images/cd8vscd4.png" alt="2D plot CD8 vs CD4 cell expression" width="90%"><p class="caption">
+2D plot CD8 vs CD4 cell expression
+</p>
+</div>
+</div>
+<div id="how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="section level3">
+<h3 class="hasAnchor">
+<a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="anchor"></a>How to identify cells in a cluster of a Tsne plot and list them ?</h3>
+<p>Using the 2D plot, select tsne1 and tsne2. Using the mouse select the cells of interest. Check “more options”, then check “show cell names”.</p>
+<div class="figure" style="text-align: center">
+<img src="images/CellSelection2.png" alt="selecting cells" width="90%"><p class="caption">
+selecting cells
+</p>
+</div>
+<!----
+### What are the different heat maps that can be generated and how many genes could be listed  by cluster ?
+
+Cells in the cluster can be selected on the 2D plot and cell names are shown after checking “show more options” followed by checking “show cell names”; 
+
+---->
+</div>
+<div id="what-is-the-best-representation-to-use-to-compare-gene-expression-level" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-is-the-best-representation-to-use-to-compare-gene-expression-level" class="anchor"></a>What is the best representation to use to compare gene expression level</h3>
+<p>Gene/UMI expression can be visualized in different plots:</p>
+<p>The <b>panel plot</b> gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells.</p>
+<p>Using <b>2D plots</b>, the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.</p>
+</div>
+<div id="can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how" class="section level3">
+<h3 class="hasAnchor">
+<a href="#can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how" class="anchor"></a>Can the analysis be performed on a subset of selected cells and how?</h3>
+<p>Analysis can be narrowed to a selection of cells copying cell names in the tab “Cell selection - Cells to keep, remove others”. The number of cells will be updated in the summary statistics on the sidebar and clicking on “apply changes” will apply cell selection.</p>
+<!----
+### How to identify signature genes with same distribution as a given marker gene? 
+
+--->
+</div>
+<div id="what-are-the-possible-trajectory-inferences-approaches-that-could-be-used" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-are-the-possible-trajectory-inferences-approaches-that-could-be-used" class="anchor"></a>What are the possible trajectory inferences approaches that could be used ?</h3>
+<p>Contributions for trajectory inference already available are SCORPIUS, ElPiGraph.R, and DCA (see GitHub)[<a href="https://github.com/baj12/SCHNAPPsContributions" class="uri">https://github.com/baj12/SCHNAPPsContributions</a>]</p>
+<!----
+
+### To display a developmental pathway according to time of expression of genes from an input involving several datasets ?
+
+
+### To display a biological  process from a single dataset ?
+--->
+</div>
+<div id="can-new-packages-be-implemented" class="section level3">
+<h3 class="hasAnchor">
+<a href="#can-new-packages-be-implemented" class="anchor"></a>Can new packages be implemented ?</h3>
+<p>The software architecture of the application makes it easy for the bioinformatician to integrate new visualizations and analyses. please see <a href="https://github.com/baj12/SCHNAPPsContributions" class="uri">https://github.com/baj12/SCHNAPPsContributions</a></p>
+</div>
+</div>
 <div id="common-problems" class="section level2">
 <h2 class="hasAnchor">
 <a href="#common-problems" class="anchor"></a>Common problems</h2>
@@ -120,73 +264,6 @@
 <p>When saving files or generating a report Shiny opens a new window and doesn’t close it. You can safely close it after the operation is completed.</p>
 </div>
 </div>
-<div id="scientific-questions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#scientific-questions" class="anchor"></a>Scientific questions</h2>
-<div id="identify-dead-cells" class="section level3">
-<h3 class="hasAnchor">
-<a href="#identify-dead-cells" class="anchor"></a>Identify Dead cells</h3>
-<p>Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.</p>
-</div>
-<div id="identify-cells-from-violin-plot" class="section level3">
-<h3 class="hasAnchor">
-<a href="#identify-cells-from-violin-plot" class="anchor"></a>Identify cells from violin plot</h3>
-<p>The cells in the violin plot are not selectable (for the moment). In order to identify those cells one has to use the 2D plotting function, preferably under Co-expression - Selected</p>
-</div>
-<div id="can-mars-seq-data-be-analyzed" class="section level3">
-<h3 class="hasAnchor">
-<a href="#can-mars-seq-data-be-analyzed" class="anchor"></a>Can MARS-Seq data be analyzed?</h3>
-<p>Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information.</p>
-</div>
-<div id="how-to-normalize-by-ribosomal-proteins" class="section level3">
-<h3 class="hasAnchor">
-<a href="#how-to-normalize-by-ribosomal-proteins" class="anchor"></a>How to normalize by ribosomal proteins?</h3>
-<p>What is the best representation to use to compare gene expression level ( UMI/gene) ? Gene/UMI expression can be visualized in different plots: The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells. Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.</p>
-</div>
-<div id="how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="section level3">
-<h3 class="hasAnchor">
-<a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them" class="anchor"></a>How to identify cells in a cluster of a Tsne plot and list them ?</h3>
-</div>
-<div id="what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster" class="section level3">
-<h3 class="hasAnchor">
-<a href="#what-are-the-different-heat-maps-that-can-be-generated-and-how-many-genes-could-be-listed-by-cluster" class="anchor"></a>What are the different heat maps that can be generated and how many genes could be listed by cluster ?</h3>
-<p>Cells in the cluster can be selected on the 2D plot and cell names are shown after checking “show more options” followed by checking “show cell names”;</p>
-</div>
-<div id="what-is-the-best-representation-to-use-to-compare-gene-expression-level" class="section level3">
-<h3 class="hasAnchor">
-<a href="#what-is-the-best-representation-to-use-to-compare-gene-expression-level" class="anchor"></a>What is the best representation to use to compare gene expression level</h3>
-<p>Gene/UMI expression can be visualized in different plots: The panel plot gives an overview which cells express different genes projected in 2 dimensions. The dimensions can be chosen freely. This allows for a general overview of the regions in the PCA/tSNE/UMAP space where differences are expressed. It can be difficult to compare the expression of individual cells. Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.</p>
-</div>
-<div id="can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how" class="section level3">
-<h3 class="hasAnchor">
-<a href="#can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how" class="anchor"></a>Can the analysis be performed on a subset of selected cells and how?</h3>
-<p>NOTE: If I understand one of the key points of this app is to be able to perform the analysis on selected cells of interest what other apps do not allow</p>
-<p>Analysis can be narrowed to a selection of cells copying cell names in the tab “Cell selection - Cells to keep, remove others”. The number of cells will be updated in the summary statistics on the sidebar and clicking on “apply changes” will apply cell selection (will generate the cell subset for further analysis?).</p>
-</div>
-<div id="how-to-identify-signature-genes-with-same-distribution-as-a-given-marker-gene" class="section level3">
-<h3 class="hasAnchor">
-<a href="#how-to-identify-signature-genes-with-same-distribution-as-a-given-marker-gene" class="anchor"></a>How to identify signature genes with same distribution as a given marker gene?</h3>
-<p>(Vale) NOTE: I do not know exactly how to phrase it, tell me if it is not clear what I mean: I do not know how to do yet</p>
-</div>
-<div id="what-are-the-possible-trajectory-inferences-approaches-that-could-be-used" class="section level3">
-<h3 class="hasAnchor">
-<a href="#what-are-the-possible-trajectory-inferences-approaches-that-could-be-used" class="anchor"></a>What are the possible trajectory inferences approaches that could be used ?</h3>
-<p>Contributions for trajectory inference already available are SCORPIUS, ElPiGraph.R, and DCA</p>
-</div>
-<div id="to-display-a-developmental-pathway-according-to-time-of-expression-of-genes-from-an-input-involving-several-datasets" class="section level3">
-<h3 class="hasAnchor">
-<a href="#to-display-a-developmental-pathway-according-to-time-of-expression-of-genes-from-an-input-involving-several-datasets" class="anchor"></a>To display a developmental pathway according to time of expression of genes from an input involving several datasets ?</h3>
-</div>
-<div id="to-display-a-biological-process-from-a-single-dataset" class="section level3">
-<h3 class="hasAnchor">
-<a href="#to-display-a-biological-process-from-a-single-dataset" class="anchor"></a>To display a biological process from a single dataset ?</h3>
-</div>
-<div id="can-new-packages-be-implemented" class="section level3">
-<h3 class="hasAnchor">
-<a href="#can-new-packages-be-implemented" class="anchor"></a>Can new packages be implemented ?</h3>
-<p>The software architecture of the application makes it easy for the bioinformatician to integrate new visualizations and analyses. please see <a href="https://github.com/baj12/SCHNAPPsContributions" class="uri">https://github.com/baj12/SCHNAPPsContributions</a></p>
-</div>
-</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -194,8 +271,26 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#common-problems">Common problems</a></li>
-      <li><a href="#scientific-questions">Scientific questions</a></li>
+<li>
+<a href="#scientific-questions">Scientific questions</a><ul class="nav nav-pills nav-stacked">
+<li><a href="#identify-dead-cells">Identify Dead cells</a></li>
+      <li><a href="#identify-cells-from-violin-plot">Identify cells from violin plot</a></li>
+      <li><a href="#can-mars-seq-data-be-analyzed">Can MARS-Seq data be analyzed?</a></li>
+      <li><a href="#how-to-normalize-by-ribosomal-proteins">How to normalize by ribosomal proteins?</a></li>
+      <li><a href="#what-is-the-best-representation-to-use-to-compare-gene-expression-level-umigene">What is the best representation to use to compare gene expression level ( UMI/gene) ?</a></li>
+      <li><a href="#how-to-identify-cells-in-a-cluster-of-a-tsne-plot-and-list-them">How to identify cells in a cluster of a Tsne plot and list them ?</a></li>
+      <li><a href="#what-is-the-best-representation-to-use-to-compare-gene-expression-level">What is the best representation to use to compare gene expression level</a></li>
+      <li><a href="#can-the-analysis-be-performed-on-a-subset-of-selected-cells-and-how">Can the analysis be performed on a subset of selected cells and how?</a></li>
+      <li><a href="#what-are-the-possible-trajectory-inferences-approaches-that-could-be-used">What are the possible trajectory inferences approaches that could be used ?</a></li>
+      <li><a href="#can-new-packages-be-implemented">Can new packages be implemented ?</a></li>
+      </ul>
+</li>
+      <li>
+<a href="#common-problems">Common problems</a><ul class="nav nav-pills nav-stacked">
+<li><a href="#nothing-happens">Nothing happens!!!!!</a></li>
+      <li><a href="#new-windows-pop-up">New windows pop up</a></li>
+      </ul>
+</li>
       </ul>
 </div>
       </div>
