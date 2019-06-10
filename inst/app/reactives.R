@@ -1766,6 +1766,7 @@ initializeGroupNames <- reactive({
   })
 })
 
+observe(initializeGroupNames())
 # sample --------
 sample <- reactive({
   if (DEBUG) {
