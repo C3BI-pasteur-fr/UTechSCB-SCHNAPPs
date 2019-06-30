@@ -1652,7 +1652,9 @@ projections <- reactive({
   
   
   projections <- data.frame(pca$x[, seq(1,ncol(pca$x))])
-  pd <- colData(scEx)
+  # todo colData() now returns a s4 object of class DataFrame
+  # not sure what else is effected...
+  pd <- as.data.frame(colData(scEx))
   if (ncol(pd) < 2) {
     cat(file = stderr(), "phenoData for scEx has less than 2 columns\n")
     return(NULL)
@@ -1806,7 +1808,7 @@ sample <- reactive({
   for (pdColName in colnames(pd)) {
     # in case dbCluster is already in the colData this would create dbCluster.1 later on
     if(pdColName == "dbCluster") next()
-    if (length(levels(factor(pd[, pdColName]))) < 100) {
+    if (length(levels(factor(pd[, pdColName]))) < 30) {
       if (is.null(retVal)) {
         retVal <- data.frame(pd[, pdColName])
         colnames(retVal) <- pdColName
