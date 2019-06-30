@@ -226,6 +226,7 @@ umapReact <- reactive({
   }
   
   scEx_log <- scEx_log()
+  pca <- pca()
   myseed <- input$gQC_um_randSeed
   # xaxis <- input$um_xaxis
   # yaxis <- input$um_yaxis
@@ -271,7 +272,8 @@ umapReact <- reactive({
   # with eg. new seed
   
   set.seed(myseed)
-  embedding <- uwot::umap(t(as.matrix(assays(scEx_log)[[1]])),
+  # embedding <- uwot::umap(t(as.matrix(assays(scEx_log)[[1]])),
+  embedding <- uwot::umap(pca$x,
                           n_neighbors = n_neighbors,
                           n_components = n_components,
                           n_epochs = n_epochs,
