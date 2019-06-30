@@ -27,8 +27,8 @@ inputTab <- shinydashboard::tabItem(
     align = "center"
   )),
   fluidRow(column(
-    5,
-    offset = 3,
+    10,
+    offset = 1,
     fileInput(
       "annoFile",
       "(Not required): Choose .CSV file with annotation to upload",
@@ -41,8 +41,8 @@ inputTab <- shinydashboard::tabItem(
   )),
   br(),
   fluidRow(column(
-    5,
-    offset = 3,
+    8,
+    offset = 2,
     fileInput(
       "file1",
       "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
