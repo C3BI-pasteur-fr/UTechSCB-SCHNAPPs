@@ -7,6 +7,7 @@ menuList <- list(
     tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
     shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
     shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
+    # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
   )
 )
 
@@ -83,7 +84,7 @@ tabList <- list(
         selectInput(
           "DE_dim_x",
           label = "X",
-          choice = c("tsne1", "tsne2", "tsne3"),
+          choices = c("tsne1", "tsne2", "tsne3"),
           selected = "tsne1"
         )
       ),
@@ -92,7 +93,7 @@ tabList <- list(
         selectInput(
           "DE_dim_y",
           label = "Y",
-          choice = c("tsne1", "tsne2", "tsne3"),
+          choices = c("tsne1", "tsne2", "tsne3"),
           selected = "tsne2"
         )
       ),
@@ -107,7 +108,39 @@ tabList <- list(
       jqui_resizable(plotOutput("DE_panelPlot") )
     ))
   ),
-
+  # DE_sortedPlot
+  # shinydashboard::tabItem(
+  #   "DE_sortedPl",
+  #   tags$ul(
+  #     tags$li(
+  #       strong("Sorted plots")
+  #     ),
+  #     fluidRow(
+  #       column(4,
+  #              offset = 1,
+  #              textInput("DE_geneIds", "comma separated list of genes for UmiCountPerGenes", value = "")),
+  #       column(
+  #       4,offset = 1,
+  #       selectInput(
+  #         "DE_dimension_y",
+  #         label = "Y",
+  #         choices = c("tsne1", "tsne2", "before.filter"),
+  #         selected = "before.filter"
+  #       )
+  #     )
+  #     ),fluidRow(
+  #       column(
+  #         10,
+  #         offset = 1,
+  #         jqui_resizable(plotly::plotlyOutput("DE_sortedPlot"))
+  #         # imageOutput("DE_sortedPlot")
+  #       )
+  #     ),
+  #     fluidRow(
+  #       verbatimTextOutput("DE_SelectionText")
+  #     )
+  #   )
+  # ),
   DE_scaterQCTab = shinydashboard::tabItem(
     "DE_scaterQC",
     tags$ul(
