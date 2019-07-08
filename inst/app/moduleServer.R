@@ -297,7 +297,7 @@ clusterServer <- function(input, output, session,
         }
       }
       
-      retVal = retVal[retVal %in% rownames(scEx_log)]
+      retVal = retVal[retVal %in% colnames(scEx_log)]
       printTimeEnd(start.time, "clusterServerReturnVal")
       exportTestValues(clusterServerReturnVal = {
         retVal
