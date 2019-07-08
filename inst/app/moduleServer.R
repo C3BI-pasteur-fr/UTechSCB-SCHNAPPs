@@ -88,6 +88,17 @@ clusterServer <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), paste0("observe: showCells\n"))
     .schnappsEnv$showCells <- input$showCells
   })
+  # clusterServer - observe input$addToGroup ----
+  observe({
+    if (DEBUG) cat(file = stderr(), "observe input$addToGroup \n")
+    if (!is.null(input$addToGroup)) {
+      if (input$addToGroup) {
+        .schnappsEnv$addToGroupValue <- TRUE
+      } else {
+        .schnappsEnv$addToGroupValue <- FALSE
+      }
+    }
+  })
   
   # clusterServer - observe input$groupNames ----
   # if we manually select a group from the list we update the name group field
@@ -449,17 +460,6 @@ clusterServer <- function(input, output, session,
     return(subsetData)
   })
   
-  # clusterServer - observe input$addToGroup ----
-  observe({
-    if (DEBUG) cat(file = stderr(), "observe input$addToGroup \n")
-    if (!is.null(input$addToGroup)) {
-      if (input$addToGroup) {
-        .schnappsEnv$addToGroupValue <- TRUE
-      } else {
-        .schnappsEnv$addToGroupValue <- FALSE
-      }
-    }
-  })
   
   # clusterServer - observe input$changeGroups ----
   observe({
@@ -668,15 +668,15 @@ clusterServer <- function(input, output, session,
     tagList(
       fluidRow(
         column(
-          3,
+          2,
           checkboxInput(ns("logX"), "log transform X", value = FALSE)
         ),
         column(
-          3,
+          2,
           checkboxInput(ns("logY"), "log transform Y", value = FALSE)
         ),
         column(
-          3,
+          2,
           selectInput(
             ns("divideXBy"),
             label = "Divide X by",
@@ -685,7 +685,7 @@ clusterServer <- function(input, output, session,
           )
         ),
         column(
-          3,
+          2,
           selectInput(
             ns("divideYBy"),
             label = "Divide Y by",
