@@ -2,8 +2,8 @@ suppressMessages(library(magrittr))
 
 printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
-  if (DEBUG){
-    cat(file = stderr(), paste("---", messtr,":done", difftime(end.time, start.time, units = "min"), " min\n"))  
+  if (DEBUG) {
+    cat(file = stderr(), paste("---", messtr, ":done", difftime(end.time, start.time, units = "min"), " min\n"))
   }
 }
 
@@ -14,22 +14,23 @@ geneName2Index <- function(g_id, featureData) {
   # start.time <- base::Sys.time()
   on.exit({
     # printTimeEnd(start.time, "geneName2Index")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "geneName2Index")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("geneName2Index", id = "geneName2Index", duration = NULL)
   }
-  
-  if(is.null(g_id)){
+
+  if (is.null(g_id)) {
     return(NULL)
   }
-  
+
   g_id <- toupper(g_id)
   g_id <- gsub(" ", "", g_id, fixed = TRUE)
   g_id <- strsplit(g_id, ",")
   g_id <- g_id[[1]]
-  
+
   notFound <- g_id[!g_id %in% toupper(featureData$symbol)]
   if (length(featureData$symbol) == length(notFound)) {
     # in case there is only one gene that is not available.
@@ -41,12 +42,12 @@ geneName2Index <- function(g_id, featureData) {
     }
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(paste("following genes were not found", notFound, collapse = " "),
-                       id = "moduleNotFound", type = "warning",
-                       duration = 20
+        id = "moduleNotFound", type = "warning",
+        duration = 20
       )
     }
   }
-  
+
   geneid <- rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ])
 
   return(geneid)
@@ -54,7 +55,7 @@ geneName2Index <- function(g_id, featureData) {
 
 
 updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NULL, scEx, projections) {
-  featureData = rowData(scEx)
+  featureData <- rowData(scEx)
   # if ((dimY == "UmiCountPerGenes") | (dimX == "UmiCountPerGenes")) {
   geneNames <- geneName2Index(geneNames, featureData)
   # if (length(geneNames) > 0) {
@@ -106,7 +107,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "Gene.count",
                              colors = NULL) {
   geneid <- geneName2Index(g_id, featureData)
-  
+
   if (length(geneid) == 0) {
     return(NULL)
   }
@@ -122,7 +123,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   #   expression <- Matrix::colSums(exprs(scEx_log)[geneid, ])
   # }
   # validate(need(is.na(sum(expression)) != TRUE, ""))
-  
+
   # geneid <- geneName2Index(geneNames, featureData)
   projections <- updateProjectionsWithUmiCount(
     dimX = dimX, dimY = dimY,
@@ -130,11 +131,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
-  
-  
+
+
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
-  
+
   if (DEBUG) {
     cat(file = stderr(), paste("output$sCA_dge_plot1:---", clId[1], "---\n"))
   }
@@ -148,18 +149,22 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     subsetData$shape <- as.numeric(as.factor(subsetData$sample))
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(ls(), "legend.position",
-                                                              ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(
+      ls(), "legend.position",
+      ls(envir = globalenv())
+    ))
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
-  if (nrow(subsetData) == 0) return(NULL)
+  if (nrow(subsetData) == 0) {
+    return(NULL)
+  }
   # subsetData$shape = as.factor(1)
   gtitle <- paste(g_id, clId, sep = "-Cluster", collapse = " ")
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
-  
+
   suppressMessages(require(plotly))
   f <- list(
     family = "Courier New, monospace",
@@ -172,7 +177,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (divYBy != "None") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
   }
-  
+
   typeX <- typeY <- "linear"
   if (logx) {
     typeX <- "log"
@@ -196,39 +201,42 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     titlefont = f,
     type = typeY
   )
-  
-  
-  if (is.factor(subsetData[,dimX])) {
-    subsetData[,dimX] = as.character(subsetData[,dimX])
+
+
+  if (is.factor(subsetData[, dimX])) {
+    subsetData[, dimX] <- as.character(subsetData[, dimX])
   }
-  if (is.factor(subsetData[,dimY])) {
-    subsetData[,dimY] = as.character(subsetData[,dimY])
+  if (is.factor(subsetData[, dimY])) {
+    subsetData[, dimY] <- as.character(subsetData[, dimY])
   }
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
-  p1 <- plotly::plot_ly(data = subsetData, source = "subset",
-                        key = rownames(subsetData)) %>%
-    add_trace(x = ~ get(dimX)
-              ,y = ~ get(dimY),  
-              type = "scatter" ,mode = "markers"
-              ,text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs)
-              ,color = ~ get(dimCol)
-              ,colors = colors
-              ,showlegend =  TRUE
-    ) %>% 
+  p1 <- plotly::plot_ly(
+    data = subsetData, source = "subset",
+    key = rownames(subsetData)
+  ) %>%
+    add_trace(
+      x = ~ get(dimX),
+      y = ~ get(dimY),
+      type = "scatter", mode = "markers",
+      text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+      color = ~ get(dimCol),
+      colors = colors,
+      showlegend = TRUE
+    ) %>%
     layout(
       xaxis = xAxis,
       yaxis = yAxis,
       title = gtitle,
       dragmode = "select"
-    )     
-  if( is.factor(subsetData[,dimCol]) ) {
-    
+    )
+  if (is.factor(subsetData[, dimCol])) {
+
   } else {
-    p1 = colorbar(p1, title = dimCol)
+    p1 <- colorbar(p1, title = dimCol)
   }
-  
+
   selectedCells <- NULL
   if (length(grpN) > 0) {
     if (length(grpNs[rownames(subsetData), grpN]) > 0 & sum(grpNs[rownames(subsetData), grpN], na.rm = TRUE) > 0) {
@@ -243,7 +251,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     x1 <- subsetData[selectedCells, dimX, drop = FALSE]
     y1 <- subsetData[selectedCells, dimY, drop = FALSE]
     p1 <- p1 %>%
-      add_trace(data = subsetData[selectedCells, ],
+      add_trace(
+        data = subsetData[selectedCells, ],
         x = x1[, 1], y = y1[, 1],
         marker = list(
           color = rep("red", nrow(x1)),
@@ -322,18 +331,17 @@ DiffExpTest <- function(expression, cells.1, cells.2, genes.use = NULL, print.ba
 
 
 heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
-  
   addColNames <- input[[paste0(moduleName, "-ColNames")]]
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
   moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
   colTree <- input[[paste0(moduleName, "-showColTree")]]
-  
+
   if (is.null(heatmapData) | is.null(projections) | is.null(heatmapData$mat)) {
     return(NULL)
   }
-  
+
   heatmapData$filename <- NULL
-  
+
   if (length(addColNames) > 0 & moreOptions) {
     heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
   }
@@ -345,40 +353,38 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
     # return()
   }
   if (moreOptions) {
-    heatmapData$cluster_cols = colTree
+    heatmapData$cluster_cols <- colTree
   }
   heatmapData$fontsize <- 14
   system.time(do.call(TRONCO::pheatmap, heatmapData))
-  
 }
 
 # twoDplotFromModule ----
 #' function to be used in markdown docs to ease the plotting of the clusterServer module
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
-
-    grpNs <- groupNames$namesDF
+  grpNs <- groupNames$namesDF
   grpN <- make.names(input$groupName)
-  
-  dimY <- input[[paste0(moduleName,"-dimension_y")]]
-  dimX <- input[[paste0(moduleName,"-dimension_x")]]
-  dimCol <- input[[paste0(moduleName,"-dimension_col")]]
-  clId <- input[[paste0(moduleName,"-clusters")]]
 
-  geneNames <- input[[paste0(moduleName,"-geneIds")]]
-  geneNames2 <- input[[paste0(moduleName,"-geneIds2")]]
-  logx <- input[[paste0(moduleName,"-logX")]]
-  logy <- input[[paste0(moduleName,"-logY")]]
-  divXBy <- input[[paste0(moduleName,"-divideXBy")]]
-  divYBy <- input[[paste0(moduleName,"-divideYBy")]]
+  dimY <- input[[paste0(moduleName, "-dimension_y")]]
+  dimX <- input[[paste0(moduleName, "-dimension_x")]]
+  dimCol <- input[[paste0(moduleName, "-dimension_col")]]
+  clId <- input[[paste0(moduleName, "-clusters")]]
+
+  geneNames <- input[[paste0(moduleName, "-geneIds")]]
+  geneNames2 <- input[[paste0(moduleName, "-geneIds2")]]
+  logx <- input[[paste0(moduleName, "-logX")]]
+  logy <- input[[paste0(moduleName, "-logY")]]
+  divXBy <- input[[paste0(moduleName, "-divideXBy")]]
+  divYBy <- input[[paste0(moduleName, "-divideYBy")]]
   scols <- sampleCols$colPal
   ccols <- clusterCols$colPal
-  
-  
+
+
   if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
     return(NULL)
   }
-  
+
   featureData <- rowData(scEx_log)
   if (is.null(g_id) || nchar(g_id) == 0) {
     g_id <- featureData$symbol
@@ -387,8 +393,8 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (is.null(logy)) logy <- FALSE
   if (is.null(divXBy)) divXBy <- "None"
   if (is.null(divYBy)) divYBy <- "None"
-  
- 
+
+
   if (dimCol == "sampleNames") {
     myColors <- scols
   } else {
@@ -397,11 +403,113 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (dimCol == "dbCluster") {
     myColors <- ccols
   }
-  
+
   p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
-                         geneNames2, dimX, dimY, clId, grpN, legend.position,
-                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+    geneNames2, dimX, dimY, clId, grpN, legend.position,
+    grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
   )
   return(p1)
-  
+}
+
+###### caching ----
+
+# return values:    status = ["finished", "running", "error", "new" ]
+#                   message = running message (or error)
+#                   retVal = return value
+checkShaCache <- function(moduleName = "traj_elpi_modules",
+                          moduleParameters = list(
+                            scEx_log, projections, TreeEPG,
+                            elpimode, gene_sel, seed
+                          )) {
+  require(digest)
+  retVal <- NULL
+  message <- ""
+  status <- "new"
+
+  shaStr <- ""
+  idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
+  infile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
+  if (!file.exists("schnappsCache")) {
+    dir.create("schnappsCache")
+  }
+  if (!dir.exists("schnappsCache")) {
+    error("cache directory is not a directory")
+  }
+  # nothing has been done so far
+  if (!file.exists(infile)) {
+    return(list(status = status, message = message, retVal = retVal))
+  }
+  # now we know that there is a result, check if it is the right one.
+  message(paste("\nloading cache", idStr,"\n"))
+  cp <- load(infile)
+  if (!all(c("message", "retVal", "status") %in% cp)) {
+    message <- "not all required values returned by cache function"
+    return(list(status = status, message = message, retVal = retVal))
+  }
+  # check if number of objects is the same
+  # moduleParameters
+  # + message
+  # + retVal
+  # + status
+  # + list(moduleParameters)
+  if (length(cp) != 4) {
+    # now we have problem: same sha but different input
+  }
+  # all values are set in writeShaCache
+  return(list(status = status, message = message, retVal = retVal))
+}
+
+# writeShaCache ---
+# write return values to cache directory
+writeShaCache <- function(moduleName = "",
+                          moduleParameters = list(),
+                          retVal = NULL,
+                          status = "error",
+                          message = "") {
+  require(digest)
+  idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
+  outfile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
+  if (!file.exists("schnappsCache")) {
+    dir.create("schnappsCache")
+  }
+  if (!dir.exists("schnappsCache")) {
+    error("cache directory is not a directory")
+  }
+  save(file = outfile, list = c(
+    "message", "retVal", "status", "moduleParameters"
+  ))
+}
+
+
+getshaStr <- function(moduleParameters) {
+  shaStr <- ""
+  idx <- 1
+  for (md in moduleParameters) {
+    # print(class(md))
+    # print(idx); idx=idx+1
+    shaStr <- paste(
+      shaStr,
+      tryCatch(sha1(md, digits = 14),
+        warning = function(x) {
+          # print("warning")
+          # print(x)
+          # print(idx)
+          return(
+            sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+          )
+        },
+        error = function(x) {
+          if (class(md) == "SingleCellExperiment") {
+            return(sha1(as.matrix(assays(md)[[1]])))
+          } else {
+            print(idx)
+            return(
+              sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+            )
+          }
+        }
+      )
+    )
+  }
+  return(sha1(shaStr))
 }

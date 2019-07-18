@@ -1224,6 +1224,13 @@ scEx_log <- reactive({
   return(scEx_log)
 })
 
+
+scEx_log_sha <- reactive({
+  scEx_log <- scEx_log()
+  if (is.null(scEx_log)) 
+    return(NULL)
+  return(sha1(as.matrix(assays(scEx_log)[[1]])))
+})
 # scExLogMatrixDisplay ----
 # scExLog matrix with symbol as first column
 # TODO
