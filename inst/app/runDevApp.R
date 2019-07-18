@@ -6,8 +6,9 @@
   .schnappsEnv <- new.env(parent=emptyenv())
 # }
 
-localContributionDir = "~/Rstudio/shHubgit/Dummy/"
-defaultValueSingleGene = "LYZ"
+  localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
+  # localContributionDir = ""
+  defaultValueSingleGene = "LYZ"
 defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
@@ -33,6 +34,7 @@ source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
+
 runApp(app)
 
 # schnapps(
