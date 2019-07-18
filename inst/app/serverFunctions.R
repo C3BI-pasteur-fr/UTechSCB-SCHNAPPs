@@ -201,10 +201,20 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     titlefont = f,
     type = typeY
   )
+<<<<<<< HEAD
 
 
   if (is.factor(subsetData[, dimX])) {
     subsetData[, dimX] <- as.character(subsetData[, dimX])
+=======
+  if (dimX == "barcode") {
+    subsetData$"__dimXorder" = rank(subsetData[,dimY])
+    dimX = "__dimXorder"
+  }
+  
+  if (is.factor(subsetData[,dimX])) {
+    subsetData[,dimX] = as.character(subsetData[,dimX])
+>>>>>>> 3a1c57cfcf959e360f4e824a11faa60102177569
   }
   if (is.factor(subsetData[, dimY])) {
     subsetData[, dimY] <- as.character(subsetData[, dimY])
@@ -212,6 +222,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
+<<<<<<< HEAD
   p1 <- plotly::plot_ly(
     data = subsetData, source = "subset",
     key = rownames(subsetData)
@@ -225,14 +236,35 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       colors = colors,
       showlegend = TRUE
     ) %>%
+=======
+
+    p1 <- plotly::plot_ly(data = subsetData, source = "subset",
+                          key = rownames(subsetData)) %>%
+    add_trace(x = ~ get(dimX)
+              ,y = ~ get(dimY),  
+              type = "scatter" ,mode = "markers"
+              ,text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs)
+              ,color = ~ get(dimCol)
+              ,colors = colors
+              ,showlegend =  TRUE
+    ) %>% 
+>>>>>>> 3a1c57cfcf959e360f4e824a11faa60102177569
     layout(
       xaxis = xAxis,
       yaxis = yAxis,
       title = gtitle,
       dragmode = "select"
+<<<<<<< HEAD
     )
   if (is.factor(subsetData[, dimCol])) {
 
+=======
+    )     
+  
+  
+  if ( is.factor(subsetData[,dimCol]) ) {
+    
+>>>>>>> 3a1c57cfcf959e360f4e824a11faa60102177569
   } else {
     p1 <- colorbar(p1, title = dimCol)
   }

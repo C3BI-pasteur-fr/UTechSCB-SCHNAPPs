@@ -115,7 +115,7 @@ coE_heatmapSelectedReactive <- reactive({
   scCells <- sc$selectedCells() # [1] "AAACCTGAGACACTAA-1" "AAACCTGAGACGACGT-1" "AAACCTGAGTCAAGCG-1" "AAACCTGCAAGAAGAG-1" "AAACCTGCAGACAGGT-1" "AAACCTGCATACAGCT-1" "AAACCTGGTGTGACCC-1"
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
-  
+ 
   if (is.null(scEx_log) ||
       is.null(projections) || is.null(scCells) || length(scCells) == 0) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
