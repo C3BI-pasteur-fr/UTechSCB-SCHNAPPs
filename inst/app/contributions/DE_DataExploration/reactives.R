@@ -20,7 +20,7 @@ DE_scaterPNG <- reactive({
 
   runScater <- input$runScater
   # takes too long, commenting out for course
-  #if (!runScater) {
+  if (!runScater) {
     return(list(
       src = "",
       contentType = "image/png",
@@ -28,7 +28,7 @@ DE_scaterPNG <- reactive({
       height = 10,
       alt = "Scater plot will be here when 'run scater' is checked"
     ))
-  #}
+  }
   scaterReads <- scaterReads()
   if (is.null(scaterReads)) {
     return(NULL)
@@ -189,3 +189,8 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
   
   return(p1)
 }
+
+# DE_selectedCells <- reactiveValues(
+#   selectedCells <- ""
+# )
+
