@@ -1227,6 +1227,7 @@ scEx_log <- reactive({
 
 scEx_log_sha <- reactive({
   scEx_log <- scEx_log()
+  require(digest)
   if (is.null(scEx_log)) 
     return(NULL)
   return(sha1(as.matrix(assays(scEx_log)[[1]])))
