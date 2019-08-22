@@ -2186,7 +2186,8 @@ reacativeReport <- function() {
       "projections",
       "scEx_log",
       "scEx",
-      "report.env"
+      "report.env",
+      ".schnappsEnv"
     )
   )
   userDataEnv <-
@@ -2244,6 +2245,15 @@ reacativeReport <- function() {
            collapse = "\n"
     )
   
+  # we load this twice since we need .schnappsEnv here for the first time...
+  reactiveFiles <-
+    paste0(
+      reactiveFiles,
+      "#load internal data\nload(file=\"",
+      tmpPrjFile,
+      "\")\nfor (n in names(report.env)) {assign(n,report.env[[n]])}\n",
+      collapse = "\n"
+    )
   # Projections -----
   # projections can contain mannually annotated groups of cells and different normalizations.
   # to reduce complexity we are going to save those in a separate RData file

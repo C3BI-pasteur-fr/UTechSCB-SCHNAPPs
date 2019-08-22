@@ -22,7 +22,7 @@ if(exists("params")){
   require(DT)
   require(pheatmap)
   require(threejs)
-  require(sm)
+  # require(sm)
   require(RColorBrewer)
   require(mclust)
   require(reshape2)

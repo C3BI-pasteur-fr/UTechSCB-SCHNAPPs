@@ -43,7 +43,6 @@ Imports:
     colourpicker,
     igraph,
     threejs,
-    sm,
     RColorBrewer,
     mclust,
     vipor,
@@ -77,7 +76,8 @@ Imports:
     rmarkdown,
     pryr
 Suggests:
-    testthat
+    testthat,
+    sm
 RoxygenNote: 6.1.1
 URL: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs
 BugReports: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues
