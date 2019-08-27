@@ -680,7 +680,7 @@ clusterServer <- function(input, output, session,
           selectInput(
             ns("divideXBy"),
             label = "Divide X by",
-            choices = c("None", "Gene.Count", "UMI.Count"),
+            choices = c("None", "Gene.count", "UMI.count"),
             selected = "None"
           )
         ),
@@ -689,7 +689,7 @@ clusterServer <- function(input, output, session,
           selectInput(
             ns("divideYBy"),
             label = "Divide Y by",
-            choices = c("None", "Gene.Count", "UMI.Count"),
+            choices = c("None", "Gene.count", "UMI.count"),
             selected = "None"
           )
         )
