@@ -72,7 +72,7 @@ tabList <- list(
         strong("MULTIPLE"),
         "gene ids to visualize expression in all clusters"
       ),
-      tags$li("If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to the count for that gene. Otherwise, all genes are used")
+      tags$li("If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to the count for that gene. Otherwise, all genes are used. Only in this case the check box 'same scale' is used.")
     ),
     fluidRow(
       column(
@@ -101,6 +101,10 @@ tabList <- list(
         2,
 
         textInput("DE_panelplotids", "Comma seperated gene names", value = defaultValueMultiGenes)
+      ),
+      column(
+        2,
+        checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
       )
     ),
     fluidRow(column(
