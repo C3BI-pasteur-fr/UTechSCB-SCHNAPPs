@@ -156,6 +156,7 @@ output$DE_panelPlot <- renderPlot({
   cl4 <- input$DE_clusterSelectionPanelPlot
   dimx4 <- input$DE_dim_x
   dimy4 <- input$DE_dim_y
+  sameScale <- input$DE_panelplotSameScale
   
   if (is.null(scEx_log) | is.null(projections) | is.null(cl4)) {
     return(NULL)
@@ -184,6 +185,9 @@ output$DE_panelPlot <- renderPlot({
       ymax <- max(ymax, max(Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])))
     }
     ylim <- c(0, ymax)
+    if(!sameScale){
+      ylim <- NULL
+    }
   }
   if (cl4 == "All") {
     for (i in 1:length(genesin)) {
