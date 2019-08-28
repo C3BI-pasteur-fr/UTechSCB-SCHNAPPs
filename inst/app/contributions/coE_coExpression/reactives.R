@@ -289,7 +289,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
     return(NULL)
   }
   
-  expression <- Matrix::colSums(assays(scEx)[[1]][map, ] >= minExpr)
+  expression <- Matrix::colSums(assays(scEx)[[1]][map, ,drop=F] >= minExpr)
   ylabText <- "number genes from list"
   
   if (coE_showPermutations) {
