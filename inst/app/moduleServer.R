@@ -399,12 +399,12 @@ clusterServer <- function(input, output, session,
     if (is.null(divXBy)) divXBy <- "None"
     if (is.null(divYBy)) divYBy <- "None"
     # TODO returns a table but is not used
-    updateProjectionsWithUmiCount(
-      dimX = dimX, dimY = dimY,
-      geneNames = geneNames,
-      geneNames2 = geneNames2,
-      scEx = scEx_log, projections = tdata
-    )
+    # updateProjectionsWithUmiCount(
+    #   dimX = dimX, dimY = dimY,
+    #   geneNames = geneNames,
+    #   geneNames2 = geneNames2,
+    #   scEx = scEx_log, projections = tdata
+    # )
     if (dimCol == "sampleNames") {
       myColors <- scols
     } else {
@@ -639,6 +639,7 @@ clusterServer <- function(input, output, session,
     moreOptions <- input$moreOptions
     # groupNs <- groupNames$namesDF
     grpNs <- groupNames$namesDF
+    projections <- projections()
     if (!moreOptions) {
       if (DEBUG) cat(file = stderr(), "additionalOptions NULL\n")
       groupName <<- ""
@@ -680,7 +681,8 @@ clusterServer <- function(input, output, session,
           selectInput(
             ns("divideXBy"),
             label = "Divide X by",
-            choices = c("None", "Gene.count", "UMI.count"),
+            # choices = c("None", "Gene.count", "UMI.count"),
+            choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
             selected = "None"
           )
         ),
@@ -689,7 +691,8 @@ clusterServer <- function(input, output, session,
           selectInput(
             ns("divideYBy"),
             label = "Divide Y by",
-            choices = c("None", "Gene.count", "UMI.count"),
+            # choices = c("None", "Gene.count", "UMI.count"),
+            choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
             selected = "None"
           )
         )
