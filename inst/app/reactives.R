@@ -698,7 +698,6 @@ useCellsFunc <-
     }
     
     #### end: cells with genes expressed
-    
     return(goodCols)
   }
 
@@ -1080,7 +1079,13 @@ scExFunc <-
       )
       return(NULL)
     }
-    
+    # cells with same expression pattern
+    # save(file = "~/SCHNAPPsDebug/scEx3.RData", list = c(ls(), ls(envir = globalenv())))
+    # load(file = "~/SCHNAPPsDebug/scEx3.RData")
+    # which(duplicated(as.matrix(assays(scExOrg[keepGenes, keepCells])[[1]])))
+    # which(duplicated(as.matrix(assays(scEx)[[1]])))
+    # 
+    # sum(duplicated(t(as.matrix(assays(scExOrg[keepGenes, keepCells])[[1]]))))
     # if something changed, check that it doesn't change again
     scExNew <- scExOrg[keepGenes, keepCells]
     if (changed) {
@@ -1154,6 +1159,7 @@ scEx <- reactive({
     minG = minG,
     maxG = maxG
   )
+  
   
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
@@ -1461,12 +1467,23 @@ scranCluster <- function(pca,
       params$subset.row <- geneid
     }
   }
-  
+  require(scran)
   retVal <- tryCatch({
     suppressMessages(do.call("quickCluster", params))
   },
   error = function(e) {
-    cat(file = stderr(), paste("\nProblem with clustering", e, "\n\n"))
+    cat(file = stderr(), paste("\nProblem with clustering:\n\n",as.character(e), "\n\n"))
+    if (grepl("rank variances of zero", as.character(e))) {
+      if (useRanks){
+        if (!is.null(getDefaultReactiveDomain())) {
+          showNotification("quickClusterError", id = "quickClusterError", type="error", duration = NULL)
+        }
+        cat(file = stderr(),"\nNot using ranks due to identical ranks\n")
+        params$use.ranks = F
+        return(do.call("quickCluster", params))
+      }
+      cat(file = stderr(),"\nRemove duplicated cells\n")
+    }
     return(NULL)
   },
   warning = function(e) {
@@ -1556,6 +1573,7 @@ scran_Cluster <- reactive({
       id = "dbClusterError",
       duration = NULL
     )
+    exit()
   }
   
   exportTestValues(scran_Cluster = {
