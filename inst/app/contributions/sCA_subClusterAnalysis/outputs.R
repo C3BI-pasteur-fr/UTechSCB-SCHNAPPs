@@ -22,8 +22,9 @@ sCA_dgeTableReac <- reactive({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "sCA_dgeTableReac")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "sCA_dgeTableReac")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dgeTableReac", id = "sCA_dgeTableReac", duration = NULL)
@@ -46,20 +47,25 @@ sCA_dgeTableReac <- reactive({
   if ("Description" %in% colnames(featureData)) {
     top.genes$Description <- featureData[rownames(top.genes), "Description"]
   }
-  rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep="___")
+  rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "___")
   if (dim(top.genes)[1] > 0) {
+    # change inf to high/low number
+    infIdx <- which(is.infinite(top.genes$avg_diff))
+    top.genes$avg_diff[top.genes$avg_diff[infIdx] > 0] <- 9999999
+    top.genes$avg_diff[top.genes$avg_diff[infIdx] < 0] <- -9999999
+    top.genes$Description[is.na(top.genes$Description)] = ""
     return(top.genes)
   } else {
     return(NULL)
   }
-
 })
 
 # dge table ----
 callModule(
   tableSelectionServer,
   "sCA_dgeTable",
-  sCA_dgeTableReac)
+  sCA_dgeTableReac
+)
 
 
 # sub cluster analysis ( used for 2 panels )
@@ -68,8 +74,9 @@ output$sCA_dgeClustersSelection <- renderUI({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "sCA_dgeClustersSelection")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "sCA_dgeClustersSelection")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dgeClustersSelection", id = "sCA_dgeClustersSelection", duration = NULL)
@@ -86,7 +93,7 @@ output$sCA_dgeClustersSelection <- renderUI({
 
 
   if (is.null(projections)) {
-    tags$span(style="color:red", "Please load data first")
+    tags$span(style = "color:red", "Please load data first")
   } else {
     noOfClusters <- levels(as.factor(projections$dbCluster))
     # noOfClusters <- max(as.numeric(as.character(projections$dbCluster)))
@@ -99,7 +106,3 @@ output$sCA_dgeClustersSelection <- renderUI({
     )
   }
 })
-
-
-
-
