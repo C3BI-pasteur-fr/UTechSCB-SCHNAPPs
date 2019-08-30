@@ -185,10 +185,10 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (logy) {
     typeY <- "log"
   }
-  if (is.factor(subsetData[, dimX])) {
+  if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
     typeX <- NULL
   }
-  if (is.factor(subsetData[, dimY])) {
+  if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
     typeY <- NULL
   }
   xAxis <- list(
@@ -206,10 +206,10 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     dimX = "__dimXorder"
   }
   
-  if (is.factor(subsetData[,dimX])) {
+  if (is.factor(subsetData[,dimX])| is.logical(subsetData[, dimX])) {
     subsetData[,dimX] = as.character(subsetData[,dimX])
   }
-  if (is.factor(subsetData[, dimY])) {
+  if (is.factor(subsetData[, dimY])| is.logical(subsetData[, dimY])) {
     subsetData[, dimY] <- as.character(subsetData[, dimY])
   }
   # dimCol = "Gene.count"
@@ -219,8 +219,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     p1 <- plotly::plot_ly(data = subsetData, source = "subset",
                           key = rownames(subsetData)) %>%
     add_trace(x = ~ get(dimX)
-              ,y = ~ get(dimY),  
-              type = "scatter" ,mode = "markers"
+              ,y = ~ get(dimY)  
+              ,type = "scatter" ,mode = "markers"
               ,text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs)
               ,color = ~ get(dimCol)
               ,colors = colors
