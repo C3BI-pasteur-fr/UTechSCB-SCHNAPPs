@@ -665,7 +665,7 @@ clusterServer <- function(input, output, session,
     }
     # load(file="~/SCHNAPPsDebug/additionalOptions.RData")
     
-
+    
     tagList(
       fluidRow(
         column(
@@ -919,18 +919,20 @@ tableSelectionServer <- function(input, output, session,
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
       dataTables <- as.data.frame(dataTables[, cols2disp])
-      return(DT::datatable(dataTables,
-                           rownames = F,
-                           filter = "top",
-                           selection = list(mode = "multiple", selected = modSelectedRows),
-                           options = list(
-                             orderClasses = TRUE,
-                             autoWidth = TRUE,
-                             scrollX = TRUE,
-                             stateSave = TRUE,
-                             order = colOrder
-                           )
-      ))
+      return(
+        DT::datatable(dataTables,
+                      rownames = F,
+                      filter = "top",
+                      selection = list(mode = "multiple", selected = modSelectedRows),
+                      options = list(
+                        orderClasses = TRUE,
+                        autoWidth = TRUE,
+                        scrollX = TRUE,
+                        stateSave = TRUE
+                        ,order = colOrder
+                      )
+        )
+      )
     } else {
       return(warning("test"))
     }
