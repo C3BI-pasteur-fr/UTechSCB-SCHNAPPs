@@ -790,6 +790,8 @@ tableSelectionServer <- function(input, output, session,
   ns <- session$ns
   modSelectedRows <- c()
   colOrder <- list()
+  searchStr <- ""
+  colState <- list()
   
   output$cellSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
@@ -873,8 +875,15 @@ tableSelectionServer <- function(input, output, session,
   
   observe({
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
+    # browser()
     colOrder <<- input$cellNameTable_state$order
+    colState <<- input$cellNameTable_state
   })
+  
+  # observe({
+  #   if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
+  #   searchStr <<- input$cellNameTable_state$order
+  # })
   
   output$cellNameTable <- DT::renderDT({
     if (DEBUG) cat(file = stderr(), "output$cellNameTable\n")
@@ -893,7 +902,7 @@ tableSelectionServer <- function(input, output, session,
     ns <- session$ns
     reorderCells <- input$reorderCells
     selectedRows <- input$cellNameTable_rows_selected
-    
+    searchStr <- 
     if (is.null(dataTables)) {
       return(NULL)
     }
@@ -919,18 +928,22 @@ tableSelectionServer <- function(input, output, session,
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
       dataTables <- as.data.frame(dataTables[, cols2disp])
+      if (length(colState) == 0) {
+        colState = list(
+          orderClasses = TRUE,
+          autoWidth = TRUE,
+          scrollX = TRUE,
+          search = list(search = searchStr),
+          stateSave = TRUE
+          ,order = colOrder
+        )
+      }
       return(
         DT::datatable(dataTables,
                       rownames = F,
                       filter = "top",
                       selection = list(mode = "multiple", selected = modSelectedRows),
-                      options = list(
-                        orderClasses = TRUE,
-                        autoWidth = TRUE,
-                        scrollX = TRUE,
-                        stateSave = TRUE
-                        ,order = colOrder
-                      )
+                      options = colState
         )
       )
     } else {
