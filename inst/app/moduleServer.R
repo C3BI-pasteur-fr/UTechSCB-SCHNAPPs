@@ -788,10 +788,13 @@ tableSelectionServer <- function(input, output, session,
                                  dataTab) {
   if (DEBUG) cat(file = stderr(), paste("tableSelectionServer", session$ns("test"), "\n"))
   ns <- session$ns
-  modSelectedRows <- c()
-  colOrder <- list()
-  searchStr <- ""
-  colState <- list()
+  # modSelectedRows <- c()
+  # colOrder <- list()
+  # searchStr <- ""
+  # colState <- list()
+  assign(ns("colState"), list(), envir = .schnappsEnv)
+  assign(ns("colOrder"), list(), envir = .schnappsEnv)
+  assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   
   output$cellSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
@@ -870,14 +873,17 @@ tableSelectionServer <- function(input, output, session,
   # })
   observe({
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_rows_selected\n")
-    modSelectedRows <<- input$cellNameTable_rows_selected
+    assign(ns("modSelectedRows"), input$cellNameTable_rows_selected, envir = .schnappsEnv)
   })
   
   observe({
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
     # browser()
-    colOrder <<- input$cellNameTable_state$order
-    colState <<- input$cellNameTable_state
+    # colOrder <<- input$cellNameTable_state$order
+    # colState <<- input$cellNameTable_state
+    assign(ns("colState"), input$cellNameTable_state, envir = .schnappsEnv)
+    assign(ns("colOrder"), input$cellNameTable_state$order, envir = .schnappsEnv)
+    tmp <- input$cellNameTable_state$search
   })
   
   # observe({
@@ -902,13 +908,14 @@ tableSelectionServer <- function(input, output, session,
     ns <- session$ns
     reorderCells <- input$reorderCells
     selectedRows <- input$cellNameTable_rows_selected
-    searchStr <- 
+    # searchStr <- 
     if (is.null(dataTables)) {
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."),
+        # list = c(ls(), ls(envir = globalenv()),ls(envir = .schnappsEnv))
         list = c(ls(), ls(envir = globalenv()))
       )
     }
@@ -928,22 +935,38 @@ tableSelectionServer <- function(input, output, session,
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
       dataTables <- as.data.frame(dataTables[, cols2disp])
+      colState <- get (ns("colState"), envir = .schnappsEnv)
       if (length(colState) == 0) {
         colState = list(
           orderClasses = TRUE,
           autoWidth = TRUE,
           scrollX = TRUE,
-          search = list(search = searchStr),
+          # search = list(search = searchStr),
           stateSave = TRUE
-          ,order = colOrder
+          ,order = get (ns("colOrder"), envir = .schnappsEnv)
         )
+        searchColList =list()
+      } else {
+        searchColList =list()
+        for (cIdx in 1:length(colState$columns)){
+          searchColList[[cIdx]] = colState$columns[[cIdx]]$search
+        }
       }
+      # if (DEBUG) cat(file = stderr(), paste(colState$search,"\n"))
       return(
         DT::datatable(dataTables,
                       rownames = F,
                       filter = "top",
-                      selection = list(mode = "multiple", selected = modSelectedRows),
-                      options = colState
+                      selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
+                      options = list(
+                        orderClasses = TRUE,
+                        autoWidth = TRUE,
+                        scrollX = TRUE,
+                        search = colState$search,
+                        searchCols = searchColList
+                        ,stateSave = TRUE
+                        ,order = get (ns("colOrder"), envir = .schnappsEnv)
+                      )
         )
       )
     } else {
