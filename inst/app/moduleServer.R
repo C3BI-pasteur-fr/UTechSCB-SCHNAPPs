@@ -1119,14 +1119,15 @@ pHeatMapModule <- function(input, output, session,
     heatmapData$fontsize <- 14
     # heatmapData$fontsize_row = 18
     # heatmapData$filename=NULL
-    if (nrow(heatmapData$mat) > 100) {
+    if (nrow(heatmapData$mat) > 1000) {
       showNotification(
-        "more than 100 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
+        "more than 1000 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
         id = "pHeatMapPlotWARNING",
         type = "warning",
         duration = 20
       )
-      heatmapData$mat <- heatmapData$mat[1:100, ]
+      heatmapData$mat <- heatmapData$mat[1:1000, ]
+      heatmapData$gaps_row <- heatmapData$gaps_row[heatmapData$gaps_row <1000]
     }
     if (nrow(heatmapData$mat) == 0) {
       return(list(
@@ -1139,6 +1140,8 @@ pHeatMapModule <- function(input, output, session,
     }
     
     do.call(TRONCO::pheatmap, heatmapData)
+    # library(seriation)
+    # hm <- hmap(x, method = "HC_ward", main = "HC_ward")
     
     pixelratio <- session$clientData$pixelratio
     if (is.null(pixelratio)) pixelratio <- 1
