@@ -202,40 +202,43 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     type = typeY
   )
   if (dimX == "barcode") {
-    subsetData$"__dimXorder" = rank(subsetData[,dimY])
-    dimX = "__dimXorder"
+    subsetData$"__dimXorder" <- rank(subsetData[, dimY])
+    dimX <- "__dimXorder"
   }
-  
-  if (is.factor(subsetData[,dimX])| is.logical(subsetData[, dimX])) {
-    subsetData[,dimX] = as.character(subsetData[,dimX])
+
+  if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
+    subsetData[, dimX] <- as.character(subsetData[, dimX])
   }
-  if (is.factor(subsetData[, dimY])| is.logical(subsetData[, dimY])) {
+  if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
     subsetData[, dimY] <- as.character(subsetData[, dimY])
   }
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
 
-    p1 <- plotly::plot_ly(data = subsetData, source = "subset",
-                          key = rownames(subsetData)) %>%
-    add_trace(x = ~ get(dimX)
-              ,y = ~ get(dimY)  
-              ,type = "scatter" ,mode = "markers"
-              ,text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs)
-              ,color = ~ get(dimCol)
-              ,colors = colors
-              ,showlegend =  TRUE
-    ) %>% 
+  p1 <- plotly::plot_ly(
+    data = subsetData, source = "subset",
+    key = rownames(subsetData)
+  ) %>%
+    add_trace(
+      x = ~ get(dimX),
+      y = ~ get(dimY),
+      type = "scatter", mode = "markers",
+      text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+      color = ~ get(dimCol),
+      colors = colors,
+      showlegend = TRUE
+    ) %>%
     layout(
       xaxis = xAxis,
       yaxis = yAxis,
       title = gtitle,
       dragmode = "select"
-    )     
-  
-  
-  if ( is.factor(subsetData[,dimCol]) ) {
-    
+    )
+
+
+  if (is.factor(subsetData[, dimCol])) {
+
   } else {
     p1 <- colorbar(p1, title = dimCol)
   }
@@ -270,6 +273,22 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         name = "selected",
         key = rownames(subsetData[selectedCells, ])
       )
+  }
+  # add density on y-axis if sorted by barcode
+  if (dimX == "__dimXorder") {
+    density <- stats::density(subsetData[, dimY], na.rm = T)
+    library(MASS)
+    fit <- fitdistr(subsetData[!is.na(subsetData[, dimY]), dimY], "normal", na.rm = T)
+    hline <- function(y, dash) {
+      list(type = "line", x0 = 0, x1 = 1, xref = "paper", y0 = y, y1 = y, line = list(dash = dash))
+    }
+    p1 <- p1 %>% layout(shapes = list(
+      hline(fit$estimate[1], "dash"),
+      # hline(fit$estimate[1] + fit$estimate[2]),
+      # hline(fit$estimate[1] - fit$estimate[2]),
+      hline(fit$estimate[1] + 3 * fit$estimate[2], "dot"),
+      hline(fit$estimate[1] - 3 * fit$estimate[2], "dot")
+    ))
   }
   p1
 }
@@ -443,7 +462,7 @@ checkShaCache <- function(moduleName = "traj_elpi_modules",
     return(list(status = status, message = message, retVal = retVal))
   }
   # now we know that there is a result, check if it is the right one.
-  message(paste("\nloading cache", idStr,"\n"))
+  message(paste("\nloading cache", idStr, "\n"))
   cp <- load(infile)
   if (!all(c("message", "retVal", "status") %in% cp)) {
     message <- "not all required values returned by cache function"
