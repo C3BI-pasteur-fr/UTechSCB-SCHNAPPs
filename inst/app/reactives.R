@@ -61,6 +61,13 @@ inputDataFunc <- function(inFile) {
     if (exists(v)) rm(v)
   }
   fpLs <- tryCatch(load(fp), error = function(e) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Error reading input file!!", id = "inputDataFuncERROR", 
+                       type = "error", duration = NULL)
+    }
+    if (DEBUG) {
+      cat(file = stderr(), "\n\nERROR reading data.\n\n\n")
+    }
     NULL
   })
   
@@ -421,8 +428,8 @@ inputData <- reactive({
   }
   # load(file='~/SCHNAPPsDebug/inputData.RData')
   
-  # inFile$datapath = "data/scEx.RData"
-  # annFile$datapath = "data/scExGenesRowNames.csv"
+  # inFile$datapath = "data/sessionData.RData"
+  # annFile$datapath = "data/selectedCells.csv"
   # TODO either multiple files with rdata/rds or single file of csv/other
   fpExtension <- tools::file_ext(inFile$datapath[1])
   if (toupper(fpExtension) %in% c("RDATA", "RDS")) {
