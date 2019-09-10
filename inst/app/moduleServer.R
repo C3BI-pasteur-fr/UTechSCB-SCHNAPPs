@@ -793,6 +793,7 @@ tableSelectionServer <- function(input, output, session,
   # searchStr <- ""
   # colState <- list()
   assign(ns("colState"), list(), envir = .schnappsEnv)
+  assign(ns("pageLength"), 15, envir = .schnappsEnv)
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   
@@ -882,6 +883,7 @@ tableSelectionServer <- function(input, output, session,
     # colOrder <<- input$cellNameTable_state$order
     # colState <<- input$cellNameTable_state
     assign(ns("colState"), input$cellNameTable_state, envir = .schnappsEnv)
+    assign(ns("pageLength"), input$cellNameTable_state$pageLength, envir = .schnappsEnv)
     assign(ns("colOrder"), input$cellNameTable_state$order, envir = .schnappsEnv)
     tmp <- input$cellNameTable_state$search
   })
@@ -962,6 +964,7 @@ tableSelectionServer <- function(input, output, session,
                         orderClasses = TRUE,
                         autoWidth = TRUE,
                         scrollX = TRUE,
+                        pageLength =  get (ns("pageLength"), envir = .schnappsEnv),
                         search = colState$search,
                         searchCols = searchColList
                         ,stateSave = TRUE
