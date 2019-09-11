@@ -240,9 +240,10 @@ coE_topExpCCTable <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_topExpCCTable", id = "coE_topExpCCTable", duration = NULL)
   }
-  
+  # browser()
   scEx_log <- scEx_log()
   projections <- projections()
+  genesin <- input$coE_heatmapselected_geneids
   # coEtgPerc <- input$coEtgPerc
   # coEtgminExpr <- input$coEtgMinExpr
   sc <- coE_selctedCluster()
@@ -250,10 +251,16 @@ coE_topExpCCTable <- reactive({
   scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
   
-  if (is.null(scEx_log) || is.null(scCells)) {
+  if (is.null(scEx_log) || is.null(scCells) ) {
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
+  featureData <- rowData(scEx_log)
+  genesin <- geneName2Index(genesin, featureData)
+  if (is.null(genesin)) {
+    return(NULL)
+  }
+  
+    if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_topExpCCTable.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_topExpCCTable.RData")
@@ -262,16 +269,17 @@ coE_topExpCCTable <- reactive({
   nums <- unlist(lapply(projections, is.numeric))
   numProje = projections[,nums]
   # colnames(numProje)
-  
-  featureData <- rowData(scEx_log)
+  genesin = unique(genesin)
   # we only work on cells that have been selected
-  mat <- assays(scEx_log)[[1]][, scCells]
+  mat <- assays(scEx_log)[[1]][genesin, scCells]
   # only genes that express at least coEtgminExpr UMIs
-  mat[mat < coEtgminExpr] <- 0
+  # mat[mat < coEtgminExpr] <- 0
   # only genes that are expressed in coEtgPerc or more cells
-  allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
-  mat <- mat[allexpressed, ]
+  # allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
+  # mat <- mat[allexpressed, ]
 
+  rownames(mat) <- featureData[rownames(mat), "symbol"]
+  mat = mat[!rowSums(mat) == 0,]
   numProje <- t(numProje)[,colnames(mat)]
   corrInput <- as.matrix(rbind(numProje,mat))
   # rownames(res2$r)
@@ -280,8 +288,8 @@ coE_topExpCCTable <- reactive({
   flatMat <- flattenCorrMatrix(res2$r, res2$P)
   
   retVal <- as.data.frame(flatMat[,])
-  duplicated(retVal$row)
-  rownames(retVal) = paste0(retVal$row, "__________", retVal$column)
+  # duplicated(retVal$row)
+  rownames(retVal) = make.unique(paste0(retVal$row, "__________", retVal$column), sep="___")
   exportTestValues(coE_topExpCCTable = {retVal})  
   return(retVal)
 })
