@@ -222,6 +222,71 @@ coE_topExpGenesTable <- reactive({
   return(retVal)
 })
 
+# coE_topExpCCTable ----
+#' coE_topExpCCTable
+#' in coE_topExpCCTable tab we show a table correlation coefficients and associated p-values 
+#' using the Hmisc::rcorr function
+#' coEtgPerc = genes shown have to be expressed in at least X % of cells
+#' coEtgMinExpr = genes shown have at least to X UMIs expressed 
+coE_topExpCCTable <- reactive({
+  require("Hmisc")
+  if (DEBUG) cat(file = stderr(), "coE_topExpCCTable started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_topExpCCTable")
+    if (!is.null(getDefaultReactiveDomain()))
+      removeNotification(id = "coE_topExpCCTable")
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_topExpCCTable", id = "coE_topExpCCTable", duration = NULL)
+  }
+  
+  scEx_log <- scEx_log()
+  projections <- projections()
+  # coEtgPerc <- input$coEtgPerc
+  # coEtgminExpr <- input$coEtgMinExpr
+  sc <- coE_selctedCluster()
+  # scCL <- sc$cluster
+  scCL <- levels(projections$dbCluster)
+  scCells <- sc$selectedCells()
+  
+  if (is.null(scEx_log) || is.null(scCells)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_topExpCCTable.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/coE_topExpCCTable.RData")
+  
+  # get numeric columns from projections.
+  nums <- unlist(lapply(projections, is.numeric))
+  numProje = projections[,nums]
+  # colnames(numProje)
+  
+  featureData <- rowData(scEx_log)
+  # we only work on cells that have been selected
+  mat <- assays(scEx_log)[[1]][, scCells]
+  # only genes that express at least coEtgminExpr UMIs
+  mat[mat < coEtgminExpr] <- 0
+  # only genes that are expressed in coEtgPerc or more cells
+  allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
+  mat <- mat[allexpressed, ]
+
+  numProje <- t(numProje)[,colnames(mat)]
+  corrInput <- as.matrix(rbind(numProje,mat))
+  # rownames(res2$r)
+  res2 <- rcorr(t(corrInput))
+  
+  flatMat <- flattenCorrMatrix(res2$r, res2$P)
+  
+  retVal <- as.data.frame(flatMat[,])
+  duplicated(retVal$row)
+  rownames(retVal) = paste0(retVal$row, "__________", retVal$column)
+  exportTestValues(coE_topExpCCTable = {retVal})  
+  return(retVal)
+})
+
+
 combinePermutations <- function(perm1, perm2){
   perms <- rep("", length(perm1))
   for (cIdx in 1:length(perm1)){

@@ -67,6 +67,14 @@ tabList <- list(
       pHeatMapUI("coE_heatmapSelectedModule")
     )),
     # br(),
+    fluidRow(div(
+      p(strong("\tTable with coefficient of variance:")),
+      tags$ul(
+        tags$li(
+          "for each gene we divice the standard diviation by the mean (coefficient of variance, cv)\n"
+        )
+      )
+    )),
     fluidRow(
       column(
         3,
@@ -82,7 +90,16 @@ tabList <- list(
         )
       )
     ),
-    tableSelectionUi("coE_topExpGenes") %>% shinycssloaders::withSpinner()
+    tableSelectionUi("coE_topExpGenes") ,
+    fluidRow(div(
+      p(strong("\tTable with correlation coefficients:")),
+      tags$ul(
+        tags$li(
+          "using Hmisc we calculate the correlation coefficient and p-values for the selected genes and cells\n"
+        )
+      )
+    )),
+    tableSelectionUi("coE_topCCGenes") 
   ),
   expressionTab = shinydashboard::tabItem(
     "CoExpressionViolin",

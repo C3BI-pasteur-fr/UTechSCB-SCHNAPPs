@@ -33,6 +33,16 @@ callModule(
   coE_topExpGenesTable
 )
 
+# max expressed genes ----
+callModule(
+  tableSelectionServer,
+  "coE_topCCGenes",
+  coE_topExpCCTable
+)
+
+
+
+
 # SOM heatmap module -----
 callModule(
   pHeatMapModule,
