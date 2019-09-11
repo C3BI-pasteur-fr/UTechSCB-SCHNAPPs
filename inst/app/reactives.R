@@ -180,12 +180,12 @@ inputDataFunc <- function(inFile) {
   # handle different extreme cases for the symbol column (already encountered)
   if (is.factor(featuredata$symbol)) {
     if (levels(featuredata$symbol) == "NA") {
-      featuredata$symbol <- rownames(featuredata)
+      featuredata$symbol <- make.unique(rownames(featuredata))
       rowData(scEx) <- featuredata
     }
   }
   if ("symbol" %in% colnames(featuredata)) {
-    featuredata$symbol <- featuredata$symbol
+    featuredata$symbol <- make.unique(featuredata$symbol)
     rowData(scEx) <- featuredata
   }
   
