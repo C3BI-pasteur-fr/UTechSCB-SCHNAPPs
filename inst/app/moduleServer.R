@@ -814,6 +814,8 @@ tableSelectionServer <- function(input, output, session,
     
     dataTables <- dataTab()
     selectedRows <- input$cellNameTable_rows_selected
+    scEx <- scEx()
+    
     if (is.null(dataTables)) {
       return(NULL)
     }
@@ -833,7 +835,9 @@ tableSelectionServer <- function(input, output, session,
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ])
       retVal <- retVal[!is.na(retVal)]
+      retVal <- sub("(.*)_____(.*)", "\\1, \\2", retVal)
       retVal <- sub("(.*)___.*", "\\1", retVal)
+      
       retVal <- unique(retVal)
       retVal <- paste0(retVal, collapse = ", ")
     } else {
@@ -1243,6 +1247,7 @@ pHeatMapModule <- function(input, output, session,
       orderColNames <- input$orderNames
       moreOptions <- input$moreOptions
       groupNs <- groupNames$namesDF
+      scale <- input$normRow
       proje <- projections()
       if (.schnappsEnv$DEBUGSAVE) {
         save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c("outfilePH", ls(), 
@@ -1253,7 +1258,7 @@ pHeatMapModule <- function(input, output, session,
       dfilename <- paste0(.schnappsEnv$reportTempDir, "/sessionData.RData")
       base::save(
         file = dfilename, list =
-          c("heatmapData", "addColNames", "orderColNames", "moreOptions", "proje", "groupNs")
+          c("heatmapData", "addColNames", "orderColNames", "moreOptions", "proje", "groupNs", "scale")
       )
       
       
