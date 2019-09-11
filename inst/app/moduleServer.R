@@ -829,16 +829,17 @@ tableSelectionServer <- function(input, output, session,
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."))
-    
+    # browser()
     # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
     # remove this here
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ])
       retVal <- retVal[!is.na(retVal)]
-      retVal <- sub("(.*)_____(.*)", "\\1, \\2", retVal)
+      retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
+      retVal <- unlist(strsplit(retVal, ","))
       retVal <- sub("(.*)___.*", "\\1", retVal)
-      
       retVal <- unique(retVal)
+      retVal <- retVal[retVal %in% rowData(scEx)$symbol]
       retVal <- paste0(retVal, collapse = ", ")
     } else {
       retVal <- NULL
