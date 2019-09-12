@@ -265,12 +265,12 @@ generalParametersTab <- shinydashboard::tabItem(
   fluidRow(div(h3("Parameters for PCA"), align = "left")),
   fluidRow(
     column(2, offset = 0,
-           numericInput("pcaRank", "Number of components", 10, min = 2)),
+           numericInput("pcaRank", "Number of components", 50, min = 2)),
     column(2, offset = 0,
            checkboxInput("pcaCenter", "center data", TRUE)
     ),
     column(2, offset = 0,
-           checkboxInput("pcaScale", "scale data", FALSE)
+           checkboxInput("pcaScale", "scale data", TRUE)
     ) 
   ),
   fluidRow(
