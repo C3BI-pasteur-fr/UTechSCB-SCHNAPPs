@@ -1301,7 +1301,7 @@ scExLogMatrixDisplay <- reactive({
   return(retVal)
 })
 
-pcaFunc <- function(scEx_log, rank, center, scale) {
+pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1323,7 +1323,56 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
     save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
-  scaterPCA <- tryCatch({
+  genesin <- geneName2Index(pcaGenes, featureData)
+  if (is.null(genesin) || length(genesin)==0 ){
+    genesin = rownames(scEx_log)
+  }
+  if (length(genesin) < rank){
+    rank = length(genesin)
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        paste("Problem with PCA: Too many PCs requested, setting to ", rank),
+        type = "warning",
+        id = "pcawarning",
+        duration = NULL
+      )
+    }
+  }
+    
+  withWarnings <- function(expr) {
+    
+    wHandler <- function(w) {
+      if (DEBUG) {
+        cat(file = stderr(), paste("runPCA created a warning:", w, "\n"))
+      }
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          "Problem with PCA?",
+          type = "warning",
+          id = "pcawarning",
+          duration = NULL
+        )
+      }
+      invokeRestart("muffleWarning")
+    }
+    eHandler <- function(e){
+      cat(file = stderr(), paste("error in PCA:", e))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          paste("Problem with PCA, probably not enough cells?", e),
+          type = "warning",
+          id = "pcawarning",
+          duration = NULL
+        )
+      }
+      cat(file = stderr(), "PCA FAILED!!!\n")
+      return(NULL)
+    }
+    val <- withCallingHandlers(expr, warning = wHandler, error = eHandler)
+    return(val)
+  }
+  
+  scaterPCA <- withWarnings({
     # not sure, but this works on another with dgTMatrix
     if (is(assays(scEx_log)[["logcounts"]], "dgTMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
@@ -1331,7 +1380,7 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
     }
     BiocSingular::runPCA(
      # t(assays(scEx_log)[["logcounts"]]),
-     scEx_log,
+     scEx_log[genesin,],
      ncomponents = rank,
      ntop = 500,
      exprs_values = "logcounts",
@@ -1346,26 +1395,8 @@ pcaFunc <- function(scEx_log, rank, center, scale) {
       #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
       # BSPARAM = IrlbaParam()
      )
-  },
-  error = function(e) {
-    cat(file = stderr(), paste("error in PCA:", e))
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification(
-        "Problem with PCA, probably not enough cells?",
-        type = "warning",
-        id = "pcawarning",
-        duration = NULL
-      )
-    }
-    cat(file = stderr(), "PCA FAILED!!!\n")
-    return(NULL)
-  },
-  warning = function(e) {
-    if (DEBUG) {
-      cat(file = stderr(), paste("runPCA created a warning:", e, "\n"))
-    }
-  }
-  )
+  })
+ 
   if (is.null(scaterPCA)) {
     return(NULL)
   }
@@ -1402,8 +1433,9 @@ pca <- reactive({
   rank = input$pcaRank
   center = input$pcaCenter
   scale = input$pcaScale
-  
+  pcaGenes <-  input$cells4PCA
   scEx_log <- scEx_log()
+  
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "pca:NULL\n")
@@ -1414,8 +1446,8 @@ pca <- reactive({
   if (is.null(rank)) rank <- 10
   if (is.null(center)) centr <- TRUE
   if (is.null(scale)) scale <- FALSE
-  
-  retVal <- pcaFunc(scEx_log, rank, center, scale)
+  featureData <- rowData(scEx_log)
+  retVal <- pcaFunc(scEx_log, rank, center, scale, pcaGenes, featureData)
   
   printTimeEnd(start.time, "pca")
   exportTestValues(pca = {
