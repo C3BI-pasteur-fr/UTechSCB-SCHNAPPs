@@ -273,6 +273,14 @@ generalParametersTab <- shinydashboard::tabItem(
            checkboxInput("pcaScale", "scale data", FALSE)
     ) 
   ),
+  fluidRow(
+    column(10,
+           offset = 1,
+           shinyBS::tipify(textInput("cells4PCA", "Cells to be used for PCA", width = "100%"),
+                           title = "comma separted list of cell names"
+           )
+    )
+  ),
   br(),
   fluidRow(div(h3("Parameters for clustering"), align = "left")),
   fluidRow(
