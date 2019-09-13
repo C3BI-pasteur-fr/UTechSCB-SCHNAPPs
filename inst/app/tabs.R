@@ -289,7 +289,7 @@ generalParametersTab <- shinydashboard::tabItem(
     #        numericInput("kNr", "Number of clusters", 10, min = 2, max = 30)
     # ),
     column(2, offset = 1,
-           selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = "counts")),
+           selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA")),
     column(2, 
            numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2)),
     column(2, 
