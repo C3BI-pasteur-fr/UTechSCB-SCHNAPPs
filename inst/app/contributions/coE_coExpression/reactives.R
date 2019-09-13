@@ -279,7 +279,7 @@ coE_topExpCCTable <- reactive({
   # mat <- mat[allexpressed, ]
 
   rownames(mat) <- featureData[rownames(mat), "symbol"]
-  mat = mat[!rowSums(mat) == 0,]
+  mat = mat[!Matrix::rowSums(mat) == 0,]
   numProje <- t(numProje)[,colnames(mat)]
   corrInput <- as.matrix(rbind(numProje,mat))
   # rownames(res2$r)
