@@ -155,6 +155,7 @@ output$summaryStatsSideBar <- renderUI({
   medianUMI <- medianUMI()
   medianENSG <- medianENSG()
   memoryUsed <- getMemoryUsed()
+  infile <- inputFile$inFile
   normalizationRadioButton <- input$normalizationRadioButton
   if (.schnappsEnv$DEBUGSAVE) {
     save(
@@ -163,7 +164,7 @@ output$summaryStatsSideBar <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
-  line0 <- paste(inputFile$inFile, " _ ", annFile)
+  line0 <- paste(infile, " _ ", annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
   line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
@@ -199,8 +200,12 @@ output$summaryStatsSideBar <- renderUI({
   })
   
   HTML(htmlOut)
-})
 
+  })
+
+  addPopover(session = session, id = "summaryStatsSideBar", title = "Data summary",
+             content = "<ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
+             trigger = "click", options = list(container = "body"))
 
 # Select Genes ----
 # this is part of the basic functionality from this
