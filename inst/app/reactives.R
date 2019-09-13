@@ -45,12 +45,12 @@ inputDataFunc <- function(inFile) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("inputDataFunc", id = "inputDataFunc", duration = NULL)
   }
-  
+
   stats <- tibble(.rows = length(inFile$datapath))
   stats$names <- inFile$name
   stats$nFeatures <- 0
   stats$nCells <- 0
-  
+
   #
   cat(file = stderr(), paste("reading", inFile$name[1], "\n"))
   fp <- inFile$datapath[1]
@@ -62,16 +62,18 @@ inputDataFunc <- function(inFile) {
   }
   fpLs <- tryCatch(load(fp), error = function(e) {
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("Error reading input file!!", id = "inputDataFuncERROR", 
-                       type = "error", duration = NULL)
+      showNotification("Error reading input file!!",
+        id = "inputDataFuncERROR",
+        type = "error", duration = NULL
+      )
     }
     if (DEBUG) {
       cat(file = stderr(), "\n\nERROR reading data.\n\n\n")
     }
     NULL
   })
-  
-  # in case we are loading from a report 
+
+  # in case we are loading from a report
   scExFound <- FALSE
   if ("scEx" %in% fpLs) {
     scExFound <- TRUE
@@ -80,8 +82,7 @@ inputDataFunc <- function(inFile) {
     scExFound <- FALSE
     for (varName in fpLs) {
       # if ("SingleCellExperiment" %in% class(get(varName))) {
-        if ( is(get(varName), "SingleCellExperiment") ) {
-          
+      if (is(get(varName), "SingleCellExperiment")) {
         scEx <- get(varName)
         scExFound <- TRUE
         break()
@@ -91,14 +92,14 @@ inputDataFunc <- function(inFile) {
   if (!scExFound) {
     return(NULL)
   }
-  cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName ," as SingleCellExperiment.\n"))
-  
+  cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName, " as SingleCellExperiment.\n"))
+
   fdAll <- rowData(scEx)
   pdAll <- colData(scEx)
   exAll <- assays(scEx)[["counts"]]
   stats[1, "nFeatures"] <- nrow(fdAll)
   stats[1, "nCells"] <- nrow(pdAll)
-  
+
   # read multiple files
   if (length(inFile$datapath) > 1) {
     for (fpIdx in 2:length(inFile$datapath)) {
@@ -108,13 +109,13 @@ inputDataFunc <- function(inFile) {
       scExFound <- FALSE
       for (varName in fpLs) {
         # if ("SingleCellExperiment" %in% class(get(varName))) {
-        if ( is(get(varName), "SingleCellExperiment") ) {
+        if (is(get(varName), "SingleCellExperiment")) {
           scEx <- get(varName)
           scExFound <- TRUE
           break()
         }
       }
-      cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "contains variable", varName ,"\n"))
+      cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "contains variable", varName, "\n"))
       if (!scExFound) {
         next()
       }
@@ -126,7 +127,7 @@ inputDataFunc <- function(inFile) {
       fdAll <- fdAll[fdIdx, ]
       pd1 <- colData(scEx)
       if (!"counts" %in% names(assays(scEx))) {
-        cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName ,"didn't contain counts slot\n"))
+        cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
         next()
       }
       ex1 <- assays(scEx)[["counts"]][fdIdx, ]
@@ -140,16 +141,17 @@ inputDataFunc <- function(inFile) {
       }
       # stats[fpIdx, "nFeatures"] <- nrow(fd)
       stats[fpIdx, "nCells"] <- nrow(pd1)
-      
+
       exAll <- Matrix::cbind2(exAll[fdIdx, ], ex1)
     }
   }
   exAll <- as(exAll, "dgTMatrix")
-  
-  
+
+
   if ("sampleNames" %in% colnames(pdAll)) {
-    if (! is(pdAll$sampleNames, "factor") )
-      pdAll$sampleNames = factor(pdAll$sampleNames)
+    if (!is(pdAll$sampleNames, "factor")) {
+      pdAll$sampleNames <- factor(pdAll$sampleNames)
+    }
     sampNames <- levels(pdAll$sampleNames)
     isolate({
       # sampleCols$colPal <- colorRampPalette(brewer.pal(
@@ -167,14 +169,14 @@ inputDataFunc <- function(inFile) {
     )
     pdAll$sampleNames <- 1
   }
-  
-  
+
+
   scEx <- SingleCellExperiment(
     assay = list(counts = exAll),
     colData = pdAll,
     rowData = fdAll
   )
-  
+
   dataTables <- list()
   featuredata <- rowData(scEx)
   # handle different extreme cases for the symbol column (already encountered)
@@ -188,27 +190,27 @@ inputDataFunc <- function(inFile) {
     featuredata$symbol <- make.unique(featuredata$symbol)
     rowData(scEx) <- featuredata
   }
-  
+
   # dataTables$featuredataOrg <- rowData(scEx)
   dataTables$scEx <- scEx
   dataTables$featuredata <- featuredata
-  
+
   if (is.null(scEx$barcode)) {
     showNotification("scEx doesn't contain barcode column", type = "error")
     return(NULL)
   }
   # some checks
-  
+
   if (sum(is.infinite(assays(scEx)[["counts"]])) > 0) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("scEx contains infinite values",
-                       type = "error"
+        type = "error"
       )
     }
     return(NULL)
   }
-  
-  
+
+
   if (sum(c("id", "symbol") %in% colnames(rowData(scEx))) < 2) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
@@ -218,7 +220,7 @@ inputDataFunc <- function(inFile) {
       )
     }
   }
-  
+
   if (!sum(c("symbol", "Description") %in% colnames(featuredata)) == 2) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
@@ -236,14 +238,14 @@ inputDataFunc <- function(inFile) {
   # if (is.null(rowData(dataTables$scEx)$symbol)){
   #
   # }
-  
+
   inputFileStats$stats <- stats
   return(dataTables)
 }
 
 readMM <- function(inFile) {
   data <- Matrix::readMM(file = inFile$datapath)
-  
+
   return(NULL)
 }
 
@@ -259,8 +261,8 @@ readCSV <- function(inFile) {
     save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv())))
   }
   if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
-    rownames(data) = data[,1]
-    data = data[,-1]
+    rownames(data) <- data[, 1]
+    data <- data[, -1]
   }
   # load(file='~/SCHNAPPsDebug/readCSV.RData')
   exAll <- as(as.matrix(data), "dgTMatrix")
@@ -281,7 +283,7 @@ readCSV <- function(inFile) {
   dataTables <- list()
   dataTables$scEx <- scExnew
   dataTables$featuredata <- rowData(scExnew)
-  
+
   stats <- tibble(.rows = length(inFile$datapath))
   stats$names <- inFile$name
   stats$nFeatures <- 0
@@ -289,24 +291,24 @@ readCSV <- function(inFile) {
   stats[1, "nFeatures"] <- nrow(data)
   stats[1, "nCells"] <- ncol(data)
   inputFileStats$stats <- stats
-  
+
   return(dataTables)
 }
 
-# 
+#
 # inFile$datapath="data/scEx.csv"
 # load("data/scEx.RData")
 # write.file.csv(colData(scEx), row.names=TRUE, file="data/scExCells.csv" )
 # write.file.csv(rowData(scEx), row.names=TRUE, file="data/scExGenes.csv" )
 # annFile$datapath="data/scExGenes.csv"
 #' appendAnnotation
-#' 
+#'
 #' append annotation to singleCellExperiment object
 #' uses colData
 appendAnnotation <- function(scEx, annFile) {
   rDat <- rowData(scEx)
   cDat <- colData(scEx)
-  
+
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
     if (.schnappsEnv$DEBUGSAVE) {
@@ -314,8 +316,8 @@ appendAnnotation <- function(scEx, annFile) {
     }
     # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
-      rownames(data) = data[,1]
-      data = data[,-1]
+      rownames(data) <- data[, 1]
+      data <- data[, -1]
     }
     # feature data
     if (all(rownames(data) %in% rownames(rDat))) {
@@ -332,22 +334,22 @@ appendAnnotation <- function(scEx, annFile) {
     }
     # symbol used as row name
     if (any(rownames(data) %in% rDat$symbol)) {
-      rowColfound = FALSE
-      nrComm = c()
+      rowColfound <- FALSE
+      nrComm <- c()
       for (cIdx in colnames(data)) {
-        ci = which(colnames(data) == cIdx)
-        nrComm[ci] = sum(rownames(rDat) %in% data[,cIdx] )
+        ci <- which(colnames(data) == cIdx)
+        nrComm[ci] <- sum(rownames(rDat) %in% data[, cIdx])
       }
-      if (max(nrComm) > (nrow(data)/2)) {
-        rowColfound = which(nrComm == max(nrComm))
+      if (max(nrComm) > (nrow(data) / 2)) {
+        rowColfound <- which(nrComm == max(nrComm))
       }
       if (rowColfound == FALSE) {
         cat(file = stderr(), paste("couldn't find column with rownames when symbols are used as rownames for ", annFile$name, "\n"))
         break()
       } else {
-        whichRowNames = which(data[,cIdx] %in% rownames(rDat))
-        rownames(data)[whichRowNames] = as.character(data[whichRowNames,rowColfound])
-        data = data[, -rowColfound]
+        whichRowNames <- which(data[, cIdx] %in% rownames(rDat))
+        rownames(data)[whichRowNames] <- as.character(data[whichRowNames, rowColfound])
+        data <- data[, -rowColfound]
       }
       # if any factor is already set we need to avoid having different levles
       if (any(colnames(rDat) %in% colnames(data))) {
@@ -360,7 +362,7 @@ appendAnnotation <- function(scEx, annFile) {
       }
       rDat[rownames(data), colnames(data)] <- data
     }
-    
+
     # colData
     if (all(rownames(data) %in% rownames(cDat))) {
       # if any factor is already set we need to avoid having different levles
@@ -406,10 +408,10 @@ inputData <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("inputData", id = "inputData", duration = NULL)
   }
-  
+
   inFile <- input$file1
   annFile <- input$annoFile
-  
+
   if (is.null(inFile)) {
     if (DEBUG) {
       cat(file = stderr(), "inputData: NULL\n")
@@ -427,7 +429,7 @@ inputData <- reactive({
     save(file = "~/SCHNAPPsDebug/inputData.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/inputData.RData')
-  
+
   # inFile$datapath = "data/sessionData.RData"
   # annFile$datapath = "data/selectedCells.csv"
   # TODO either multiple files with rdata/rds or single file of csv/other
@@ -437,21 +439,21 @@ inputData <- reactive({
   } else {
     retVal <- readCSV(inFile)
   }
-  
+
   if (is.null(retVal)) {
     return(NULL)
   }
-  
+
   if (is.null(retVal[["scEx"]])) {
     return(NULL)
   }
-  
+
   if (!is.null(annFile)) {
     if (file.exists(annFile$datapath[1])) {
       retVal$scEx <- appendAnnotation(scEx = retVal$scEx, annFile = annFile)
     }
   }
-  
+
   sampNames <- levels(colData(retVal$scEx)$sampleNames)
   isolate({
     sampleCols$colPal <- allowedColors[seq_along(sampNames)]
@@ -459,7 +461,7 @@ inputData <- reactive({
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
   inputFile$annFile <- paste(annFile$name, collapse = ", ")
-  
+
   exportTestValues(inputData = {
     list(
       assays(retVal$scEx)[["counts"]],
@@ -484,7 +486,7 @@ medianENSGfunc <- function(scEx) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("medianENSGfunc", id = "medianENSGfunc", duration = NULL)
   }
-  
+
   geneC <- Matrix::colSums(scEx > 0, na.rm = TRUE)
   return(median(t(geneC)))
 }
@@ -504,7 +506,7 @@ medianENSG <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("medianENSG", id = "medianENSG", duration = NULL)
   }
-  
+
   scEx_log <- scEx_log()
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -517,7 +519,7 @@ medianENSG <- reactive({
     return(0)
   }
   retVal <- medianENSGfunc(scEx_log)
-  
+
   exportTestValues(medianENSG = {
     retVal
   })
@@ -538,9 +540,9 @@ medianUMIfunc <- function(scEx) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("medianUMIfunc", id = "medianUMIfunc", duration = NULL)
   }
-  
+
   umiC <- Matrix::colSums(scEx, na.rm = TRUE)
-  
+
   return(median(t(umiC)))
 }
 
@@ -559,7 +561,7 @@ medianUMI <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("medianUMI", id = "medianUMI", duration = NULL)
   }
-  
+
   scEx <- scEx()
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -573,7 +575,7 @@ medianUMI <- reactive({
   # load(file='~/SCHNAPPsDebug/medianUMI.RData')
   scEx <- assays(scEx)[["counts"]]
   retVal <- medianUMIfunc(scEx)
-  
+
   exportTestValues(medianUMI = {
     retVal
   })
@@ -588,12 +590,12 @@ medianUMI <- reactive({
 # internal, should not be used by plug-ins
 useCellsFunc <-
   function(dataTables,
-           geneNames,
-           rmCells,
-           rmPattern,
-           keepCells,
-           cellKeepOnly,
-           geneNamesNEG) {
+             geneNames,
+             rmCells,
+             rmPattern,
+             keepCells,
+             cellKeepOnly,
+             geneNamesNEG) {
     if (DEBUG) {
       cat(file = stderr(), "useCellsFunc started.\n")
     }
@@ -607,7 +609,7 @@ useCellsFunc <-
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("useCellsFunc", id = "useCellsFunc", duration = NULL)
     }
-    
+
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/useCellsFunc.RData", list = c(ls()))
     }
@@ -620,17 +622,17 @@ useCellsFunc <-
     genesin <- gsub(" ", "", genesin, fixed = TRUE)
     genesin <- strsplit(genesin, ",")
     genesin <- genesin[[1]]
-    
+
     cellKeep <- toupper(keepCells)
     cellKeep <- gsub(" ", "", cellKeep, fixed = TRUE)
     cellKeep <- strsplit(cellKeep, ",")
     cellKeep <- cellKeep[[1]]
-    
+
     cellKeepOnly <- toupper(cellKeepOnly)
     cellKeepOnly <- gsub(" ", "", cellKeepOnly, fixed = TRUE)
     cellKeepOnly <- strsplit(cellKeepOnly, ",")
     cellKeepOnly <- cellKeepOnly[[1]]
-    
+
     # specifically remove cells
     if (nchar(rmCells) > 0) {
       cellsRM <- toupper(rmCells)
@@ -640,17 +642,17 @@ useCellsFunc <-
       goodCols[which(toupper(colnames(dataTables$scEx)) %in% cellsRM)] <-
         FALSE
     }
-    
+
     # remove cells by pattern
     if (nchar(rmPattern) > 0) {
       goodCols[grepl(rmPattern, colnames(dataTables$scEx), ignore.case = TRUE)] <- FALSE
     }
-    
+
     if (!length(cellKeep) == 0) {
       ids <- which(toupper(colnames(dataTables$scEx)) %in% cellKeep)
       goodCols[ids] <- TRUE
     }
-    
+
     # genes that have to be expressed at least in one of them.
     selCols <- rep(FALSE, length(goodCols))
     if (!length(genesin) == 0) {
@@ -669,13 +671,13 @@ useCellsFunc <-
       }
       goodCols <- goodCols & selCols
     }
-    
+
     # genes that should NOT be expressed.
     genesin <- toupper(geneNamesNEG)
     genesin <- gsub(" ", "", genesin, fixed = TRUE)
     genesin <- strsplit(genesin, ",")
     genesin <- genesin[[1]]
-    
+
     selCols <- rep(FALSE, length(goodCols))
     if (!length(genesin) == 0) {
       ids <- which(toupper(dataTables$featuredata$symbol) %in% genesin)
@@ -696,14 +698,14 @@ useCellsFunc <-
       selCols <- !selCols
       goodCols <- goodCols & selCols
     }
-    
+
     if (!length(cellKeepOnly) == 0) {
       goodCols[c(1:length(goodCols))] <- FALSE
       ids <-
         which(toupper(colnames(dataTables$scEx)) %in% cellKeepOnly)
       goodCols[ids] <- TRUE
     }
-    
+
     #### end: cells with genes expressed
     return(goodCols)
   }
@@ -725,7 +727,7 @@ useCells <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("useCells", id = "useCells", duration = NULL)
   }
-  
+
   dataTables <- inputData()
   cellSelectionValues <- cellSelectionValues()
   geneNames <- cellSelectionValues$minExpGenes
@@ -741,7 +743,7 @@ useCells <- reactive({
     }
     return(NULL)
   }
-  
+
   retVal <- useCellsFunc(
     dataTables,
     geneNames,
@@ -751,7 +753,7 @@ useCells <- reactive({
     cellKeepOnly,
     geneNamesNEG
   )
-  
+
   exportTestValues(useCells = {
     retVal
   })
@@ -761,11 +763,11 @@ useCells <- reactive({
 
 useGenesFunc <-
   function(dataTables,
-           ipIDs,
-           # regular expression of genes to be removed
-           geneListSelection,
-           genesKeep,
-           geneLists) {
+             ipIDs,
+             # regular expression of genes to be removed
+             geneListSelection,
+             genesKeep,
+             geneLists) {
     if (DEBUG) {
       cat(file = stderr(), "useGenesFunc started.\n")
     }
@@ -779,7 +781,7 @@ useGenesFunc <-
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("useGenesFunc", id = "useGenesFunc", duration = NULL)
     }
-    
+
     gList <-
       geneLists # global variable, assigning it locally ensures that it will be saved
     if (.schnappsEnv$DEBUGSAVE) {
@@ -799,7 +801,7 @@ useGenesFunc <-
     genesKeep <- genesKeep[[1]]
     keepGeneIds <-
       which(toupper(dataTables$featuredata$symbol) %in% genesKeep)
-    
+
     # dataTables$featuredata$symbol[keepIDs]
     # gene groups to be included
     # work on the geneList tree
@@ -819,7 +821,7 @@ useGenesFunc <-
           (rownames(dataTables$scEx) %in% selGenes) & keepIDs
       }
     }
-    
+
     keepIDs[keepGeneIds] <- TRUE
     return(keepIDs)
   }
@@ -833,7 +835,7 @@ gsSelectedGenesTable <- reactive({
   useGenes <- useGenes()
   useCells <- useCells()
   minGenes <- input$minGenesGS
-  
+
   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     return(NULL)
   }
@@ -844,18 +846,18 @@ gsSelectedGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
-  
+
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
-  dt = fd[useGenes,]
+  dt <- fd[useGenes, ]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   # get the order of the frist two columns correct
-  firstCol = which(colnames(dt) == "symbol")
-  firstCol = c(firstCol, which(colnames(dt) == "Description"))
+  firstCol <- which(colnames(dt) == "symbol")
+  firstCol <- c(firstCol, which(colnames(dt) == "Description"))
   # those we created so we know they are there
-  firstCol = firstCol = c(firstCol,which (colnames(dt) %in% c("rowSums", "rowSamples")))
-  colOrder = c(firstCol, (1:ncol(dt))[-firstCol])
+  firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
+  colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
   dt <- dt[, colOrder]
   dt <- dt[dt$rowSums >= minGenes, ]
   exportTestValues(selectedGenesTable = {
@@ -869,7 +871,7 @@ gsSelectedGenesTable <- reactive({
 
 
 # removed genes table ----
-gsRMGenesTable <- reactive({  
+gsRMGenesTable <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "output$removedGenesTable\n")
   }
@@ -877,12 +879,12 @@ gsRMGenesTable <- reactive({
   useGenes <- useGenes()
   useCells <- useCells()
   minGenes <- input$minGenesGS
-  
+
   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     return(NULL)
   }
   useGenes <- !useGenes
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/removedGenesTable.RData",
@@ -895,12 +897,14 @@ gsRMGenesTable <- reactive({
   dt <- fd[useGenes, c("symbol", "Description")]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
-  
+
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
   })
-  if (nrow(dt) == 0) { return(NULL) }
+  if (nrow(dt) == 0) {
+    return(NULL)
+  }
   rownames(dt) <- dt$symbol
   as.data.frame(dt)
   # DT::datatable(as.data.frame(dt))
@@ -921,25 +925,25 @@ beforeFilterCounts <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("beforeFilterCounts", id = "beforeFilterCounts", duration = NULL)
   }
-  
+
   dataTables <- inputData()
   geneSelectionValues <- geneSelectionValues()
   # ipIDs <- input$selectIds # regular expression of genes to be removed
   ipIDs <- geneSelectionValues$selectIds
   if (!exists("dataTables") |
-      is.null(dataTables) |
-      length(dataTables$featuredata$symbol) == 0) {
+    is.null(dataTables) |
+    length(dataTables$featuredata$symbol) == 0) {
     if (DEBUG) {
       cat(file = stderr(), "beforeFilterCounts: NULL\n")
     }
     return(NULL)
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/beforeFilterCounts.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/beforeFilterCounts.RData")
-  
+
   geneIDs <- NULL
   if (nchar(ipIDs) > 0) {
     geneIDs <- grepl(ipIDs, dataTables$featuredata$symbol, ignore.case = TRUE)
@@ -948,7 +952,7 @@ beforeFilterCounts <- reactive({
     return(rep(0, nrow(dataTables$featuredata)))
   }
   retVal <- Matrix::colSums(assays(dataTables$scEx)[["counts"]][geneIDs, ])
-  
+
   exportTestValues(beforeFilterCounts = {
     retVal
   })
@@ -971,7 +975,7 @@ useGenes <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("useGenes", id = "useGenes", duration = NULL)
   }
-  
+
   dataTables <- inputData()
   geneSelectionValues <- geneSelectionValues()
   # ipIDs <-
@@ -981,10 +985,10 @@ useGenes <- reactive({
   # geneListSelection <- input$geneListSelection
   genesKeep <- geneSelectionValues$genesKeep
   geneListSelection <- geneSelectionValues$geneListSelection
-  
+
   if (!exists("dataTables") |
-      is.null(dataTables) |
-      length(dataTables$featuredata$symbol) == 0) {
+    is.null(dataTables) |
+    length(dataTables$featuredata$symbol) == 0) {
     if (DEBUG) {
       cat(file = stderr(), "useGenes: NULL\n")
     }
@@ -993,10 +997,10 @@ useGenes <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("which genes to use", id = "useGenes", duration = NULL)
   }
-  
+
   retVal <-
     useGenesFunc(dataTables, ipIDs, geneListSelection, genesKeep, geneLists)
-  
+
   exportTestValues(useGenes = {
     retVal
   })
@@ -1007,11 +1011,11 @@ useGenes <- reactive({
 # will be called recursively to ensure that nothing changes when cells/genes are changing.
 scExFunc <-
   function(scExOrg,
-           useCells,
-           useGenes,
-           minGene,
-           minG,
-           maxG) {
+             useCells,
+             useGenes,
+             minGene,
+             minG,
+             maxG) {
     if (DEBUG) {
       cat(file = stderr(), "scExFunc started.\n")
     }
@@ -1029,13 +1033,13 @@ scExFunc <-
       removeNotification(id = "scExFunc1")
       removeNotification(id = "scExFunc2")
     }
-    
+
     # change names to be hopefully a bit more clear
     changed <- FALSE # trace if something changed
     keepGenes <- useGenes
     keepCells <- useCells
     scEx <- assays(scExOrg)[[1]]
-    
+
     # overall gene expression Min
     if (!is.null(minGene)) {
       selGenes <- Matrix::rowSums(scEx[, keepCells]) >= minGene
@@ -1045,7 +1049,7 @@ scExFunc <-
         changed <- TRUE
       }
     }
-    
+
     # min reads per cell
     if (!is.null(minG)) {
       selCols <- Matrix::colSums(scEx[keepGenes, ], na.rm = FALSE) > minG
@@ -1056,7 +1060,7 @@ scExFunc <-
         changed <- TRUE
       }
     }
-    
+
     # max reads per cell
     if (!is.null(maxG)) {
       selCols <- Matrix::colSums(scEx[keepGenes, ], na.rm = FALSE) <= maxG
@@ -1067,7 +1071,7 @@ scExFunc <-
         keepCells <- selCols
       }
     }
-    
+
     if (sum(keepCells) == 0) {
       showNotification(
         "not enough cells left",
@@ -1091,7 +1095,7 @@ scExFunc <-
     # load(file = "~/SCHNAPPsDebug/scEx3.RData")
     # which(duplicated(as.matrix(assays(scExOrg[keepGenes, keepCells])[[1]])))
     # which(duplicated(as.matrix(assays(scEx)[[1]])))
-    # 
+    #
     # sum(duplicated(t(as.matrix(assays(scExOrg[keepGenes, keepCells])[[1]]))))
     # if something changed, check that it doesn't change again
     scExNew <- scExOrg[keepGenes, keepCells]
@@ -1102,7 +1106,7 @@ scExFunc <-
         return(NULL)
       }
     }
-    
+
     pD <- colData(scExNew)
     for (colN in colnames(pD)) {
       if (colN == "barcode") {
@@ -1113,7 +1117,7 @@ scExFunc <-
       }
     }
     colData(scExNew) <- pD
-    
+
     return(scExNew)
   }
 
@@ -1134,7 +1138,7 @@ scEx <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("scEx", id = "scEx", duration = NULL)
   }
-  
+
   dataTables <- inputData()
   useCells <- useCells()
   useGenes <- useGenes()
@@ -1142,20 +1146,20 @@ scEx <- reactive({
   minGene <- cellSelectionValues$minGenesGS # min number of reads per gene
   minG <- cellSelectionValues$minGenes # min number of reads per cell
   maxG <- cellSelectionValues$maxGenes # max number of reads per cell
-  
+
   if (!exists("dataTables") |
-      is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
+    is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx: NULL\n")
     }
     return(NULL)
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/scEx.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scEx.RData")
-  
+
   # TODO:??? should be keep the cell names from the projections?
   # here we are just reinitializing.
   retVal <- scExFunc(
@@ -1166,8 +1170,8 @@ scEx <- reactive({
     minG = minG,
     maxG = maxG
   )
-  
-  
+
+
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
   })
@@ -1189,10 +1193,10 @@ rawNormalization <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("rawNormalization", id = "rawNormalization", duration = NULL)
   }
-  
+
   scEx <- scEx()
   names(assays(scEx)) <- "logcounts"
-  
+
   exportTestValues(rawNormalization = {
     str(scEx)
   })
@@ -1214,10 +1218,10 @@ scEx_log <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("scEx_log", id = "scEx_log", duration = NULL)
   }
-  
+
   scEx <- scEx()
   normMethod <- input$normalizationRadioButton
-  
+
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx_log:NULL\n")
@@ -1228,9 +1232,9 @@ scEx_log <- reactive({
     save(file = "~/SCHNAPPsDebug/scEx_log.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scEx_log.RData")
-  
+
   scEx_log <- do.call(normMethod, args = list())
-  
+
   exportTestValues(scEx_log = {
     assays(scEx_log)["logcounts"]
   })
@@ -1241,8 +1245,9 @@ scEx_log <- reactive({
 scEx_log_sha <- reactive({
   scEx_log <- scEx_log()
   require(digest)
-  if (is.null(scEx_log)) 
+  if (is.null(scEx_log)) {
     return(NULL)
+  }
   return(sha1(as.matrix(assays(scEx_log)[[1]])))
 })
 # scExLogMatrixDisplay ----
@@ -1262,11 +1267,11 @@ scExLogMatrixDisplay <- reactive({
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("scExLogMatrixDisplay",
-                     id = "scExLogMatrixDisplay",
-                     duration = NULL
+      id = "scExLogMatrixDisplay",
+      duration = NULL
     )
   }
-  
+
   # dataTables = inputData()
   # useCells = useCells()
   # useGenes = useGenes()
@@ -1281,10 +1286,10 @@ scExLogMatrixDisplay <- reactive({
     save(file = "~/SCHNAPPsDebug/scExLogMatrixDisplay.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/scExLogMatrixDisplay.RData")
-  
+
   # TODO
   if (dim(scEx_log)[1] > 20000) {
-    
+
   }
   retVal <-
     data.frame(
@@ -1297,7 +1302,7 @@ scExLogMatrixDisplay <- reactive({
   )
   rownames(retVal) <-
     make.names(rowData(scEx_log)$symbol, unique = TRUE)
-  
+
   return(retVal)
 })
 
@@ -1318,17 +1323,17 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
   if (!is.null(getDefaultReactiveDomain())) {
     removeNotification(id = "pcawarning")
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
   genesin <- geneName2Index(pcaGenes, featureData)
-  if (is.null(genesin) || length(genesin)==0 ){
-    genesin = rownames(scEx_log)
+  if (is.null(genesin) || length(genesin) == 0) {
+    genesin <- rownames(scEx_log)
   }
-  if (length(genesin) < rank){
-    rank = length(genesin)
+  if (length(genesin) < rank) {
+    rank <- length(genesin)
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
         paste("Problem with PCA: Too many PCs requested, setting to ", rank),
@@ -1338,9 +1343,8 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
       )
     }
   }
-    
+
   withWarnings <- function(expr) {
-    
     wHandler <- function(w) {
       if (DEBUG) {
         cat(file = stderr(), paste("runPCA created a warning:", w, "\n"))
@@ -1355,7 +1359,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
       }
       invokeRestart("muffleWarning")
     }
-    eHandler <- function(e){
+    eHandler <- function(e) {
       cat(file = stderr(), paste("error in PCA:", e))
       if (!is.null(getDefaultReactiveDomain())) {
         showNotification(
@@ -1371,7 +1375,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
     val <- withCallingHandlers(expr, warning = wHandler, error = eHandler)
     return(val)
   }
-  
+
   scaterPCA <- withWarnings({
     # not sure, but this works on another with dgTMatrix
     if (is(assays(scEx_log)[["logcounts"]], "dgTMatrix")) {
@@ -1379,24 +1383,24 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
     BiocSingular::runPCA(
-     # t(assays(scEx_log)[["logcounts"]]),
-     scEx_log[genesin,],
-     ncomponents = rank,
-     ntop = 500,
-     exprs_values = "logcounts",
-     # rank = rank,
-     #  center = center,
+      # t(assays(scEx_log)[["logcounts"]]),
+      scEx_log[genesin, ],
+      ncomponents = rank,
+      ntop = 500,
+      exprs_values = "logcounts",
+      # rank = rank,
+      #  center = center,
       scale = scale
-     # ,
-     # method = "irlba",
+      # ,
+      # method = "irlba",
       # BPPARAM = bpparam(),
       # BPPARAM = SnowParam(workers = 3, type = "SOCK),
       # BPPARAM = MulticoreParam(
       #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
       # BSPARAM = IrlbaParam()
-     )
+    )
   })
- 
+
   if (is.null(scaterPCA)) {
     return(NULL)
   }
@@ -1430,25 +1434,25 @@ pca <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
-  rank = input$pcaRank
-  center = input$pcaCenter
-  scale = input$pcaScale
-  pcaGenes <-  input$cells4PCA
+  rank <- input$pcaRank
+  center <- input$pcaCenter
+  scale <- input$pcaScale
+  pcaGenes <- input$cells4PCA
   scEx_log <- scEx_log()
-  
+
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "pca:NULL\n")
     }
     return(NULL)
   }
-  
+
   if (is.null(rank)) rank <- 10
   if (is.null(center)) centr <- TRUE
   if (is.null(scale)) scale <- FALSE
   featureData <- rowData(scEx_log)
   retVal <- pcaFunc(scEx_log, rank, center, scale, pcaGenes, featureData)
-  
+
   printTimeEnd(start.time, "pca")
   exportTestValues(pca = {
     retVal
@@ -1480,48 +1484,75 @@ scranCluster <- function(pca,
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("scranCluster", id = "scranCluster", duration = NULL)
   }
-  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scranCluster.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file="~/SCHNAPPsDebug/scranCluster.RData")
+
   set.seed(seed)
   geneid <- geneName2Index(geneSelectionClustering, featureData)
-  
+
   params <- list(
-    min.mean = 1,
+    # min.size: An integer scalar specifying the minimum size of each cluster.
     min.size = minClusterSize,
     method = clusterMethod,
     use.ranks = useRanks,
-    d = ncol(pca$x)
+    # d: An integer scalar specifying the number of principal components to retain.
+    # If NULL and use.ranks=TRUE, this defaults to 50. If use.rank=FALSE, the number of PCs
+    # is chosen by denoisePCA.
+    # If NA, no dimensionality reduction is performed and the gene expression values
+    # (or their rank equivalents) are directly used in clustering.
+    d = ncol(pca$x),
+    # When use.ranks=TRUE, the function will also filter out genes with average counts 
+    # (as defined by calcAverage) below min.mean. This removes low-abundance genes with many 
+    # tied ranks, especially due to zeros, which may reduce the precision of the clustering. 
+    # We suggest setting min.mean to 1 for read count data and 0.1 for UMI data.
+    min.mean=0.1
     # ,
     # BPPARAM = MulticoreParam(
     #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
   )
-  if (clusterSource == "counts") {
-    reducedDims(scEx) <- SimpleList(PCA=pca$x)
-    params$assay.type <- "counts"
-    params$x <- scEx
-  } else {
-    params$x <- scEx_log
-    reducedDims(scEx_log) <- SimpleList(PCA=pca$x)
-    params$assay.type <- "logcounts"
-    if (length(geneid) > 0) {
-      params$subset.row <- geneid
-    }
-  }
+  switch(clusterSource,
+    "PCA" = {
+      reducedDims(scEx) <- SimpleList(PCA = pca$x)
+      params$assay.type <- "counts"
+      params$x <- scEx
+    },
+    "logcounts" = {
+      params$x <- scEx_log
+      reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
+      params$assay.type <- "logcounts"
+      if (length(geneid) > 0) {
+        params$subset.row <- geneid
+      }
+      use.ranks = NA
+    },
+    "counts" = {
+      params$x <- scEx
+      reducedDims(scEx) <- SimpleList(PCA = pca$x)
+      params$assay.type <- "counts"
+      if (length(geneid) > 0) {
+        params$subset.row <- geneid
+      }
+      use.ranks = NA 
+     }
+  )
   require(scran)
   retVal <- tryCatch({
     suppressMessages(do.call("quickCluster", params))
   },
   error = function(e) {
-    cat(file = stderr(), paste("\nProblem with clustering:\n\n",as.character(e), "\n\n"))
+    cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
     if (grepl("rank variances of zero", as.character(e))) {
-      if (useRanks){
+      if (useRanks) {
         if (!is.null(getDefaultReactiveDomain())) {
-          showNotification("quickClusterError", id = "quickClusterError", type="error", duration = NULL)
+          showNotification("quickClusterError", id = "quickClusterError", type = "error", duration = NULL)
         }
-        cat(file = stderr(),"\nNot using ranks due to identical ranks\n")
-        params$use.ranks = F
+        cat(file = stderr(), "\nNot using ranks due to identical ranks\n")
+        params$use.ranks <- F
         return(do.call("quickCluster", params))
       }
-      cat(file = stderr(),"\nRemove duplicated cells\n")
+      cat(file = stderr(), "\nRemove duplicated cells\n")
     }
     return(NULL)
   },
@@ -1530,12 +1561,12 @@ scranCluster <- function(pca,
     return(suppressMessages(do.call("quickCluster", params)))
   }
   )
-  if("barcode" %in% colnames(colData(scEx_log))) {
-    barCode = colData(scEx_log)$barcode
-  }else{
-    barCode = rownames(colData(scEx_log))
+  if ("barcode" %in% colnames(colData(scEx_log))) {
+    barCode <- colData(scEx_log)$barcode
+  } else {
+    barCode <- rownames(colData(scEx_log))
   }
-  
+
   retVal <- data.frame(
     Barcode = barCode,
     Cluster = retVal
@@ -1564,38 +1595,38 @@ scran_Cluster <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     removeNotification(id = "dbClusterError")
   }
-  
+
   pca <- pca()
   scEx <- scEx()
   scEx_log <- scEx_log()
   seed <- input$seed
   # kNr <- input$kNr
   useRanks <- input$useRanks
-  
+
   clusterSource <- clusterMethodReact$clusterSource
   geneSelectionClustering <- input$geneSelectionClustering
   minClusterSize <- input$minClusterSize
   clusterMethod <- clusterMethodReact$clusterMethod
-  
+
   if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
     if (DEBUG) {
       cat(file = stderr(), "scran_Cluster:NULL\n")
     }
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scran_Cluster.RData", list = c(ls(), ls(envir = globalenv())))
-  }
+  # if (.schnappsEnv$DEBUGSAVE) {
+  #   save(file = "~/SCHNAPPsDebug/scran_Cluster.RData", list = c(ls(), ls(envir = globalenv())))
+  # }
   # load(file="~/SCHNAPPsDebug/scran_Cluster.RData")
-  
+
   featureData <- rowData(scEx_log)
-  
+
   if (is.null(seed)) {
     seed <- 1
   }
   retVal <- scranCluster(
     pca,
-    scEx, 
+    scEx,
     scEx_log,
     seed,
     clusterSource,
@@ -1614,7 +1645,7 @@ scran_Cluster <- reactive({
     )
     exit()
   }
-  
+
   exportTestValues(scran_Cluster = {
     retVal
   })
@@ -1636,33 +1667,33 @@ dbCluster <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("dbCluster", id = "dbCluster", duration = NULL)
   }
-  
+
   # kNr <- input$kNr
   clustering <- scran_Cluster()
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/dbCluster.RData")
-  
+
   if (is.null(clustering)) {
     if (DEBUG) {
       cat(file = stderr(), "dbCluster: NULL\n")
     }
     return(NULL)
   }
-  
+
   dbCluster <- clustering$Cluster
-  
+
   # cluster colors
   inCols <- list()
   lev <- levels(dbCluster)
-  
+
   inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
-  
+
   clusterCols$colPal <- unlist(inCols)
-  
+
   exportTestValues(dbCluster = {
     dbCluster
   })
@@ -1702,9 +1733,9 @@ projections <- reactive({
   scEx <- scEx()
   pca <- pca()
   prjs <- sessionProjections$prjs
-  
+
   if (!exists("scEx") |
-      is.null(scEx) | !exists("pca") | is.null(pca)) {
+    is.null(scEx) | !exists("pca") | is.null(pca)) {
     if (DEBUG) {
       cat(file = stderr(), "sampleInfo: NULL\n")
     }
@@ -1714,9 +1745,9 @@ projections <- reactive({
     save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
-  
-  
-  projections <- data.frame(pca$x[, seq(1,ncol(pca$x))])
+
+
+  projections <- data.frame(pca$x[, seq(1, ncol(pca$x))])
   # todo colData() now returns a s4 object of class DataFrame
   # not sure what else is effected...
   pd <- as.data.frame(colData(scEx))
@@ -1724,7 +1755,7 @@ projections <- reactive({
     cat(file = stderr(), "phenoData for scEx has less than 2 columns\n")
     return(NULL)
   }
-  
+
   withProgress(message = "Performing projections", value = 0, {
     n <- length(.schnappsEnv$projectionFunctions)
     iter <- 1
@@ -1734,7 +1765,7 @@ projections <- reactive({
       if (DEBUG) {
         cat(file = stderr(), paste("calculation projection:  ", proj[1], "\n"))
       }
-      if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2] , "\n"))
+      if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2], "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
       if (.schnappsEnv$DEBUGSAVE) {
         save(
@@ -1765,11 +1796,11 @@ projections <- reactive({
         } else {
           stop("error: ", proj[1], "didn't produce a result")
         }
-       }
-      
+      }
+
       colnames(projections) <- cn
-      if (DEBUG) cat(file = stderr(), paste("colnames ",paste0( colnames(projections), collapse = " ") , "\n"))
-      if (DEBUG) cat(file = stderr(), paste("observe this: ", proj[2] , "\n"))
+      if (DEBUG) cat(file = stderr(), paste("colnames ", paste0(colnames(projections), collapse = " "), "\n"))
+      if (DEBUG) cat(file = stderr(), paste("observe this: ", proj[2], "\n"))
       # observe(proj[2], quoted = TRUE)
     }
   })
@@ -1781,19 +1812,19 @@ projections <- reactive({
       projections[, pdIdx] <- pd[, pdIdx]
     }
   }
-  
+
   if (ncol(prjs) > 0 & nrow(prjs) == nrow(projections)) {
     projections <- cbind(projections, prjs)
   }
   # remove columns with only one unique value
-  rmC=c()
-  for (cIdx in 1:ncol(projections)){
+  rmC <- c()
+  for (cIdx in 1:ncol(projections)) {
     # ignore sampleNames
     if (colnames(projections)[cIdx] == "sampleNames") next()
-    if (length(unique(projections[,cIdx])) == 1) rmC = c(rmC, cIdx)
+    if (length(unique(projections[, cIdx])) == 1) rmC <- c(rmC, cIdx)
   }
-  if (length(rmC) > 0) projections = projections[, -rmC]
-  
+  if (length(rmC) > 0) projections <- projections[, -rmC]
+
   exportTestValues(projections = {
     projections
   })
@@ -1815,11 +1846,11 @@ initializeGroupNames <- reactive({
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("initializeGroupNames",
-                     id = "initializeGroupNames",
-                     duration = NULL
+      id = "initializeGroupNames",
+      duration = NULL
     )
   }
-  
+
   scEx <- scEx()
   if (is.null(scEx)) {
     return(NULL)
@@ -1855,7 +1886,7 @@ sample <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sample", id = "sample", duration = NULL)
   }
-  
+
   scEx <- scEx()
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -1867,12 +1898,12 @@ sample <- reactive({
     save(file = "~/SCHNAPPsDebug/sample.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/sample.RData")
-  
+
   pd <- colData(scEx)
   retVal <- NULL
   for (pdColName in colnames(pd)) {
     # in case dbCluster is already in the colData this would create dbCluster.1 later on
-    if(pdColName == "dbCluster") next()
+    if (pdColName == "dbCluster") next()
     if (length(levels(factor(pd[, pdColName]))) < 30) {
       if (is.null(retVal)) {
         retVal <- data.frame(pd[, pdColName])
@@ -1881,7 +1912,7 @@ sample <- reactive({
       retVal[, pdColName] <- factor(as.character(pd[, pdColName]))
     }
   }
-  rownames(retVal) = rownames(pd)
+  rownames(retVal) <- rownames(pd)
   exportTestValues(sample = {
     retVal
   })
@@ -1903,9 +1934,9 @@ geneCount <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("geneCount", id = "geneCount", duration = NULL)
   }
-  
+
   scEx_log <- scEx_log()
-  
+
   if (is.null(scEx_log)) {
     return(NULL)
   }
@@ -1913,9 +1944,9 @@ geneCount <- reactive({
     save(file = "~/SCHNAPPsDebug/geneCount.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/geneCount.RData")
-  
+
   retVal <- Matrix::colSums(assays(scEx_log)[["logcounts"]] > 0)
-  
+
   exportTestValues(geneCount = {
     retVal
   })
@@ -1937,10 +1968,10 @@ beforeFilterPrj <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("beforeFilterPrj", id = "beforeFilterPrj", duration = NULL)
   }
-  
+
   scEx <- scEx()
   bfc <- beforeFilterCounts()
-  
+
   if (is.null(scEx) | is.null(bfc)) {
     return(NULL)
   }
@@ -1948,10 +1979,10 @@ beforeFilterPrj <- reactive({
     save(file = "~/SCHNAPPsDebug/beforeFilterPrj.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/beforeFilterPrj.RData")
-  
+
   cn <- colnames(scEx)
   retVal <- bfc[cn]
-  
+
   exportTestValues(beforeFilterPrj = {
     retVal
   })
@@ -1973,9 +2004,9 @@ umiCount <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("umiCount", id = "umiCount", duration = NULL)
   }
-  
+
   scEx <- scEx()
-  
+
   if (is.null(scEx)) {
     return(NULL)
   }
@@ -1983,9 +2014,9 @@ umiCount <- reactive({
     save(file = "~/SCHNAPPsDebug/umiCount.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/umiCount.RData")
-  
+
   retVal <- Matrix::colSums(assays(scEx)[["counts"]])
-  
+
   exportTestValues(umiCount = {
     retVal
   })
@@ -2015,7 +2046,7 @@ sampleInfo <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sampleInfo", id = "sampleInfo", duration = NULL)
   }
-  
+
   scEx <- scEx()
   if (!exists("scEx")) {
     if (DEBUG) {
@@ -2027,9 +2058,9 @@ sampleInfo <- reactive({
     save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/sampleInfo.RData")
-  
+
   retVal <- sampleInfoFunc(scEx)
-  
+
   exportTestValues(sampleInfo = {
     retVal
   })
@@ -2053,9 +2084,9 @@ inputSample <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("inputSample", id = "inputSample", duration = NULL)
   }
-  
+
   dataTables <- inputData()
-  
+
   if (is.null(dataTables)) {
     return(NULL)
   }
@@ -2066,7 +2097,7 @@ inputSample <- reactive({
     save(file = "~/SCHNAPPsDebug/inputSample.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file='~/SCHNAPPsDebug/inputSample.RData')
-  
+
   # TODO should come from sampleInfo
   sampInf <- gsub(".*-(.*)", "\\1", dataTables$scEx$barcode)
   cellIds <- data.frame(
@@ -2074,7 +2105,7 @@ inputSample <- reactive({
     sample = sampInf,
     ngenes = Matrix::colSums(assays(dataTables$scEx)[[1]])
   )
-  
+
   if (DEBUG) {
     cat(file = stderr(), "inputSample: done\n")
   }
@@ -2145,27 +2176,27 @@ reacativeReport <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("reacativeReport", id = "reacativeReport", duration = NULL)
   }
-  
+
   scEx <- scEx()
   projections <- projections()
   scEx_log <- scEx_log()
   inputNames <- names(input)
   # browser()
-  
+
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "output$report:NULL\n")
     }
     return(NULL)
   }
-  
+
   tmpPrjFile <-
     tempfile(
       pattern = "file",
       tmpdir = .schnappsEnv$reportTempDir,
       fileext = ".RData"
     )
-  
+
   report.env <- new.env()
   # translate reactiveValues to lists
   # this way they can be saved
@@ -2181,24 +2212,27 @@ reacativeReport <- function() {
         rectVals <- c(rectVals, var)
         assign(var, reactiveValuesToList(get(var)), envir = report.env)
       } else if (class(get(var))[1] == "reactiveExpr") {
-        if (DEBUG) cat(
-          file = stderr(),
-          paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
-        )
+        if (DEBUG) {
+          cat(
+            file = stderr(),
+            paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
+          )
+        }
         # if ( var == "coE_selctedCluster")
-          # browser()
+        # browser()
         rectVals <- c(rectVals, var)
         tempVar <- tryCatch(eval(parse(text = paste0(
           "\`", var, "\`()"
         ))),
-        error = function(e){
-          cat(file = stderr(), paste("error var", var, ":(",e,")\n"))
+        error = function(e) {
+          cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
           e
         },
-        warning = function(e){
-          cat(file = stderr(), paste("warning with var", var, ":(",e,")\n"))
+        warning = function(e) {
+          cat(file = stderr(), paste("warning with var", var, ":(", e, ")\n"))
           e
-        })
+        }
+        )
         assign(var, tempVar, envir = report.env)
         # for modules we have to take care of return values
         # this has to be done manually (for the moment)
@@ -2216,24 +2250,24 @@ reacativeReport <- function() {
             # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
             #   browser()
             # assign(paste0(var, "-cluster"),
-                   # eval(report.env[[var]][["cluster"]]),
-                   # envir = report.env
+            # eval(report.env[[var]][["cluster"]]),
+            # envir = report.env
             # )
             tempVar <- report.env[[var]][["selectedCells"]]
             assign(paste0(var, "-selectedCells"),
-                   eval(parse(text = "tempVar()")),
-                   envir = report.env
+              eval(parse(text = "tempVar()")),
+              envir = report.env
             )
           }
         }
       }
     }
-    
+
     assign("input", reactiveValuesToList(get("input")), envir = report.env)
   })
   pca <- pca()
   tsne <- tsne()
-  
+
   scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
   reportTempDir <- get("reportTempDir", envir = .schnappsEnv)
   base::save(
@@ -2257,11 +2291,11 @@ reacativeReport <- function() {
     )
   }
   # load('~/SCHNAPPsDebug/tempReport.1.RData')
-  
+
   outZipFile <- paste0(.schnappsEnv$reportTempDir, "/report.zip")
-  
+
   reactiveFiles <- ""
-  
+
   # fixed files -----------
   tmpFile <-
     tempfile(
@@ -2270,21 +2304,21 @@ reacativeReport <- function() {
       fileext = ".RData"
     )
   file.copy(paste0(packagePath, "/geneLists.RData"),
-            tmpFile,
-            overwrite = TRUE
+    tmpFile,
+    overwrite = TRUE
   )
   file.copy(paste0(packagePath, "/Readme.txt"),
-            .schnappsEnv$reportTempDir,
-            overwrite = TRUE
+    .schnappsEnv$reportTempDir,
+    overwrite = TRUE
   )
   reactiveFiles <-
     paste0(reactiveFiles,
-           "#geneLists.RData\nload(file=\"",
-           tmpFile,
-           "\")\n",
-           collapse = "\n"
+      "#geneLists.RData\nload(file=\"",
+      tmpFile,
+      "\")\n",
+      collapse = "\n"
     )
-  
+
   # global variables
   tmpFile <-
     tempfile(
@@ -2295,13 +2329,13 @@ reacativeReport <- function() {
   save(file = tmpFile, list = c("allowedColors"))
   reactiveFiles <-
     paste0(reactiveFiles,
-           "#allowedColors",
-           "\nload(file=\"",
-           tmpFile,
-           "\")\n",
-           collapse = "\n"
+      "#allowedColors",
+      "\nload(file=\"",
+      tmpFile,
+      "\")\n",
+      collapse = "\n"
     )
-  
+
   # we load this twice since we need .schnappsEnv here for the first time...
   reactiveFiles <-
     paste0(
@@ -2314,7 +2348,7 @@ reacativeReport <- function() {
   # Projections -----
   # projections can contain mannually annotated groups of cells and different normalizations.
   # to reduce complexity we are going to save those in a separate RData file
-  
+
   # return(tmpPrjFile)
   # the reactive.R can hold functions that can be used in the report to reduce the possibility of code replication
   # we copy them to the temp directory and load them in the markdown
@@ -2371,7 +2405,7 @@ reacativeReport <- function() {
       reactiveFiles,
       "\n```\n\n"
     )
-  
+
   # handle plugin reports
   # load contribution reports
   # parse all report.Rmd files under contributions to include in application
@@ -2408,31 +2442,31 @@ reacativeReport <- function() {
     )
     fpRidx <- fpRidx + 1
   }
-  
+
   # Copy the report file to a temporary directory before processing it, in
   # case we don't have write permissions to the current working dir (which
   # can happen when deployed).
   tempReport <- file.path(.schnappsEnv$reportTempDir, "report.Rmd")
-  
+
   # tempServerFunctions <- file.path(.schnappsEnv$reportTempDir, "serverFunctions.R")
   # file.copy("serverFunctions.R", tempServerFunctions, overwrite = TRUE)
-  
+
   # create a new list of all parameters that can be passed to the markdown doc.
-  
+
   params <- list( # tempServerFunctions = tempServerFunctions,
     # tempprivatePlotFunctions = tempprivatePlotFunctions,
     calledFromShiny = TRUE # this is to notify the markdown that we are running the script from shiny. used for debugging/development
     # save the outputfile name for others to use to save
     # params$outputFile <- file$datapath[1])
   )
-  
+
   # for (idx in 1:length(names(input))) {
   #   params[[inputNames[idx]]] <- input[[inputNames[idx]]]
   # }
   params[["reportTempDir"]] <- .schnappsEnv$reportTempDir
-  
+
   file.copy(paste0(packagePath, "/report.Rmd"), tempReport, overwrite = TRUE)
-  
+
   # read the template and replace parameters placeholder with list
   # of paramters
   x <- readLines(tempReport)
@@ -2444,7 +2478,7 @@ reacativeReport <- function() {
   y <- gsub("__LOAD_REACTIVES__", LoadReactiveFiles, y)
   # cat(y, file="tempReport.Rmd", sep="\n")
   cat(y, file = tempReport, sep = "\n")
-  
+
   if (DEBUG) {
     cat(file = stderr(), "output$report:scEx:\n")
   }
@@ -2466,41 +2500,42 @@ reacativeReport <- function() {
   suppressMessages(require(callr))
   # if (.schnappsEnv$DEBUGSAVE)
   # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)
-  
+
   # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
   # file.copy("contributions/gQC_generalQC//report.Rmd",
   #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
   tryCatch(
-  r(
-    function(input, output_file, params, envir)
-      rmarkdown::render(
-        input = input,
-        output_file = output_file,
+    r(
+      function(input, output_file, params, envir)
+        rmarkdown::render(
+          input = input,
+          output_file = output_file,
+          params = params,
+          envir = envir
+        ),
+      args = list(
+        input = tempReport,
+        output_file = "report.html",
         params = params,
-        envir = envir
-      ),
-    args = list(
-      input = tempReport,
-      output_file = "report.html",
-      params = params,
-      envir = new.env()
-    )
-    # ,
-    # stderr = stderr(),
-    # stdout = stderr()
-  ), error = function(e){
-    cat(file = stderr(), paste("==== An error occurred during the creation of the report\n"))
-  }
+        envir = new.env()
+      )
+      # ,
+      # stderr = stderr(),
+      # stdout = stderr()
+    ),
+    error = function(e) {
+      cat(file = stderr(), paste("==== An error occurred during the creation of the report\n"))
+    }
   )
   # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
   #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
   # rmarkdown::render(input = tempReport, output_file = "report.html",
   #                   params = params, envir = new.env())
-  
+
   tDir <- paste0(.schnappsEnv$reportTempDir, "/")
   base::file.copy(tmpPrjFile, paste0(.schnappsEnv$reportTempDir, "/sessionData.RData"))
   write.csv(as.matrix(assays(scEx_log)[[1]]),
-            file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")
+    file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")
   )
   base::save(
     file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.RData"),
@@ -2528,7 +2563,7 @@ consolidateScEx <-
     colData(scEx)[["dbCluster"]] <- projections$dbCluster
     colData(scEx)[["UmiCountPerGenes"]] <- projections$UmiCountPerGenes
     colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2
-    
+
     return(scEx)
   }
 
