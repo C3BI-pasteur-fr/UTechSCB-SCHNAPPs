@@ -56,7 +56,7 @@ inputTab <- shinydashboard::tabItem(
 
   br(),
   fluidRow(column(6,
-                  textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-|^RP|^MRP")
+                  textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
   )),
   fluidRow(column(6,
                   tags$div(

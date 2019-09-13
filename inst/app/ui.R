@@ -98,15 +98,17 @@ for (fp in uiFiles) {
 
 mListNames <- c()
 for (menuListItem in 1:length(allMenus)) {
-  mListNames[menuListItem] = allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
+  mListNames[menuListItem] <- allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
 }
-sollOrder <- c("input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
-  "Data Exploration", "Subcluster analysis")
-sollOrderIdx = c()
+sollOrder <- c(
+  "input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
+  "Data Exploration", "Subcluster analysis"
+)
+sollOrderIdx <- c()
 for (sIdx in 1:length(sollOrder)) {
-  sollOrderIdx[sIdx] = which(sollOrder[sIdx] == mListNames)
+  sollOrderIdx[sIdx] <- which(sollOrder[sIdx] == mListNames)
 }
-sollOrderIdx = c(sollOrderIdx, which(!1:length(allMenus) %in%  sollOrderIdx))
+sollOrderIdx <- c(sollOrderIdx, which(!1:length(allMenus) %in% sollOrderIdx))
 
 allMenus <- allMenus[sollOrderIdx]
 
@@ -144,25 +146,28 @@ scShinyUI <- shinyUI(
       #   "check this if you are working on the cell/gene selection to avoid certain calculations"
       # ),
 
-      shinyBS::tipify(
-        htmlOutput("summaryStatsSideBar"),
-        "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ", "right"
+
+      htmlOutput("summaryStatsSideBar"),
+      shinyBS::bsTooltip("summaryStatsSideBar",
+        "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
+        "right",
+        trigger = "hover", options = list(container = "body")
       ),
-      
+
       ### failed tests to change color of button text
-      
+
       # <div id="scoped-content">
       #   <style type="text/css" scoped>
-      #   h1 { color: red; } 
+      #   h1 { color: red; }
       # </style>
-      #   
+      #
       #   <h1>Hello</h1>
       #   </div>
-      #   
+      #
       # withTags({
       #   div(id="scoped-content",
       #       tags$style(type="text/css", scoped=NA, "downloadbutton a { color: red; }"),
-      #       tags$a(id = "report", class = paste("btn btn-default shiny-download-link ", "downloadbutton"), href = "", target = "_blank", download = NA, 
+      #       tags$a(id = "report", class = paste("btn btn-default shiny-download-link ", "downloadbutton"), href = "", target = "_blank", download = NA,
       #              icon("download"), "Generate report"),
       #       downloadButton("report", "Generate report", class="downloadbutton")
       #   )
@@ -170,21 +175,21 @@ scShinyUI <- shinyUI(
       ## <div class="header" checked>
       ##   <p>Ready to take the Shiny tutorial? If so</p>
       ##   <a href="shiny.rstudio.com/tutorial">Click Here!</a>
-      ## </div> 
+      ## </div>
       # tags$style(type="text/css", "downloadbutton a { color: #444; }"),
-      downloadButton("report", "Generate report", class="butt"),
+      downloadButton("report", "Generate report", class = "butt"),
       tags$head(tags$style(".butt{color: black !important;}")), #  font color
-      
+
       # commentetd out because currently no-one is using it
       # actionButton("goCalc", "Force Calculations"),
-      
+
       # bookmarkButton(id = "bookmark1"),
       shinyBS::tipify(
-        downloadButton("countscsv", "Download counts.csv", class="butt"),
+        downloadButton("countscsv", "Download counts.csv", class = "butt"),
         "<h3>download current normalized count data as CSV file</h3>"
       ),
       shinyBS::tipify(
-        downloadButton("RDSsave", "Download RData", class="butt"),
+        downloadButton("RDSsave", "Download RData", class = "butt"),
         "<h3>download current cell/gene configuration for reimport to this app</h3>"
       ),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),

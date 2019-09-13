@@ -131,8 +131,8 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
       marker = list(
         size = 2,
         line = list(width = 0),
-        color = ~values,
-        colors = "Greens"
+        color = ~values
+        # ,colors = "Greens"
       )
     )
   layout(p, title = paste(featureData[geneid, "symbol"], collapse = ", "))

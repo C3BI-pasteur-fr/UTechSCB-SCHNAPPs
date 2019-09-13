@@ -16,7 +16,7 @@ for (fp in parFiles) {
     for (li in 1:length(myNormalizationChoices)) {
       liVal <- myNormalizationChoices[[li]]
       if (length(liVal) > 0) {
-        if (DEBUG) cat(file = stderr(), paste("normalization Choice: ", liVal, "\n"))
+        # if (DEBUG) cat(file = stderr(), paste("normalization Choice: ", liVal, "\n"))
         oldNames <- names(normaliztionChoices)
         normaliztionChoices[[length(normaliztionChoices) + 1]] <- liVal
         names(normaliztionChoices) <- c(oldNames, names(myNormalizationChoices)[li])
