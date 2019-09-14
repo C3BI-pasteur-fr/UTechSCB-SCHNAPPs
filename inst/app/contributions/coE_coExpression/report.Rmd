@@ -16,8 +16,8 @@ if (exists("params")) {
   rm(list = ls())
   load("~/SCHNAPPsDebug/report.RData")
   cat(file = stderr(), getwd())
-  
-library(magrittr)
+
+  library(magrittr)
   require(shiny)
   require(plotly)
   require(shinythemes)
@@ -36,24 +36,24 @@ library(magrittr)
   require(kableExtra)
   require(shinyWidgets)
   require(scater)
-  
+
   source("../../../serverFunctions.R")
   source("../../../reactives.R", local = TRUE)
   # source("reactives.R", local = TRUE)
-  
+
   LOCALEXECUTION <- TRUE # to know that we are debugging.
   useCells <- useCellsFunc(dataTables,
-                           geneNames = input$minExpGenes,
-                           rmCells = input$cellsFiltersOut,
-                           rmPattern = input$cellPatternRM,
-                           keepCells = input$cellKeep,
-                           cellKeepOnly = input$cellKeepOnly
+    geneNames = input$minExpGenes,
+    rmCells = input$cellsFiltersOut,
+    rmPattern = input$cellPatternRM,
+    keepCells = input$cellKeep,
+    cellKeepOnly = input$cellKeepOnly
   )
-  
+
   ipIDs <- input$selectIds
   geneListSelection <- input$geneListSelection
   minGene <- input$minGenesGS
-  
+
   useGenes <- useGenesFunc(dataTables, useCells, ipIDs, geneListSelection, minGene)
   featureDataReact <- dataTables$featuredata[useGenes, ]
   featureData <- dataTables$featuredata[useGenes, ]
@@ -61,6 +61,7 @@ library(magrittr)
   scEx_log <- dataTables$scEx_log[useGenes, useCells]
   log2cpm <- dataTables$log2cpm[useGenes, useCells]
 }
+# save(file = "~/SCHNAPPsDebug/report.tmp.RData", list = ls())
 ```
 
 ## All clusters 
@@ -81,15 +82,17 @@ ccols <- clusterCols$colPal
 
 
 scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]])
-heatmapData <- coE_heatmapFunc(
+heatmapData <- tryCatch(coE_heatmapFunc(
   featureData = featureData, scEx_matrix = scEx_matrix,
   projections = projections, genesin = genesin, cells = colnames(scEx_matrix),
   sampCol = sampCol, ccols = ccols
+), error = function(e){return(NULL)}
 )
-
-if (nrow(heatmapData$mat)>0){
-  moduleName <- "coExpHeatmapModule"
-  heatmapPlotFromModule(heatmapData, moduleName, input, projections)
+if (!is.null(heatmapData)) {
+  if (nrow(heatmapData$mat) > 0) {
+    moduleName <- "coExpHeatmapModule"
+    heatmapPlotFromModule(heatmapData, moduleName, input, projections)
+  }
 }
 ```
 
@@ -161,12 +164,12 @@ if (dimCol == "dbCluster") {
 }
 
 p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
-                       geneNames2, dimX, dimY, clId, grpN, legend.position,
-                       grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+  geneNames2, dimX, dimY, clId, grpN, legend.position,
+  grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
 )
 
 
-if (!is.null(p1)){
+if (!is.null(p1)) {
   p1 %>%
     add_trace(
       data = subsetData[scCells, ],
@@ -179,7 +182,6 @@ if (!is.null(p1)){
       inherit = F
     )
 }
-
 ```
 
 
@@ -232,12 +234,12 @@ subsetData <- subset(projections, dbCluster %in% inpClusters)
 
 # cells.1 <- rownames(scCells)
 heatmapData <- coE_heatmapFunc(featureData,
-                               scEx_matrix,
-                               projections,
-                               genesin,
-                               cells = scCells,
-                               sampCol = sampCol,
-                               ccols = ccols
+  scEx_matrix,
+  projections,
+  genesin,
+  cells = scCells,
+  sampCol = sampCol,
+  ccols = ccols
 )
 
 
@@ -256,11 +258,8 @@ coEtgminExpr <- input$coEtgMinExpr
 scCells <- `coE_selctedCluster-selectedCells`
 
 if (is.null(scEx_log) || is.null(scCells)) {
-  
+
 } else {
-  
-  
-  
   featureData <- rowData(scEx_log)
   # we only work on cells that have been selected
   mat <- assays(scEx_log)[[1]][, scCells]
@@ -269,7 +268,7 @@ if (is.null(scEx_log) || is.null(scCells)) {
   # only genes that are expressed in coEtgPerc or more cells
   allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
   mat <- mat[allexpressed, ]
-  
+
   cv <- function(x) {
     sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)
   }
@@ -289,15 +288,15 @@ if (is.null(scEx_log) || is.null(scCells)) {
     rownames(outMat) <- make.unique(as.character(outMat$gene), sep = "___")
     dataTables <- as.data.frame(outMat)
   }
-  
+
   maxCol <- min(20, ncol(dataTables))
   if (dim(dataTables)[2] > 1) {
     DT::datatable(dataTables[, 1:maxCol],
-                  rownames = F, filter = "top",
-                  options = list(
-                    orderClasses = TRUE,
-                    autoWidth = TRUE
-                  )
+      rownames = F, filter = "top",
+      options = list(
+        orderClasses = TRUE,
+        autoWidth = TRUE
+      )
     )
   } else {
     print("no table to print")
@@ -362,52 +361,53 @@ if (is.null(projections)) {
 
 
 ```{r coe_som}
-  genesin <- input$coE_geneSOM
-  nSOM <- input$coE_dimSOM
-  sampCol <- sampleCols$colPal
-  ccols <- clusterCols$colPal
+genesin <- input$coE_geneSOM
+nSOM <- input$coE_dimSOM
+sampCol <- sampleCols$colPal
+ccols <- clusterCols$colPal
 
-  scEx_matrix <- as.matrix(assays(scEx_log)[[1]])
-  featureData <- rowData(scEx_log)
-  # go from readable gene name to ENSG number
-  genesin <- geneName2Index(genesin, featureData)
+scEx_matrix <- as.matrix(assays(scEx_log)[[1]])
+featureData <- rowData(scEx_log)
+# go from readable gene name to ENSG number
+genesin <- geneName2Index(genesin, featureData)
 
-  geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin)
+geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin)
 
-  annotation <- data.frame(projections[, c("dbCluster", "sampleNames")])
-  rownames(annotation) <- rownames(projections)
-  colnames(annotation) <- c("Cluster", "sampleNames")
-  annCols <- list("sampleNames" = sampCol,
-                  "Cluster" = ccols)
-  
-  retVal <- list(
-    mat = scEx_matrix[geneNames, ,drop = FALSE],
-    cluster_rows = TRUE,
-    cluster_cols = TRUE,
-    # scale = "row",
-    fontsize_row = 14,
-    labels_row = featureData[geneNames, "symbol"],
-    show_rownames = TRUE,
-    annotation_col = annotation,
-    show_colnames = FALSE,
-    annotation_legend = TRUE,
-    # breaks = seq(minBreak, maxBreak, by = stepBreak),
-    # filename = 'test.png',
-    # filename = normalizePath(outfile),
-    color = colorRampPalette(rev(RColorBrewer::brewer.pal(
-      n = 6, name =
-        "RdBu"
-    )))(6),
-    annotation_colors = annCols
-  )
-  # system.time(do.call(TRONCO::pheatmap, retVal))
+annotation <- data.frame(projections[, c("dbCluster", "sampleNames")])
+rownames(annotation) <- rownames(projections)
+colnames(annotation) <- c("Cluster", "sampleNames")
+annCols <- list(
+  "sampleNames" = sampCol,
+  "Cluster" = ccols
+)
+
+retVal <- list(
+  mat = scEx_matrix[geneNames, , drop = FALSE],
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
+  # scale = "row",
+  fontsize_row = 14,
+  labels_row = featureData[geneNames, "symbol"],
+  show_rownames = TRUE,
+  annotation_col = annotation,
+  show_colnames = FALSE,
+  annotation_legend = TRUE,
+  # breaks = seq(minBreak, maxBreak, by = stepBreak),
+  # filename = 'test.png',
+  # filename = normalizePath(outfile),
+  color = colorRampPalette(rev(RColorBrewer::brewer.pal(
+    n = 6, name =
+      "RdBu"
+  )))(6),
+  annotation_colors = annCols
+)
+# system.time(do.call(TRONCO::pheatmap, retVal))
 
 
 if (nrow(retVal$mat) > 1) {
   moduleName <- "coE_heatmapSOM"
   heatmapPlotFromModule(retVal, moduleName, input, projections)
 }
-
 ```
 
 *Genes found by SOM*:

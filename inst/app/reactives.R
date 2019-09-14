@@ -2505,7 +2505,7 @@ reacativeReport <- function() {
   # file.copy("contributions/gQC_generalQC//report.Rmd",
   #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
   tryCatch(
-    r(
+    callr::r(
       function(input, output_file, params, envir)
         rmarkdown::render(
           input = input,
@@ -2519,12 +2519,12 @@ reacativeReport <- function() {
         params = params,
         envir = new.env()
       )
-      # ,
-      # stderr = stderr(),
-      # stdout = stderr()
+      ,
+      stderr = stderr(),
+      stdout = stderr()
     ),
     error = function(e) {
-      cat(file = stderr(), paste("==== An error occurred during the creation of the report\n"))
+      cat(file = stderr(), paste("==== An error occurred during the creation of the report\n", e, "\n"))
     }
   )
   # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
