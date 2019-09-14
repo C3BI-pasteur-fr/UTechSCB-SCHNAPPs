@@ -21,6 +21,9 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   if (is.null(genesin) | is.null(cells)) {
     return(NULL)
   }
+  if (length(genesin)<2){
+    return(NULL)
+  }
   expression <- scEx_matrix[genesin, cells]
   
   validate(need(
