@@ -1437,7 +1437,7 @@ pca <- reactive({
   rank <- input$pcaRank
   center <- input$pcaCenter
   scale <- input$pcaScale
-  pcaGenes <- input$cells4PCA
+  pcaGenes <- input$genes4PCA
   scEx_log <- scEx_log()
 
   if (is.null(scEx_log)) {
