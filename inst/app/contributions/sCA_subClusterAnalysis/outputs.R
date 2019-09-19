@@ -51,8 +51,8 @@ sCA_dgeTableReac <- reactive({
   if (dim(top.genes)[1] > 0) {
     # change inf to high/low number
     infIdx <- which(is.infinite(top.genes$avg_diff))
-    top.genes$avg_diff[top.genes$avg_diff[infIdx] > 0] <- 9999999
-    top.genes$avg_diff[top.genes$avg_diff[infIdx] < 0] <- -9999999
+    top.genes$avg_diff[infIdx[top.genes$avg_diff[infIdx] > 0]] <- 9999999
+    top.genes$avg_diff[infIdx[top.genes$avg_diff[infIdx] < 0]] <- -9999999
     top.genes$Description[is.na(top.genes$Description)] = ""
     return(top.genes)
   } else {
