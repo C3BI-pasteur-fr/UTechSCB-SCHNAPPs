@@ -27,6 +27,12 @@ inputFile <- reactiveValues(
   inFile = "",
   annFile = ""
 )
+if("crayon" %in% rownames(installed.packages()) == FALSE) {
+  green = function(x){x}
+} else {
+  require(crayon)
+}
+
 
 # inputDataFunc ----
 # loads singleCellExperiment
@@ -158,13 +164,19 @@ inputDataFunc <- function(inFile) {
         cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
         next()
       }
-      ex1 <- assays(scEx)[["counts"]]
-      colnames(ex1) <- rownames(pd1)
-      tmpMat = matrix(nrow=length(rListAll), ncol = ncol(ex1), data=0)
-      rownames(tmpMat) = rListAll
-      ex1 = rbind(ex1, tmpMat)
-      
+      ex1 <- assays(scEx)[["counts"]][fdIdx, ]
+      pdAllCols2add = colnames(pdAll)[!colnames(pdAll) %in% colnames(pd1)]
+      pd1Cols2add = colnames(pd1)[!colnames(pd1) %in% colnames(pdAll)]
+      for (pd1C in pd1Cols2add) {
+        pdAll[,pd1C] = NA
+      }
+      for (pd1C in pdAllCols2add) {
+        pd1[,pd1C] = NA
+      }
       if (sum(rownames(pdAll) %in% rownames(pd1)) > 0) {
+        cat(green("Houston, there are cells with the same name\n"))
+        save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats","fdAll"))
+        # load("~/SCHNAPPsDebug/inputProblem.RData")
         cat(file = stderr(), "Houston, there are cells with the same name\n")
         rownames(pd1) <- paste0(rownames(pd1), "_", fpIdx)
         pdAll <- rbind(pdAll, pd1)
