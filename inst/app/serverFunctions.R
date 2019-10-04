@@ -48,7 +48,7 @@ geneName2Index <- function(g_id, featureData) {
     }
   }
 
-  geneid <- rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ])
+  geneid <- unique(rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ]))
 
   return(geneid)
 }
