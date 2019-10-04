@@ -181,9 +181,10 @@ clusterServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("selectedCellNames", id = "selectedCellNames", duration = NULL)
     }
-    
-    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
+    # browser()
     projections <- projections()
+    req(projections)
+    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
     dimY <- input$dimension_y
     dimX <- input$dimension_x
     geneNames <- input$geneIds
