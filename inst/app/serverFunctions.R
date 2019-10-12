@@ -21,16 +21,16 @@ geneName2Index <- function(g_id, featureData) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("geneName2Index", id = "geneName2Index", duration = NULL)
   }
-
+  
   if (is.null(g_id)) {
     return(NULL)
   }
-
+  
   g_id <- toupper(g_id)
   g_id <- gsub(" ", "", g_id, fixed = TRUE)
   g_id <- strsplit(g_id, ",")
   g_id <- g_id[[1]]
-
+  
   notFound <- g_id[!g_id %in% toupper(featureData$symbol)]
   if (length(featureData$symbol) == length(notFound)) {
     # in case there is only one gene that is not available.
@@ -42,14 +42,14 @@ geneName2Index <- function(g_id, featureData) {
     }
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(paste("following genes were not found", notFound, collapse = " "),
-        id = "moduleNotFound", type = "warning",
-        duration = 20
+                       id = "moduleNotFound", type = "warning",
+                       duration = 20
       )
     }
   }
-
+  
   geneid <- unique(rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ]))
-
+  
   return(geneid)
 }
 
@@ -107,7 +107,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "Gene.count",
                              colors = NULL) {
   geneid <- geneName2Index(g_id, featureData)
-
+  
   if (length(geneid) == 0) {
     return(NULL)
   }
@@ -123,7 +123,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   #   expression <- Matrix::colSums(exprs(scEx_log)[geneid, ])
   # }
   # validate(need(is.na(sum(expression)) != TRUE, ""))
-
+  
   # geneid <- geneName2Index(geneNames, featureData)
   projections <- updateProjectionsWithUmiCount(
     dimX = dimX, dimY = dimY,
@@ -131,11 +131,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
-
-
+  
+  
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
-
+  
   if (DEBUG) {
     cat(file = stderr(), paste("output$sCA_dge_plot1:---", clId[1], "---\n"))
   }
@@ -164,7 +164,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
-
+  
   suppressMessages(require(plotly))
   f <- list(
     family = "Courier New, monospace",
@@ -177,7 +177,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (divYBy != "None") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
   }
-
+  
   typeX <- typeY <- "linear"
   if (logx) {
     typeX <- "log"
@@ -205,7 +205,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     subsetData$"__dimXorder" <- rank(subsetData[, dimY])
     dimX <- "__dimXorder"
   }
-
+  
   if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
     subsetData[, dimX] <- as.character(subsetData[, dimX])
   }
@@ -215,7 +215,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
-
+  
   p1 <- plotly::plot_ly(
     data = subsetData, source = "subset",
     key = rownames(subsetData)
@@ -235,14 +235,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       title = gtitle,
       dragmode = "select"
     )
-
-
+  
+  
   if (is.factor(subsetData[, dimCol])) {
-
+    
   } else {
     p1 <- colorbar(p1, title = dimCol)
   }
-
+  
   selectedCells <- NULL
   if (length(grpN) > 0) {
     if (length(grpNs[rownames(subsetData), grpN]) > 0 & sum(grpNs[rownames(subsetData), grpN], na.rm = TRUE) > 0) {
@@ -357,13 +357,13 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
   moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
   colTree <- input[[paste0(moduleName, "-showColTree")]]
-
+  
   if (is.null(heatmapData) | is.null(projections) | is.null(heatmapData$mat)) {
     return(NULL)
   }
-
+  
   heatmapData$filename <- NULL
-
+  
   if (length(addColNames) > 0 & moreOptions) {
     heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
   }
@@ -386,12 +386,12 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
   grpNs <- groupNames$namesDF
   grpN <- make.names(input$groupName)
-
+  
   dimY <- input[[paste0(moduleName, "-dimension_y")]]
   dimX <- input[[paste0(moduleName, "-dimension_x")]]
   dimCol <- input[[paste0(moduleName, "-dimension_col")]]
   clId <- input[[paste0(moduleName, "-clusters")]]
-
+  
   geneNames <- input[[paste0(moduleName, "-geneIds")]]
   geneNames2 <- input[[paste0(moduleName, "-geneIds2")]]
   logx <- input[[paste0(moduleName, "-logX")]]
@@ -400,13 +400,13 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   divYBy <- input[[paste0(moduleName, "-divideYBy")]]
   scols <- sampleCols$colPal
   ccols <- clusterCols$colPal
-
-
+  
+  
   if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
     return(NULL)
   }
-
+  
   featureData <- rowData(scEx_log)
   if (is.null(g_id) || nchar(g_id) == 0) {
     g_id <- featureData$symbol
@@ -415,8 +415,8 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (is.null(logy)) logy <- FALSE
   if (is.null(divXBy)) divXBy <- "None"
   if (is.null(divYBy)) divYBy <- "None"
-
-
+  
+  
   if (dimCol == "sampleNames") {
     myColors <- scols
   } else {
@@ -425,10 +425,10 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (dimCol == "dbCluster") {
     myColors <- ccols
   }
-
+  
   p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
-    geneNames2, dimX, dimY, clId, grpN, legend.position,
-    grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+                         geneNames2, dimX, dimY, clId, grpN, legend.position,
+                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
   )
   return(p1)
 }
@@ -447,7 +447,7 @@ checkShaCache <- function(moduleName = "traj_elpi_modules",
   retVal <- NULL
   message <- ""
   status <- "new"
-
+  
   shaStr <- ""
   idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
   infile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
@@ -512,24 +512,24 @@ getshaStr <- function(moduleParameters) {
     shaStr <- paste(
       shaStr,
       tryCatch(sha1(md, digits = 14),
-        warning = function(x) {
-          # print("warning")
-          # print(x)
-          # print(idx)
-          return(
-            sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
-          )
-        },
-        error = function(x) {
-          if (class(md) == "SingleCellExperiment") {
-            return(sha1(as.matrix(assays(md)[[1]])))
-          } else {
-            print(idx)
-            return(
-              sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
-            )
-          }
-        }
+               warning = function(x) {
+                 # print("warning")
+                 # print(x)
+                 # print(idx)
+                 return(
+                   sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+                 )
+               },
+               error = function(x) {
+                 if (class(md) == "SingleCellExperiment") {
+                   return(sha1(as.matrix(assays(md)[[1]])))
+                 } else {
+                   print(idx)
+                   return(
+                     sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+                   )
+                 }
+               }
       )
     )
   }
@@ -551,3 +551,43 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
+# record history in env
+# needs pdftk https://www.pdflabs.com/tools/pdftk-server/ 
+# only save to history file if variable historyFile in schnappsEnv is set
+if (!all(c("staplr", "pdftools") %in% rownames(installed.packages()))){
+  recHistory <- function(...){
+    return(NULL)
+  }
+}else{
+  recHistory <- function(name, plot1){
+    if(!exists("historyFile", envir = .schnappsEnv)){
+      return(NULL)
+    }
+    if(!exists("history", envir = .schnappsEnv)){
+      .schnappsEnv$history = list()
+    }
+    tmpF <- tempfile(fileext = ".svg")
+    if ("plotly" %in% class(plot1)){
+      htmlwidgets::saveWidget(plot1, file = tmpF, title = name, 
+                              selfcontained = F, 
+                              libdir = paste0(dirname(tmpF), .Platform$file.sep, "historyLib"))
+      if(file.exists(.schnappsEnv$historyFile)){
+        tmpF2 <- tempfile(fileext = ".html")
+        # requires orca bing installed (https://github.com/plotly/orca#installation)
+        # withr::with_dir("images", orca(img, "plot2.png"))
+        withr::with_dir(dirname(tmpF), plotly::orca(p=plot1, file = basename(tmpF)))
+        file.copy(.schnappsEnv$historyFile, tmpF2)
+        sysStr <- paste("pandoc -s -f html -t latex -o ", .schnappsEnv$historyFile,
+                        " ", tmpF2, " ", tmpF)
+        system(sysStr)
+      }else {
+        file.copy(tmpF, .schnappsEnv$historyFile)
+      }
+      return(TRUE)
+    }
+    
+    # pdf(file = tmpF,onefile = TRUE)
+    # ggsave(filename = tmpF, plot = plot1, device = pdf())
+    # dev.off()
+  }
+}

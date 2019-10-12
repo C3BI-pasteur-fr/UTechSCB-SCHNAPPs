@@ -373,7 +373,7 @@ clusterServer <- function(input, output, session,
     scols <- sampleCols$colPal
     ccols <- clusterCols$colPal
     moreOptions <- input$moreOptions
-    
+    myns <- session$ns("historyPlot")
     if (is.null(scEx_log) | is.null(scEx_log) | is.null(tdata)) {
       if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
       return(NULL)
@@ -419,6 +419,7 @@ clusterServer <- function(input, output, session,
                            geneNames2, dimX, dimY, clId, grpN, legend.position,
                            grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
     )
+    recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
     printTimeEnd(start.time, "clusterPlot")
     exportTestValues(clusterPlot = {
