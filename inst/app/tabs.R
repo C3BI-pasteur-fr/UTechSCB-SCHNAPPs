@@ -275,6 +275,8 @@ generalParametersTab <- shinydashboard::tabItem(
     column(2, offset = 0,
            numericInput("pcaRank", "Number of components", 50, min = 2)),
     column(2, offset = 0,
+           numericInput("pcaN", "Number of variable genes to be used", 500, min = 50)),
+    column(2, offset = 0,
            checkboxInput("pcaCenter", "center data", TRUE)
     ),
     column(2, offset = 0,
