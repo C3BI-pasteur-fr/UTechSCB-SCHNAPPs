@@ -428,7 +428,9 @@ inputData <- reactive({
 
   inFile <- input$file1
   annFile <- input$annoFile
-
+  sampleCells <- input$sampleInput
+  subsampleNum <- input$subsampleNum
+  
   if (is.null(inFile)) {
     if (DEBUG) {
       cat(file = stderr(), "inputData: NULL\n")
@@ -479,6 +481,12 @@ inputData <- reactive({
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
   inputFile$annFile <- paste(annFile$name, collapse = ", ")
 
+  if (sampleCells) {
+    samp <- base::sample(x = ncol(assays(retVal$scEx)[["counts"]]), 
+                   size = min(subsampleNum, ncol(assays(retVal$scEx)[["counts"]])),
+                   replace = FALSE)
+    retVal$scEx <- retVal$scEx[,samp]
+  }
   exportTestValues(inputData = {
     list(
       assays(retVal$scEx)[["counts"]],
