@@ -27,7 +27,7 @@ inputTab <- shinydashboard::tabItem(
     align = "center"
   )),
   fluidRow(column(
-    10,
+    8,
     offset = 1,
     fileInput(
       "annoFile",
@@ -52,6 +52,14 @@ inputTab <- shinydashboard::tabItem(
       multiple = TRUE,
       width = '50%'
     )
+  )),
+  br(),
+  fluidRow(column(
+    4,
+    offset = 2,
+    checkboxInput("sampleInput", label = "sub sample", value = TRUE)),
+    column(4,numericInput("subsampleNum", label = "max number of cells", 
+                 min = 500, max = 10000, step = 100, value = 1000)
   )),
 
   br(),
