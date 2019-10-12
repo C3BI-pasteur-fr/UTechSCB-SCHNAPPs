@@ -106,9 +106,15 @@ inputDataFunc <- function(inFile) {
   stats[1, "nFeatures"] <- nrow(fdAll)
   stats[1, "nCells"] <- nrow(pdAll)
 
+    if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/readInp1.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/readInp1.RData')
+  
   # read multiple files
   if (length(inFile$datapath) > 1) {
     for (fpIdx in 2:length(inFile$datapath)) {
+      inFile$datapath[fpIdx] = "~/Downloads/paper1.RData"
       cat(file = stderr(), paste("reading", inFile$name[fpIdx], "\n"))
       fp <- inFile$datapath[fpIdx]
       fpLs <- load(fp)
@@ -125,13 +131,35 @@ inputDataFunc <- function(inFile) {
       if (!scExFound) {
         next()
       }
-      fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
+      rListAll = rownames(fdAll)[!rownames(fdAll) %in% rownames(rowData(scEx))]
+      rListNew = rownames(rowData(scEx))[!rownames(rowData(scEx)) %in% rownames(fdAll)]
+      
+      # fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
       # if (length(fdIdx) != nrow(fd)) {
       #   cat(file = stderr(), "Houston, there is a problem with the features\n")
       # }
       # fd <- featuredata[fdIdx, ]
-      fdAll <- fdAll[fdIdx, ]
+      rowdataNew = rowData(scEx)[rListNew,]
+      fdAll[rListNew,] = NA
+      for (cIdx in colnames(rowdataNew)){
+        if (! cIdx %in% colnames(fdAll)) {
+          fdAll = cbind(fdAll, data.frame(row.names = rownames(fdAll),  rep(NA, nrow(fdAll))))
+          colnames(fdAll)[length(colnames(fdAll))] = cIdx
+        }
+        fdAll[rListNew, cIdx] = rowdataNew[, cIdx]
+      }
+      # fdAll[rListNew,"id"] = rListNew
+      
+      # append new genes
+      tmpMat = matrix(nrow=length(rListNew), ncol = ncol(exAll), data=0)
+      rownames(tmpMat) = rListNew
+      exAll = rbind(exAll, tmpMat)
+      
+      
+      
+      # fdAll <- fdAll[fdIdx, ]
       pd1 <- colData(scEx)
+      rownames(pd1) = paste0(rownames(pd1), "-", fpIdx)
       if (!"counts" %in% names(assays(scEx))) {
         cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
         next()
@@ -159,7 +187,9 @@ inputDataFunc <- function(inFile) {
       # stats[fpIdx, "nFeatures"] <- nrow(fd)
       stats[fpIdx, "nCells"] <- nrow(pd1)
 
-      exAll <- Matrix::cbind2(exAll[fdIdx, ], ex1)
+      nrow(ex1)
+      nrow(exAll)
+      exAll <- Matrix::cbind2(exAll[rownames(exAll),], ex1[rownames(exAll),])
     }
   }
   exAll <- as(exAll, "dgTMatrix")
@@ -187,7 +217,12 @@ inputDataFunc <- function(inFile) {
     pdAll$sampleNames <- 1
   }
 
-
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/readInp.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/readInp.RData')
+  
   scEx <- SingleCellExperiment(
     assay = list(counts = exAll),
     colData = pdAll,
@@ -266,22 +301,32 @@ readMM <- function(inFile) {
   return(NULL)
 }
 
-# inFile$datapath="data/scEx.csv"
+# inFile$datapath="~/Downloads/GSE122084_RAW/GSM3855868_Salmonella_exposed_cells.txt"
 # load("data/scEx.RData")
 # scMat = as.matrix(assays(scEx)[[1]])
 # write.file.csv(scMat, row.names=TRUE, file="data/scEx.csv" )
 
 readCSV <- function(inFile) {
   # check.names = T will change the rownames. Since this is not enforced for the singleExperiment we shouldn't do it here either.
-  data <- read.table(file = inFile$datapath, check.names = FALSE, header = TRUE, sep = ",")
+  con <- file(inFile$datapath,"r")
+  first_line <- readLines(con,n=1)
+  close(con)
+  commaCount = length(gregexpr(",", first_line, perl  = T)[[1]])
+  tabCount = length(gregexpr("\t", first_line, perl  = T)[[1]])
+  spaceCount = length(gregexpr(" ", first_line, perl  = T)[[1]])
+  sep = ","
+  if (spaceCount > commaCount) sep = " "
+  if (commaCount > tabCount) sep = ","
+  if (tabCount > commaCount) sep = "\t"
+  data <- read.table(file = inFile$datapath, check.names = FALSE, header = TRUE, sep = sep, stringsAsFactors = F)
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/readCSV.RData", list = c(ls(), ls(envir = globalenv())))
   }
-  if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
-    rownames(data) <- data[, 1]
+  # load(file='~/SCHNAPPsDebug/readCSV.RData')
+  if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES", "genes")) {
+    rownames(data) <- make.unique(data[, 1])
     data <- data[, -1]
   }
-  # load(file='~/SCHNAPPsDebug/readCSV.RData')
   exAll <- as(as.matrix(data), "dgTMatrix")
   rownames(exAll) <- rownames(data)
   colnames(exAll) <- colnames(data)
@@ -1331,7 +1376,7 @@ scExLogMatrixDisplay <- reactive({
   return(retVal)
 })
 
-pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
+pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1411,7 +1456,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData) {
       # t(assays(scEx_log)[["logcounts"]]),
       scEx_log[genesin, ],
       ncomponents = rank,
-      ntop = 500,
+      ntop = pcaN,
       exprs_values = "logcounts",
       # rank = rank,
       #  center = center,
@@ -1460,6 +1505,7 @@ pca <- reactive({
     showNotification("pca", id = "pca", duration = NULL)
   }
   rank <- input$pcaRank
+  pcaN <- input$pcaN
   center <- input$pcaCenter
   scale <- input$pcaScale
   pcaGenes <- input$genes4PCA
@@ -1476,7 +1522,7 @@ pca <- reactive({
   if (is.null(center)) centr <- TRUE
   if (is.null(scale)) scale <- FALSE
   featureData <- rowData(scEx_log)
-  retVal <- pcaFunc(scEx_log, rank, center, scale, pcaGenes, featureData)
+  retVal <- pcaFunc(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN)
 
   printTimeEnd(start.time, "pca")
   exportTestValues(pca = {
@@ -1533,9 +1579,11 @@ scranCluster <- function(pca,
     # tied ranks, especially due to zeros, which may reduce the precision of the clustering. 
     # We suggest setting min.mean to 1 for read count data and 0.1 for UMI data.
     min.mean=0.1
-    # ,
-    # BPPARAM = MulticoreParam(
-    #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
+    ,
+    BPPARAM = MulticoreParam(
+      workers = ifelse(detectCores()>1, detectCores()-1, 1)),
+    block.BPPARAM = MulticoreParam(
+      workers = ifelse(detectCores()>1, detectCores()-1, 1))
   )
   switch(clusterSource,
     "PCA" = {

@@ -60,7 +60,7 @@ if(exists("params")){
   log2cpm = dataTables$log2cpm[useGenes, useCells]
   if(DEBUG)cat(file=stderr(), "pca\n")
   
-  pca = pcaFunc(scEx_log, input$pcaRank, input$pcaCenter, input$pcaScale)
+  pca = pcaFunc(scEx_log, input$pcaRank, input$pcaCenter, input$pcaScale, input$pcaN)
   if(DEBUG)cat(file=stderr(), "tsne\n")
   seed=1
   set.seed(seed = seed)
