@@ -1779,6 +1779,11 @@ clusterMethodReact <- reactiveValues(
   clusterSource = "counts"
 )
 
+# collect copied/renamed projections
+projectionsTable <- reactiveValues(
+  newProjections = data.frame()
+)
+
 # projections ----
 #' projections
 #' each column is of length of number of cells
@@ -1806,7 +1811,8 @@ projections <- reactive({
   scEx <- scEx()
   pca <- pca()
   prjs <- sessionProjections$prjs
-
+  newPrjs <- projectionsTable$newProjections
+  
   if (!exists("scEx") |
     is.null(scEx) | !exists("pca") | is.null(pca)) {
     if (DEBUG) {
@@ -1821,6 +1827,7 @@ projections <- reactive({
 
 
   projections <- data.frame(pca$x[, seq(1, ncol(pca$x))])
+  
   # todo colData() now returns a s4 object of class DataFrame
   # not sure what else is effected...
   pd <- as.data.frame(colData(scEx))
@@ -1897,7 +1904,11 @@ projections <- reactive({
     if (length(unique(projections[, cIdx])) == 1) rmC <- c(rmC, cIdx)
   }
   if (length(rmC) > 0) projections <- projections[, -rmC]
-
+ 
+  if (ncol(newPrjs)>0){
+    projections <- cbind(projections, newPrjs[rownames(projections),, drop=FALSE])
+  }
+  
   exportTestValues(projections = {
     projections
   })

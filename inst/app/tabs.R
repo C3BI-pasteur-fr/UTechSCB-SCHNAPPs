@@ -12,6 +12,31 @@ source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 # DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
 # DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
+# renameTab ----
+renameTab <- shinydashboard::tabItem(
+  tabName = "renameProj",
+  fluidRow(div(h3("rename projections"), align = "center")),
+  br(),
+  fluidRow(
+    column(4, offset = 1,
+           selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")),
+    column(
+    4,
+    offset = 1,
+    textInput("newPrj", "new name of Projection", value = "")
+    ),
+    column(2, offset = 0, 
+           actionButton("updatePrjsButton", "rename")),
+    tags$style(type='text/css', "#updatePrjsButton { width:100%; margin-top: 25px;}")
+  ),
+  fluidRow(
+    column(4, offset = 1,
+           selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")),
+    column(2, offset = 0, 
+           actionButton("delPrjsButton", "delete")),
+    tags$style(type='text/css', "#delPrjsButton { width:100%; margin-top: 25px;}")
+  )
+)
 
 # inputTab ----
 inputTab <- shinydashboard::tabItem(

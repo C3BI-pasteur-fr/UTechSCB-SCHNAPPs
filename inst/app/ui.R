@@ -48,7 +48,8 @@ allTabs <- list(
   inputTab,
   geneSelectionTab,
   cellSelectionTab,
-  generalParametersTab
+  generalParametersTab,
+  renameTab
 )
 # parameters tab, includes basic normalization
 source(paste0(packagePath, "/parameters.R"), local = TRUE)
@@ -70,6 +71,10 @@ allMenus <- list(
   shinydashboard::menuItem("Gene selection",
     # id="geneSelectionID",
     tabName = "geneSelection", icon = icon("atom")
+  ),
+  shinydashboard::menuItem("rename projections",
+                           # id="geneSelectionID",
+                           tabName = "renameProj", icon = icon("signature")
   )
 )
 
