@@ -135,11 +135,7 @@ coE_heatmapSelectedReactive <- reactive({
   # else {
   # output$coE_heatmapNull = NULL
   # }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv())))
-  }
-  # load(file = "~/SCHNAPPsDebug/selectedHeatmap.RData")
-  
+
   
   scEx_matrix <- assays(scEx_log)[[1]]
   featureData <- rowData(scEx_log)

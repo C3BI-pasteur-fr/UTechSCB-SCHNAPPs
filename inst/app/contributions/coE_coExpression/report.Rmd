@@ -86,8 +86,9 @@ heatmapData <- tryCatch(coE_heatmapFunc(
   featureData = featureData, scEx_matrix = scEx_matrix,
   projections = projections, genesin = genesin, cells = colnames(scEx_matrix),
   sampCol = sampCol, ccols = ccols
-), error = function(e){return(NULL)}
-)
+), error = function(e) {
+  return(NULL)
+})
 if (!is.null(heatmapData)) {
   if (nrow(heatmapData$mat) > 0) {
     moduleName <- "coExpHeatmapModule"
@@ -133,54 +134,52 @@ legend.position <- "none"
 scCells <- `coE_selctedCluster-selectedCells`
 
 if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
-  if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
-  return(NULL)
-}
-
-featureData <- rowData(scEx_log)
-
-# load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."))
-if (is.null(g_id) || nchar(g_id) == 0) {
-  g_id <- featureData$symbol
-}
-if (is.null(logx)) logx <- FALSE
-if (is.null(logy)) logy <- FALSE
-if (is.null(divXBy)) divXBy <- "None"
-if (is.null(divYBy)) divYBy <- "None"
-
-subsetData <- updateProjectionsWithUmiCount(
-  dimX = dimX, dimY = dimY,
-  geneNames = geneNames,
-  geneNames2 = geneNames2,
-  scEx = scEx_log, projections = projections
-)
-if (dimCol == "sampleNames") {
-  myColors <- scols
 } else {
-  myColors <- NULL
-}
-if (dimCol == "dbCluster") {
-  myColors <- ccols
-}
+  featureData <- rowData(scEx_log)
 
-p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
-  geneNames2, dimX, dimY, clId, grpN, legend.position,
-  grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
-)
+  # load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."))
+  if (is.null(g_id) || nchar(g_id) == 0) {
+    g_id <- featureData$symbol
+  }
+  if (is.null(logx)) logx <- FALSE
+  if (is.null(logy)) logy <- FALSE
+  if (is.null(divXBy)) divXBy <- "None"
+  if (is.null(divYBy)) divYBy <- "None"
+
+  subsetData <- updateProjectionsWithUmiCount(
+    dimX = dimX, dimY = dimY,
+    geneNames = geneNames,
+    geneNames2 = geneNames2,
+    scEx = scEx_log, projections = projections
+  )
+  if (dimCol == "sampleNames") {
+    myColors <- scols
+  } else {
+    myColors <- NULL
+  }
+  if (dimCol == "dbCluster") {
+    myColors <- ccols
+  }
+
+  p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
+    geneNames2, dimX, dimY, clId, grpN, legend.position,
+    grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+  )
 
 
-if (!is.null(p1)) {
-  p1 %>%
-    add_trace(
-      data = subsetData[scCells, ],
-      x =
-        ~ get(dimX), y = ~ get(dimY),
-      type = "scatter", mode =
-        "markers", color = "red",
-      name =
-        "selected", showlegend = TRUE,
-      inherit = F
-    )
+  if (!is.null(p1)) {
+    p1 %>%
+      add_trace(
+        data = subsetData[scCells, ],
+        x =
+          ~ get(dimX), y = ~ get(dimY),
+        type = "scatter", mode =
+          "markers", color = "red",
+        name =
+          "selected", showlegend = TRUE,
+        inherit = F
+      )
+  }
 }
 ```
 
@@ -333,7 +332,7 @@ coE_showPermutations <- input$coE_showPermutations
 sampCol <- sampleCols$colPal
 ccols <- clusterCols$colPal
 
-if (is.null(projections)) {
+if (is.null(projections) | is.null(scEx_log)) {
   print("no violin plot to print")
 } else {
   featureData <- rowData(scEx_log)
@@ -365,48 +364,49 @@ genesin <- input$coE_geneSOM
 nSOM <- input$coE_dimSOM
 sampCol <- sampleCols$colPal
 ccols <- clusterCols$colPal
+if (!is.null(scEx_log)) {
+  scEx_matrix <- as.matrix(assays(scEx_log)[[1]])
+  featureData <- rowData(scEx_log)
+  # go from readable gene name to ENSG number
+  genesin <- geneName2Index(genesin, featureData)
 
-scEx_matrix <- as.matrix(assays(scEx_log)[[1]])
-featureData <- rowData(scEx_log)
-# go from readable gene name to ENSG number
-genesin <- geneName2Index(genesin, featureData)
+  geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin)
 
-geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin)
+  annotation <- data.frame(projections[, c("dbCluster", "sampleNames")])
+  rownames(annotation) <- rownames(projections)
+  colnames(annotation) <- c("Cluster", "sampleNames")
+  annCols <- list(
+    "sampleNames" = sampCol,
+    "Cluster" = ccols
+  )
 
-annotation <- data.frame(projections[, c("dbCluster", "sampleNames")])
-rownames(annotation) <- rownames(projections)
-colnames(annotation) <- c("Cluster", "sampleNames")
-annCols <- list(
-  "sampleNames" = sampCol,
-  "Cluster" = ccols
-)
-
-retVal <- list(
-  mat = scEx_matrix[geneNames, , drop = FALSE],
-  cluster_rows = TRUE,
-  cluster_cols = TRUE,
-  # scale = "row",
-  fontsize_row = 14,
-  labels_row = featureData[geneNames, "symbol"],
-  show_rownames = TRUE,
-  annotation_col = annotation,
-  show_colnames = FALSE,
-  annotation_legend = TRUE,
-  # breaks = seq(minBreak, maxBreak, by = stepBreak),
-  # filename = 'test.png',
-  # filename = normalizePath(outfile),
-  color = colorRampPalette(rev(RColorBrewer::brewer.pal(
-    n = 6, name =
-      "RdBu"
-  )))(6),
-  annotation_colors = annCols
-)
-# system.time(do.call(TRONCO::pheatmap, retVal))
+  retVal <- list(
+    mat = scEx_matrix[geneNames, , drop = FALSE],
+    cluster_rows = TRUE,
+    cluster_cols = TRUE,
+    # scale = "row",
+    fontsize_row = 14,
+    labels_row = featureData[geneNames, "symbol"],
+    show_rownames = TRUE,
+    annotation_col = annotation,
+    show_colnames = FALSE,
+    annotation_legend = TRUE,
+    # breaks = seq(minBreak, maxBreak, by = stepBreak),
+    # filename = 'test.png',
+    # filename = normalizePath(outfile),
+    color = colorRampPalette(rev(RColorBrewer::brewer.pal(
+      n = 6, name =
+        "RdBu"
+    )))(6),
+    annotation_colors = annCols
+  )
+  # system.time(do.call(TRONCO::pheatmap, retVal))
 
 
-if (nrow(retVal$mat) > 1) {
-  moduleName <- "coE_heatmapSOM"
-  heatmapPlotFromModule(retVal, moduleName, input, projections)
+  if (nrow(retVal$mat) > 1) {
+    moduleName <- "coE_heatmapSOM"
+    heatmapPlotFromModule(retVal, moduleName, input, projections)
+  }
 }
 ```
 

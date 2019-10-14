@@ -111,6 +111,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (length(geneid) == 0) {
     return(NULL)
   }
+  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
+    return(NULL)
+  }
   # if (length(geneid) == 1) {
   #   expression <- exprs(scEx_log)[geneid, ,drop=FALSE]
   # } else {
@@ -136,18 +139,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
   
-  if (DEBUG) {
-    cat(file = stderr(), paste("output$sCA_dge_plot1:---", clId[1], "---\n"))
-  }
-  subsetData <- subset(projections, dbCluster %in% clId)
-  # subsetData$dbCluster = factor(subsetData$dbCluster)
-  # if there are more than 18 samples ggplot cannot handle different shapes and we ignore the
-  # sample information
-  if (length(as.numeric(as.factor(subsetData$sample))) > 18) {
-    subsetData$shape <- as.factor(1)
-  } else {
-    subsetData$shape <- as.numeric(as.factor(subsetData$sample))
-  }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(
       ls(), "legend.position",
@@ -156,6 +147,22 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
+  if (DEBUG) {
+    cat(file = stderr(), paste("output$sCA_dge_plot1:---", clId[1], "---\n"))
+  }
+  if ("dbCluster" %in% clId) {
+    subsetData <- subset(projections, dbCluster %in% clId)
+  } else {
+    subsetData <- projections
+  }
+  # subsetData$dbCluster = factor(subsetData$dbCluster)
+  # if there are more than 18 samples ggplot cannot handle different shapes and we ignore the
+  # sample information
+  if (length(as.numeric(as.factor(subsetData$sampleNames))) > 18) {
+    subsetData$shape <- as.factor(1)
+  } else {
+    subsetData$shape <- as.numeric(as.factor(subsetData$sampleNames))
+  }
   if (nrow(subsetData) == 0) {
     return(NULL)
   }

@@ -75,7 +75,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   ccols <- clusterCols$colPal
 
   upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
-  if (is.null(projections)) {
+  if (is.null(projections) | is.null(scEx_log)) {
     if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot:NULL\n")
     return(NULL)
   }
