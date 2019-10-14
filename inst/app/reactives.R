@@ -103,7 +103,6 @@ inputDataFunc <- function(inFile) {
   cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName, " as SingleCellExperiment.\n"))
   # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = ls())
   # load("~/SCHNAPPsDebug/inputProblem.RData")
-
   fdAll <- rowData(scEx)
   pdAll <- colData(scEx)
   exAll <- assays(scEx)[["counts"]]
@@ -1298,7 +1297,6 @@ scEx_log <- reactive({
   scEx <- scEx()
   normMethod <- input$normalizationRadioButton
   disableNorm <- input$disablescEx_log
-
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx_log:NULL\n")
@@ -1826,7 +1824,6 @@ projections <- reactive({
   pca <- pca()
   prjs <- sessionProjections$prjs
   newPrjs <- projectionsTable$newProjections
-
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv())))
   }
@@ -1854,8 +1851,8 @@ projections <- reactive({
   }
   projections <- pd
 
-  if (!is.null(pca)) {
-    projections <- cbind(projections, pca$x)
+    if (!is.null(pca)) {
+    projections <- cbind(projections, pca)
   }
 
   withProgress(message = "Performing projections", value = 0, {

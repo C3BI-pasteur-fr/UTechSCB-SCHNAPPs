@@ -400,7 +400,6 @@ clusterServer <- function(input, output, session,
     if (is.null(scEx_log)) {
       scEx_log <- scEx
     }
-
     # clId <- input$clusters
     clId <- levels(projections$dbCluster)
 
