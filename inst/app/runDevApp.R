@@ -13,6 +13,7 @@ defaultValueMultiGenes = "tbx18, wt1, msln, edf1, tagln2, anxa5, ctgf, fstl1,nac
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
 DEBUGSAVE = F
+historyFile = "~/Rstudio/Schnapps/history.File.pdf"
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -26,6 +27,7 @@ assign("defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
 assign("defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
 assign("DEBUG", DEBUG, envir = .schnappsEnv)
 assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+assign("historyFile", historyFile, envir = .schnappsEnv)
 ls(.schnappsEnv)
 
 devscShinyApp = TRUE

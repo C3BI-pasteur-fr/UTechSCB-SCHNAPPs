@@ -22,6 +22,26 @@ BiocManager::install("BiocSingular")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
+### history functionality
+
+To take advantage of the history functionality orca needs to be installed:
+(https://github.com/plotly/orca#installation)
+
+orca is part of ploty so nothing to be done for R. But the pdftools are required:
+
+```
+install.packages("pdftools")
+
+```
+
+Notes:
+
+1. once history check box is checked only the following plots will be recorded, the current plot will not be saved.
+2. any selection in the plot will not be visible. It is not a screen-shot.
+3. The date of recording is added to the title.
+4. Creating of the history will take some time.
+5. once activated, any changes of parameters will trigger re-plot and also a save to the history. This "feature" can also be used to create of the current plot by adding a "," in one of the fields.
+
 ## create sample data set
 
 Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.
@@ -40,6 +60,11 @@ To start the app:
 library(SCHNAPPs)
 schnapps()
 ```
+
+### history functionality
+
+Plots can be automatically stored in a PDF file as they are created. This allows to somehow track what is being done. To enable this, the parameter historyFile has to be set to a file (probably non-existing, otherwise it will be appended to).
+
 
 ### generate data files
 

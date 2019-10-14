@@ -554,11 +554,12 @@ flattenCorrMatrix <- function(cormat, pmat) {
 # record history in env
 # needs pdftk https://www.pdflabs.com/tools/pdftk-server/ 
 # only save to history file if variable historyFile in schnappsEnv is set
-if (!all(c("staplr", "pdftools") %in% rownames(installed.packages()))){
+if (!all(c( "pdftools") %in% rownames(installed.packages()))){
   recHistory <- function(...){
     return(NULL)
   }
 }else{
+  require(pdftools)
   recHistory <- function(name, plot1){
     if(!exists("historyFile", envir = .schnappsEnv)){
       return(NULL)
@@ -566,20 +567,17 @@ if (!all(c("staplr", "pdftools") %in% rownames(installed.packages()))){
     if(!exists("history", envir = .schnappsEnv)){
       .schnappsEnv$history = list()
     }
-    tmpF <- tempfile(fileext = ".svg")
+    name = paste(name, date())
+    tmpF <- tempfile(fileext = ".pdf")
+    plot1 <-
+      plot1%>% layout( title = name) 
     if ("plotly" %in% class(plot1)){
-      htmlwidgets::saveWidget(plot1, file = tmpF, title = name, 
-                              selfcontained = F, 
-                              libdir = paste0(dirname(tmpF), .Platform$file.sep, "historyLib"))
+      # requires orca bing installed (https://github.com/plotly/orca#installation)
+      withr::with_dir(dirname(tmpF), plotly::orca(p=plot1, file = basename(tmpF)))
       if(file.exists(.schnappsEnv$historyFile)){
-        tmpF2 <- tempfile(fileext = ".html")
-        # requires orca bing installed (https://github.com/plotly/orca#installation)
-        # withr::with_dir("images", orca(img, "plot2.png"))
-        withr::with_dir(dirname(tmpF), plotly::orca(p=plot1, file = basename(tmpF)))
-        file.copy(.schnappsEnv$historyFile, tmpF2)
-        sysStr <- paste("pandoc -s -f html -t latex -o ", .schnappsEnv$historyFile,
-                        " ", tmpF2, " ", tmpF)
-        system(sysStr)
+        tmpF2 <- tempfile(fileext = ".pdf")
+         file.copy(.schnappsEnv$historyFile, tmpF2)
+        pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile)
       }else {
         file.copy(tmpF, .schnappsEnv$historyFile)
       }

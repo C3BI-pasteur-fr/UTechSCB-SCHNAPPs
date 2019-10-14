@@ -274,16 +274,19 @@ coE_topExpCCTable <- reactive({
   # colnames(numProje)
   genesin = unique(genesin)
   # we only work on cells that have been selected
-  mat <- assays(scEx_log)[[1]][genesin, scCells]
+  mat <- assays(scEx_log)[[1]][genesin, scCells, drop = FALSE]
   # only genes that express at least coEtgminExpr UMIs
   # mat[mat < coEtgminExpr] <- 0
   # only genes that are expressed in coEtgPerc or more cells
   # allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
   # mat <- mat[allexpressed, ]
   
+  if (length(mat) == 0) {
+    return(NULL)
+  }
   rownames(mat) <- featureData[rownames(mat), "symbol"]
-  mat = mat[!Matrix::rowSums(mat) == 0,]
-  numProje <- t(numProje)[,colnames(mat)]
+  mat = mat[!Matrix::rowSums(mat) == 0,, drop = FALSE]
+  numProje <- t(numProje)[,colnames(mat), drop = FALSE]
   corrInput <- as.matrix(rbind(numProje,mat))
   # rownames(res2$r)
   res2 <- rcorr(t(corrInput))
