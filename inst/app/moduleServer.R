@@ -190,6 +190,7 @@ clusterServer <- function(input, output, session,
     geneNames <- input$geneIds
     geneNames2 <- input$geneIds2
     scEx_log <- scEx_log()
+    scEx <- scEx()
     namedGroup <- input$groupNames
     grpN <- make.names(input$groupName)
     grpNs <- groupNames$namesDF
@@ -354,6 +355,7 @@ clusterServer <- function(input, output, session,
     }
     
     scEx_log <- scEx_log()
+    scEx <- scEx()
     tdata <- tData()
     projections <- projections()
     grpNs <- groupNames$namesDF
@@ -378,10 +380,15 @@ clusterServer <- function(input, output, session,
     if (is.null(save2History)) {
       save2History = FALSE
     }
-    if (is.null(scEx_log) | is.null(scEx_log) | is.null(tdata)) {
+    if (is.null(scEx) | is.null(tdata)) {
       if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
       return(NULL)
     }
+    # in case the normalization is not done
+    if (is.null(scEx_log)) {
+      scEx_log = scEx
+    }
+    
     # clId <- input$clusters
     clId <- levels(projections$dbCluster)
 
@@ -390,7 +397,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving\n"))
       save(
         file = paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."),
-        list = c(ls(envir = globalenv()), ls(), "legend.position", "input$save2History")
+        list = c(ls(envir = globalenv()), ls(), "legend.position")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
