@@ -91,6 +91,9 @@ DE_scaterPNG <- reactive({
 #' Here, only the expression of a gene or gene list is shown, compared to the other tSNE plot 
 #' in General QC - tSNE
 DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
+  if(is.null(scEx_log)){
+    return(NULL)
+  }
   featureData <- rowData(scEx_log)
   geneid <- geneName2Index(g_id, featureData)
   if (length(geneid) == 0) {
@@ -139,6 +142,9 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
 }
 
 DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
+  if(is.null(scEx_log)){
+    return(NULL)
+  }
   featureData <- rowData(scEx_log)
   geneid <- geneName2Index(g_id, featureData)
   

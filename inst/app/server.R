@@ -146,7 +146,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # base projections
   # display name, reactive to calculate projections
   projectionFunctions <- list(
-    c("sampleNames", "sample"),
+    # c("sampleNames", "sample"),
     c("Gene count", "geneCount"),
     c("UMI count", "umiCount"),
     c("before filter", "beforeFilterPrj")

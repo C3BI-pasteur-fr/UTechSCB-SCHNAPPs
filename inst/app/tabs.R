@@ -12,31 +12,6 @@ source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 # DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
 # DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
-# renameTab ----
-renameTab <- shinydashboard::tabItem(
-  tabName = "renameProj",
-  fluidRow(div(h3("rename projections"), align = "center")),
-  br(),
-  fluidRow(
-    column(4, offset = 1,
-           selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")),
-    column(
-    4,
-    offset = 1,
-    textInput("newPrj", "new name of Projection", value = "")
-    ),
-    column(2, offset = 0, 
-           actionButton("updatePrjsButton", "rename")),
-    tags$style(type='text/css', "#updatePrjsButton { width:100%; margin-top: 25px;}")
-  ),
-  fluidRow(
-    column(4, offset = 1,
-           selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")),
-    column(2, offset = 0, 
-           actionButton("delPrjsButton", "delete")),
-    tags$style(type='text/css', "#delPrjsButton { width:100%; margin-top: 25px;}")
-  )
-)
 
 # inputTab ----
 inputTab <- shinydashboard::tabItem(
@@ -67,7 +42,7 @@ inputTab <- shinydashboard::tabItem(
   br(),
   fluidRow(column(
     8,
-    offset = 2,
+    offset = 1,
     fileInput(
       "file1",
       "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
@@ -81,17 +56,22 @@ inputTab <- shinydashboard::tabItem(
   br(),
   fluidRow(column(
     4,
-    offset = 2,
+    offset = 1,
     checkboxInput("sampleInput", label = "sub sample", value = TRUE)),
     column(4,numericInput("subsampleNum", label = "max number of cells", 
-                 min = 500, max = 10000, step = 100, value = 1000)
-  )),
-
+                          min = 500, max = 10000, step = 100, value = 1000)
+    )),
+  fluidRow(column(
+    4,
+    offset = 1,
+    checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
+    )),
+  
   br(),
-  fluidRow(column(6,
+  fluidRow(column(8,offset = 1,
                   textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
   )),
-  fluidRow(column(6,
+  fluidRow(column(8, offset = 1, 
                   tags$div(
 
                     tags$p("This regular expression will be used before filtering out genes.
@@ -371,6 +351,32 @@ generalParametersTab <- shinydashboard::tabItem(
   #   column(11,offset = 1,
   #          textOutput("descriptOfWorkOutput", inline = TRUE))
   # )
+)
+
+# renameTab ----
+renameTab <- shinydashboard::tabItem(
+  tabName = "renameProj",
+  fluidRow(div(h3("rename projections"), align = "center")),
+  br(),
+  fluidRow(
+    column(4, offset = 1,
+           selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")),
+    column(
+      4,
+      offset = 1,
+      textInput("newPrj", "new name of Projection", value = "")
+    ),
+    column(2, offset = 0, 
+           actionButton("updatePrjsButton", "rename")),
+    tags$style(type='text/css', "#updatePrjsButton { width:100%; margin-top: 25px;}")
+  ),
+  fluidRow(
+    column(4, offset = 1,
+           selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")),
+    column(2, offset = 0, 
+           actionButton("delPrjsButton", "delete")),
+    tags$style(type='text/css', "#delPrjsButton { width:100%; margin-top: 25px;}")
+  )
 )
 
 
