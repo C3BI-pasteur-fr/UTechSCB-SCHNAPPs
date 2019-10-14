@@ -373,20 +373,24 @@ clusterServer <- function(input, output, session,
     scols <- sampleCols$colPal
     ccols <- clusterCols$colPal
     moreOptions <- input$moreOptions
-    myns <- session$ns("historyPlot")
+    myns <- session$ns("-")
+    save2History <- .schnappsEnv$saveHistorycheckbox
+    if (is.null(save2History)) {
+      save2History = FALSE
+    }
     if (is.null(scEx_log) | is.null(scEx_log) | is.null(tdata)) {
       if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
       return(NULL)
     }
     # clId <- input$clusters
     clId <- levels(projections$dbCluster)
-    
-    featureData <- rowData(scEx_log)
+
+        featureData <- rowData(scEx_log)
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), paste("cluster plot saving\n"))
       save(
         file = paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."),
-        list = c(ls(envir = globalenv()), ls(), "legend.position")
+        list = c(ls(envir = globalenv()), ls(), "legend.position", "input$save2History")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
@@ -419,7 +423,7 @@ clusterServer <- function(input, output, session,
                            geneNames2, dimX, dimY, clId, grpN, legend.position,
                            grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
     )
-    recHistory(myns, p1)
+    if (save2History) recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
     printTimeEnd(start.time, "clusterPlot")
     exportTestValues(clusterPlot = {
@@ -1075,6 +1079,7 @@ pHeatMapModule <- function(input, output, session,
     moreOptions <- input$moreOptions
     colTree <- input$showColTree
     scale <- input$normRow
+    save2History <- input$save2History
     
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")

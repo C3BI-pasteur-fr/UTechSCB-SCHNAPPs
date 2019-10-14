@@ -198,7 +198,11 @@ scShinyUI <- shinyUI(
         "<h3>download current cell/gene configuration for reimport to this app</h3>"
       ),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
-      verbatimTextOutput("DEBUGSAVEstring")
+      verbatimTextOutput("DEBUGSAVEstring"),
+      if (exists("historyFile", envir = .schnappsEnv)){
+        checkboxInput("save2History", "save to history file", FALSE)
+      },
+      verbatimTextOutput("save2Historystring")
     ), # dashboard side bar
     shinydashboard::dashboardBody(
       shinyBS::bsAlert("alert"),
