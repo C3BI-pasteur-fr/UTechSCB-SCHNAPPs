@@ -99,7 +99,9 @@ inputDataFunc <- function(inFile) {
     return(NULL)
   }
   cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName, " as SingleCellExperiment.\n"))
-
+  # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = ls())
+  # load("~/SCHNAPPsDebug/inputProblem.RData")
+  
   fdAll <- rowData(scEx)
   pdAll <- colData(scEx)
   exAll <- assays(scEx)[["counts"]]
@@ -578,7 +580,7 @@ medianENSG <- reactive({
   }
 
   scEx_log <- scEx_log()
-  if (is.null(scEx)) {
+  if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "medianENSG:NULL\n")
     }
@@ -1291,7 +1293,8 @@ scEx_log <- reactive({
 
   scEx <- scEx()
   normMethod <- input$normalizationRadioButton
-
+  disableNorm <- input$disablescEx_log
+  
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx_log:NULL\n")
@@ -1303,6 +1306,9 @@ scEx_log <- reactive({
   }
   # load(file="~/SCHNAPPsDebug/scEx_log.RData")
 
+  if (disableNorm) {
+    return(NULL)
+  }
   scEx_log <- do.call(normMethod, args = list())
 
   exportTestValues(scEx_log = {
@@ -1813,8 +1819,12 @@ projections <- reactive({
   prjs <- sessionProjections$prjs
   newPrjs <- projectionsTable$newProjections
   
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   if (!exists("scEx") |
-    is.null(scEx) | !exists("pca") | is.null(pca)) {
+    is.null(scEx) ) {
     if (DEBUG) {
       cat(file = stderr(), "sampleInfo: NULL\n")
     }
@@ -1826,8 +1836,7 @@ projections <- reactive({
   # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
 
 
-  projections <- data.frame(pca$x[, seq(1, ncol(pca$x))])
-  
+
   # todo colData() now returns a s4 object of class DataFrame
   # not sure what else is effected...
   pd <- as.data.frame(colData(scEx))
@@ -1835,7 +1844,12 @@ projections <- reactive({
     cat(file = stderr(), "phenoData for scEx has less than 2 columns\n")
     return(NULL)
   }
-
+  projections <- pd
+  
+  if (!is.null(pca)) {
+    projections <- cbind(projections, pca)
+  }
+  
   withProgress(message = "Performing projections", value = 0, {
     n <- length(.schnappsEnv$projectionFunctions)
     iter <- 1
