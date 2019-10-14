@@ -389,6 +389,15 @@ output$DEBUGSAVEstring <- renderText({
   }
 })
 
+output$save2Historystring <- renderText({
+  if (DEBUG) {
+    .schnappsEnv$saveHistorycheckbox <- input$save2History
+    saveHistorycheckbox <- input$save2History
+  } else {
+    NULL
+  }
+})
+
 # cellSelectionMod ----
 callModule(tableSelectionServer, "cellSelectionMod", inputSample)
 
