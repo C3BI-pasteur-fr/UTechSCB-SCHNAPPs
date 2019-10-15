@@ -61,6 +61,7 @@ tabList <- list(
     #   offset = 1,
     #   uiOutput("coE_heatmapNull")
     # )),
+    fluidRow(checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
     fluidRow(column(
       12,
       offset = 0,
@@ -75,6 +76,7 @@ tabList <- list(
         )
       )
     )),
+    fluidRow(checkboxInput(inputId = "coEtgMinExprShow", label = "calc min expressing genes", value = FALSE)),
     fluidRow(
       column(
         3,
@@ -99,6 +101,7 @@ tabList <- list(
         )
       )
     )),
+    fluidRow(checkboxInput(inputId = "coE_topCCGenesShow", label = "calc correlations", value = FALSE)),
     tableSelectionUi("coE_topCCGenes") 
   ),
   expressionTab = shinydashboard::tabItem(
