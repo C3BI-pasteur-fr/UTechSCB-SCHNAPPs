@@ -74,7 +74,8 @@ Imports:
     shinyBS,
     knitr,
     rmarkdown,
-    pryr
+    pryr,
+    manhattanly
 Suggests:
     testthat,
     sm,
