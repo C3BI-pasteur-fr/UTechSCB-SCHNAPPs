@@ -72,6 +72,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
 
   retVal <-
     DiffExpTest(subsetExpression, cells.1, cells.2, genes.use = genes.use)
+  retVal[is.na(retVal[,"p_val"]), ] = 1
   retVal[, "avg_diff"] <- total.diff[rownames(retVal)]
   retVal$symbol <-
     featureData[rownames(retVal), "symbol"]
@@ -102,9 +103,13 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   genes.use <- rownames(subsetExpression)
 
   p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
-  p_val <- p_val[!is.na(p_val)]
+  p_val[is.na(p_val)] <- 1
 
-  retVal = data.frame(p_val = p_val, symbol = featureData[names(p_val), "symbol"])
+  data.1 <- apply(subsetExpression[genes.use, cells.1], 1, expMean)
+  data.2 <- apply(subsetExpression[genes.use, cells.2], 1, expMean)
+  avg_diff <- (data.1 - data.2)
+  
+  retVal = data.frame(p_val = p_val, avg_diff = avg_diff, symbol = featureData[names(p_val), "symbol"])
   return(retVal)
 }
 
@@ -130,7 +135,7 @@ sCA_dge <- reactive({
   db2 <- input$db2
   method <- input$sCA_dgeRadioButton
 
-  if (is.null(scEx_log) | is.null(projections)) {
+  if (is.null(scEx_log) | is.null(projections) || is.null(db1) || is.null(db2)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -139,7 +144,7 @@ sCA_dge <- reactive({
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
 
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions)== method)/2)
-  dgeFunc <- diffExpFunctions[[methodIdx]][2]
+  dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
   gCells <- sCA_getCells(projections, cl1, db1, db2)
   retVal <- do.call(dgeFunc, args = list(scEx_log = scEx_log,
                                          cells.1 = gCells$c1, cells.2 = gCells$c2))

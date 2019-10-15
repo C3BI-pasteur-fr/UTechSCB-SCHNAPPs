@@ -33,7 +33,7 @@ sCA_dgeTableReac <- reactive({
   scEx <- scEx()
   top.genes <- sCA_dge()
 
-  if (is.null(scEx)) {
+  if (is.null(scEx) || is.null(top.genes)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -105,4 +105,57 @@ output$sCA_dgeClustersSelection <- renderUI({
       multiple = TRUE
     )
   }
+})
+
+output$sCA_volcanoPlot <- plotly::renderPlotly({
+  if (DEBUG) cat(file = stderr(), "sCA_volcanoPlot started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "sCA_volcanoPlot")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "sCA_volcanoPlot")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("sCA_volcanoPlot", id = "sCA_volcanoPlot", duration = NULL)
+  }
+  
+  DGEdata <- sCA_dgeTableReac()
+  
+  if (is.null(DGEdata)) {
+    if (DEBUG) cat(file = stderr(), "output$sCA_volcanoPlot:NULL\n")
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file="~/SCHNAPPsDebug/sCA_volcanoPlot.RData")
+  
+  if ("p_val" %in% colnames(DGEdata)){
+    pval = "p_val"
+  }
+  if ("avg_diff" %in% colnames(DGEdata)){
+    effect_size = "avg_diff"
+  }
+  require(manhattanly)
+  DGEdata$EFFECTSIZE = DGEdata[,effect_size]
+  DGEdata$P = DGEdata[, pval]
+  TEXT <- paste(paste("symbol: ",DGEdata$symbol), sep = "<br>")
+  
+  retVal = volcanoly(DGEdata, snp="symbol")
+  
+  retVal %<>% plotly::add_trace(x = DGEdata$EFFECTSIZE, y = -log10(DGEdata$p_val),
+                         type = "scatter",
+                         mode = "markers",
+                         text = TEXT,
+                         marker = list(color = "grey",
+                                       size = 5),
+                         name = "")
+# retVal
+  
+  exportTestValues(dgeVolcanoPlot = {
+    str(retVal)
+  })
+  layout(retVal)
+  
 })
