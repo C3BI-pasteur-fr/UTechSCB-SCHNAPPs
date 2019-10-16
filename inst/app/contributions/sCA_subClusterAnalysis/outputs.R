@@ -137,13 +137,16 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   if ("avg_diff" %in% colnames(DGEdata)){
     effect_size = "avg_diff"
   }
+  DGEdata[is.na(DGEdata[,pval]),pval] = 1
+  DGEdata[is.na(DGEdata[,effect_size]),effect_size] = 0
   require(manhattanly)
   DGEdata$EFFECTSIZE = DGEdata[,effect_size]
   DGEdata$P = DGEdata[, pval]
   TEXT <- paste(paste("symbol: ",DGEdata$symbol), sep = "<br>")
   
   retVal = volcanoly(DGEdata, snp="symbol")
-  
+
+  # magrittr::%<>%
   retVal %<>% plotly::add_trace(x = DGEdata$EFFECTSIZE, y = -log10(DGEdata$p_val),
                          type = "scatter",
                          mode = "markers",

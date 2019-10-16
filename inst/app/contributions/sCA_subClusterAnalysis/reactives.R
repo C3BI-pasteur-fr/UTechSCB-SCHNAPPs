@@ -18,8 +18,8 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_getCells", id = "sCA_getCells", duration = NULL)
   }
-
-    dbCluster = projections$dbCluster
+  
+  dbCluster = projections$dbCluster
   subsetData <- subset(projections, dbCluster %in% cl1)
   if (is(subsetData[,db1$mapping$x], "logical")) {
     subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
@@ -37,8 +37,71 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
 #' first entry is displayed in Radio box, second is function to be called.
 myDiffExpFunctions = list(
   c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
-  c("t-test", "sCA_dge_ttest")
+  c("t-test", "sCA_dge_ttest"),
+  c("DESeq2", "sCA_dge_deseq2")
 )
+
+#! TODO
+# some dge functions are based on counts most on log-counts
+# this is hard-coded here, but should be a parameter somehow like myDiffExpFunctions
+# such it can be used by contributed functions
+
+#' sCA_dge_deseq2
+#' calculate dge using DESeq2
+
+sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
+  if (DEBUG) cat(file = stderr(), "sCA_dge_deseq2 started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "sCA_dge_deseq2")
+    if (!is.null(getDefaultReactiveDomain()))
+      removeNotification(id = "sCA_dge_deseq2")
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("sCA_dge_deseq2", id = "sCA_dge_deseq2", duration = NULL)
+  }
+  if (!'DESeq2' %in% rownames(installed.packages())) {
+    warning("Please install DESeq2 - learn more at https://bioconductor.org/packages/release/bioc/html/DESeq2.html")
+    showNotification("Please install DESeq2", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
+  
+  
+  group.info <- data.frame(row.names = c(cells.1, cells.2))
+  group.info[cells.1, "group"] <- "Group1"
+  group.info[cells.2, "group"] <- "Group2"
+  group.info[, "group"] <- factor(x = group.info[, "group"])
+  group.info$wellKey <- rownames(x = group.info)
+  data.use = assays(scEx_log)[[1]][,rownames(group.info)]
+  dds1 <- DESeq2::DESeqDataSetFromMatrix(
+    countData = data.use,
+    colData = group.info,
+    design = ~ group
+  )
+  dds1 <- DESeq2::estimateSizeFactors(object = dds1, type="poscounts")
+  dds1 <- DESeq2::estimateDispersions(object = dds1, fitType = "local")
+  dds1 <- DESeq2::nbinomWaldTest(object = dds1)
+  res <- DESeq2::results(
+    object = dds1,
+    contrast = c("group", "Group1", "Group2"),
+    alpha = 0.05
+  )
+  res$log2FoldChange[is.na(res$log2FoldChange)] = 0
+  res$padj[is.na(res$padj)] = 1
+  res$pvalue[is.na(res$pvalue)] = 1
+  featureData <- rowData(scEx_log)
+  
+  to.return <- data.frame(p_val = res$padj, 
+                          avg_diff = res$log2FoldChange,row.names = rownames(res), symbol = rownames(res))
+  
+  
+  return(to.return)
+}
+
+
 
 #' sCA_dge_CellViewfunc
 #' calculate differentically expressed genes given 2 sets of cells
@@ -66,10 +129,10 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   data.1 <- apply(subsetExpression[genes.use, cells.1], 1, expMean)
   data.2 <- apply(subsetExpression[genes.use, cells.2], 1, expMean)
   total.diff <- (data.1 - data.2)
-
+  
   genes.diff <- names(which(abs(total.diff) > .2))
   genes.use <- ainb(genes.use, genes.diff)
-
+  
   retVal <-
     DiffExpTest(subsetExpression, cells.1, cells.2, genes.use = genes.use)
   retVal[is.na(retVal[,"p_val"]), ] = 1
@@ -101,10 +164,10 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]),]
   genes.use <- rownames(subsetExpression)
-
+  
   p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
   p_val[is.na(p_val)] <- 1
-
+  
   data.1 <- apply(subsetExpression[genes.use, cells.1], 1, expMean)
   data.2 <- apply(subsetExpression[genes.use, cells.2], 1, expMean)
   avg_diff <- (data.1 - data.2)
@@ -127,28 +190,34 @@ sCA_dge <- reactive({
     showNotification("sCA_dge", id = "sCA_dge", duration = NULL)
     removeNotification(id = "dgewarning")
   }
-
+  
   scEx_log <- scEx_log()
+  scEx <- scEx()
   projections <- projections()
   cl1 <- input$sCA_dgeClustersSelection
   db1 <- input$db1
   db2 <- input$db2
   method <- input$sCA_dgeRadioButton
-
+  
   if (is.null(scEx_log) | is.null(projections) || is.null(db1) || is.null(db2)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv()), ".schnappsEnv"))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
-
+  
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions)== method)/2)
   dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
   gCells <- sCA_getCells(projections, cl1, db1, db2)
+  
+  # in case we need counts and not normalized counts
+  if (dgeFunc %in% c("sCA_dge_deseq2")) {
+    scEx_log = scEx
+  }
   retVal <- do.call(dgeFunc, args = list(scEx_log = scEx_log,
                                          cells.1 = gCells$c1, cells.2 = gCells$c2))
-
+  
   if (nrow(retVal) == 0) {
     if (DEBUG) cat(file = stderr(), "dge: nothing found\n")
     if (!is.null(getDefaultReactiveDomain())) {
@@ -157,7 +226,7 @@ sCA_dge <- reactive({
   }
   # update reactiveValue
   sCA_selectedDge$sCA_dgeTable <- retVal
-
+  
   exportTestValues(sCA_dge = {retVal})
   return(retVal)
 })
@@ -210,8 +279,8 @@ updateInputSubclusterAxes <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("updateInputSubclusterAxes", id = "updateInputSubclusterAxes", duration = NULL)
   }
-
-    projections <- projections()
+  
+  projections <- projections()
   # we combine the group names with the projections to add ability to select groups
   # gn <- groupNames$namesDF
   # Can use character(0) to remove all choices
@@ -230,7 +299,7 @@ updateInputSubclusterAxes <- reactive({
                     choices = colnames(projections),
                     selected = .schnappsEnv$subClusterDim1
   )
-
+  
   updateSelectInput(session, "sCA_subscluster_y1",
                     choices = colnames(projections),
                     selected = .schnappsEnv$subClusterDim2
@@ -253,15 +322,15 @@ subCluster2Dplot <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("subCluster2Dplot", id = "subCluster2Dplot", duration = NULL)
   }
-
+  
   renderPlot({
     if (DEBUG) cat(file = stderr(), "output$sCA_dge_plot2\n")
-
+    
     projections <- projections()
     x1 <- input$sCA_subscluster_x1
     y1 <- input$sCA_subscluster_y1
     c1 <- input$sCA_dgeClustersSelection
-
+    
     if (is.null(projections)) {
       return(NULL)
     }
@@ -269,8 +338,8 @@ subCluster2Dplot <- function() {
       save(file = "~/SCHNAPPsDebug/sCA_dge_plot2.RData", list = c(ls(envir = globalenv(), ls())))
     }
     # load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")
-
-
+    
+    
     subsetData <- subset(projections, dbCluster %in% c1)
     p1 <-
       ggplot(subsetData,

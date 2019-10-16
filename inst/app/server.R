@@ -203,7 +203,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
         dgeChoices <- c(dgeChoices, liVal[1])
       } else {
         # shouldn't happen
-        error("number of values for normalization function is not 2\n")
+        stop("number of values for normalization function is not 2\n")
       }
     }
   }
