@@ -1,6 +1,6 @@
 # TODO: make sure this is working
 myZippedReportFiles <- c("DGE.csv")
-
+require(Seurat)
 
 
 
@@ -29,10 +29,10 @@ sCA_dgeTableReac <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dgeTableReac", id = "sCA_dgeTableReac", duration = NULL)
   }
-
+  
   scEx <- scEx()
   top.genes <- sCA_dge()
-
+  
   if (is.null(scEx) || is.null(top.genes)) {
     return(NULL)
   }
@@ -41,7 +41,7 @@ sCA_dgeTableReac <- reactive({
   }
   # cp = load(file="~/SCHNAPPsDebug/output_dge.RData")
   featureData <- rowData(scEx)
-
+  
   top.genes$symbol <-
     featureData[rownames(top.genes), "symbol"]
   if ("Description" %in% colnames(featureData)) {
@@ -51,9 +51,11 @@ sCA_dgeTableReac <- reactive({
   if (dim(top.genes)[1] > 0) {
     # change inf to high/low number
     infIdx <- which(is.infinite(top.genes$avg_diff))
-    top.genes$avg_diff[infIdx[top.genes$avg_diff[infIdx] > 0]] <- 9999999
-    top.genes$avg_diff[infIdx[top.genes$avg_diff[infIdx] < 0]] <- -9999999
-    top.genes$Description[is.na(top.genes$Description)] = ""
+    if( length(infIdx) > 0) {
+      top.genes$avg_diff[infIdx[top.genes$avg_diff[infIdx] > 0]] <- 9999999
+      top.genes$avg_diff[infIdx[top.genes$avg_diff[infIdx] < 0]] <- -9999999
+      top.genes$Description[is.na(top.genes$Description)] = ""
+    }
     return(top.genes)
   } else {
     return(NULL)
@@ -81,17 +83,17 @@ output$sCA_dgeClustersSelection <- renderUI({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dgeClustersSelection", id = "sCA_dgeClustersSelection", duration = NULL)
   }
-
+  
   projections <- projections()
   up1 <- updateInputSubclusterAxes()
-
+  
   if (DEBUG) cat(file = stderr(), "output$sCA_dgeClustersSelection\n")
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(envir = globalenv(), ls(), ls(envir = .schnappsEnv))))
   }
   # load(file="~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData")
-
-
+  
+  
   if (is.null(projections)) {
     tags$span(style = "color:red", "Please load data first")
   } else {
@@ -105,6 +107,40 @@ output$sCA_dgeClustersSelection <- renderUI({
       multiple = TRUE
     )
   }
+})
+
+output$sCA_volc_selected <- renderText({
+  if (DEBUG) cat(file = stderr(), "sCA_volc_selected started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "sCA_volc_selected")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "sCA_volc_selected")
+    }
+  })
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("sCA_volc_selected", id = "sCA_volc_selected", duration = NULL)
+  }
+  
+  brushedPs <- plotly::event_data("plotly_selected")
+  DGEdata <- sCA_dgeTableReac()
+  
+  if (is.null(brushedPs)) {
+    if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: brush null\n")
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_volc_selected.RData", list = c(ls(envir = globalenv()), ls()))
+  }
+  # load(file=paste0("~/SCHNAPPsDebug/sCA_volc_selected.RData"))
+  # cells.names <- brushedPs$key
+  # cells.names <- unique(cells.names[!is.na(cells.names)])
+  # if (DEBUG) {
+  #   cat(file = stderr(), paste("curveNumbers:", unique(brushedPs$curveNumber), "\n"))
+  # }
+  retVal = paste(rownames(DGEdata)[brushedPs[brushedPs$curveNumber==0,"pointNumber"] +1], collapse = ", ")
+  return(retVal)
 })
 
 output$sCA_volcanoPlot <- plotly::renderPlotly({
@@ -130,9 +166,14 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
     save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/sCA_volcanoPlot.RData")
-  
-  if ("p_val" %in% colnames(DGEdata)){
-    pval = "p_val"
+  if ("p_val_adj" %in% colnames(DGEdata)) {
+    pval = "p_val_adj"
+  } else 
+    if ("p_val" %in% colnames(DGEdata)){
+      pval = "p_val"
+    }
+  if ("avg_logFC" %in% colnames(DGEdata)) {
+    effect_size = "avg_logFC"
   }
   if ("avg_diff" %in% colnames(DGEdata)){
     effect_size = "avg_diff"
@@ -144,21 +185,24 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   DGEdata$P = DGEdata[, pval]
   TEXT <- paste(paste("symbol: ",DGEdata$symbol), sep = "<br>")
   
-  retVal = volcanoly(DGEdata, snp="symbol")
-
+  retVal = volcanoly(DGEdata, snp="symbol") %>%
+    layout(
+      dragmode = "select"
+    )
+  
   # magrittr::%<>%
   retVal %<>% plotly::add_trace(x = DGEdata$EFFECTSIZE, y = -log10(DGEdata$p_val),
-                         type = "scatter",
-                         mode = "markers",
-                         text = TEXT,
-                         marker = list(color = "grey",
-                                       size = 5),
-                         name = "")
-# retVal
+                                type = "scatter",
+                                mode = "markers",
+                                text = TEXT,
+                                marker = list(color = "grey",
+                                              size = 5),
+                                name = "")
+  # retVal
   
   exportTestValues(dgeVolcanoPlot = {
     str(retVal)
   })
-  layout(retVal)
+  retVal
   
 })

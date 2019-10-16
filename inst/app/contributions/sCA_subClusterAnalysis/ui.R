@@ -96,6 +96,9 @@ tabList <- list(
         # )
       )
     ),
+    fluidRow(
+      verbatimTextOutput("sCA_volc_selected")
+    ),
     fluidRow(column(11, offset = 1),
              h4("Volcano plot", offset = 1),
              jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))

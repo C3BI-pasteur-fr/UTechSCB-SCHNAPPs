@@ -185,7 +185,7 @@ clusterServer <- function(input, output, session,
     # browser()
     projections <- projections()
     req(projections)
-    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
+    brushedPs <- plotly::event_data("plotly_selected", source = "subset")
     dimY <- input$dimension_y
     dimX <- input$dimension_x
     geneNames <- input$geneIds
