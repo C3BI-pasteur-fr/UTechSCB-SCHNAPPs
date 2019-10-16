@@ -38,17 +38,105 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
 myDiffExpFunctions = list(
   c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
   c("t-test", "sCA_dge_ttest"),
-  c("DESeq2", "sCA_dge_deseq2")
+  c("DESeq2", "sCA_dge_deseq2"),
+  c("seurat:wilcox", "sCA_dge_s_wilcox"),
+  c("seurat:bimod", "sCA_dge_s_bimod"),
+  c("seurat:t-test", "sCA_dge_s_t"),
+  c("seurat:LR", "sCA_dge_s_LR"),
+  c("seurat:neg-binomial", "sCA_dge_s_negbinom"),
+  c("seurat:Poisson", "sCA_dge_s_poisson")
 )
+
+
+
+
+ 
 
 #! TODO
 # some dge functions are based on counts most on log-counts
 # this is hard-coded here, but should be a parameter somehow like myDiffExpFunctions
 # such it can be used by contributed functions
 
+
+#' Seurat FindMarkers
+#' 
+#' cellMeta = colData(scEx)
+sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox"){
+  if (DEBUG) cat(file = stderr(), "sCA_seuratFindMarkers started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "sCA_seuratFindMarkers")
+    if (!is.null(getDefaultReactiveDomain()))
+      removeNotification(id = "sCA_seuratFindMarkers")
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("sCA_seuratFindMarkers", id = "sCA_seuratFindMarkers", duration = NULL)
+  }
+  if (!'DESeq2' %in% rownames(installed.packages())) {
+    warning("Please install DESeq2 - learn more at https://bioconductor.org/packages/release/bioc/html/DESeq2.html")
+    showNotification("Please install DESeq2", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file='~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData')
+  
+  cellMeta = colData(scEx)
+  rData = rowData(scEx)
+  meta.data = cellMeta[,"sampleNames", drop = FALSE]
+  # creates object @assays$RNA@data and @assays$RNA@counts
+  seurDat <- CreateSeuratObject(counts = assays(scEx)[[1]],
+                                meta.data = meta.data)
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[rownames(seurDat@assays$RNA@data),]
+  
+  markers <- Seurat::FindMarkers(seurDat@assays$RNA@data, 
+                                 cells.1 = cells.1,
+                                 cells.2 = cells.2,
+                                 min.pct = 0,
+                                 test.use = test
+                                 # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
+                                 # test.use = "t"      # p_val avg_logFC pct.1 pct.2 p_val_adj
+                                 # test.use = "negbinom" # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "poisson"  # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "LR"     # p_val  avg_logFC pct.1 pct.2 p_val_adj
+                                 # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
+                                 # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
+  )
+  if (nrow(markers) > 0){
+    markers$symbol = rData[rownames(markers), "symbol"]
+  }
+  if ("Description" %in% colnames(rData)) {
+    markers$Description <- rData[rownames(markers), "Description"]
+  }
+  return(markers)
+}
+
+
+sCA_dge_s_wilcox <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="wilcox")
+}
+sCA_dge_s_bimod <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="bimod")
+}
+sCA_dge_s_t <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="t")
+}
+sCA_dge_s_LR<- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="LR")
+}
+sCA_dge_s_negbinom <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="negbinom")
+}
+sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="poisson")
+}
+
+
+
 #' sCA_dge_deseq2
 #' calculate dge using DESeq2
-
 sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   if (DEBUG) cat(file = stderr(), "sCA_dge_deseq2 started.\n")
   start.time <- base::Sys.time()
@@ -212,7 +300,7 @@ sCA_dge <- reactive({
   gCells <- sCA_getCells(projections, cl1, db1, db2)
   
   # in case we need counts and not normalized counts
-  if (dgeFunc %in% c("sCA_dge_deseq2")) {
+  if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_poisson", "sCA_dge_s_poisson")) {
     scEx_log = scEx
   }
   retVal <- do.call(dgeFunc, args = list(scEx_log = scEx_log,
