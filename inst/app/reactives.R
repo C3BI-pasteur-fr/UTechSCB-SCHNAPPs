@@ -117,7 +117,7 @@ inputDataFunc <- function(inFile) {
   # read multiple files
   if (length(inFile$datapath) > 1) {
     for (fpIdx in 2:length(inFile$datapath)) {
-      inFile$datapath[fpIdx] <- "~/Downloads/paper1.RData"
+      # inFile$datapath[fpIdx] <- "~/Downloads/paper1.RData"
       cat(file = stderr(), paste("reading", inFile$name[fpIdx], "\n"))
       fp <- inFile$datapath[fpIdx]
       fpLs <- load(fp)
@@ -167,7 +167,7 @@ inputDataFunc <- function(inFile) {
         cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
         next()
       }
-      ex1 <- assays(scEx)[["counts"]][fdIdx, ]
+      ex1 <- assays(scEx)[["counts"]]
       pdAllCols2add <- colnames(pdAll)[!colnames(pdAll) %in% colnames(pd1)]
       pd1Cols2add <- colnames(pd1)[!colnames(pd1) %in% colnames(pdAll)]
       for (pd1C in pd1Cols2add) {
@@ -192,7 +192,8 @@ inputDataFunc <- function(inFile) {
 
       nrow(ex1)
       nrow(exAll)
-      exAll <- Matrix::cbind2(exAll[rownames(exAll), ], ex1[rownames(exAll), ])
+      # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats", "fdAll"))
+      exAll <- Matrix::cbind2(exAll[which(rownames(exAll) %in% rownames(ex1)), ], ex1[which(rownames(ex1) %in% rownames(exAll)), ])
     }
   }
   exAll <- as(exAll, "dgTMatrix")
