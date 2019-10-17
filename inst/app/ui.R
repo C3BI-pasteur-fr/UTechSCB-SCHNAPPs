@@ -7,6 +7,7 @@
 
 
 suppressMessages(require(shiny))
+suppressMessages(require(shinyBS))
 suppressMessages(require(shinydashboard))
 suppressMessages(require(plotly))
 suppressMessages(require(shinythemes))
@@ -17,7 +18,6 @@ suppressMessages(require(pheatmap))
 suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinycssloaders))
-suppressMessages(require(shinyBS))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -154,11 +154,15 @@ scShinyUI <- shinyUI(
 
       htmlOutput("summaryStatsSideBar"),
       shinyBS::bsTooltip("summaryStatsSideBar",
-        "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
-        "right",
-        trigger = "hover", options = list(container = "body")
+                         "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
+                         "right",
+                         trigger = "hover", options = list(container = "body")
       ),
-
+      shinyBS::bsTooltip("pcaRank",
+                         title = "test ",
+                         "bottom"
+      ),
+      
       ### failed tests to change color of button text
 
       # <div id="scoped-content">
@@ -209,7 +213,7 @@ scShinyUI <- shinyUI(
       tags$div(
         allTabs,
         class = "tab-content"
-      )
+      ),bsTooltip("pcaRank", title = "comma separted list of cell names", "bottom")
     ) # dashboard body
   ) # main dashboard
 )
