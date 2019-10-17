@@ -227,6 +227,11 @@ inputDataFunc <- function(inFile) {
   }
   # load(file='~/SCHNAPPsDebug/readInp.RData')
 
+  newNames = colnames(exAll)
+  pdAll = pdAll[newNames,]
+  colnames(exAll) = make.unique(newNames)
+  rownames(pdAll) = make.unique(newNames)
+  
   scEx <- SingleCellExperiment(
     assay = list(counts = exAll),
     colData = pdAll,
