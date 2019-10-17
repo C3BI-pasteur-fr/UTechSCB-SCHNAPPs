@@ -65,7 +65,7 @@ inputTab <- shinydashboard::tabItem(
     4,
     offset = 1,
     checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
-    )),
+  )),
   
   br(),
   fluidRow(column(8,offset = 1,
@@ -73,7 +73,7 @@ inputTab <- shinydashboard::tabItem(
   )),
   fluidRow(column(8, offset = 1, 
                   tags$div(
-
+                    
                     tags$p("This regular expression will be used before filtering out genes.
                It is meant to keep track of genes that were removed from gene filtering. This will generate a projection
                            called 'before.filter'.")
@@ -208,21 +208,21 @@ cellSelectionTab <- shinydashboard::tabItem(
     column(5,
            offset = 1,
            shinyBS::tipify(textInput("cellPatternRM", "cells to be filtered out by pattern"),
-                  title = "regular expression for cells to be removed (e.g. -1 will remove all cells from sample 1"
+                           title = "regular expression for cells to be removed (e.g. -1 will remove all cells from sample 1"
            )
     ),
     column(5,
-             offset = 0,
-             shinyBS::tipify(textInput("cellKeep", "cells to keep"),
-                             title = "comma separated list of cells (with min expression) that should be kept"
-             )
+           offset = 0,
+           shinyBS::tipify(textInput("cellKeep", "cells to keep"),
+                           title = "comma separated list of cells (with min expression) that should be kept"
+           )
     )
   ), br(),
   fluidRow(
     column(10,
            offset = 1,
            shinyBS::tipify(textInput("cellKeepOnly", "cells to keep (remove others)"),
-                  title = "comma separated list of cells (with min expression) that should be kept and anything else removed"
+                           title = "comma separated list of cells (with min expression) that should be kept and anything else removed"
            )
     )
   ),
@@ -230,7 +230,7 @@ cellSelectionTab <- shinydashboard::tabItem(
     column(10,
            offset = 1,
            shinyBS::tipify(textInput("cellsFiltersOut", "Cells to be removed", width = "100%"),
-                  title = "comma separted list of cell names to be explicitly removed"
+                           title = "comma separted list of cell names to be explicitly removed"
            )
     )
   ), br(),
@@ -267,7 +267,7 @@ parameterItems <- list(
   shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters"),
   shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
   shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
-  )
+)
 
 
 # generalParametersTab ----
@@ -275,64 +275,96 @@ generalParametersTab <- shinydashboard::tabItem(
   "generalParameters",
   fluidRow(div(h2("General parameters"), align = "center")),
   br(),
-  fluidRow(div(h3("Parameters for PCA"), align = "left")),
-  fluidRow(
-    column(2, offset = 0,
-           numericInput("pcaRank", "Number of components", 50, min = 2)),
-    column(2, offset = 0,
-           numericInput("pcaN", "Number of variable genes to be used", 500, min = 50)),
-    column(2, offset = 0,
-           checkboxInput("pcaCenter", "center data", TRUE)
-    ),
-    column(2, offset = 0,
-           checkboxInput("pcaScale", "scale data", TRUE)
-    ) 
-  ),
-  fluidRow(
-    column(10,
-           offset = 1,
-           shinyBS::tipify(textInput("genes4PCA", "Genes to be used for PCA", width = "100%"),
-                           title = "comma separted list of cell names"
-           )
-    )
-  ),
-  br(),
-  fluidRow(div(h3("Parameters for clustering"), align = "left")),
-  fluidRow(
-    # column(2,
-    #        offset = 1,
-    #        numericInput("kNr", "Number of clusters", 10, min = 2, max = 30)
-    # ),
-    column(2, offset = 1,
-           selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA")),
-    column(2, 
-           numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2)),
-    column(2, 
-           selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph")),
-    column(2, 
-           selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE"))
-    
-    ),
-  fluidRow(
-    column(10, offset = 1,
-           textInput("geneSelectionClustering", "Genes to be used for clustering")
-    )
-  ),
+  # fluidRow(div(h3("Parameters for PCA"), align = "left")),
+  # fluidRow(
+  #   column(2, offset = 0,
+  #          numericInput("pcaRank", "Number of components", 50, min = 2)),
+  #   column(2, offset = 0,
+  #          numericInput("pcaN", "Number of variable genes to be used", 500, min = 50)),
+  #   column(2, offset = 0,
+  #          checkboxInput("pcaCenter", "center data", TRUE)
+  #   ),
+  #   column(2, offset = 0,
+  #          checkboxInput("pcaScale", "scale data", TRUE)
+  #   ) 
+  # ),
+  # fluidRow(
+  #   column(10,
+  #          offset = 1,
+  #          shinyBS::tipify(textInput("genes4PCA", "Genes to be used for PCA", width = "100%"),
+  #                          title = "comma separted list of cell names"
+  #          )
+  #   )
+  # ),
   br(),
   fluidRow(
-    column(10, offset = 1,
-           textOutput("Nclusters"))
+    box(
+      title = "Parameters for PCA", width = 12,
+      # The id lets us use input$tabset1 on the server to find the current tab
+      id = "tabsetPCA", 
+      fluidRow(
+        column(6, offset = 0,
+               numericInput("pcaRank", "Number of components", 50, min = 2)),
+        column(6, offset = 0,
+               numericInput("pcaN", "Number of variable genes to be used", 500, min = 50)),
+      ),
+      fluidRow(
+        column(6, offset = 0,
+               checkboxInput("pcaCenter", "center data", TRUE)
+        ),
+        column(6, offset = 0,
+               checkboxInput("pcaScale", "scale data", TRUE)
+        )
+      ),
+      fluidRow(
+        column(12,offset = 0,
+               textInput("genes4PCA", "Genes to be used for PCA", width = "100%") %>% 
+                 shinyBS::tipify(title = "comma separted list of cell names")
+        )
+      )
+      
+    ),
   ),
+  fluidRow(
+    tabBox( title = "Parameters for clustering", width = 12,
+            id = "tabsetCluster",
+            tabPanel("Seurat clustering", width = 12,
+                     fluidRow(
+                       column(6, offset = 0,
+                              selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA", width = "100%")),
+                       column(6, 
+                              numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2, width = "100%"))
+                     ),
+                     fluidRow(
+                       column(6, 
+                              selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")),
+                       column(6, 
+                              selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%"))
+                       
+                     ),
+                     bsTooltip("useRanks", title = "comma separted list of cell names", "bottom"),
+                     fluidRow(
+                       column(12, offset = 0,
+                              textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%")
+                       )
+                     ),
+                     fluidRow(
+                       column(12, offset = 0, textOutput("Nclusters"))
+                     )
+            )
+    )),
+  # fluidRow(div(h3("Parameters for clustering"), align = "left")),
+  br(),
   br(),
   fluidRow(div(h3("Comments"), align = "left")),
   fluidRow(
     if ("shinyMCE" %in% rownames(installed.packages()))
-           shinyMCE::tinyMCE(
-             "descriptionOfWork",
-             "Please describe your work. This will be included in the report."
-           ) else 
-      textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
-           
+      shinyMCE::tinyMCE(
+        "descriptionOfWork",
+        "Please describe your work. This will be included in the report."
+      ) else 
+        textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
+    
   ),
   br(),
   fluidRow(div(h3("Colors"), align = "left")),
