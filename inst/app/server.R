@@ -1,5 +1,6 @@
 # # LIBRARIES -----------------------------------------------------------------
 suppressMessages(require(shiny))
+suppressMessages(require(shinyBS))
 suppressMessages(require(reactlog))
 suppressMessages(require(shinyTree))
 suppressMessages(require(tibble))
@@ -29,7 +30,6 @@ suppressMessages(require(scran))
 suppressMessages(require(callr))
 suppressMessages(require(debugme))
 suppressMessages(require(BiocSingular))
-suppressMessages(require(shinyBS))
 
 if (!exists(".schnappsEnv")) {
   .schnappsEnv <- new.env(parent = emptyenv())
