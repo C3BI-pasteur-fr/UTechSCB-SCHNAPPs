@@ -1,89 +1,60 @@
 Package: SCHNAPPs
 Type: Package
 Title: Single Cell Shiny Application for Analysing Single Cell Transcriptomics Data
-Version: 1.1.5
+Version: 1.1.7
 Authors@R: c(person("Bernd", "Jagla", role = c("aut", "cre"), email = "bernd.jagla@pasteur.fr", comment = c(ORCID = "0000-0002-7696-0484")))
 Maintainer: Bernd Jagla <bernd.jagla@pasteur.fr>
 Description: Single Cell sHiny APPlication (SCHNAPPs) is a R/Shiny based application to interact, manipulate, explore, and analyze single cell RNA-seq experiments, including MARS-seq and others.
     The application is open and extendable. The main idea is to be able to run basic visualization and analyses, including normalization, clustering,...
     on a defined subset of cells/genes. Key is, that all computations are based only on the cells that have been selected. Input can be a 
-    SingleCellExperiment object or CSV files of the count matrix.
+    SingleCellExperiment object or CSV/TSV files of the count matrix.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: 
     R (>= 3.6)
 Imports:
-    BiocParallel,
-    SingleCellExperiment,
-    SummarizedExperiment, 
-    RJSONIO,
-    shinycssloaders,
-    shinyjqui,
-    Matrix,
-    BiocSingular,
-    debugme,
-    methods,
-    reactlog,
-    utils,
-    stats,
-    shiny,
-    shinydashboard,
-    shinyAce,
-    shinyTree,
-    shinythemes,
-    shinyjs,
-    shinyWidgets,
-    kohonen,
-    Rsomoclu,
-    DT, 
-    ggplot2,
-    plotly,
-    pheatmap,
-    colourpicker,
-    igraph,
-    threejs,
-    RColorBrewer,
-    mclust,
-    vipor,
-    mgcv,
-    scater,
-    kableExtra,
-    reshape2,
-    AnnotationDbi,
-    graphics,
-    grDevices,
-    cowplot,
-    scales,
     dplyr,
-    gtools,
-    shinytest,
-    scran,
-    callr,
-    htmltools,
-    magrittr,
-    TRONCO,
-    psych,
-    irlba,
-    tibble,
-    uwot,
-    tidyverse,
-    Rtsne,
-    viridisLite,
-    viridis,
-    shinyBS,
+    shiny,
+    colourpicker,
+    DT, 
     knitr,
+    manhattanly,
+    mclust,
+    pheatmap,
+    psych,
     rmarkdown,
-    pryr,
+    Rsomoclu,
+    scater,
+    scran,
     Seurat,
-    manhattanly
+    shinydashboard,
+    shinyTree,
+    shinyWidgets,
+    SingleCellExperiment,
+    SingleR,
+    SummarizedExperiment,
+    threejs,
+    tidyverse,
+    TRONCO
 Suggests:
-    testthat,
-    sm,
-    staplr,
+    igraph,
+    reshape2,
+    vipor,
+    shinyAce,
+    RJSONIO,
+    mgcv,
+    cowplot,
+    kableExtra,
     pdftools,
+    shinyjqui,
+    shinycssloaders,
+    shinyMCE,
+    pryr,
+    gtools,
+    callr,
     DESeq2,
-    ggalluvial,
+    shinyBS,
     crayon
 RoxygenNote: 6.1.1
 URL: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs

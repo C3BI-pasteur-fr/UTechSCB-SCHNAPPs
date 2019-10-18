@@ -131,6 +131,7 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
             "Cluster:", as.numeric(as.character(projections$dbCluster))),
       # text = paste("Cluster:", as.numeric(as.character(projections$dbCluster))),
       mode = "markers",
+      source = "C",
       marker = list(
         size = 2,
         line = list(width = 0),

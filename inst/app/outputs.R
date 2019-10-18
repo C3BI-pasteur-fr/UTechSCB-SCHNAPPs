@@ -69,7 +69,7 @@ output$normalizationsParametersDynamic <- renderUI({
     return(NULL)
   }
   selectedChoice <- input$normalizationRadioButton
-
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
@@ -78,11 +78,11 @@ output$normalizationsParametersDynamic <- renderUI({
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
   do.call("switch",
-    args = c(
-      selectedChoice,
-      normaliztionParameters,
-      h3("no parameters provided")
-    )
+          args = c(
+            selectedChoice,
+            normaliztionParameters,
+            h3("no parameters provided")
+          )
   )
 })
 
@@ -198,16 +198,17 @@ output$summaryStatsSideBar <- renderUI({
   exportTestValues(summaryStatsSideBar = {
     htmlOut
   })
-
+  
   HTML(htmlOut)
 })
 
-addPopover(
-  session = session, id = "summaryStatsSideBar", title = "Data summary",
-  content = "<ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
-  trigger = "click", options = list(container = "body")
-)
-
+if ("shinyBS" %in% rownames(installed.packages())){
+  addPopover(
+    session = session, id = "summaryStatsSideBar", title = "Data summary",
+    content = "<ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
+    trigger = "click", options = list(container = "body")
+  )
+}
 # Select Genes ----
 # this is part of the basic functionality from this
 # tools and thus, can stay in this file.
@@ -417,7 +418,7 @@ output$descriptOfWorkOutput <- renderPrint({
 output$sampleColorSelection <- renderUI({
   scEx <- scEx()
   sampCol <- sampleCols$colPal
-
+  
   if (is.null(scEx)) {
     return(NULL)
   }
@@ -428,10 +429,10 @@ output$sampleColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
-
+  
   lev <- levels(colData(scEx)$sampleNames)
   # cols <- gg_fill_hue(length(lev))
-
+  
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -451,7 +452,7 @@ output$clusterColorSelection <- renderUI({
   scEx <- scEx()
   projections <- projections()
   clusterCol <- clusterCols$colPal
-
+  
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
@@ -462,10 +463,10 @@ output$clusterColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
-
+  
   lev <- levels(projections$dbCluster)
   # cols <- gg_fill_hue(length(lev))
-
+  
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -486,16 +487,16 @@ observeEvent(input$updateColors, {
   cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
   scExx <- scEx()
   projections <- projections()
-
+  
   if (is.null(scExx) || is.null(projections)) {
     return(NULL)
   }
   # sample colors
   scols <- sampleCols$colPal
-
+  
   inCols <- list()
   lev <- levels(colData(scExx)$sampleNames)
-
+  
   inCols <- lapply(seq_along(lev), function(i) {
     input[[paste0("sampleNamecol", lev[i])]]
   })
@@ -505,17 +506,17 @@ observeEvent(input$updateColors, {
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors.RData")
-
+  
   # isolate({
   sampleCols$colPal <- unlist(inCols)
   # })
-
+  
   # cluster colors
   ccols <- clusterCols$colPal
-
+  
   inCols <- list()
   lev <- levels(projections$dbCluster)
-
+  
   inCols <- lapply(seq_along(lev), function(i) {
     input[[paste0("clusterNamecol", lev[i])]]
   })
@@ -525,7 +526,7 @@ observeEvent(input$updateColors, {
     cat(file = stderr(), paste0("observeEvent 2 save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/updateColors2.RData")
-
+  
   # isolate({
   clusterCols$colPal <- unlist(inCols)
   # })
@@ -571,13 +572,13 @@ output$RDSsave <- downloadHandler(
     if (DEBUG) {
       cat(file = stderr(), paste("RDSsave: \n"))
     }
-
+    
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
     tsne <- tsne()
-
+    
     if (is.null(scEx)) {
       return(NULL)
     }
@@ -585,14 +586,14 @@ output$RDSsave <- downloadHandler(
       save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
-
+    
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
-
+    
     save(file = file, list = c("scEx"))
     if (DEBUG) {
       cat(file = stderr(), paste("RDSsave:done \n"))
     }
-
+    
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
@@ -600,7 +601,7 @@ output$RDSsave <- downloadHandler(
 # Report creation ------------------------------------------------------------------
 output$report <- downloadHandler(
   filename = "report.zip",
-
+  
   content = function(outZipFile) {
     outrepFile <- reacativeReport()
     file.copy(from = outrepFile, to = outZipFile)
@@ -679,7 +680,7 @@ observeEvent(input$clusterSource, {
 
 observeEvent(input$scranWarning_cancel, {
   updateSelectInput(session, "clusterMethod",
-    selected = "igraph"
+                    selected = "igraph"
   )
   # updateSelectInput(session, "clusterSource",
   #                   selected = "counts"
@@ -699,12 +700,12 @@ observeEvent(input$scranWarning_ok, {
 # rename projections
 observe({
   projections <- projections()
-
+  
   updateSelectInput(session, "oldPrj",
-    choices = c(colnames(projections))
+                    choices = c(colnames(projections))
   )
   updateSelectInput(session, "delPrj",
-    choices = c(colnames(projectionsTable$newProjections))
+                    choices = c(colnames(projectionsTable$newProjections))
   )
 })
 
@@ -741,11 +742,11 @@ observeEvent(input$updatePrjsButton, {
   newPrj <- input$newPrj
   projections <- projections()
   newPrjs <- projectionsTable$newProjections
-
+  
   if (is.null(projections)) {
     return(NULL)
   }
-
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/updatePrjsButton.RData",

@@ -1,6 +1,19 @@
-suppressMessages(require(shinyjqui))
 suppressMessages(library(magrittr))
 
+if ("shinycssloaders" %in% rownames(installed.packages())) {
+  suppressMessages(library(shinycssloaders))
+} else {
+  withSpinner <-function(x) {
+    x
+  }
+}
+if ("shinyjqui" %in% rownames(installed.packages())) {
+suppressMessages(require(shinyjqui))
+} else {
+  jqui_resizable <- function(x) {
+    x
+  }
+}
 # clusterUI -----------
 # to select clusters from the list of available knn clusters
 # Flexible 2 plot
@@ -91,7 +104,7 @@ tableSelectionUi <- function(id) {
       br(),
       column(
         width = 12,
-        DT::DTOutput(ns("cellNameTable")) %>% shinycssloaders::withSpinner(),
+        DT::DTOutput(ns("cellNameTable")) %>% withSpinner(),
         style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
       )
     ),

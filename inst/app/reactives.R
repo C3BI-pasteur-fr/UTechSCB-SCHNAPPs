@@ -2237,7 +2237,15 @@ inputSample <- reactive({
 
 
 getMemoryUsed <- reactive({
-  suppressMessages(require(pryr))
+  #
+  if ("pryr" %in% rownames(installed.packages())){
+    suppressMessages(require(pryr))
+  } else {
+    mem_used <- function(){
+      showNotification("Please install pryr", id = "noPryr", type="error", duration = NULL)
+      return(0)
+    }
+  }
   if (DEBUG) {
     cat(file = stderr(), "getMemoryUsed started.\n")
   }
@@ -2295,7 +2303,13 @@ reacativeReport <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("reacativeReport", id = "reacativeReport", duration = NULL)
   }
-
+  if (!"callr" %in% rownames(installed.packages())){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("please install 'callr' to enable reports", 
+                       id = "noCallR", duration = NULL, type = "error")
+    }
+    return(NULL)
+  }
   scEx <- scEx()
   projections <- projections()
   scEx_log <- scEx_log()
@@ -2616,6 +2630,7 @@ reacativeReport <- function() {
   # save(file = "~/SCHNAPPsDebug/tempReport.RData", list = c("session", "myparams", ls(), "zippedReportFiles"))
   # load(file = '~/SCHNAPPsDebug/tempReport.RData')
   if (DEBUG) cat(file = stderr(), paste("workdir: ", getwd()))
+  
   suppressMessages(require(callr))
   # if (.schnappsEnv$DEBUGSAVE)
   # file.copy(tempReport, "~/SCHNAPPsDebug/tmpReport.Rmd", overwrite = TRUE)

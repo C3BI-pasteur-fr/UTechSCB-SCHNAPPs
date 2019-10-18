@@ -31,7 +31,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 1,
-      pHeatMapUI("coExpHeatmapModule") %>% shinycssloaders::withSpinner()
+      pHeatMapUI("coExpHeatmapModule") %>% withSpinner()
     ))
   ),
 
@@ -116,11 +116,7 @@ tabList <- list(
       )
     )),
     br(),
-    br(),
-    shinyBS::tipify(
-      checkboxInput("coE_showPermutations", "show Permutations", FALSE),
-      "check this if you are working on the cell/gene selection to avoid certain calculations"
-    ),
+    checkboxInput("coE_showPermutations", "show Permutations", FALSE),
     fluidRow(
       column(
         3,
@@ -166,7 +162,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 1,
-      pHeatMapUI("coE_heatmapSOM") %>% shinycssloaders::withSpinner()
+      pHeatMapUI("coE_heatmapSOM") %>% withSpinner()
     )),
     br(),
     fluidRow(column(
