@@ -196,8 +196,11 @@ inputDataFunc <- function(inFile) {
       exAll <- Matrix::cbind2(exAll[which(rownames(exAll) %in% rownames(ex1)), ], ex1[which(rownames(ex1) %in% rownames(exAll)), ])
     }
   }
+  rn = rownames(exAll)
+  cn = colnames(exAll)
   exAll <- as(exAll, "dgTMatrix")
-
+  rownames(exAll) = rn
+  colnames(exAll) = cn
 
   if ("sampleNames" %in% colnames(pdAll)) {
     if (!is(pdAll$sampleNames, "factor")) {
