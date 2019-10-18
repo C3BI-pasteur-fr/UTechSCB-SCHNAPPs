@@ -31,7 +31,6 @@ if (!exists("DEBUGSAVE")) {
 library(shiny)
 library(shinyTree)
 library(tibble)
-library(shinyBS)
 library(plotly)
 library(shinythemes)
 library(ggplot2)
