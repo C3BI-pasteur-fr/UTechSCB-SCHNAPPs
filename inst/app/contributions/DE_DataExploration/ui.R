@@ -57,7 +57,7 @@ tabList <- list(
     br(),
     fluidRow(column(
       12,
-      jqui_resizable( plotOutput("DE_gene_vio_plot") %>% shinycssloaders::withSpinner())
+      jqui_resizable( plotOutput("DE_gene_vio_plot") %>% withSpinner())
     ))
   ),
 
@@ -156,7 +156,7 @@ tabList <- list(
         column(
           10,
           offset = 1,
-          imageOutput("DE_scaterQC") %>% shinycssloaders::withSpinner() # PNG output with temp file
+          imageOutput("DE_scaterQC") %>% withSpinner() # PNG output with temp file
         )
       )
     )

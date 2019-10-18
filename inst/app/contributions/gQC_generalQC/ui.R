@@ -1,4 +1,5 @@
 suppressMessages(require(magrittr))
+source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 menuList <- list(
   shinydashboard::menuItem("General QC",
            # id="generalQCID",
@@ -20,7 +21,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 1,
-      plotOutput("gQC_plotUmiHist") %>% shinycssloaders::withSpinner()
+      plotOutput("gQC_plotUmiHist") %>% withSpinner()
     ))
   ),
 
@@ -30,7 +31,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 1,
-      plotOutput("gQC_plotSampleHist") %>% shinycssloaders::withSpinner()
+      plotOutput("gQC_plotSampleHist") %>% withSpinner()
     ))
   ),
 
@@ -40,7 +41,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 1,
-      plotOutput("gQC_variancePCA") %>% shinycssloaders::withSpinner()
+      plotOutput("gQC_variancePCA") %>% withSpinner()
     ))
   ),
   tsnePlotTab = shinydashboard::tabItem(
@@ -50,17 +51,11 @@ tabList <- list(
     fluidRow(
       column(
         3,
-        shinyBS::tipify(
-          numericInput("gQC_tsneDim", "Tsne dimensions", 3, min = 3, max = 3),
-          "<h3>Dimensions for tSNE, currently fixed to 3</h3>"
-        )
+        numericInput("gQC_tsneDim", "Tsne dimensions", 3, min = 3, max = 3)
        ),
       column(
         3,
-        shinyBS::tipify(
-        numericInput("gQC_tsnePerplexity", "Perplexity", 30, min = 1, max = 100),
-        "<h3>Perplexity parameter (should not be bigger than 3 * perplexity < nrow(X) - 1, see details Rtsne for further information) default = 30</h3>"
-        )
+        numericInput("gQC_tsnePerplexity", "Perplexity", 30, min = 1, max = 100)
       ),
       column(
         3,

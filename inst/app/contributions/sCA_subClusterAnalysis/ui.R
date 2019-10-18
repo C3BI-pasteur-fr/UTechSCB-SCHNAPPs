@@ -1,4 +1,6 @@
 suppressMessages(library(magrittr))
+source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
+
 menuList <- list(
   shinydashboard::menuItem("Subcluster analysis", 
                            icon = icon("bar-chart-o"),
@@ -64,14 +66,14 @@ tabList <- list(
         plotOutput("sCA_dge_plot1", brush = brushOpts(
           id =
             "db1"
-        )) %>% shinycssloaders::withSpinner()
+        )) %>% withSpinner()
       ),
       column(
         6,
         plotOutput("sCA_dge_plot2", brush = brushOpts(
           id =
             "db2"
-        )) %>% shinycssloaders::withSpinner()
+        )) %>% withSpinner()
       )
     ),
     shinydashboard::tabItem(
