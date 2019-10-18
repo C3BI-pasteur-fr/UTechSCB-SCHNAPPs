@@ -12,6 +12,19 @@ source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 # DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
 # DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
+#' checkbsTT
+#! TODO needs to go in a separate file
+.schnappsEnv$sbTT_pcaN <- bsPopover("pcaN", title = "comma separted list of cell names", "bottom")
+checkbsTT <- function(item){
+  if(exists(".schnappsEnv"))
+    if (exists(paste0("sbTT_",item), envir = .schnappsEnv)) 
+      .schnappsEnv[[paste0("sbTT_",item)]]
+}
+# checkbsTT(item="pcaN")
+#####
+
+
+
 
 # inputTab ----
 inputTab <- shinydashboard::tabItem(
@@ -260,6 +273,7 @@ for (fp in parFiles) {
   }
 }
 
+
 # submenu items for the paramters main tab
 parameterItems <- list(
   shinydashboard::menuSubItem("Normalization", tabName = "normalizations"),
@@ -308,6 +322,7 @@ generalParametersTab <- shinydashboard::tabItem(
         column(6, offset = 0,
                numericInput("pcaN", "Number of variable genes to be used", 500, min = 50)),
       ),
+      checkbsTT("pcaN"),
       fluidRow(
         column(6, offset = 0,
                checkboxInput("pcaCenter", "center data", TRUE)
@@ -328,7 +343,7 @@ generalParametersTab <- shinydashboard::tabItem(
   fluidRow(
     tabBox( title = "Parameters for clustering", width = 12,
             id = "tabsetCluster",
-            tabPanel("Seurat clustering", width = 12,
+            tabPanel("Scran clustering", width = 12,
                      fluidRow(
                        column(6, offset = 0,
                               selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA", width = "100%")),
@@ -342,7 +357,7 @@ generalParametersTab <- shinydashboard::tabItem(
                               selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%"))
                        
                      ),
-                     bsTooltip("useRanks", title = "comma separted list of cell names", "bottom"),
+                     
                      fluidRow(
                        column(12, offset = 0,
                               textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%")
