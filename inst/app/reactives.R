@@ -1861,7 +1861,7 @@ projections <- reactive({
   projections <- pd
 
     if (!is.null(pca)) {
-    projections <- cbind(projections, pca)
+    projections <- cbind(projections, pca$x)
   }
 
   withProgress(message = "Performing projections", value = 0, {
