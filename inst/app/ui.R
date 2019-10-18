@@ -7,7 +7,7 @@
 
 
 suppressMessages(require(shiny))
-suppressMessages(require(shinyBS))
+source(paste0(packagePath,  "/toolTips.R"), local = TRUE)
 suppressMessages(require(shinydashboard))
 suppressMessages(require(plotly))
 suppressMessages(require(shinythemes))
@@ -17,7 +17,7 @@ suppressMessages(require(edgeR))
 suppressMessages(require(pheatmap))
 suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
-suppressMessages(require(shinycssloaders))
+# suppressMessages(require(shinycssloaders))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -41,8 +41,8 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # }
 # input, cell/gene selection tabs
 # source('tabs.R',  local = TRUE)
+source(paste0(packagePath,  "/modulesUI.R"), local = FALSE)
 source(paste0(packagePath, "/tabs.R"), local = TRUE)
-
 # general tabs
 allTabs <- list(
   inputTab,
@@ -146,61 +146,14 @@ scShinyUI <- shinyUI(
         id = "sideBarID",
         allMenus
       ),
-      # shinyBS::tipify(
-      #   checkboxInput("noStats", "don't display stats", FALSE),
-      #   "check this if you are working on the cell/gene selection to avoid certain calculations"
-      # ),
-
-
       htmlOutput("summaryStatsSideBar"),
-      shinyBS::bsTooltip("summaryStatsSideBar",
-                         "<h3>Data summary</h3> <ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
-                         "right",
-                         trigger = "hover", options = list(container = "body")
-      ),
-      shinyBS::bsTooltip("pcaRank",
-                         title = "test ",
-                         "bottom"
-      ),
       
-      ### failed tests to change color of button text
-
-      # <div id="scoped-content">
-      #   <style type="text/css" scoped>
-      #   h1 { color: red; }
-      # </style>
-      #
-      #   <h1>Hello</h1>
-      #   </div>
-      #
-      # withTags({
-      #   div(id="scoped-content",
-      #       tags$style(type="text/css", scoped=NA, "downloadbutton a { color: red; }"),
-      #       tags$a(id = "report", class = paste("btn btn-default shiny-download-link ", "downloadbutton"), href = "", target = "_blank", download = NA,
-      #              icon("download"), "Generate report"),
-      #       downloadButton("report", "Generate report", class="downloadbutton")
-      #   )
-      # }),
-      ## <div class="header" checked>
-      ##   <p>Ready to take the Shiny tutorial? If so</p>
-      ##   <a href="shiny.rstudio.com/tutorial">Click Here!</a>
-      ## </div>
-      # tags$style(type="text/css", "downloadbutton a { color: #444; }"),
       downloadButton("report", "Generate report", class = "butt"),
       tags$head(tags$style(".butt{color: black !important;}")), #  font color
 
-      # commentetd out because currently no-one is using it
-      # actionButton("goCalc", "Force Calculations"),
-
       # bookmarkButton(id = "bookmark1"),
-      shinyBS::tipify(
-        downloadButton("countscsv", "Download counts.csv", class = "butt"),
-        "<h3>download current normalized count data as CSV file</h3>"
-      ),
-      shinyBS::tipify(
-        downloadButton("RDSsave", "Download RData", class = "butt"),
-        "<h3>download current cell/gene configuration for reimport to this app</h3>"
-      ),
+      downloadButton("countscsv", "Download counts.csv", class = "butt"),
+      downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),
       if (exists("historyFile", envir = .schnappsEnv)){
@@ -209,11 +162,10 @@ scShinyUI <- shinyUI(
       verbatimTextOutput("save2Historystring")
     ), # dashboard side bar
     shinydashboard::dashboardBody(
-      shinyBS::bsAlert("alert"),
       tags$div(
         allTabs,
         class = "tab-content"
-      ),bsTooltip("pcaRank", title = "comma separted list of cell names", "bottom")
+      )
     ) # dashboard body
   ) # main dashboard
 )

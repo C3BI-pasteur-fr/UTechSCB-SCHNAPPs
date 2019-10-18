@@ -18,20 +18,11 @@
 #' 
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
-#' @importFrom  shiny actionButton setBookmarkExclude observeEvent updateRadioButtons shinyUI
-#' checkboxInput htmlOutput downloadButton  tags withProgress
-#' renderPrint renderUI exportTestValues renderText isolate downloadHandler fluidRow fileInput textInput
-#' column numericInput textOutput icon uiOutput
-#' radioButtons verbatimTextOutput wellPanel
-#' @importFrom htmltools HTML br
 #' @importFrom shinyTree renderTree shinyTree
-#' @importFrom magrittr %>%
 #' @importFrom DT DTOutput dataTableProxy
-#' @importFrom shinycssloaders withSpinner
-#' @importFrom plotly event_data plot_ly
-#' @importFrom shinyBS tipify bsAlert
+#' @importFrom dplyr '%>%'
 #' @importFrom shiny shinyApp runApp
-#'
+#' 
 #' @export schnapps
 #'
 

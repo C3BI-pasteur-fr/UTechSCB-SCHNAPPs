@@ -352,6 +352,7 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
       hoverinfo = "text",
       text = paste("Cluster:", as.numeric(as.character(projections$dbCluster))),
       mode = "markers",
+      source = "B",
       marker =
         list(
           line = list(width = 0),
