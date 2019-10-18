@@ -90,7 +90,7 @@ output$normalizationsParametersDynamic <- renderUI({
 cellSelectionValues <- reactiveVal(
   list(
     minExpGenes = defaultValueRegExGene,
-    minGenes = "",
+    minGenes = 20,
     maxGenes = 1000000,
     cellPatternRM = "",
     cellKeep = "",
