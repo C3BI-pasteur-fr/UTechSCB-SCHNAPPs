@@ -199,7 +199,8 @@ cellSelectionTab <- shinydashboard::tabItem(
            offset = 0,
            textInput("cellKeep", "cells to keep")
     )
-  ), br(),checkbsTT("cellKeep"),
+  ), br(),
+  checkbsTT("cellKeep"),
   fluidRow(
     column(10,
            offset = 1,
@@ -274,7 +275,8 @@ generalParametersTab <- shinydashboard::tabItem(
         column(6, offset = 0,
                checkboxInput("pcaScale", "scale data", TRUE)
         ),
-        checkbsTT("pcaCenter"), checkbsTT("pcaScale")
+        checkbsTT("pcaCenter"),
+        checkbsTT("pcaScale")
       ),
       fluidRow(
         column(12,offset = 0,
@@ -295,6 +297,8 @@ generalParametersTab <- shinydashboard::tabItem(
                        column(6, 
                               numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2, width = "100%"))
                      ),
+                     checkbsTT(item="clusterSource"),
+                     checkbsTT(item="minClusterSize"),
                      fluidRow(
                        column(6, 
                               selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")),
@@ -302,15 +306,19 @@ generalParametersTab <- shinydashboard::tabItem(
                               selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%"))
                        
                      ),
+                     checkbsTT(item=""),
+                     checkbsTT(item=""),
                      
                      fluidRow(
                        column(12, offset = 0,
                               textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%")
                        )
                      ),
+                     checkbsTT(item="geneSelectionClustering"),
                      fluidRow(
                        column(12, offset = 0, textOutput("Nclusters"))
-                     )
+                     ),
+                     checkbsTT(item="")
             )
     )),
   # fluidRow(div(h3("Parameters for clustering"), align = "left")),
@@ -326,17 +334,21 @@ generalParametersTab <- shinydashboard::tabItem(
         textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
     
   ),
+  checkbsTT(item="descriptionOfWork"),
   br(),
   fluidRow(div(h3("Colors"), align = "left")),
   fluidRow(
     actionButton("updateColors", "Update colours", icon = icon("update"))
   ),
+  checkbsTT(item="updateColors"),
   fluidRow(column(4,offset = 1,
                   uiOutput('sampleColorSelection')
   ),
+  checkbsTT(item="sampleColorSelection"),
   column(4,offset = 1,
          uiOutput('clusterColorSelection')
-  )
+  ),
+  checkbsTT(item="clusterColorSelection")
   )
   # ,
   # fluidRow(
@@ -362,13 +374,18 @@ renameTab <- shinydashboard::tabItem(
            actionButton("updatePrjsButton", "rename")),
     tags$style(type='text/css', "#updatePrjsButton { width:100%; margin-top: 25px;}")
   ),
+  checkbsTT(item="oldPrj"),
+  checkbsTT(item="newPrj"),
+  checkbsTT(item="updatePrjsButton"),
   fluidRow(
     column(4, offset = 1,
            selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")),
     column(2, offset = 0, 
            actionButton("delPrjsButton", "delete")),
     tags$style(type='text/css', "#delPrjsButton { width:100%; margin-top: 25px;}")
-  )
+  ),
+  checkbsTT(item="delPrj"),
+  checkbsTT(item="delPrjsButton")
 )
 
 
