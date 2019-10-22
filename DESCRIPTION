@@ -29,6 +29,7 @@ Imports:
     scran,
     Seurat,
     shinydashboard,
+    shinythemes,
     shinyTree,
     shinyWidgets,
     SingleCellExperiment,
