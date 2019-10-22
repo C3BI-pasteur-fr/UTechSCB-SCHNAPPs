@@ -32,12 +32,12 @@ Imports:
     shinyTree,
     shinyWidgets,
     SingleCellExperiment,
-    SingleR,
     SummarizedExperiment,
     threejs,
     tidyverse,
     TRONCO
 Suggests:
+    SingleR,
     igraph,
     reshape2,
     vipor,
