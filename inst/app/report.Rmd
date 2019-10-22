@@ -52,7 +52,7 @@ library(gtools)
 library(SingleCellExperiment)
 library(Matrix)
 library(colourpicker)
-library(shinytest)
+# library(shinytest)
 library(scran)
 
 # we overwirte this function because it doesn't make sense in the report and causes problems otherwise
