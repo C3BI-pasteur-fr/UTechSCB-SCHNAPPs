@@ -19,6 +19,8 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 # update bioconductor packages if required
 BiocManager::install()
 BiocManager::install("BiocSingular")
+BiocManager::install(version='devel')
+BiocManager::install("SingleR")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
