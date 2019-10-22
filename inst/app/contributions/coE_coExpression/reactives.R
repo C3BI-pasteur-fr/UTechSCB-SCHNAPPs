@@ -239,6 +239,10 @@ coE_topExpGenesTable <- reactive({
 #' coEtgPerc = genes shown have to be expressed in at least X % of cells
 #' coEtgMinExpr = genes shown have at least to X UMIs expressed
 coE_topExpCCTable <- reactive({
+  if (! "Hmisc" %in% rownames(installed.packages())) {
+    showNotification("Please install Hmisc", id = "hmiscError", type="error", duration = NULL)
+    return (NULL)
+  }
   require("Hmisc")
   if (DEBUG) cat(file = stderr(), "coE_topExpCCTable started.\n")
   start.time <- base::Sys.time()
