@@ -1,6 +1,5 @@
 # # LIBRARIES -----------------------------------------------------------------
 suppressMessages(require(shiny))
-# suppressMessages(require(reactlog))
 suppressMessages(require(shinyTree))
 suppressMessages(require(tibble))
 suppressMessages(require(plotly))
@@ -9,26 +8,34 @@ suppressMessages(require(ggplot2))
 suppressMessages(require(DT))
 suppressMessages(require(pheatmap))
 suppressMessages(require(threejs))
-# suppressMessages(require(sm))
 suppressMessages(require(RColorBrewer))
 suppressMessages(require(mclust))
 suppressMessages(require(reshape2))
 suppressMessages(require(ggplot2))
 suppressMessages(require(knitr))
-# suppressMessages(require(kableExtra))
 suppressMessages(require(shinyWidgets))
 suppressMessages(require(scater))
 suppressMessages(require(kohonen))
 suppressMessages(require(Rsomoclu))
-# suppressMessages(require(gtools))
 suppressMessages(require(SingleCellExperiment))
 suppressMessages(require(Matrix))
 suppressMessages(require(colourpicker))
 # suppressMessages(require(shinytest))
 suppressMessages(require(scran))
-# suppressMessages(require(callr))
-# suppressMessages(require(debugme))
 suppressMessages(require(BiocSingular))
+
+if ("debugme" %in% rownames(installed.packages())) {
+  suppressMessages(require(debugme))
+}
+if ("gtools" %in% rownames(installed.packages())) {
+  suppressMessages(require(gtools))
+}
+if ("kableExtra" %in% rownames(installed.packages())) {
+  suppressMessages(require(kableExtra))
+}
+if ("reactlog" %in% rownames(installed.packages())) {
+  suppressMessages(require(reactlog))
+}
 
 if (!exists(".schnappsEnv")) {
   .schnappsEnv <- new.env(parent = emptyenv())

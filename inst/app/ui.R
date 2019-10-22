@@ -17,7 +17,6 @@ suppressMessages(require(edgeR))
 suppressMessages(require(pheatmap))
 suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
-# suppressMessages(require(shinycssloaders))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
