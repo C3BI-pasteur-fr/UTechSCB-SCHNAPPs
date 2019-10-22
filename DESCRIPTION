@@ -55,6 +55,9 @@ Suggests:
     gtools,
     callr,
     DESeq2,
+    Hmisc,
+    reactlog,
+    debugme,
     shinyBS,
     crayon
 RoxygenNote: 6.1.1
