@@ -1,5 +1,5 @@
 fps <- list.files(pattern = ".RData$|.RDs$",
-                  path = "F:/Rstudio/data/",
+                  path = "~/Downloads/",
                   recursive = TRUE,
                   full.names = T,
                   ignore.case = T)
