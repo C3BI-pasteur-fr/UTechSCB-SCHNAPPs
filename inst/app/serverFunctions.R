@@ -111,9 +111,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (length(geneid) == 0) {
     return(NULL)
   }
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
-    return(NULL)
-  }
   # if (length(geneid) == 1) {
   #   expression <- exprs(scEx_log)[geneid, ,drop=FALSE]
   # } else {
@@ -135,6 +132,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     scEx = scEx_log, projections = projections
   )
   
+  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
+    return(NULL)
+  }
   
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
