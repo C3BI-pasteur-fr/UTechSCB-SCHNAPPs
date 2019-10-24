@@ -39,12 +39,12 @@ myNormalizationParameters <- list(
       label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
       min = 60, max = 30000, step = 10,
       value = 200
+    ),
+    numericInput("DE_seuratSCtransform_scaleFactor",
+                 label = "Scaling to use for transformed data",
+                 min = 1, max = 30000, step = 10,
+                 value = 1000
     )
-  ),
-  numericInput("DE_seuratSCtransform_scaleFactor",
-    label = "Scaling to use for transformed data",
-    min = 1, max = 30000, step = 10,
-    value = 1000
   )
 )
 
