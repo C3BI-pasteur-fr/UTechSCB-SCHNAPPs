@@ -28,6 +28,11 @@ myNormalizationParameters <- list(
       label = "How many neighbors (k) to use when filtering anchors",
       min = 2, max = 3000, step = 1,
       value = 200
+    ),
+    numericInput("DE_seuratStandard_k.weight",
+                 label = "Number of neighbors to consider when weighting",
+                 min = 2, max = 3000, step = 1,
+                 value = 100
     )
   ),
   DE_seuratSCtransform = tagList(
@@ -39,12 +44,12 @@ myNormalizationParameters <- list(
       label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
       min = 60, max = 30000, step = 10,
       value = 200
+    ),
+    numericInput("DE_seuratSCtransform_scaleFactor",
+                 label = "Scaling to use for transformed data",
+                 min = 1, max = 30000, step = 10,
+                 value = 1000
     )
-  ),
-  numericInput("DE_seuratSCtransform_scaleFactor",
-    label = "Scaling to use for transformed data",
-    min = 1, max = 30000, step = 10,
-    value = 1000
   )
 )
 
@@ -145,12 +150,13 @@ DE_seuratSCtransform <- reactive({
 
 
 
-DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200) {
+DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.weight= 100) {
   require(Seurat)
   cellMeta <- colData(scEx)
   # split in different samples
   meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
   # creates object @assays$RNA@data and @assays$RNA@counts
+  integrated <- NULL
   seurDat <- tryCatch(
     {
       seurDat <- CreateSeuratObject(
@@ -166,15 +172,15 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200) {
         )
       }
       anchors <- FindIntegrationAnchors(
-        object.list = seur.list, dims = 1:2, anchor.features = anchorsF,
+        object.list = seur.list, dims = 1:dims, anchor.features = anchorsF,
         k.filter = kF
       )
-      integrated <- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = kF)
+      integrated <- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight, verbose = TRUE)
       DefaultAssay(integrated) <- "integrated"
 
       # Run the standard workflow for visualization and clustering
       integrated <- ScaleData(integrated, verbose = TRUE)
-      integrated@assays
+      # integrated@assays
 
 
       # NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
@@ -184,6 +190,15 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200) {
       return(NULL)
     }
   )
+  
+  A <- integrated@assays$integrated@data 
+  scEx_bcnorm <- SingleCellExperiment(
+    assay = list(logcounts = as(A, "dgTMatrix")),
+    colData = colData(scEx)[colnames(A), , drop = FALSE],
+    rowData = rowData(scEx)[rownames(A), , drop = FALSE]
+  )
+  return(scEx_bcnorm)
+  
 }
 
 DE_seuratStandard <- reactive({
@@ -203,7 +218,8 @@ DE_seuratStandard <- reactive({
   sDims <- input$DE_seuratStandard_dims
   anchorF <- input$DE_seuratStandard_anchorF
   kF <- input$DE_seuratStandard_kF
-
+  k.weight <- input$k.weight
+  
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "DE_seuratStandard:NULL\n")
@@ -219,7 +235,7 @@ DE_seuratStandard <- reactive({
 
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratStandardfunc(scEx = scEx, dims = sDims, anchorsF = anchorF, kF = kF)
+  retVal <- DE_seuratStandardfunc(scEx = scEx, dims = sDims, anchorsF = anchorF, kF = kF, k.weight = k.weight)
 
   if (is.null(retVal)) {
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
