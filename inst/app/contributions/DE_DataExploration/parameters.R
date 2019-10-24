@@ -55,7 +55,7 @@ DE_seuratSCtransformFunc <-function(scEx, nfeatures = 3000, k.filter = 100){
   anchors <- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT", 
                                     anchor.features = features, verbose = TRUE, k.filter = k.filter)
   integrated <- IntegrateData(anchorset = anchors, normalization.method = "SCT", 
-                                       verbose = TRUE)
+                              verbose = TRUE)
   integrated <- NormalizeData(integrated, verbose = TRUE)
   
   integrated <- RunPCA(integrated, verbose = TRUE)
@@ -67,7 +67,7 @@ DE_seuratSCtransformFunc <-function(scEx, nfeatures = 3000, k.filter = 100){
   CombinePlots(plots)
   
   FeaturePlot(integrated, c("CCR7", "S100A4", "GZMB", "GZMK", "GZMH"))
-
+  
   
   A <-  integrated@assays$integrated@data
   scEx_bcnorm <- SingleCellExperiment(assay = list(logcounts = as(A,"dgTMatrix")),
@@ -92,7 +92,7 @@ DE_seuratSCtransform <- reactive({
   scEx <- scEx()
   nfeatures <- input$DE_seuratSCtransform_nfeatures
   k.filter <- input$DE_seuratSCtransform_k.filter
-
+  
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "DE_seuratSCtransform:NULL\n")
@@ -113,7 +113,7 @@ DE_seuratSCtransform <- reactive({
   if(is.null(retVal)){
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
   }
-
+  
   exportTestValues(DE_seuratSCtransform = {assays(retVal)[["logcounts"]]})  
   return(retVal)
 })
