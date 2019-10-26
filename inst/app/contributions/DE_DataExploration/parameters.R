@@ -186,12 +186,12 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
       # NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
     },
     error = function(e) {
-      cat(file = stderr(), paste("\n\nError during Seurat normalization:\n", e, "\n\n"))
+      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\n", e, "\n\n"))
       return(NULL)
     }
   )
   
-  A <- integrated@assays$integrated@data 
+  A <- seurDat@assays$integrated@data 
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "dgTMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
