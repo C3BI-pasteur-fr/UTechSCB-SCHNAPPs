@@ -190,7 +190,9 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
       return(NULL)
     }
   )
-  
+  if (is.null(seurDat)) {
+    return(NULL)
+  }
   A <- seurDat@assays$integrated@data 
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "dgTMatrix")),
