@@ -91,6 +91,12 @@ if (!exists("allowedColors")) {
     "#fddbc7", "#e0e0e0", "#999999", "#4d4d4d"
   ))
 }
+
+if (all(c("future", "parallel") %in% rownames(installed.packages()))){
+  library(future)
+  plan("multiprocess", workers = parallel::detectCores()-1)
+}
+
 # Sys.setenv(DEBUGME = ".")
 base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 
