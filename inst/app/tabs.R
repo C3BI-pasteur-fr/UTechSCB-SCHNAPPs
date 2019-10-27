@@ -66,7 +66,12 @@ inputTab <- shinydashboard::tabItem(
   fluidRow(column(
     4,
     offset = 1,
-    checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
+    radioButtons("whichscLog", label = "Compute normalizations?",
+                choices = c("disable log" = "disablescEx_log" , 
+                            "use scEx from loaded data" = "useLog" ,
+                            "calculate normalization here" = "calcLog"),
+                selected = "disablescEx_log")
+    # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
   )),checkbsTT("disablescEx_log"),
   
   br(),
