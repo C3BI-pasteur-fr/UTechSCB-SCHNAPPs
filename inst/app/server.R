@@ -93,6 +93,7 @@ if (!exists("allowedColors")) {
 }
 
 if (all(c("future", "parallel") %in% rownames(installed.packages()))){
+  library(parallel)
   library(future)
   plan("multiprocess", workers = parallel::detectCores()-1)
 }
