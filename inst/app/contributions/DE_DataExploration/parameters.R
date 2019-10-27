@@ -6,7 +6,8 @@ myNormalizationChoices <- list(
   scEx_log = "DE_logNormalization",
   gene_norm = "DE_logGeneNormalization",
   SeuratStandard = "DE_seuratStandard",
-  SeuratSCtransform = "DE_seuratSCtransform"
+  SeuratSCtransform = "DE_seuratSCtransform",
+  SeuratRefBased = "DE_seuratRefBased"
 )
 
 # value should be of class shiny.tag
@@ -50,10 +51,131 @@ myNormalizationParameters <- list(
                  min = 1, max = 30000, step = 10,
                  value = 1000
     )
+  ),
+  DE_seuratRefBased = tagList(
+    numericInput("DE_seuratRefBased_nfeatures",
+                 label = "Number of features to retain/use",
+                 min = 200, max = 20000, step = 10, value = 3000
+    ),
+    numericInput("DE_seuratRefBased_k.filter",
+                 label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
+                 min = 60, max = 30000, step = 10,
+                 value = 200
+    ),
+    numericInput("DE_seuratRefBased_scaleFactor",
+                 label = "Scaling to use for transformed data",
+                 min = 1, max = 30000, step = 10,
+                 value = 1000
+    )
   )
 )
 
+DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalingFactor = 1000) {
+  require(Seurat)
+  cellMeta <- colData(scEx)
+  # split in different samples
+  meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx)[[1]],
+    meta.data = meta.data
+  )
+  seur.list <- SplitObject(seurDat, split.by = "sampleNames")
+  for (i in 1:length(seur.list)) {
+    seur.list[[i]] <- SCTransform(seur.list[[i]], verbose = TRUE)
+  }
+  integrated <- tryCatch({
+  # save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+  features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)
+  seur.list <- PrepSCTIntegration(
+    object.list = seur.list, anchor.features = features,
+    verbose = TRUE
+  )
+  # take the sample with the highest number of cells as reference
+  reference_dataset <- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]
+  
+  anchors <- FindIntegrationAnchors(
+    object.list = seur.list, normalization.method = "SCT",
+    anchor.features = features, verbose = TRUE, k.filter = k.filter,
+    reference = reference_dataset
+  )
+  integrated <- IntegrateData(
+    anchorset = anchors, normalization.method = "SCT",
+    verbose = TRUE
+  )
+  # integrated <- NormalizeData(integrated, verbose = TRUE)
+  
+  # integrated <- RunPCA(integrated, verbose = TRUE)
+  # integrated <- RunUMAP(integrated, dims = 1:30)
+  # plots <- DimPlot(integrated, group.by = c("sampleNames"), combine = TRUE, dims = )
+  # plots <- lapply(X = plots, FUN = function(x) x + theme(legend.position = "top") +
+  #                   guides(color = guide_legend(nrow = 3,
+  #                                               byrow = TRUE, override.aes = list(size = 3))))
+  # CombinePlots(plots)
+  
+  # FeaturePlot(integrated, c("CCR7", "S100A4", "GZMB", "GZMK", "GZMH"))
+  },
+  error = function(e) {
+    cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\n", e, "\n\n"))
+    return(NULL)
+  })
+  if (is.null(integrated)) {
+    return(NULL)
+  }
+  A <- integrated@assays$integrated@data * scalingFactor
+  scEx_bcnorm <- SingleCellExperiment(
+    assay = list(logcounts = as(A, "dgTMatrix")),
+    colData = colData(scEx)[colnames(A), , drop = FALSE],
+    rowData = rowData(scEx)[rownames(A), , drop = FALSE]
+  )
+  return(scEx_bcnorm)
+}
 
+DE_seuratRefBased <- reactive({
+  if (DEBUG) cat(file = stderr(), "DE_seuratRefBased started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "DE_seuratRefBased")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "DE_seuratRefBased")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_seuratRefBased", id = "DE_seuratRefBased", duration = NULL)
+  }
+  
+  scEx <- scEx()
+  nfeatures <- input$DE_seuratRefBased_nfeatures
+  k.filter <- input$DE_seuratRefBased_k.filter
+  scalingFactor <- input$DE_seuratRefBased_scaleFactor
+  
+  if (is.null(scEx)) {
+    if (DEBUG) {
+      cat(file = stderr(), "DE_seuratRefBased:NULL\n")
+    }
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file="~/SCHNAPPsDebug/DE_seuratRefBased.RData")
+  
+  
+  
+  # # TODO ?? define scaling factor somewhere else???
+  # sfactor = max(max(assays(scEx)[["counts"]]),1000)
+  retVal <- DE_seuratRefBasedFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, scalingFactor = scalingFactor)
+  
+  if (is.null(retVal)) {
+    showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
+  }
+  
+  exportTestValues(DE_seuratSCtransform = {
+    assays(retVal)[["logcounts"]]
+  })
+  return(retVal)
+})
+
+# =======
 DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalingFactor = 1000) {
   require(Seurat)
   cellMeta <- colData(scEx)
