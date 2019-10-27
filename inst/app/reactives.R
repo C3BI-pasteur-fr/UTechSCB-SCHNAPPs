@@ -2715,15 +2715,17 @@ reacativeReport <- function() {
 
 consolidateScEx <-
   function(scEx, projections, scEx_log, pca, tsne) {
+    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls(), ls(envir = globalenv())))
+    # load(file = "~/SCHNAPPsDebug/consolidate.RData")
     commCells = base::intersect(colnames(scEx), colnames(scEx_log))
     commGenes = base::intersect(rownames(scEx), rownames(scEx_log))
     scEx = scEx[commGenes, commCells]
-    reducedDims(scEx) <- SimpleList(PCA = pca$x, TSNE = tsne)
+    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells,], TSNE = tsne[commCells,])
     assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
-    colData(scEx)[["before.Filter"]] <- projections$before.filter[commGenes]
-    colData(scEx)[["dbCluster"]] <- projections$dbCluster[commGenes]
-    colData(scEx)[["UmiCountPerGenes"]] <- projections$UmiCountPerGenes[commGenes]
-    colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2[commGenes]
+    colData(scEx)[["before.Filter"]] <- projections$before.filter[commCells]
+    colData(scEx)[["dbCluster"]] <- projections$dbCluster[commCells]
+    colData(scEx)[["UmiCountPerGenes"]] <- projections$UmiCountPerGenes[commCells]
+    colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2[commCells]
     
     return(scEx)
   }
