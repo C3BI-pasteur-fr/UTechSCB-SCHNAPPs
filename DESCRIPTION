@@ -39,6 +39,8 @@ Imports:
     TRONCO
 Suggests:
     igraph,
+    future,
+    parallel,
     reshape2,
     vipor,
     shinyAce,
