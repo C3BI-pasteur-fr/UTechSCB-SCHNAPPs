@@ -131,6 +131,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
+  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
+    return(NULL)
+  }
   
   if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
     return(NULL)
