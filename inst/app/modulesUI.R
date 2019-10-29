@@ -85,30 +85,30 @@ clusterUI <- function(id) {
 tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(div(
-      h5("Selected itmes to be copied"),
-      align = "left"
-    )),
-    fluidRow(
-      verbatimTextOutput(ns("cellSelection"))
-    ),
-    fluidRow(
-      downloadButton(ns("download_cellNameTable"), "Download table")
-    ),
-    fluidRow(
-      h4("Cells", offset = 1),
-      column(3,
-             checkboxInput(ns("selectAll"), "Select all rows", FALSE)), 
-      column(3,
-             checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)), 
-      br(),
-      column(
-        width = 12,
-        DT::DTOutput(ns("cellNameTable")) %>% withSpinner(),
-        style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
+    box(width = 12,
+      fluidRow(
+        column(width = 12,
+          div(
+            h5("Selected itmes to be copied"),
+            align = "left"
+          ),
+          verbatimTextOutput(ns("cellSelection")),
+          downloadButton(ns("download_cellNameTable"), "Download table")
+        )
+      ),
+      fluidRow(
+        h4("Cells", offset = 1),
+        column(width = 3,
+               checkboxInput(ns("selectAll"), "Select all rows", FALSE)), 
+        column(width = 3,
+               checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)), 
+        br(),
+        column(width = 12,
+          DT::DTOutput(ns("cellNameTable")) %>% withSpinner(),
+          style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
+        )
       )
-    ),
-    fluidRow()
+    )
   )
 }
 
