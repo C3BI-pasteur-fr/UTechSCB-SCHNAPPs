@@ -83,14 +83,10 @@ inputDataFunc <- function(inFile) {
   
   # in case we are loading from a report
   scExFound <- FALSE
-  allScEx_log = NULL
-  if ("scEx" %in% fpLs) {
+  allScEx_log <- NULL
+  if ("scEx" %in% fpLs) { # we prefer the scEx object ;)
     scExFound <- TRUE
     varName <- "scEx"
-    # In case we are loading precalculated normalizations.
-    if ("scEx_log" %in% fpLs){
-      allScEx_log = scEx_log
-    }
   } else {
     scExFound <- FALSE
     for (varName in fpLs) {
@@ -105,14 +101,19 @@ inputDataFunc <- function(inFile) {
   if (!scExFound) {
     return(NULL)
   }
-  cat(file = stderr(), paste("file ", inFile$name[1], "contains variable", varName, " as SingleCellExperiment.\n"))
+  cat(file = stderr(), green(paste("file ", inFile$name[1], "contains variable", varName, " as SingleCellExperiment.\n")))
   # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = ls())
   # load("~/SCHNAPPsDebug/inputProblem.RData")
-  fdAll <- rowData(scEx)
-  pdAll <- colData(scEx)
-  exAll <- assays(scEx)[["counts"]]
-  stats[1, "nFeatures"] <- nrow(fdAll)
-  stats[1, "nCells"] <- nrow(pdAll)
+  # fdAll <- rowData(scEx)
+  # pdAll <- colData(scEx)
+  # exAll <- assays(scEx)[["counts"]]
+  stats[1, "nFeatures"] <- nrow(rowData(scEx))
+  stats[1, "nCells"] <- nrow(colData(scEx))
+  allScEx <- scEx # save to allScEx to be able to combine if multiple SCE objects are given
+  # In case we are loading precalculated normalizations.
+  if ("logcounts" %in% names(assays(scEx))) {
+    allScEx_log <- scEx
+  }
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/readInp1.RData", list = c(ls(), ls(envir = globalenv())))
@@ -127,18 +128,10 @@ inputDataFunc <- function(inFile) {
       fp <- inFile$datapath[fpIdx]
       fpLs <- load(fp)
       scExFound <- FALSE
-      # we prefer our own data
       if ("scEx" %in% fpLs) {
         scExFound <- TRUE
-        varName = "scEx"
+        varName <- "scEx" # we don't have to set scEx
         # In case we are loading precalculated normalizations.
-        if ("scEx_log" %in% fpLs){
-          if (is.null(allScEx_log())){
-            allScEx_log = scEx_log
-          } else {
-            allScEx_log = cbind(allScEx_log, scEx_log)
-          }
-        }
       } else {
         for (varName in fpLs) {
           # if ("SingleCellExperiment" %in% class(get(varName))) {
@@ -149,88 +142,120 @@ inputDataFunc <- function(inFile) {
           }
         }
       }
-      cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "contains variable", varName, "\n"))
+      cat(file = stderr(), green(paste("file ", inFile$datapath[fpIdx], "contains variable", varName, "\n")))
       if (!scExFound) {
         next()
       }
-      rListAll <- rownames(fdAll)[!rownames(fdAll) %in% rownames(rowData(scEx))]
-      rListNew <- rownames(rowData(scEx))[!rownames(rowData(scEx)) %in% rownames(fdAll)]
-      
-      # fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
-      # if (length(fdIdx) != nrow(fd)) {
-      #   cat(file = stderr(), "Houston, there is a problem with the features\n")
-      # }
-      # fd <- featuredata[fdIdx, ]
-      rowdataNew <- rowData(scEx)[rListNew, ]
-      fdAll[rListNew, ] <- NA
-      for (cIdx in colnames(rowdataNew)) {
-        if (!cIdx %in% colnames(fdAll)) {
-          fdAll <- cbind(fdAll, data.frame(row.names = rownames(fdAll), rep(NA, nrow(fdAll))))
-          colnames(fdAll)[length(colnames(fdAll))] <- cIdx
+      if ("counts" %in% names(assays(scEx))) {
+        if (is.null(allScEx)) {
+          allScEx <- scEx
+        } else {
+          newColnames = make.unique(c(colnames(allScEx), colnames(scEx)))
+          colnames(scEx) <- newColnames[(ncol(allScEx) + 1):length(newColnames)]
+          genesUnion <- intersect(rownames(scEx), rownames(allScEx))
+          
+          allScEx <- addColData(allScEx, scEx)
+          scEx <- addColData(scEx, allScEx_log)
+          # colData(allScEx_log)
+          allScEx <- cbind(allScEx[genesUnion,], scEx[genesUnion,])
         }
-        fdAll[rListNew, cIdx] <- rowdataNew[, cIdx]
-      }
-      # fdAll[rListNew,"id"] = rListNew
-      
-      # append new genes
-      tmpMat <- matrix(nrow = length(rListNew), ncol = ncol(exAll), data = 0)
-      rownames(tmpMat) <- rListNew
-      exAll <- rbind(exAll, tmpMat)
-      
-      
-      
-      # fdAll <- fdAll[fdIdx, ]
-      pd1 <- colData(scEx)
-      rownames(pd1) <- paste0(rownames(pd1), "-", fpIdx)
-      if (!"counts" %in% names(assays(scEx))) {
-        cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
+      } else {
+        cat(file = stderr(), (paste("!!!!!file ", inFile$datapath[fpIdx], "contains variable", varName, " but no counts assay!!!!\n")))
         next()
       }
-      ex1 <- assays(scEx)[["counts"]]
-      pdAllCols2add <- colnames(pdAll)[!colnames(pdAll) %in% colnames(pd1)]
-      pd1Cols2add <- colnames(pd1)[!colnames(pd1) %in% colnames(pdAll)]
-      for (pd1C in pd1Cols2add) {
-        pdAll[, pd1C] <- NA
-      }
-      for (pd1C in pdAllCols2add) {
-        pd1[, pd1C] <- NA
-      }
-      if (sum(rownames(pdAll) %in% rownames(pd1)) > 0) {
-        cat(green("Houston, there are cells with the same name\n"))
-        save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats", "fdAll"))
-        # load("~/SCHNAPPsDebug/inputProblem.RData")
-        cat(file = stderr(), "Houston, there are cells with the same name\n")
-        rownames(pd1) <- paste0(rownames(pd1), "_", fpIdx)
-        pdAll <- rbind(pdAll, pd1)
-        colnames(ex1) <- rownames(pd1)
-      } else {
-        pdAll <- rbind(pdAll, pd1)
-      }
-      # stats[fpIdx, "nFeatures"] <- nrow(fd)
-      stats[fpIdx, "nCells"] <- nrow(pd1)
       
-      nrow(ex1)
-      nrow(exAll)
-      # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats", "fdAll"))
-      exAll <- Matrix::cbind2(exAll[which(rownames(exAll) %in% rownames(ex1)), ], ex1[which(rownames(ex1) %in% rownames(exAll)), ])
+      # In case we are loading precalculated normalizations we need to also keep the logcounts.
+      if ("logcounts" %in% names(assays(scEx))) {
+        if (is.null(allScEx_log)) {
+          allScEx_log <- scEx
+        } else {
+          newColnames = make.unique(c(colnames(allScEx_log), colnames(scEx)))
+          colnames(scEx) <- newColnames[(ncol(allScEx_log) + 1):length(newColnames)]
+          genesUnion <- intersect(rownames(scEx), rownames(allScEx_log))
+          
+          allScEx_log <- addColData(allScEx_log, scEx)
+          scEx <- addColData(scEx, allScEx_log)
+          # colData(allScEx_log)
+          allScEx_log <- cbind(allScEx_log[genesUnion,], scEx[genesUnion,])
+        }
+      }
+      stats[fpIdx, "nFeatures"] <- nrow(scEx)
+      stats[fpIdx, "nCells"] <- ncol(scEx)
+      
+      # 
+      # # rListAll <- rownames(fdAll)[!rownames(fdAll) %in% rownames(rowData(scEx))]
+      # rListNew <- rownames(rowData(scEx))[!rownames(rowData(scEx)) %in% rownames(fdAll)]
+      # 
+      # # fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
+      # # if (length(fdIdx) != nrow(fd)) {
+      # #   cat(file = stderr(), "Houston, there is a problem with the features\n")
+      # # }
+      # # fd <- featuredata[fdIdx, ]
+      # rowdataNew <- rowData(scEx)[rListNew, ]
+      # fdAll[rListNew, ] <- NA
+      # for (cIdx in colnames(rowdataNew)) {
+      #   if (!cIdx %in% colnames(fdAll)) {
+      #     fdAll <- cbind(fdAll, data.frame(row.names = rownames(fdAll), rep(NA, nrow(fdAll))))
+      #     colnames(fdAll)[length(colnames(fdAll))] <- cIdx
+      #   }
+      #   fdAll[rListNew, cIdx] <- rowdataNew[, cIdx]
+      # }
+      # # fdAll[rListNew,"id"] = rListNew
+      # 
+      # # append new genes
+      # tmpMat <- matrix(nrow = length(rListNew), ncol = ncol(exAll), data = 0)
+      # rownames(tmpMat) <- rListNew
+      # exAll <- rbind(exAll, tmpMat)
+      # 
+      # 
+      # 
+      # # fdAll <- fdAll[fdIdx, ]
+      # pd1 <- colData(scEx)
+      # rownames(pd1) <- paste0(rownames(pd1), "-", fpIdx)
+      # if (!"counts" %in% names(assays(scEx))) {
+      #   cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
+      #   next()
+      # }
+      # ex1 <- assays(scEx)[["counts"]]
+      # pdAllCols2add <- colnames(pdAll)[!colnames(pdAll) %in% colnames(pd1)]
+      # pd1Cols2add <- colnames(pd1)[!colnames(pd1) %in% colnames(pdAll)]
+      # for (pd1C in pd1Cols2add) {
+      #   pdAll[, pd1C] <- NA
+      # }
+      # for (pd1C in pdAllCols2add) {
+      #   pd1[, pd1C] <- NA
+      # }
+      # if (sum(rownames(pdAll) %in% rownames(pd1)) > 0) {
+      #   cat(green("Houston, there are cells with the same name\n"))
+      #   save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats"))
+      #   # load("~/SCHNAPPsDebug/inputProblem.RData")
+      #   cat(file = stderr(), "Houston, there are cells with the same name\n")
+      #   rownames(pd1) <- paste0(rownames(pd1), "_", fpIdx)
+      #   pdAll <- rbind(pdAll, pd1)
+      #   colnames(ex1) <- rownames(pd1)
+      # } else {
+      #   pdAll <- rbind(pdAll, pd1)
+      # }
+      
+      # nrow(ex1)
+      # nrow(exAll)
+      # # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats", "fdAll"))
+      # exAll <- Matrix::cbind2(exAll[which(rownames(exAll) %in% rownames(ex1)), ], ex1[which(rownames(ex1) %in% rownames(exAll)), ])
     }
   }
-  rn = rownames(exAll)
-  cn = colnames(exAll)
-  exAll <- as(exAll, "dgTMatrix")
-  rownames(exAll) = rn
-  colnames(exAll) = cn
-  
-  if ("sampleNames" %in% colnames(pdAll)) {
-    if (!is(pdAll$sampleNames, "factor")) {
-      pdAll$sampleNames <- factor(pdAll$sampleNames)
+  # rn <- rownames(exAll)
+  # cn <- colnames(exAll)
+  # exAll <- as(exAll, "dgTMatrix")
+  # rownames(exAll) <- rn
+  # colnames(exAll) <- cn
+  # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("allScEx", "allScEx_log", "sampleCols"))
+  # load(file = "~/SCHNAPPsDebug/inputProblem.RData")
+  if ("sampleNames" %in% colnames(colData(allScEx))) {
+    if (!is(colData(allScEx)$sampleNames, "factor")) {
+      colData(allScEx)$sampleNames <- factor(colData(allScEx)$sampleNames)
     }
-    sampNames <- levels(pdAll$sampleNames)
+    sampNames <- levels(colData(allScEx)$sampleNames)
     isolate({
-      # sampleCols$colPal <- colorRampPalette(brewer.pal(
-      #   n = 6, name =
-      #     "PRGn"
-      # ))(length(sampNames))
       sampleCols$colPal <- allowedColors[seq_along(sampNames)]
       names(sampleCols$colPal) <- sampNames
     })
@@ -240,7 +265,7 @@ inputDataFunc <- function(inFile) {
       duration = NULL,
       type = "error"
     )
-    pdAll$sampleNames <- 1
+    colData(allScEx)$sampleNames <- 1
   }
   
   
@@ -249,43 +274,47 @@ inputDataFunc <- function(inFile) {
   }
   # load(file='~/SCHNAPPsDebug/readInp.RData')
   
-  newNames = colnames(exAll)
-  pdAll = pdAll[newNames,]
-  colnames(exAll) = make.unique(newNames)
-  rownames(pdAll) = make.unique(newNames)
+  # newNames <- colnames(exAll)
+  # pdAll <- pdAll[newNames, ]
+  # colnames(exAll) <- make.unique(newNames)
+  # rownames(pdAll) <- make.unique(newNames)
+  # 
+  # scEx <- SingleCellExperiment(
+  #   assay = list(counts = exAll),
+  #   colData = pdAll,
+  #   rowData = fdAll[rownames(exAll), ]
+  # )
   
-  scEx <- SingleCellExperiment(
-    assay = list(counts = exAll),
-    colData = pdAll,
-    rowData = fdAll[rownames(exAll),]
-  )
-  
+  #' save orginial data 
   dataTables <- list()
-  featuredata <- rowData(scEx)
+  featuredata <- rowData(allScEx)
   # handle different extreme cases for the symbol column (already encountered)
   if (is.factor(featuredata$symbol)) {
     if (levels(featuredata$symbol) == "NA") {
       featuredata$symbol <- make.unique(rownames(featuredata))
-      rowData(scEx) <- featuredata
+      rowData(allScEx) <- featuredata
     }
   }
   if ("symbol" %in% colnames(featuredata)) {
     featuredata$symbol <- make.unique(featuredata$symbol)
-    rowData(scEx) <- featuredata
+    rowData(allScEx) <- featuredata
   }
   
-  # dataTables$featuredataOrg <- rowData(scEx)
-  dataTables$scEx <- scEx
+  # dataTables$featuredataOrg <- rowData(allScEx)
+  dataTables$scEx <- allScEx
   dataTables$featuredata <- featuredata
-  dataTables$scEx_log = allScEx_log
+  if(!is.null(allScEx_log)){
+    assays(allScEx_log)[["counts"]] <- NULL
+  }
+  dataTables$scEx_log <- allScEx_log
   
-  if (is.null(scEx$barcode)) {
+  if (is.null(allScEx$barcode)) {
     showNotification("scEx doesn't contain barcode column", type = "error")
     return(NULL)
   }
   # some checks
   
-  if (sum(is.infinite(assays(scEx)[["counts"]])) > 0) {
+  if (sum(is.infinite(assays(allScEx)[["counts"]])) > 0) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("scEx contains infinite values",
                        type = "error"
@@ -295,7 +324,7 @@ inputDataFunc <- function(inFile) {
   }
   
   
-  if (sum(c("id", "symbol") %in% colnames(rowData(scEx))) < 2) {
+  if (sum(c("id", "symbol") %in% colnames(rowData(allScEx))) < 2) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
         "scEx - rowData doesn't contain id and/or symbol columns",
@@ -325,7 +354,7 @@ inputDataFunc <- function(inFile) {
   
   inputFileStats$stats <- stats
   return(dataTables)
-}
+} # end of inputDataFunc
 
 readMM <- function(inFile) {
   data <- Matrix::readMM(file = inFile$datapath)
@@ -1343,7 +1372,7 @@ scEx_log <- reactive({
   }
   
   if (whichscLog == "useLog" & !is.null(dataTables$scEx_log)) {
-    scEx_log <- dataTables$scEx_log  
+    scEx_log <- dataTables$scEx_log[rownames(scEx), colnames(scEx)]
   } else {
     scEx_log <- do.call(normMethod, args = list())
   }
@@ -1657,28 +1686,29 @@ scranCluster <- function(pca,
          }
   )
   require(scran)
-  retVal <- tryCatch({
-    suppressMessages(do.call("quickCluster", params))
-  },
-  error = function(e) {
-    cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
-    if (grepl("rank variances of zero", as.character(e))) {
-      if (useRanks) {
-        if (!is.null(getDefaultReactiveDomain())) {
-          showNotification("quickClusterError", id = "quickClusterError", type = "error", duration = NULL)
+  retVal <- tryCatch(
+    {
+      suppressMessages(do.call("quickCluster", params))
+    },
+    error = function(e) {
+      cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
+      if (grepl("rank variances of zero", as.character(e))) {
+        if (useRanks) {
+          if (!is.null(getDefaultReactiveDomain())) {
+            showNotification("quickClusterError", id = "quickClusterError", type = "error", duration = NULL)
+          }
+          cat(file = stderr(), "\nNot using ranks due to identical ranks\n")
+          params$use.ranks <- F
+          return(do.call("quickCluster", params))
         }
-        cat(file = stderr(), "\nNot using ranks due to identical ranks\n")
-        params$use.ranks <- F
-        return(do.call("quickCluster", params))
+        cat(file = stderr(), "\nRemove duplicated cells\n")
       }
-      cat(file = stderr(), "\nRemove duplicated cells\n")
+      return(NULL)
+    },
+    warning = function(e) {
+      if (DEBUG) cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
+      return(suppressMessages(do.call("quickCluster", params)))
     }
-    return(NULL)
-  },
-  warning = function(e) {
-    if (DEBUG) cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
-    return(suppressMessages(do.call("quickCluster", params)))
-  }
   )
   if ("barcode" %in% colnames(colData(scEx_log))) {
     barCode <- colData(scEx_log)$barcode
@@ -1886,7 +1916,7 @@ projections <- reactive({
   projections <- pd
   
   if (!is.null(pca)) {
-    projections <- cbind(projections, pca$x)
+    projections <- cbind(projections, pca$x[rownames(projections),])
   }
   
   withProgress(message = "Performing projections", value = 0, {
@@ -1924,11 +1954,18 @@ projections <- reactive({
       } else {
         if (nrow(projections) == length(tmp)) {
           projections <- cbind(projections, tmp)
-        } else if (nrow(projections) == nrow(tmp)) {
-          projections <- cbind(projections, tmp)
         } else {
-          stop("error: ", proj[1], "didn't produce a result")
+          if (!is.null(nrow(tmp))){
+            if (nrow(projections) == nrow(tmp)) {
+              projections <- cbind(projections, tmp)
+            } } else {
+              save(file = "~/SCHNAPPsDebug/projectionsError.RData", list = c(ls(), ls(envir = globalenv())))
+              stop("error: ", proj[1], "didn't produce a result, please send file ~/SCHNAPPsDebug/projectionsError.RData to bernd")
+            }
         }
+        # else {
+        #   stop("error: ", proj[1], "didn't produce a result")
+        # }
       }
       
       colnames(projections) <- cn
@@ -2263,11 +2300,11 @@ inputSample <- reactive({
 
 getMemoryUsed <- reactive({
   #
-  if ("pryr" %in% rownames(installed.packages())){
+  if ("pryr" %in% rownames(installed.packages())) {
     suppressMessages(require(pryr))
   } else {
-    mem_used <- function(){
-      showNotification("Please install pryr", id = "noPryr", type="error", duration = NULL)
+    mem_used <- function() {
+      showNotification("Please install pryr", id = "noPryr", type = "error", duration = NULL)
       return(0)
     }
   }
@@ -2328,10 +2365,11 @@ reacativeReport <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("reacativeReport", id = "reacativeReport", duration = NULL)
   }
-  if (!"callr" %in% rownames(installed.packages())){
+  if (!"callr" %in% rownames(installed.packages())) {
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("please install 'callr' to enable reports", 
-                       id = "noCallR", duration = NULL, type = "error")
+      showNotification("please install 'callr' to enable reports",
+                       id = "noCallR", duration = NULL, type = "error"
+      )
     }
     return(NULL)
   }
@@ -2665,13 +2703,14 @@ reacativeReport <- function() {
   #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
   tryCatch(
     callr::r(
-      function(input, output_file, params, envir)
+      function(input, output_file, params, envir) {
         rmarkdown::render(
           input = input,
           output_file = output_file,
           params = params,
           envir = envir
-        ),
+        )
+      },
       args = list(
         input = tempReport,
         output_file = "report.html",
@@ -2717,10 +2756,10 @@ consolidateScEx <-
   function(scEx, projections, scEx_log, pca, tsne) {
     # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls(), ls(envir = globalenv())))
     # load(file = "~/SCHNAPPsDebug/consolidate.RData")
-    commCells = base::intersect(colnames(scEx), colnames(scEx_log))
-    commGenes = base::intersect(rownames(scEx), rownames(scEx_log))
-    scEx = scEx[commGenes, commCells]
-    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells,], TSNE = tsne[commCells,])
+    commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
+    commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
+    scEx <- scEx[commGenes, commCells]
+    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
     assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
     colData(scEx)[["before.Filter"]] <- projections$before.filter[commCells]
     colData(scEx)[["dbCluster"]] <- projections$dbCluster[commCells]
