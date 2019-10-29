@@ -390,6 +390,11 @@ output$DEBUGSAVEstring <- renderText({
   }
 })
 
+# output$currentTabInfo <- renderText({
+#   # browser()
+#   str(input$sideBarID)
+# })
+
 output$save2Historystring <- renderText({
   if (DEBUG) {
     .schnappsEnv$saveHistorycheckbox <- input$save2History

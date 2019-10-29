@@ -159,6 +159,7 @@ scShinyUI <- shinyUI(
         checkboxInput("save2History", "save to history file", FALSE)
       },
       verbatimTextOutput("save2Historystring")
+      # ,verbatimTextOutput("currentTabInfo")
     ), # dashboard side bar
     shinydashboard::dashboardBody(
       tags$div(

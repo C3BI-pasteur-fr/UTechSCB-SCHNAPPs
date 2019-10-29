@@ -444,6 +444,8 @@ clusterServer <- function(input, output, session,
     if (save2History) recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
     printTimeEnd(start.time, "clusterPlot")
+    # browser()
+    # .schnappsEnv[[paste0()]] <- p
     exportTestValues(clusterPlot = {
       p1
     })
