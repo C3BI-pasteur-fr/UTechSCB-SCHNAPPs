@@ -9,7 +9,7 @@
   localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
   # localContributionDir = ""
   defaultValueSingleGene = "LYZ"
-defaultValueMultiGenes = "tbx18, wt1, msln, edf1, tagln2, anxa5, ctgf, fstl1,naca, rack1, eef2, npm1, bmp4, pparg, ucp2, vim,col1a1, col3a1, col18a1, sparc, bgn, mmp2, postn,ccl2, ccl7, il33, vcan"
+defaultValueMultiGenes = "Gzmb, prf1, ifng, pdcd1, havcr2, lag3, tsc22d3, zfp36l2"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
 DEBUGSAVE = F
