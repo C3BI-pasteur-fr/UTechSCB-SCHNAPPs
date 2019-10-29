@@ -387,13 +387,14 @@ clusterServer <- function(input, output, session,
     scols <- sampleCols$colPal
     ccols <- clusterCols$colPal
     moreOptions <- input$moreOptions
-    myns <- session$ns("-")
-    save2History <- .schnappsEnv$saveHistorycheckbox
-    if (is.null(save2History)) {
-      save2History <- FALSE
-    }
+    myns <- session$ns("2Dplot")
+    # save2History <- .schnappsEnv$saveHistorycheckbox
+    # if (is.null(save2History)) {
+    #   save2History <- FALSE
+    # }
     if (is.null(scEx) | is.null(tdata)) {
       if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return(NULL)
     }
     # in case the normalization is not done
@@ -441,7 +442,12 @@ clusterServer <- function(input, output, session,
       geneNames2, dimX, dimY, clId, grpN, legend.position,
       grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
     )
-    if (save2History) recHistory(myns, p1)
+    
+    # save p1 to .schnappsEnv for saving to history
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- p1
+    
+    
+    # if (save2History) recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
     printTimeEnd(start.time, "clusterPlot")
     # browser()
@@ -769,12 +775,14 @@ clusterServer <- function(input, output, session,
     grpN <- make.names(input$groupName)
     grpSelected <- make.names(input$groupNames)
     grpNs <- groupNames$namesDF
-
+    myns <- ns("cellSelection")
 
     if (!myshowCells) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return("")
     }
     if (is.null(projections)) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -796,7 +804,9 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- cells.names[!is.na(cells.names)]
     retVal <- paste(retVal, collapse = ", ")
-
+    
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- retVal
+    
     exportTestValues(ClusterCellSelection = {
       retVal
     })
@@ -925,6 +935,7 @@ tableSelectionServer <- function(input, output, session,
   # })
 
   output$cellNameTable <- DT::renderDT({
+    myns <- session$ns("cellNameTable")
     if (DEBUG) cat(file = stderr(), "output$cellNameTable\n")
     start.time <- base::Sys.time()
     on.exit(
@@ -943,6 +954,7 @@ tableSelectionServer <- function(input, output, session,
     selectedRows <- input$cellNameTable_rows_selected
     # searchStr <-
     if (is.null(dataTables)) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -986,22 +998,24 @@ tableSelectionServer <- function(input, output, session,
         }
       }
       # if (DEBUG) cat(file = stderr(), paste(colState$search,"\n"))
+      dtout <- DT::datatable(dataTables,
+                             rownames = F,
+                             filter = "top",
+                             selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
+                             options = list(
+                               orderClasses = TRUE,
+                               autoWidth = TRUE,
+                               scrollX = TRUE,
+                               pageLength = get(ns("pageLength"), envir = .schnappsEnv),
+                               search = colState$search,
+                               searchCols = searchColList,
+                               stateSave = TRUE,
+                               order = get(ns("colOrder"), envir = .schnappsEnv)
+                             )
+      )
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- dtout
       return(
-        DT::datatable(dataTables,
-          rownames = F,
-          filter = "top",
-          selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
-          options = list(
-            orderClasses = TRUE,
-            autoWidth = TRUE,
-            scrollX = TRUE,
-            pageLength = get(ns("pageLength"), envir = .schnappsEnv),
-            search = colState$search,
-            searchCols = searchColList,
-            stateSave = TRUE,
-            order = get(ns("colOrder"), envir = .schnappsEnv)
-          )
-        )
+        dtout
       )
     } else {
       return(warning("test"))
@@ -1099,7 +1113,8 @@ pHeatMapModule <- function(input, output, session,
     moreOptions <- input$moreOptions
     colTree <- input$showColTree
     scale <- input$normRow
-    save2History <- input$save2History
+    myns <- ns("pHeatMap")
+    # save2History <- input$save2History
 
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
@@ -1111,6 +1126,7 @@ pHeatMapModule <- function(input, output, session,
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
 
     if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return(list(
         src = "empty.png",
         contentType = "image/png",
@@ -1188,7 +1204,8 @@ pHeatMapModule <- function(input, output, session,
     # if (is.null(height)) {
     #   height <- 96 * 7
     # }
-    outfilePH <<- outfile
+    outfilePH <- outfile
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- outfile
     return(list(
       src = outfilePH,
       contentType = "image/png",

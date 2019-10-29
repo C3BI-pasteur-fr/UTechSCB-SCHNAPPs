@@ -156,9 +156,11 @@ scShinyUI <- shinyUI(
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),
       if (exists("historyFile", envir = .schnappsEnv)){
-        checkboxInput("save2History", "save to history file", FALSE)
-      },
-      verbatimTextOutput("save2Historystring")
+        # checkboxInput("save2History", "save to history file", FALSE)
+        actionButton("save2History", "Save current plots to history")
+      }
+      # ,
+      # verbatimTextOutput("save2Historystring")
       # ,verbatimTextOutput("currentTabInfo")
     ), # dashboard side bar
     shinydashboard::dashboardBody(
