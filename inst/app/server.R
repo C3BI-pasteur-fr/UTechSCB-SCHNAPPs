@@ -91,6 +91,17 @@ if (!exists("allowedColors")) {
     "#fddbc7", "#e0e0e0", "#999999", "#4d4d4d"
   ))
 }
+
+
+if (all(c("future", "parallel") %in% rownames(installed.packages()))){
+  library(parallel)
+  library(future)
+  options(future.globals.maxSize = 1000 * 1024^2)
+  maxCores = parallel::detectCores()-1
+  maxCores = 8 # 32GB memory
+  plan("multiprocess", workers = maxCores)
+}
+
 # Sys.setenv(DEBUGME = ".")
 base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 
