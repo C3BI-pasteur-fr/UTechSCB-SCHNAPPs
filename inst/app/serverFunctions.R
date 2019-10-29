@@ -599,3 +599,36 @@ if (!all(c( "pdftools") %in% rownames(installed.packages()))){
     # dev.off()
   }
 }
+
+#' addColData
+#' adds empty column to SingleCellExperiment object
+#' the columns from scEx that are not present allScEx_log will be added to the latter one
+#' return singleCellObject with added columns
+addColData <- function(allScEx_log, scEx) {
+  cd1 <- colnames(colData(scEx))
+  cd2 <- colnames(colData(allScEx_log))
+  
+  for (cc in setdiff(cd1,cd2)) {
+    lv <- NULL
+    nCol <- NULL
+    switch(class(colData(scEx)[,cc]),
+           "factor" = {
+             levels(colData(scEx)[,cc]) = c(levels(colData(scEx)[,cc]) , "NA")
+             lv = levels(colData(scEx)[,cc])
+             nCol = data.frame(factor( rep("NA", nrow(colData(allScEx_log))), levels = lv))
+             colnames(nCol) = cc
+           },
+           "character" = {
+             nCol = data.frame(cc = rep("NA", nrow(colData(allScEx_log))), stringsAsFactors = F)
+             colnames(nCol) = cc
+           },
+           "numeric" = {
+             nCol = data.frame(cc = rep(0, nrow(colData(allScEx_log))))
+             colnames(nCol) = cc
+           }
+    )
+    colData(allScEx_log) = cbind(colData(allScEx_log), nCol)
+    
+  }
+  return(allScEx_log)
+}
