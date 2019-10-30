@@ -202,7 +202,6 @@ coE_heatmapselected_geneids `r input$coE_heatmapselected_geneids`
 
 orderColNames : `r input$'coE_heatmapSelectedModule-orderNames'`
 
-moreOptions <- `r input$'coE_heatmapSelectedModule-moreOptions'`
 
 
 ```{r coE_heatmapSelectedModule, echo=TRUE, eval=TRUE}

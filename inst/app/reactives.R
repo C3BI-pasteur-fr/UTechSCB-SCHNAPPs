@@ -1354,8 +1354,12 @@ scEx_log <- reactive({
   
   scEx <- scEx()
   dataTables <- inputData()
-  normMethod <- input$normalizationRadioButton
   whichscLog <- input$whichscLog
+  # update if button is clicked
+  update <- input$updateNormalization
+  # don't update if parameters are changed
+  normMethod <- isolate(input$normalizationRadioButton)
+  
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx_log:NULL\n")
@@ -1578,13 +1582,15 @@ pca <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
-  rank <- input$pcaRank
-  pcaN <- input$pcaN
-  center <- input$pcaCenter
-  scale <- input$pcaScale
-  pcaGenes <- input$genes4PCA
   scEx_log <- scEx_log()
-  
+  # only redo calculations if button is pressed.
+  input$updatePCAParameters
+  rank <- isolate(input$pcaRank)
+  pcaN <- isolate(input$pcaN)
+  center <- isolate(input$pcaCenter)
+  scale <- isolate(input$pcaScale)
+  pcaGenes <- isolate(input$genes4PCA)
+   
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "pca:NULL\n")
@@ -1748,6 +1754,8 @@ scran_Cluster <- reactive({
   pca <- pca()
   scEx <- scEx()
   scEx_log <- scEx_log()
+  
+  input$updateClusteringParameters
   seed <- input$seed
   # kNr <- input$kNr
   useRanks <- input$useRanks
@@ -1817,6 +1825,7 @@ dbCluster <- reactive({
     showNotification("dbCluster", id = "dbCluster", duration = NULL)
   }
   
+  input$updateClusteringParameters
   # kNr <- input$kNr
   clustering <- scran_Cluster()
   
@@ -2047,7 +2056,7 @@ initializeGroupNames <- reactive({
         none = rep(FALSE, dim(scEx)[2])
       )
     rownames(df) <- colnames(scEx)
-    groupNames[["namesDF"]] <- df
+    groupNames$namesDF <- df
   })
 })
 

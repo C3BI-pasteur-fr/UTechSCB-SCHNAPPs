@@ -145,10 +145,12 @@ tsne <- reactive({
   }
   
   pca <- pca()
-  gQC_tsneDim <- input$gQC_tsneDim
-  gQC_tsnePerplexity <- input$gQC_tsnePerplexity
-  gQC_tsneTheta <- input$gQC_tsneTheta
-  gQC_tsneSeed <- input$gQC_tsneSeed
+  # only recalculate when button is pressed.
+  input$updatetsneParameters
+  gQC_tsneDim <- isolate(input$gQC_tsneDim)
+  gQC_tsnePerplexity <- isolate(input$gQC_tsnePerplexity)
+  gQC_tsneTheta <- isolate(input$gQC_tsneTheta)
+  gQC_tsneSeed <- isolate(input$gQC_tsneSeed)
   
   if (is.null(pca)) {
     if (DEBUG) cat(file = stderr(), "tsne: NULL\n")
