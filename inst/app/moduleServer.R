@@ -801,6 +801,8 @@ tableSelectionServer <- function(input, output, session,
     dataTables <- dataTab()
     selectedRows <- input$cellNameTable_rows_selected
     scEx <- scEx()
+    # update if expanded and not showing
+    input$refreshtable
     
     if (is.null(dataTables)) {
       return(NULL)
@@ -1065,6 +1067,8 @@ pHeatMapModule <- function(input, output, session,
     colTree <- input$showColTree
     scale <- input$normRow
     save2History <- input$save2History
+    pWidth = input$heatmapWidth
+    pHeight = input$heatmapHeight
     
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
@@ -1083,6 +1087,10 @@ pHeatMapModule <- function(input, output, session,
         height = 96,
         alt = "pHeatMapPlot should be here"
       ))
+    }
+    if (is.null(pWidth)) {
+      pWidth = 800
+      pHeight = 300
     }
     
     if (is.null(scale)) {
@@ -1141,7 +1149,8 @@ pHeatMapModule <- function(input, output, session,
         alt = "pHeatMapPlot should be here"
       ))
     }
-    
+    heatmapData$width = pWidth / 72
+    heatmapData$height = pHeight / 72
     do.call(TRONCO::pheatmap, heatmapData)
     # library(seriation)
     # hm <- hmap(x, method = "HC_ward", main = "HC_ward")
@@ -1160,8 +1169,8 @@ pHeatMapModule <- function(input, output, session,
     return(list(
       src = outfilePH,
       contentType = "image/png",
-      width = "100%",
-      height = "100%",
+      width = paste0(pWidth, "px"),
+      height = paste0(pHeight, "px"),
       alt = "heatmap should be here"
     ))
   })
