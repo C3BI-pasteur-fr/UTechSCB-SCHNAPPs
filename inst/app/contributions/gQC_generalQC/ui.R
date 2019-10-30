@@ -137,7 +137,7 @@ tabList <- list(
       title = "UMAP parameters", solidHeader = TRUE, width = 12, status = 'primary', 
       fluidRow(
         column(width = 12, offset = 1,
-               actionButton("activateUMAP", "apply changes", width = '80%', 
+               actionButton("activateUMAP", "run UMAP", width = '80%', 
                             style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
         )
       ),

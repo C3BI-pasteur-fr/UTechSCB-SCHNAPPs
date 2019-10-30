@@ -122,10 +122,10 @@ coE_heatmapSelectedReactive <- reactive({
   scCells <- sc$selectedCells() # [1] "AAACCTGAGACACTAA-1" "AAACCTGAGACGACGT-1" "AAACCTGAGTCAAGCG-1" "AAACCTGCAAGAAGAG-1" "AAACCTGCAGACAGGT-1" "AAACCTGCATACAGCT-1" "AAACCTGGTGTGACCC-1"
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
-  coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
+  # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
   
   if (is.null(scEx_log) ||
-      is.null(projections) || is.null(scCells) || length(scCells) == 0 || coE_heatmapSelectedModuleShow == FALSE) {
+      is.null(projections) || is.null(scCells) || length(scCells) == 0 ) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
     return(
       list(
@@ -187,9 +187,9 @@ coE_topExpGenesTable <- reactive({
   # scCL <- sc$cluster
   scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
-  coEtgMinExprShow <- input$coEtgMinExprShow
+  # coEtgMinExprShow <- input$coEtgMinExprShow
   
-  if (is.null(scEx_log) || is.null(scCells) || coEtgMinExprShow == FALSE) {
+  if (is.null(scEx_log) || is.null(scCells)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -265,9 +265,9 @@ coE_topExpCCTable <- reactive({
   # scCL <- sc$cluster
   scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
-  coE_topCCGenesShow <- input$coE_topCCGenesShow
+  # coE_topCCGenesShow <- input$coE_topCCGenesShow
   
-  if (is.null(scEx_log) || is.null(scCells) || coE_topCCGenesShow == FALSE) {
+  if (is.null(scEx_log) || is.null(scCells) ) {
     return(NULL)
   }
   featureData <- rowData(scEx_log)
