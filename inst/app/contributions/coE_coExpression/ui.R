@@ -5,12 +5,12 @@ source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
 # list of menu Items
 menuList <- list(
   shinydashboard::menuItem("Co-expression", icon = icon("dashboard"),
-           # id="coexpressionID",
-    tabName = "coexpression", startExpanded = FALSE,
-    shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
-    shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
-    shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
-    shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
+                           # id="coexpressionID",
+                           tabName = "coexpression", startExpanded = FALSE,
+                           shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
+                           shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
+                           shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
+                           shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )
 
@@ -20,25 +20,24 @@ menuList <- list(
 tabList <- list(
   coexpressionAllTab = shinydashboard::tabItem(
     "coexpressionAll",
-    fluidRow(
-      column(
-        7,
-        offset = 1,
-
-        textInput("coE_heatmap_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
+    box(title = "Heat map of all cells", solidHeader = TRUE, width = 12, status = 'primary', 
+      fluidRow(
+        column(width = 12,
+               textInput("coE_heatmap_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
+        )
+      ),
+      fluidRow(
+        column(width = 12,
+               pHeatMapUI("coExpHeatmapModule")
+        )
       )
-    ),
-    fluidRow(column(
-      10,
-      offset = 1,
-      pHeatMapUI("coExpHeatmapModule") %>% withSpinner()
-    ))
+    )
   ),
-
+  
   coexpressionSelectedTab = shinydashboard::tabItem(
     "coexpressionSelected",
     tags$p(
-        strong("2D plot for selecting cells")
+      strong("2D plot for selecting cells")
     ),
     fluidRow(
       # column(
@@ -53,7 +52,7 @@ tabList <- list(
     fluidRow(column(
       6,
       offset = 1,
-
+      
       textInput("coE_heatmapselected_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
     )),
     # fluidRow(column(
@@ -81,14 +80,14 @@ tabList <- list(
       column(
         3,
         numericInput("coEtgMinExpr", "min UMI count per gene:",
-          1,
-          min = 0, max = 100000
+                     1,
+                     min = 0, max = 100000
         )
       ), column(
         3,
         numericInput("coEtgPerc", "min percentage of cells expressing a genes:",
-          60,
-          min = 1, max = 100
+                     60,
+                     min = 1, max = 100
         )
       )
     ),
@@ -120,7 +119,7 @@ tabList <- list(
     fluidRow(
       column(
         3,
-       textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
+        textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
       ),
       column(
         3,
@@ -134,8 +133,8 @@ tabList <- list(
       column(
         3,
         numericInput("coEminExpr", "min expression of genes:",
-          1,
-          min = 1, max = 100000
+                     1,
+                     min = 1, max = 100000
         )
       )
     ),
@@ -153,8 +152,8 @@ tabList <- list(
     fluidRow(column(
       3,
       numericInput("coE_dimSOM", "number of nodes per dimension",
-        20,
-        min = 2, max = 100
+                   20,
+                   min = 2, max = 100
       ),
       textInput("coE_geneSOM", "Gene of interest", value = defaultValueSingleGene)
     )),

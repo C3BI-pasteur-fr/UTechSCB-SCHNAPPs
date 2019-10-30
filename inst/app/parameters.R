@@ -9,7 +9,7 @@ for (fp in parFiles) {
   if (DEBUG) {
     cat(file = stderr(), paste(fp, "\n"))
   }
-
+  
   myNormalizationChoices <- c()
   source(fp, local = TRUE)
   if (length(myNormalizationChoices) > 0) {
@@ -34,26 +34,47 @@ allTabs[[length(allTabs) + 1]] <- list(
   shinydashboard::tabItem(
     "normalizations",
     list(
-      tags$h3("Parameters for normalization to be used"),
+      fluidRow(div(tags$h3("Parameters for normalization to be used"), align = "center")),
       tags$p("SCHNAPPs uses normalized data for plots and calculations (unless stated otherwise). Here, the specific method can be set. rawNormalization means that no normalization will be performed."),
       tags$p("A table containing the first 20 cells and the normalized values is shown."),
-      fluidRow(column(
-        10,
-        radioButtons(
-          inputId = "normalizationRadioButton",
-          label = "Normalization to use",
-          choices = normaliztionChoices,
-          selected = "DE_logNormalization",
-          width = "100%"
-        )
-       )),
-      fluidRow(column(10, verbatimTextOutput("normalizationRadioButtonValue"))),
-      wellPanel(
-        # This outputs the dynamic UI component
-        uiOutput("normalizationsParametersDynamic")
-      )
+      box(title = "Normalization method to use", solidHeader = TRUE, width = 12, status = 'primary', 
+          fluidRow(
+            column(width = 12,
+                   radioButtons(
+                     inputId = "normalizationRadioButton",
+                     label = "choose a normalization method",
+                     choices = normaliztionChoices,
+                     selected = "DE_logNormalization",
+                     width = "100%"
+                   )
+            )
+          ),
+          fluidRow(column(width = 10, 
+                          verbatimTextOutput("normalizationRadioButtonValue"))),
+          fluidRow(column(width = 12,
+                          wellPanel(
+                            # This outputs the dynamic UI component
+                            uiOutput("normalizationsParametersDynamic")
+                          ))),
+          fluidRow(column(width = 12, offset = 1,
+                          actionButton("updateNormalization", "apply changes", width = '80%', 
+                                       style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+          ))
+      ),
+      checkbsTT("normalizationRadioButton"),
+      checkbsTT("normalizationRadioButtonValue"),
+      checkbsTT("updateNormalization")
     ),
-    tableSelectionUi("normalizationResult")
+    box(
+      title = "Sample of normalized values", solidHeader = TRUE, width = 12, status = 'primary',
+      collapsible = TRUE, collapsed = TRUE,
+      fluidRow(
+        column( width = 12,
+                tableSelectionUi("normalizationResult")
+        )
+      )
+    )
+    
   )
 )
 if (DEBUG) {

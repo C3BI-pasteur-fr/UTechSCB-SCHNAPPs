@@ -30,28 +30,37 @@ inputTab <- shinydashboard::tabItem(
   )),
   box(
     title = "Input files", status = "primary", solidHeader = TRUE, width = 12,
+    footer = "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
     fluidRow(
       column(
         6,
+        offset = 3,
         fileInput(
           "file1",
-          "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
+          "Count data upload",
           accept = c(
             ".Rds", ".RData", ".Rdata", ".txt", ".csv"
           ),
           multiple = TRUE,
         ), checkbsTT("file1")
       ),
-      column(
-        6,
-        fileInput(
-          "annoFile",
-          "(Not required): Choose .CSV file with annotation to upload",
-          accept = c(
-            ".txt", ".csv", ".mtx"
-          ),
-          multiple = TRUE
-        ), checkbsTT("annoFile")
+      box(
+        title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
+        footer = "(Not required): Choose .CSV file with annotation to upload. This can be projections or gene based features.",
+        collapsible = TRUE, collapsed = TRUE,
+        fluidRow(
+          column(
+            6, offset = 3,
+            fileInput(
+              "annoFile",
+              "Annotations to add",
+              accept = c(
+                ".txt", ".csv", ".mtx"
+              ),
+              multiple = TRUE
+            ), checkbsTT("annoFile")
+          )
+        )
       )
     )
   ),
@@ -106,8 +115,8 @@ geneSelectionTab <- shinydashboard::tabItem(
   fluidRow(div(h3("Gene selection"), align = "center")),
   fluidRow(
     column(width = 12, offset = 1,
-      actionButton("updateGeneSelectionParameters", "apply changes", width = '80%', 
-                   style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+           actionButton("updateGeneSelectionParameters", "apply changes", width = '80%', 
+                        style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
     )
   ),
   checkbsTT("updateGeneSelectionParameters"),
@@ -162,75 +171,55 @@ cellSelectionTab <- shinydashboard::tabItem(
   tabName = "cellSelection",
   fluidRow(div(h3("Cell selection"), align = "center")),
   br(),
-  fluidRow(div(
-    h4(
-      "Here we filter out cells"
-    ),
-    align = "center"
-  )),
   fluidRow(
-    column(3,
-           offset = 1,
-           actionButton("updateCellSelectionParameters", "apply changes")
+    column(width = 12, offset = 1,
+           actionButton("updateCellSelectionParameters", "apply changes", width = '80%', 
+                        style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
     )
   ),
   checkbsTT("updateCellSelectionParameters"),
-  fluidRow(
-    column(6,
-           offset = 1,
-           textInput("minExpGenes", "List of genes with minimal expression", value = defaultValueRegExGene) # tool tip: '^CD7$|^KIT$
+  br(),
+  box( 
+    title = "Cell selection parameters", solidHeader = TRUE, width = 12, status = 'primary', 
+    fluidRow(
+      column(width = 6,
+             textInput("minExpGenes", "List of genes with minimal expression", value = defaultValueRegExGene), # tool tip: '^CD7$|^KIT$
+             textInput("minNonExpGenes", "List of genes that should not be expressed", value = "")
+      ),
+      column(width = 6,
+             numericInput("minGenes", "Min # of UMIs", 2, min = 2, max = 1000000),
+             numericInput("maxGenes", "Max # of UMIs", 1000000, min = 10, max = 1000000)
+      )
     )
-  ), checkbsTT("minExpGenes"),
-  fluidRow(
-    column(6,
-           offset = 1,
-           textInput("minNonExpGenes", "List of genes that should not be expressed", value = "")
+  ),
+  box(
+    title = "addition parameters", solidHeader = TRUE, width = 12, status = 'primary', 
+    fluidRow(
+      column(width = 12,
+             textInput("cellPatternRM", "cells to be filtered out by pattern"),
+             textInput("cellKeep", "cells to keep"),
+             textInput("cellKeepOnly", "cells to keep (remove others)"),
+             textInput("cellsFiltersOut", "Cells to be removed", width = "100%"),
+             textInput("cellSelectionComment", "Comment for selection of cells")
+      )
     )
-  ), checkbsTT("minNonExpGenes"),
-  fluidRow(
-    column(5,
-           offset = 1,
-           numericInput("minGenes", "Min # of UMIs", 2, min = 2, max = 1000000)
-    ),
-    column(
-      5,
-      numericInput("maxGenes", "Max # of UMIs", 1000000, min = 10, max = 1000000)
-    )
-  ), br(), checkbsTT("minGenes"), checkbsTT("maxGenes"),
-  fluidRow(
-    column(11,
-           offset = 1,
-           textInput("cellSelectionComment", "Comment for selection of cells")
-    )
-  ), checkbsTT("cellSelectionComment"),
-  fluidRow(
-    column(5,
-           offset = 1,
-           textInput("cellPatternRM", "cells to be filtered out by pattern"),
-    ), checkbsTT("cellPatternRM"),
-    column(5,
-           offset = 0,
-           textInput("cellKeep", "cells to keep")
-    )
-  ), br(),
+  ),
+  checkbsTT("minExpGenes"),
+  checkbsTT("minNonExpGenes"),
+  checkbsTT("minGenes"), 
+  checkbsTT("maxGenes"),
+  checkbsTT("cellSelectionComment"),
+  checkbsTT("cellPatternRM"),
   checkbsTT("cellKeep"),
-  fluidRow(
-    column(10,
-           offset = 1,
-           textInput("cellKeepOnly", "cells to keep (remove others)")
-    )
-  ), checkbsTT("cellKeepOnly"),
-  fluidRow(
-    column(10,
-           offset = 1,
-           textInput("cellsFiltersOut", "Cells to be removed", width = "100%")
-    )
-  ), br(), checkbsTT("cellsFiltersOut"),
-  fluidRow(column(
-    11,
-    offset = 1,
+  checkbsTT("cellKeepOnly"),
+  checkbsTT("cellsFiltersOut"),
+  br(),
+  box(
+    title = "cell table", solidHeader = TRUE, width = 12, status = 'primary',
+    collapsible = TRUE, collapsed = TRUE,
     tableSelectionUi("cellSelectionMod")
-  )), checkbsTT("cellSelectionMod"), br()
+  ),
+  checkbsTT("cellSelectionMod"), br()
 )
 
 
@@ -270,38 +259,36 @@ generalParametersTab <- shinydashboard::tabItem(
   br(),
   fluidRow(
     box(
-      title = "Parameters for PCA", width = 12,
+      title = "Parameters for PCA", solidHeader = TRUE, width = 12,  status = 'primary', 
       # The id lets us use input$tabset1 on the server to find the current tab
       id = "tabsetPCA",
       fluidRow(
         column(6,
                offset = 0,
-               numericInput("pcaRank", "Number of components", 50, min = 2)
-        ),
-        column(6,
-               offset = 0,
-               numericInput("pcaN", "Number of variable genes to be used", 500, min = 50)
-        ),
-      ),
-      checkbsTT(item = "pcaRank"),
-      checkbsTT("pcaN"),
-      fluidRow(
-        column(6,
-               offset = 0,
+               numericInput("pcaRank", "Number of components", 50, min = 2),
                checkboxInput("pcaCenter", "center data", TRUE)
         ),
         column(6,
                offset = 0,
+               numericInput("pcaN", "Number of variable genes to be used", 500, min = 50),
                checkboxInput("pcaScale", "scale data", TRUE)
         ),
-        checkbsTT("pcaCenter"),
-        checkbsTT("pcaScale")
       ),
+      checkbsTT(item = "pcaRank"),
+      checkbsTT("pcaN"),
+      checkbsTT("pcaCenter"),
+      checkbsTT("pcaScale"),
       fluidRow(
         column(12,
                offset = 0,
                textInput("genes4PCA", "Genes to be used for PCA", width = "100%")
         ), checkbsTT("genes4PCA")
+      ),
+      fluidRow(
+        column(width = 12, offset = 1,
+               actionButton("updatePCAParameters", "apply changes", width = '80%', 
+                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        )
       )
     ),
     checkbsTT(item = "tabsetPCA"),
@@ -313,33 +300,21 @@ generalParametersTab <- shinydashboard::tabItem(
       tabPanel("Scran clustering",
                width = 12,
                fluidRow(
-                 column(6,
-                        offset = 0,
-                        selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA", width = "100%")
+                 column( width = 6,
+                         selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA", width = "100%"),
+                         selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")
                  ),
-                 column(
-                   6,
-                   numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2, width = "100%")
+                 column( width = 6,
+                         numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2, width = "100%"),
+                         selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%")
                  )
                ),
                checkbsTT(item = "clusterSource"),
                checkbsTT(item = "minClusterSize"),
-               fluidRow(
-                 column(
-                   6,
-                   selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")
-                 ),
-                 column(
-                   6,
-                   selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%")
-                 )
-               ),
-               checkbsTT(item = ""),
-               checkbsTT(item = ""),
-               
+               checkbsTT(item = "clusterMethod"),
+               checkbsTT(item = "useRanks"),
                fluidRow(
                  column(12,
-                        offset = 0,
                         textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%")
                  )
                ),
@@ -348,47 +323,51 @@ generalParametersTab <- shinydashboard::tabItem(
                  column(12, offset = 0, textOutput("Nclusters"))
                ),
                checkbsTT(item = "")
+      ),
+      fluidRow(
+        column(width = 12, offset = 1,
+               actionButton("updateClusteringParameters", "apply changes", width = '80%', 
+                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        )
       )
     )
   ),
   # fluidRow(div(h3("Parameters for clustering"), align = "left")),
+  
   br(),
-  br(),
-  fluidRow(div(h3("Comments"), align = "left")),
-  fluidRow(
-    if ("shinyMCE" %in% rownames(installed.packages())) {
-      shinyMCE::tinyMCE(
-        "descriptionOfWork",
-        "Please describe your work. This will be included in the report."
-      )
-    } else {
-      textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
-    }
+  box(title = "Comments", solidHeader = TRUE, width = 12,  status = 'primary', 
+      collapsible = TRUE, collapsed = TRUE,
+      if ("shinyMCE" %in% rownames(installed.packages())) {
+        shinyMCE::tinyMCE(
+          "descriptionOfWork",
+          "Please describe your work. This will be included in the report."
+        )
+      } else {
+        textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
+      }
   ),
   checkbsTT(item = "descriptionOfWork"),
   br(),
-  fluidRow(div(h3("Colors"), align = "left")),
-  fluidRow(
-    actionButton("updateColors", "Update colours", icon = icon("update"))
+  box(title = "Colors", solidHeader = TRUE, width = 12,  status = 'primary', 
+      collapsible = TRUE, collapsed = TRUE,
+      fluidRow(column(width = 12, offset = 1,
+                      actionButton("updateColors", "Update colours", icon = icon("update"), width = '80%', 
+                                   style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+      )),
+      br(),
+      fluidRow(
+        column(width = 6,
+               uiOutput("sampleColorSelection")
+        ),
+        column(width = 6,
+               uiOutput("clusterColorSelection")
+        )
+        
+      )
   ),
   checkbsTT(item = "updateColors"),
-  fluidRow(
-    column(4,
-           offset = 1,
-           uiOutput("sampleColorSelection")
-    ),
-    checkbsTT(item = "sampleColorSelection"),
-    column(4,
-           offset = 1,
-           uiOutput("clusterColorSelection")
-    ),
-    checkbsTT(item = "clusterColorSelection")
-  )
-  # ,
-  # fluidRow(
-  #   column(11,offset = 1,
-  #          textOutput("descriptOfWorkOutput", inline = TRUE))
-  # )
+  checkbsTT(item = "sampleColorSelection"),
+  checkbsTT(item = "clusterColorSelection")
 )
 
 # renameTab ----
@@ -396,41 +375,41 @@ renameTab <- shinydashboard::tabItem(
   tabName = "renameProj",
   fluidRow(div(h3("rename projections"), align = "center")),
   br(),
-  fluidRow(
-    column(4,
-           offset = 1,
-           selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")
-    ),
-    column(
-      4,
-      offset = 1,
-      textInput("newPrj", "new name of Projection", value = "")
-    ),
-    column(2,
-           offset = 0,
-           actionButton("updatePrjsButton", "rename")
-    ),
-    tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}")
-  ),
-  checkbsTT(item = "oldPrj"),
-  checkbsTT(item = "newPrj"),
-  checkbsTT(item = "updatePrjsButton"),
-  fluidRow(
-    column(4,
-           offset = 1,
-           selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")
-    ),
-    column(2,
-           offset = 0,
-           actionButton("delPrjsButton", "delete")
-    ),
-    tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
-  ),
-  checkbsTT(item = "delPrj"),
-  checkbsTT(item = "delPrjsButton")
+  box(title = "Rename projections", solidHeader = TRUE, width = 12,  status = 'primary', 
+      fluidRow(
+        column(width = 6,
+               selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")
+        ),
+        column(width = 6,
+               fluidRow(
+                 column(width = 8,
+                        textInput("newPrj", "new name of Projection", value = "")
+                 ),
+                 column(width = 4,
+                        actionButton("updatePrjsButton", "rename")
+                 )
+               ),
+               fluidRow(
+                 column(width = 8,
+                        selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")
+                 ),
+                 column(width = 4,
+                        actionButton("delPrjsButton", "delete")
+                 ),
+                 tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}"),
+                 tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
+               )
+        )
+        
+      ),
+      checkbsTT(item = "oldPrj"),
+      checkbsTT(item = "newPrj"),
+      checkbsTT(item = "updatePrjsButton"),
+      checkbsTT(item = "delPrj"),
+      checkbsTT(item = "delPrjsButton")
+  )
+  
 )
-
-
 # # link to the content of the
 # parametersTab  = tabItem(tabName = "normalizations",
 #                             fluidRow(div(h3('Cell selection'), align = 'center')),
