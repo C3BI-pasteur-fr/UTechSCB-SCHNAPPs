@@ -125,9 +125,16 @@ tableSelectionUi <- function(id) {
                    h5("Selected itmes to be copied"),
                    align = "left"
                  ),
-                 verbatimTextOutput(ns("cellSelection")),
-                 downloadButton(ns("download_cellNameTable"), "Download table")
+                 verbatimTextOutput(ns("cellSelection"))
           )
+        ),
+        fluidRow(
+          column(width = 3,
+          downloadButton(ns("download_cellNameTable"), "Download table")
+          ),
+          column(width = 3,
+                 actionButton(ns("refreshtable"), "Refresh table"),
+                 )
         ),
         fluidRow(
           h4("Cells", offset = 1),
@@ -168,7 +175,7 @@ pHeatMapUI <- function(id) {
              )
            ),
            fluidRow(
-             column(width = 12,
+             column(width = 6,
                     selectInput(ns("normRow"),
                                 label = "scale by row (for color)",
                                 choices = c("row", "column", "none"),
@@ -189,7 +196,20 @@ pHeatMapUI <- function(id) {
                       selected = "",
                       multiple = TRUE
                     )
-             )
+             ),
+             column(width = 6,
+                    numericInput(
+                      ns("heatmapWidth"),
+                      label = "width of image in pixel",
+                      min = 100, max = 20000, step = 10,
+                      value = 800
+                    ),
+                    numericInput(
+                      ns("heatmapHeight"),
+                      label = "height of image in pixel",
+                      min = 200, max = 20000, step = 10,
+                      value = 300
+                    ))
            ),
            fluidRow(
              column(width = 12,
