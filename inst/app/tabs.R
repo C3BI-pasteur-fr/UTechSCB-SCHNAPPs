@@ -147,7 +147,7 @@ geneSelectionTab <- shinydashboard::tabItem(
   ), 
   br(),
   box(title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12,  status = 'primary', 
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = FALSE, collapsed = TRUE,
       fluidRow(
         column(12,
                tableSelectionUi("gsSelectedGenesMod")
@@ -156,7 +156,7 @@ geneSelectionTab <- shinydashboard::tabItem(
   ),
   br(),
   box(title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12,  status = 'primary', 
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = FALSE, collapsed = TRUE,
       fluidRow(
         column(12,
                tableSelectionUi("gsRMGenesMod")
@@ -216,7 +216,7 @@ cellSelectionTab <- shinydashboard::tabItem(
   br(),
   box(
     title = "cell table", solidHeader = TRUE, width = 12, status = 'primary',
-    collapsible = TRUE, collapsed = TRUE,
+    collapsible = FALSE, collapsed = TRUE,
     tableSelectionUi("cellSelectionMod")
   ),
   checkbsTT("cellSelectionMod"), br()
