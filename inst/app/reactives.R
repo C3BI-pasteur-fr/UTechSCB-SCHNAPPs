@@ -1751,19 +1751,16 @@ scran_Cluster <- reactive({
     removeNotification(id = "dbClusterError")
   }
   
-  pca <- pca()
-  scEx <- scEx()
-  scEx_log <- scEx_log()
-  
   input$updateClusteringParameters
-  seed <- input$seed
-  # kNr <- input$kNr
-  useRanks <- input$useRanks
-  
-  clusterSource <- clusterMethodReact$clusterSource
-  geneSelectionClustering <- input$geneSelectionClustering
-  minClusterSize <- input$minClusterSize
-  clusterMethod <- clusterMethodReact$clusterMethod
+  pca <- isolate(pca())
+  scEx <- isolate(scEx())
+  scEx_log <- isolate(scEx_log())
+  seed <- isolate(input$seed)
+  useRanks <- isolate(input$useRanks)
+  clusterSource <- isolate(clusterMethodReact$clusterSource)
+  geneSelectionClustering <- isolate(input$geneSelectionClustering)
+  minClusterSize <- isolate(input$minClusterSize)
+  clusterMethod <- isolate(clusterMethodReact$clusterMethod)
   
   if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
     if (DEBUG) {
