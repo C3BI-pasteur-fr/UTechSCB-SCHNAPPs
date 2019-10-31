@@ -95,7 +95,7 @@ tabList <- list(
     
     box(
       title = "Volcano plot", solidHeader = TRUE, width = 12, status = 'primary', 
-      collapsible = TRUE, collapsed = FALSE,
+      collapsible = FALSE, collapsed = FALSE,
       fluidRow(
         column(width = 12,
                verbatimTextOutput("sCA_volc_selected")
@@ -109,7 +109,7 @@ tabList <- list(
     ),
     box(
       title = "Differentially Expressed Genes", solidHeader = TRUE, width = 12, status = 'primary', 
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = FALSE, collapsed = TRUE,
       fluidRow(
         column(12,
                tableSelectionUi("sCA_dgeTable")

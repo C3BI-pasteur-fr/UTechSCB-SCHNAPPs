@@ -784,7 +784,7 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   
   output$cellSelection <- renderText({
-    if (DEBUG) cat(file = stderr(), "cellSelection\n")
+    if (DEBUG) cat(file = stderr(), "renderText: cellSelection\n")
     start.time <- Sys.time()
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
@@ -888,7 +888,7 @@ tableSelectionServer <- function(input, output, session,
   # })
   
   output$cellNameTable <- DT::renderDT({
-    if (DEBUG) cat(file = stderr(), "output$cellNameTable\n")
+    if (DEBUG) cat(file = stderr(), "renderDT: output$cellNameTable\n")
     start.time <- base::Sys.time()
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
