@@ -1759,10 +1759,13 @@ scran_Cluster <- reactive({
     removeNotification(id = "dbClusterError")
   }
   
+  # react to the following changes
   input$updateClusteringParameters
-  pca <- isolate(pca())
-  scEx <- isolate(scEx())
-  scEx_log <- isolate(scEx_log())
+  scEx <- scEx()
+  scEx_log <- scEx_log()
+  pca <- pca()
+  
+  # ignore these changes
   seed <- isolate(input$seed)
   useRanks <- isolate(input$useRanks)
   clusterSource <- isolate(clusterMethodReact$clusterSource)

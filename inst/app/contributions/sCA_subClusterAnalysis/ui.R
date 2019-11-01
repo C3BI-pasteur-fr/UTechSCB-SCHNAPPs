@@ -97,6 +97,16 @@ tabList <- list(
       title = "Volcano plot", solidHeader = TRUE, width = 12, status = 'primary', 
       collapsible = FALSE, collapsed = FALSE,
       fluidRow(
+        column(width = 6,
+               numericInput(inputId = "sCA_volc_effectLimit",label = "x-axis threshold", value = 1, min = 0.0, max = 10000,
+                            step = 0.1)
+        ),
+        column(width = 6,
+               numericInput(inputId = "sCA_volc_pval",label = "y-axis threshold", value = 0.05, min = 0.0, max = 110000,
+                            step = 0.1)
+        )
+      ),
+      fluidRow(
         column(width = 12,
                verbatimTextOutput("sCA_volc_selected")
         )
