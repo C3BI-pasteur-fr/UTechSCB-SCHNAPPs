@@ -67,7 +67,7 @@ allTabs[[length(allTabs) + 1]] <- list(
     ),
     box(
       title = "Sample of normalized values", solidHeader = TRUE, width = 12, status = 'primary',
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = FALSE, collapsed = TRUE,
       fluidRow(
         column( width = 12,
                 tableSelectionUi("normalizationResult")

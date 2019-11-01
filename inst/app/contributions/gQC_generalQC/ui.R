@@ -123,7 +123,7 @@ tabList <- list(
     br(),
     box(
       title = "Table with all projections", solidHeader = TRUE, width = 12, status = 'primary', 
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = FALSE, collapsed = FALSE,
       fluidRow(column(
         width = 12,
         tableSelectionUi("gQC_projectionTableMod")
