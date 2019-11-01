@@ -455,8 +455,9 @@ subCluster2Dplot <- function() {
         axis.title.x = element_text(face = "bold", size = 16),
         axis.title.y = element_text(face = "bold", size = 16),
         legend.position = "none"
-      ) +
-      ggtitle(c1)
+      ) 
+    # +
+    #   ggtitle(c1)
     p1
   })
 }
