@@ -797,7 +797,7 @@ tableSelectionServer <- function(input, output, session,
     }
     
     ns <- session$ns
-    
+    nsStr = ns("-")
     dataTables <- dataTab()
     selectedRows <- input$cellNameTable_rows_selected
     scEx <- scEx()
