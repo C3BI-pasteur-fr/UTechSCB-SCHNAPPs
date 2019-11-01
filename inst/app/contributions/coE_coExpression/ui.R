@@ -48,7 +48,7 @@ tabList <- list(
       ),
       box(
         title = "Detailed information on genes", solidHeader = TRUE, width = 12, status = 'primary', 
-        collapsible = TRUE, collapsed = TRUE,
+        collapsible = FALSE, collapsed = TRUE,
         footer = "",
         fluidRow(column(width = 12,
                         textInput("coE_heatmapselected_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
@@ -57,7 +57,7 @@ tabList <- list(
         # fluidRow(checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
         box(
           title = "Heatmap of selected cells and genes", solidHeader = TRUE, width = 12, status = 'primary', 
-          collapsible = TRUE, collapsed = TRUE,
+          collapsible = FALSE, collapsed = TRUE,
           fluidRow(
             column(width = 12,
                    pHeatMapUI("coE_heatmapSelectedModule")
@@ -67,7 +67,7 @@ tabList <- list(
         br(),
         box(
           title = "Table with coefficient of variance", solidHeader = TRUE, width = 12, status = 'primary', 
-          collapsible = TRUE, collapsed = TRUE,
+          collapsible = FALSE, collapsed = TRUE,
           footer = div(
             tags$ul(
               tags$li(
@@ -97,7 +97,7 @@ tabList <- list(
         ),
         box(
           title = "Table with correlation coefficients", solidHeader = TRUE, width = 12, status = 'primary', 
-          collapsible = TRUE, collapsed = TRUE,
+          collapsible = FALSE, collapsed = TRUE,
           footer = div(
             tags$ul(
               tags$li(

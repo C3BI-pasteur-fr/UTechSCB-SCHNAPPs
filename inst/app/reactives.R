@@ -1025,12 +1025,20 @@ gsRMGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
+  
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Description")]
+  dt <- fd[useGenes, ]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   
+  # get the order of the frist two columns correct
+  firstCol <- which(colnames(dt) == "symbol")
+  firstCol <- c(firstCol, which(colnames(dt) == "Description"))
+  # those we created so we know they are there
+  firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
+  colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
+  dt <- dt[, colOrder]
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
@@ -1218,7 +1226,7 @@ scExFunc <-
       showNotification(
         "not enough genes left",
         type = "warning",
-        id = "scExFunc1",
+        id = "scExFunc2",
         duration = NULL
       )
       return(NULL)
@@ -1439,7 +1447,7 @@ scExLogMatrixDisplay <- reactive({
   }
   retVal <-
     data.frame(
-      symbol = make.names(rowData(scEx)$symbol[rownames(scEx_log)], unique = TRUE),
+      symbol = make.names(rowData(scEx_log)$symbol, unique = TRUE),
       stringsAsFactors = FALSE
     )
   if (!is.null(scEx_log)) {
