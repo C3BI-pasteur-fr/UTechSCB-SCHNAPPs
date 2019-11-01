@@ -139,6 +139,7 @@ output$summaryStatsSideBar <- renderUI({
     cat(file = stderr(), "output$summaryStatsSideBar\n")
   }
   scEx <- scEx()
+  scEx_log <- scEx_log()
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "output$summaryStatsSideBar:NULL\n")
@@ -167,7 +168,9 @@ output$summaryStatsSideBar <- renderUI({
   line0 <- paste(infile, " _ ", annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
-  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
+  line1a <- paste("No. of cells (log): ", dim(scEx_log)[2], sep = "\t")
+  line2a <- paste("No. of genes (log): ", dim(scEx_log)[1], sep = "\t")
+  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")	  lline3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
   line4 <-
     paste("Median Genes with min 1 UMI: ", medianENSG, sep = "\t")
   line5 <-
@@ -184,6 +187,10 @@ output$summaryStatsSideBar <- renderUI({
     line1,
     "<br/>",
     line2,
+    "<br/>",
+    line1a,
+    "<br/>",
+    line2a,
     "<br/>",
     line3,
     "<br/>",

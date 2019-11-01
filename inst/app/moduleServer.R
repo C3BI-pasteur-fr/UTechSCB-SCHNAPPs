@@ -408,7 +408,7 @@ clusterServer <- function(input, output, session,
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), paste("cluster plot saving\n"))
       save(
-        file = paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."),
+        file = paste0("~/SCHNAPPsDebug/clusterPlot-", ns("-"), ".RData", collapse = "."),
         list = c(ls(envir = globalenv()), ls(), "legend.position")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
@@ -783,6 +783,7 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   
+  # table renderText cellSelection ----
   output$cellSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
     start.time <- Sys.time()
@@ -804,6 +805,14 @@ tableSelectionServer <- function(input, output, session,
     # update if expanded and not showing
     input$refreshtable
     
+    # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
+    inputData <- NULL
+    if (nsStr == "gsRMGenesMod--"){
+      inputData <- inputData()
+    }else{
+      inputData <- dataTables
+    }
+    
     if (is.null(dataTables)) {
       return(NULL)
     }
@@ -812,7 +821,7 @@ tableSelectionServer <- function(input, output, session,
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
-        file = paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."),
+        file = paste0("~/SCHNAPPsDebug/cellSelection-", ns("bkup"), ".RData", collapse = "."),
         list = c(ls(), ls(envir = globalenv()))
       )
     }
@@ -828,7 +837,8 @@ tableSelectionServer <- function(input, output, session,
       retVal <- sub("(.*)___.*", "\\1", retVal)
       retVal <- unique(retVal)
       # this removes everything other than row or col names
-      retVal <- retVal[retVal %in% c(rowData(scEx)$symbol, colnames(scEx))]
+      # with just scEx we will cannot display the genes in the removed table
+      retVal <- retVal[retVal %in% c(rowData(inputData$scEx)$symbol, colnames(scEx))]
       retVal <- paste0(retVal, collapse = ", ")
     } else {
       retVal <- NULL
@@ -863,14 +873,13 @@ tableSelectionServer <- function(input, output, session,
     }
   })
   
-  # output$columnSelection <- renderUI({
-  #
-  # })
+  # observe: cellNameTable_rows_selected ----
   observe({
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_rows_selected\n")
     assign(ns("modSelectedRows"), input$cellNameTable_rows_selected, envir = .schnappsEnv)
   })
   
+  # observe: cellNameTable_state ----
   observe({
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
     # browser()
@@ -882,11 +891,7 @@ tableSelectionServer <- function(input, output, session,
     tmp <- input$cellNameTable_state$search
   })
   
-  # observe({
-  #   if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
-  #   searchStr <<- input$cellNameTable_state$order
-  # })
-  
+  # renderDT cellNameTable ----
   output$cellNameTable <- DT::renderDT({
     if (DEBUG) cat(file = stderr(), "output$cellNameTable\n")
     start.time <- base::Sys.time()
@@ -902,6 +907,7 @@ tableSelectionServer <- function(input, output, session,
     
     dataTables <- dataTab()
     ns <- session$ns
+    nsStr <- ns("-")
     reorderCells <- input$reorderCells
     selectedRows <- input$cellNameTable_rows_selected
     # searchStr <-
@@ -910,7 +916,7 @@ tableSelectionServer <- function(input, output, session,
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
-        file = paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."),
+        file = paste0("~/SCHNAPPsDebug/cellNameTable-", nsStr, ".RData", collapse = "."),
         # list = c(ls(), ls(envir = globalenv()),ls(envir = .schnappsEnv))
         list = c(ls(), ls(envir = globalenv()))
       )
