@@ -1025,7 +1025,11 @@ gsRMGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
+<<<<<<< HEAD
  
+=======
+  
+>>>>>>> GUI2
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
   dt <- fd[useGenes, ]
@@ -1039,7 +1043,10 @@ gsRMGenesTable <- reactive({
   firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
   colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
   dt <- dt[, colOrder]
+<<<<<<< HEAD
   
+=======
+>>>>>>> GUI2
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
@@ -1760,19 +1767,19 @@ scran_Cluster <- reactive({
     removeNotification(id = "dbClusterError")
   }
   
-  pca <- pca()
+  # react to the following changes
+  input$updateClusteringParameters
   scEx <- scEx()
   scEx_log <- scEx_log()
+  pca <- pca()
   
-  input$updateClusteringParameters
-  seed <- input$seed
-  # kNr <- input$kNr
-  useRanks <- input$useRanks
-  
-  clusterSource <- clusterMethodReact$clusterSource
-  geneSelectionClustering <- input$geneSelectionClustering
-  minClusterSize <- input$minClusterSize
-  clusterMethod <- clusterMethodReact$clusterMethod
+  # ignore these changes
+  seed <- isolate(input$seed)
+  useRanks <- isolate(input$useRanks)
+  clusterSource <- isolate(clusterMethodReact$clusterSource)
+  geneSelectionClustering <- isolate(input$geneSelectionClustering)
+  minClusterSize <- isolate(input$minClusterSize)
+  clusterMethod <- isolate(clusterMethodReact$clusterMethod)
   
   if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
     if (DEBUG) {

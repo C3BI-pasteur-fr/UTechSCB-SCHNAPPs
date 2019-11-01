@@ -783,8 +783,7 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   
-  # table renderText cellSelection ----
-  output$cellSelection <- renderText({
+  output$rowSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
     start.time <- Sys.time()
     on.exit(

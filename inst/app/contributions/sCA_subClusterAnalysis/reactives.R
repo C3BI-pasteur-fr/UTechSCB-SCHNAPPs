@@ -87,7 +87,9 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox"){
   # creates object @assays$RNA@data and @assays$RNA@counts
   seurDat <- CreateSeuratObject(counts = assays(scEx)[[1]],
                                 meta.data = meta.data)
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[rownames(seurDat@assays$RNA@data),]
+  # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
   
   markers <- Seurat::FindMarkers(seurDat@assays$RNA@data, 
                                  cells.1 = cells.1,
@@ -453,8 +455,9 @@ subCluster2Dplot <- function() {
         axis.title.x = element_text(face = "bold", size = 16),
         axis.title.y = element_text(face = "bold", size = 16),
         legend.position = "none"
-      ) +
-      ggtitle(c1)
+      ) 
+    # +
+    #   ggtitle(c1)
     p1
   })
 }

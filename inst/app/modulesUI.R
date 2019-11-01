@@ -125,7 +125,7 @@ tableSelectionUi <- function(id) {
                    h5("Selected itmes to be copied"),
                    align = "left"
                  ),
-                 verbatimTextOutput(ns("cellSelection"))
+                 verbatimTextOutput(ns("rowSelection"))
           )
         ),
         fluidRow(
