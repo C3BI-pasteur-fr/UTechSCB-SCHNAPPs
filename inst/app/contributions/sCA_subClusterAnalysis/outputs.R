@@ -157,7 +157,9 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   }
 
   DGEdata <- sCA_dgeTableReac()
-
+  pvalT <- input$sCA_volc_pval
+  effT <- input$sCA_volc_effectLimit
+  
   if (is.null(DGEdata)) {
     if (DEBUG) cat(file = stderr(), "output$sCA_volcanoPlot:NULL\n")
     return(NULL)
@@ -185,7 +187,7 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   DGEdata$P <- DGEdata[, pval]
   TEXT <- paste(paste("symbol: ", DGEdata$symbol), sep = "<br>")
 
-  retVal <- volcanoly(DGEdata, snp = "symbol") %>%
+  retVal <- volcanoly(DGEdata, snp = "symbol", genomewideline = pvalT, effect_size_line = c(-effT,effT)) %>%
     layout(
       dragmode = "select"
     )

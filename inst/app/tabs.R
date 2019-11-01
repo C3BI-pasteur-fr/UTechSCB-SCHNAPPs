@@ -18,19 +18,36 @@ source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 # inputTab ----
 inputTab <- shinydashboard::tabItem(
   tabName = "input",
-  fluidRow(div(h3("SCHNAPPs Input"), align = "center")),
+  fluidRow(
+    div(h3("SCHNAPPs Input"), align = "center")),
   br(),
   fluidRow(div(
-    h5(
-      "This app is designed for exploratory data analysis of processed RNA-Seq data of single cell experiments.<br/>
-      Multiple files can be selected when using RData files with SingleCellExpression objects.<br/>
-      RData files are R data files generated using base::save()."
+    h4(
+      "Single Cell sHiNy APP(s)"
     ),
     align = "center"
   )),
+  
+  box(width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
+      fluidRow(
+        column(width = 12,
+               div(
+                 p(
+                   "Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies or other. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well."
+                 ),
+                 align = "left"
+               )
+        )
+      )
+  ),
+  br(),
   box(
     title = "Input files", status = "primary", solidHeader = TRUE, width = 12,
-    footer = "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
+    footer = div("Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
+                 br(),
+                 "Multiple files can be selected when using RData files with SingleCellExpression objects.",
+                 br(),
+                 "RData files are R data files generated using base::save()."),
     fluidRow(
       column(
         6,
