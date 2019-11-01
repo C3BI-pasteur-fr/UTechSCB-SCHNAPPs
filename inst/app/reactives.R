@@ -1025,11 +1025,7 @@ gsRMGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
-<<<<<<< HEAD
- 
-=======
-  
->>>>>>> GUI2
+
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
   dt <- fd[useGenes, ]
@@ -1043,10 +1039,7 @@ gsRMGenesTable <- reactive({
   firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
   colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
   dt <- dt[, colOrder]
-<<<<<<< HEAD
-  
-=======
->>>>>>> GUI2
+
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
