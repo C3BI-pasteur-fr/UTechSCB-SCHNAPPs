@@ -96,9 +96,9 @@ if (!exists("allowedColors")) {
 if (all(c("future", "parallel") %in% rownames(installed.packages()))){
   library(parallel)
   library(future)
-  options(future.globals.maxSize = 1000 * 1024^2)
+  options(future.globals.maxSize = 4000 * 1024^2)
   maxCores = parallel::detectCores()-1
-  maxCores = 8 # 32GB memory
+  maxCores = 4 # 32GB memory
   plan("multiprocess", workers = maxCores)
 }
 

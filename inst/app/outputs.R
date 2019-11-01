@@ -170,7 +170,7 @@ output$summaryStatsSideBar <- renderUI({
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
   line1a <- paste("No. of cells (log): ", dim(scEx_log)[2], sep = "\t")
   line2a <- paste("No. of genes (log): ", dim(scEx_log)[1], sep = "\t")
-  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")	  lline3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
+  line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
   line4 <-
     paste("Median Genes with min 1 UMI: ", medianENSG, sep = "\t")
   line5 <-
@@ -496,8 +496,22 @@ output$countscsv <- downloadHandler(
   filename = paste0("counts.", Sys.Date(), ".csv"),
   content = function(file) {
     if (DEBUG) {
-      cat(file = stderr(), paste("countcsv: \n"))
+      cat(file = stderr(), "RDSsave started.\n")
     }
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "RDSsave")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "RDSsave")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("RDSsave", id = "RDSsave", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "RDSsave")
+    }
+    
     scEx_log <- scEx_log()
     if (is.null(scEx_log)) {
       return(NULL)
@@ -511,7 +525,20 @@ output$RDSsave <- downloadHandler(
   filename = paste0("project.", Sys.Date(), ".RData"),
   content = function(file) {
     if (DEBUG) {
-      cat(file = stderr(), paste("RDSsave: \n"))
+      cat(file = stderr(), "RDSsave started.\n")
+    }
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "RDSsave")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "RDSsave")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("RDSsave", id = "RDSsave", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "RDSsave")
     }
     
     scEx <- scEx()
@@ -531,9 +558,6 @@ output$RDSsave <- downloadHandler(
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
     
     save(file = file, list = c("scEx"))
-    if (DEBUG) {
-      cat(file = stderr(), paste("RDSsave:done \n"))
-    }
     
     # write.csv(as.matrix(exprs(scEx)), file)
   }
@@ -554,7 +578,7 @@ returnNull <- function() {
   return(NULL)
 }
 
-# uncommented because it is corrently not used
+# commented out because it is corrently not used
 # # forceCalc -----# handling expensive calcualtions
 # forceCalc <- shiny::observe({
 #   if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))
