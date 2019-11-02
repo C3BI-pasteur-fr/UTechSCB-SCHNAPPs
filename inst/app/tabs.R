@@ -211,6 +211,7 @@ cellSelectionTab <- shinydashboard::tabItem(
   ),
   box(
     title = "addition parameters", solidHeader = TRUE, width = 12, status = 'primary', 
+    collapsible = TRUE, collapsed = TRUE,
     fluidRow(
       column(width = 12,
              textInput("cellPatternRM", "cells to be filtered out by pattern"),

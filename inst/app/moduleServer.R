@@ -807,7 +807,7 @@ tableSelectionServer <- function(input, output, session,
     # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
     inputData <- NULL
     if (nsStr == "gsRMGenesMod--"){
-      inputData <- inputData()
+      inputData <- rowData(inputData()$scEx)
     }else{
       inputData <- dataTables
     }
@@ -837,7 +837,7 @@ tableSelectionServer <- function(input, output, session,
       retVal <- unique(retVal)
       # this removes everything other than row or col names
       # with just scEx we will cannot display the genes in the removed table
-      retVal <- retVal[retVal %in% c(rowData(inputData$scEx)$symbol, colnames(scEx))]
+      retVal <- retVal[retVal %in% c(inputData$symbol, colnames(scEx))]
       retVal <- paste0(retVal, collapse = ", ")
     } else {
       retVal <- NULL
