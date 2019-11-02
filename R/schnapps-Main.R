@@ -24,6 +24,12 @@
 #' @importFrom shiny shinyApp runApp
 #' 
 #' @export schnapps
+#' 
+#' @examples
+#' # create example data
+#' data("scEx", package = "SCHNAPPs")
+#' save(file = "scEx.Rdata", list = "scEx")
+#' # use "scEx.Rdata" with load data functionality within the shiny app
 #'
 
 schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",

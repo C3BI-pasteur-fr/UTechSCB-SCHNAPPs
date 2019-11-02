@@ -44,6 +44,9 @@ The application is started from the command line in R using schnapps().
 
 ```
 library(SCHNAPPs)
+# create example data
+save(file = "filename.RData", "singleCellExperiementObject")
+# use "filename.RData" with load data functionality within the shiny app
 schnapps()
 ```
 
