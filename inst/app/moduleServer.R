@@ -549,7 +549,7 @@ clusterServer <- function(input, output, session,
     }
     grpNs[cells.names, grpN] <- TRUE
     # Set  reactive value
-    cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
+    # cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
     groupNames$namesDF <- grpNs
     updateSelectInput(session, "groupNames",
                       choices = c("plot", colnames(grpNs)),
