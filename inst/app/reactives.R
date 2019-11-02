@@ -1985,7 +1985,11 @@ projections <- reactive({
         #   stop("error: ", proj[1], "didn't produce a result")
         # }
       }
-      
+      if (!length(colnames(projections)) == length(cn)) {
+        save(file = "~/SCHNAPPsDebug/projectionsError2.RData", list = c(ls(), ls(envir = globalenv())))
+        stop("error: ", proj[1], "didn't produce a result, please send file ~/SCHNAPPsDebug/projectionsError2.RData to bernd")
+        
+      }
       colnames(projections) <- cn
       if (DEBUG) cat(file = stderr(), paste("colnames ", paste0(colnames(projections), collapse = " "), "\n"))
       if (DEBUG) cat(file = stderr(), paste("observe this: ", proj[2], "\n"))

@@ -237,9 +237,9 @@ umapReact <- reactive({
   # UMAP1 <- input$um_umap1
   # UMAP2 <- input$um_umap2
   runUMAP <- input$activateUMAP
+  scEx_log <- scEx_log()
+  pca <- pca()
   
-  scEx_log <- isolate(scEx_log())
-  pca <- isolate(pca())
   myseed <- isolate(input$gQC_um_randSeed)
   n_neighbors <- isolate(as.numeric(input$gQC_um_n_neighbors))
   n_components <- isolate(as.numeric(input$gQC_um_n_components))
