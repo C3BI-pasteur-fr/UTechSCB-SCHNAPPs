@@ -20,7 +20,7 @@
 <meta property="og:description" content="Single Cell sHiny APPlication (SCHNAPPs) is a R/Shiny based application to interact, manipulate, explore, and analyze single cell RNA-seq experiments, including MARS-seq and others.
     The application is open and extendable. The main idea is to be able to run basic visualization and analyses, including normalization, clustering,...
     on a defined subset of cells/genes. Key is, that all computations are based only on the cells that have been selected. Input can be a 
-    SingleCellExperiment object or CSV files of the count matrix.">
+    SingleCellExperiment object or CSV/TSV files of the count matrix.">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.23</span>
       </span>
     </div>
 
@@ -91,6 +91,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="contents col-md-9">
 
@@ -115,7 +116,25 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 # update bioconductor packages if required
 BiocManager::install()
 BiocManager::install("BiocSingular")
+BiocManager::install(version='devel')
+BiocManager::install("SingleR")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</a></code></pre>
+<div id="history-functionality" class="section level3">
+<h3 class="hasAnchor">
+<a href="#history-functionality" class="anchor"></a>history functionality</h3>
+<p>To take advantage of the history functionality orca needs to be installed: (<a href="https://github.com/plotly/orca#installation" class="uri">https://github.com/plotly/orca#installation</a>)</p>
+<p>orca is part of ploty so nothing to be done for R. But the pdftools are required:</p>
+<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("pdftools")
+</a></code></pre>
+<p>Notes:</p>
+<ol>
+<li>once history check box is checked only the following plots will be recorded, the current plot will not be saved.</li>
+<li>any selection in the plot will not be visible. It is not a screen-shot.</li>
+<li>The date of recording is added to the title.</li>
+<li>Creating of the history will take some time.</li>
+<li>once activated, any changes of parameters will trigger re-plot and also a save to the history. This “feature” can also be used to create of the current plot by adding a “,” in one of the fields.</li>
+</ol>
+</div>
 </div>
 <div id="create-sample-data-set" class="section level2">
 <h2 class="hasAnchor">
@@ -130,6 +149,11 @@ save(file = "scEx.Rdata", list = "scEx")</a></code></pre>
 <p>To start the app:</p>
 <pre><code><a href="https://rdrr.io/r/base/library.html">library(SCHNAPPs)
 schnapps()</a></code></pre>
+<div id="history-functionality-1" class="section level3">
+<h3 class="hasAnchor">
+<a href="#history-functionality-1" class="anchor"></a>history functionality</h3>
+<p>Plots can be automatically stored in a PDF file as they are created. This allows to somehow track what is being done. To enable this, the parameter historyFile has to be set to a file (probably non-existing, otherwise it will be appended to).</p>
+</div>
 <div id="generate-data-files" class="section level3">
 <h3 class="hasAnchor">
 <a href="#generate-data-files" class="anchor"></a>generate data files</h3>
@@ -173,24 +197,27 @@ schnapps()</a></code></pre>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Bernd Jagla <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-7696-0484" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID" height="16"></a> </li>
+<li>Bernd Jagla <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-7696-0484" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
 </ul>
 </div>
 
   </div>
 </div>
 
+
       <footer><div class="copyright">
   <p>Developed by Bernd Jagla.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.9100.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
