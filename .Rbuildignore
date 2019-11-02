@@ -6,7 +6,8 @@
 ^docs$
 ^inst/develo
 ^inst/prep4master.R
-^2$
 ^pkgdown$
 ^images2$
-^_pkgdown.yml$
+^_pkgdown\.yml$
+^UTechSCB-SCHNAPPs.wiki$
+^_gh-pages$
