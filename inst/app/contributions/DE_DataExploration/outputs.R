@@ -174,7 +174,7 @@ output$DE_panelPlot <- renderPlot({
   featureData <- rowData(scEx_log)
   # featureData$symbol = toupper(featureData$symbol)
   genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
-  
+  if (length(genesin)<1) {return (NULL)}
   par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
   rbPal <- colorRampPalette(c("#f0f0f0", "red"))
   ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))

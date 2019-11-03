@@ -315,7 +315,7 @@ coE_topExpCCTable <- reactive({
   return(retVal)
 })
 
-
+# combinePermutations ----
 combinePermutations <- function(perm1, perm2) {
   perms <- rep("", length(perm1))
   for (cIdx in 1:length(perm1)) {
@@ -327,6 +327,8 @@ combinePermutations <- function(perm1, perm2) {
   }
   perms
 }
+
+# finner
 finner <- function(xPerm, r, genesin, featureData, scEx_log, perms) {
   comb <- gtools::combinations(xPerm, r, genesin)
   for (cIdx in 1:nrow(comb)) {
@@ -502,7 +504,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
     ) +
     xlab(dbCluster) + ylab(ylabText) +
     scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames)) 
-    
+  
   # p1 <- ggplotly(p1)
   return(p1)
 }
@@ -511,7 +513,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
 #' iData = expression matrix, rows = genes
 #' cluster genes in SOM
 #' returns genes associated together within a som-node
-coE_somFunction <- function(iData, nSom, geneName) {
+coE_somFunction <- function(iData, nSom, geneName, projections,clusterSOM = "dbCluster", clusterVal = "1") {
   if (DEBUG) cat(file = stderr(), "coE_somFunction started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -529,8 +531,15 @@ coE_somFunction <- function(iData, nSom, geneName) {
   if (sum(geneName %in% rownames(iData)) == 0) {
     return(NULL)
   }
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
+  
+  cols2use <- which (colnames(iData) %in% rownames(projections[projections[, clusterSOM] == clusterVal,]))
   res2 <- Rsomoclu.train(
-    input_data = iData,
+    input_data = iData[, cols2use],
     nSomX = nSom, nSomY = nSom,
     nEpoch = 10,
     radius0 = 0,
@@ -543,15 +552,80 @@ coE_somFunction <- function(iData, nSom, geneName) {
     scaleCooling = "linear"
   )
   
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls(), ls(envir = globalenv())))
-  }
-  # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
   rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
   simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
                                                 res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
   return(simGenes)
 }
+
+# SOM observers ----
+.schnappsEnv$coE_SOMGrp <- "sampleNames"
+observe({
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_SOMGrp\n"))
+  .schnappsEnv$coE_SOMGrp <- input$coE_SOMGrp
+})
+.schnappsEnv$coE_SOMSelection <- "1"
+observe({
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_SOMSelection\n"))
+  .schnappsEnv$coE_SOMSelection <- input$coE_SOMSelection
+})
+
+# coE_updateInputSOMt ====
+coE_updateInputSOMt <- reactive({
+  if (DEBUG) cat(file = stderr(), "coE_updateInputSOMt started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_updateInputSOMt")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_updateInputSOMt")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_updateInputSOMt", id = "coE_updateInputSOMt", duration = NULL)
+  }
+  
+  tsneData <- projections()
+  
+  # Can use character(0) to remove all choices
+  if (is.null(tsneData)) {
+    return(NULL)
+  }
+  
+  coln <- colnames(tsneData)
+  choices <- c()
+  for (cn in coln) {
+    if (length(levels(as.factor(tsneData[, cn]))) < 20) {
+      choices <- c(choices, cn)
+    }
+  }
+  if (length(choices) == 0) {
+    choices <- c("no valid columns")
+  }
+  updateSelectInput(
+    session,
+    "coE_clusterSOM",
+    choices = choices,
+    selected = .schnappsEnv$coE_SOMGrp
+  )
+})
+
+observeEvent(input$coE_clusterSOM,{
+  projections <- projections()
+  if (DEBUG) cat(file = stderr(), "observeEvent: input$coE_clusterSOM.\n")
+  # Can use character(0) to remove all choices
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  if(!input$coE_clusterSOM %in% colnames(projections)) return(NULL)
+  choicesVal = levels(projections[, input$coE_clusterSOM])
+  updateSelectInput(
+    session,
+    "coE_clusterValSOM",
+    choices = choicesVal,
+    selected = .schnappsEnv$coE_SOMSelection
+  )
+  
+})
 
 # coE_heatmapSOMReactive ----
 #' coE_heatmapSOMReactive
@@ -577,12 +651,17 @@ coE_heatmapSOMReactive <- reactive({
   
   scEx_log <- scEx_log()
   projections <- projections()
-  genesin <- input$coE_geneSOM
-  nSOM <- input$coE_dimSOM
+  input$updateSOMParameters
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
+  coE_updateInputSOMt()
   
-  if (is.null(scEx_log)) {
+  genesin <- isolate(input$coE_geneSOM)
+  nSOM <- isolate(input$coE_dimSOM)
+  clusterSOM <- isolate(input$coE_clusterSOM)
+  clusterVal <- isolate(input$coE_clusterValSOM)
+  
+  if (is.null(scEx_log) | input$updateSOMParameters == 0 ) {
     return(
       list(
         src = "empty.png",
@@ -604,7 +683,8 @@ coE_heatmapSOMReactive <- reactive({
   # go from readable gene name to ENSG number
   genesin <- geneName2Index(genesin, featureData)
   
-  geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin)
+  geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin, projections,
+                               clusterSOM = clusterSOM, clusterVal = clusterVal)
   
   # plot the genes found
   output$coE_somGenes <- renderText({

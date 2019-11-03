@@ -160,14 +160,29 @@ tabList <- list(
       title = "Self organizing map (SOM)", solidHeader = TRUE, width = 12, status = 'primary', 
       footer = "Here, we calculate a SOM on all genes using the information from all cells. Then we ask, which other genes are in the same cluster as the gene of intereset.",
       fluidRow(
-        column(width = 6,
+        column(width = 12, offset = 1,
+               actionButton("updateSOMParameters", "apply changes", width = '80%', 
+                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        )
+      ),
+      fluidRow(
+        column(width = 3,
                numericInput("coE_dimSOM", "number of nodes per dimension",
                             20,
                             min = 2, max = 100
                )
         ), 
-        column(width = 6,
+        column(width = 3,
                textInput("coE_geneSOM", "Gene of interest", value = defaultValueSingleGene)
+        ),
+        column(width = 3,
+               selectInput(inputId = "coE_clusterSOM", label = "Clusters/Factor to use", 
+                           choices = c("dbCluster", "sampleName"),
+                           selected = "dbCluster")
+        ),
+        column(width = 3,
+               selectInput(inputId = "coE_clusterValSOM", label = "Values to use",
+                           choices = c("1","2"), selected = "1", multiple = TRUE)
         )
       ),
       br(),
