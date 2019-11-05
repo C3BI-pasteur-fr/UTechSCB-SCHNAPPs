@@ -70,6 +70,20 @@ gQC_update3DInput <- reactive({
     selected = .schnappsEnv$gQC_col
   )
 })
+# observe: cellNameTable_rows_selected ----
+observe({
+  if (DEBUG) cat(file = stderr(), "observe tsneVars\n")
+  out <- tsne()
+  if (is.null(out)) {
+    .schnappsEnv$calculated_gQC_tsneDim = "NA"
+  }
+  assign("gQC_tsneDim", input$gQC_tsneDim, envir = .schnappsEnv)
+  assign("gQC_tsnePerplexity", input$gQC_tsnePerplexity, envir = .schnappsEnv)
+  assign("gQC_tsneTheta", input$gQC_tsneTheta, envir = .schnappsEnv)
+  assign("gQC_tsneSeed", input$gQC_tsneSeed, envir = .schnappsEnv)
+  output$updatetsneParametersButton <- updateButtonUI(name = "updatetsneParameters",
+                                                      variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  ) )
+})
 
 # gQC_tsne_main ----
 output$gQC_tsne_main <- plotly::renderPlotly({

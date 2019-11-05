@@ -67,7 +67,7 @@ scaterReads <- reactive({
     return(NULL)
   }
   retVal <- gQC_scaterReadsFunc(scEx)
-
+  
   exportTestValues(scaterReads = {str(retVal)})  
   return(retVal)
 })
@@ -118,7 +118,7 @@ projectionTable <- reactive({
   if (is.null(projections)) {
     return(NULL)
   }
-
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls(), ls(envir = globalenv())))
   }
@@ -132,6 +132,19 @@ projectionTable <- reactive({
 # tsne ----
 #' tsne
 #' reactive calculating the tSNE projections
+
+# should be a module :
+# https://shiny.rstudio.com/articles/modules.html
+# https://stackoverflow.com/questions/43976128/create-a-reactive-function-outside-the-shiny-app
+# 
+# I guess that modules are self-contained and one cannot retrieve information from the parent session
+# this means that I cannot create rectivity from within the module to inputs that are outside.
+
+# output$updatetsneParametersButton <- updateButtonUI(name = "updatetsneParameters",
+#                                                     variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  ) )
+# updateButton(name = "updatetsneParameters", 
+#                                                   )
+
 tsne <- reactive({
   if (DEBUG) cat(file = stderr(), "tsne started.\n")
   start.time <- base::Sys.time()
@@ -151,7 +164,7 @@ tsne <- reactive({
   gQC_tsnePerplexity <- isolate(input$gQC_tsnePerplexity)
   gQC_tsneTheta <- isolate(input$gQC_tsneTheta)
   gQC_tsneSeed <- isolate(input$gQC_tsneSeed)
-  
+
   if (is.null(pca)) {
     if (DEBUG) cat(file = stderr(), "tsne: NULL\n")
     return(NULL)
@@ -168,6 +181,10 @@ tsne <- reactive({
     }
     return(NULL)
   }
+  .schnappsEnv$calculated_gQC_tsneDim = gQC_tsneDim
+  .schnappsEnv$calculated_gQC_tsnePerplexity <- gQC_tsnePerplexity
+  .schnappsEnv$calculated_gQC_tsneTheta <- gQC_tsneTheta
+  .schnappsEnv$calculated_gQC_tsneSeed <- gQC_tsneSeed
   
   exportTestValues(tsne = {retVal})  
   return(retVal)
@@ -227,7 +244,7 @@ umapReact <- reactive({
     showNotification("umapReact", id = "umapReact", duration = NULL)
   }
   
-   # xaxis <- input$um_xaxis
+  # xaxis <- input$um_xaxis
   # yaxis <- input$um_yaxis
   # cellT <- input$um_ct
   # inputCT <- input$um_inputCT
