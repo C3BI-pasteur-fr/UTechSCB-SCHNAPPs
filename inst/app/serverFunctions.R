@@ -634,3 +634,47 @@ addColData <- function(allScEx_log, scEx) {
   }
   return(allScEx_log)
 }
+
+
+updateButtonUI = function(name, variables){
+  renderUI({
+    # inp <- isolate(reactiveValuesToList(get("input")))
+    # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), ls(envir = globalenv()), "name", "variables", ".schnappsEnv", "inp", "session"))
+    # cp =load(file = "~/SCHNAPPsDebug/render.RData")
+    # browser()
+    if (DEBUG) cat(file = stderr(), "updateButtonUI\n")
+    modified = FALSE
+    # input$updatetsneParameters
+    # input$gQC_tsneDim
+    # input$gQC_tsnePerplexity
+    # input$gQC_tsneTheta
+    # input$gQC_tsneSeed
+    # variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  )
+    for (var in variables) {
+      oldVar = paste0("calculated_", var)
+      currVar = var
+      if (!exists(oldVar, envir = .schnappsEnv)) {
+        # cat(file = stderr(), "modified1\n")
+        modified = TRUE
+        next()
+      }
+      if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
+        # cat(file = stderr(), "modified12\n")
+        modified = TRUE
+      }
+      # observe("input$gQC_tsnePerplexity", quoted = T)
+    }
+    ob = quote("input$gQC_tsnePerplexity")
+    # observe(ob , quoted = TRUE)
+    # observe(quote(paste0("input$",currVar)), quoted = F)
+    if (!modified) {
+      # cat(file = stderr(), "\n\ntsne not modified\n\n\n")
+      actionButton(name, "apply changes", width = '80%', 
+                   style = "color: #fff; background-color: #00b300; border-color: #2e6da4")
+    } else {
+      # cat(file = stderr(), "\n\ntsne modified\n\n\n")
+      actionButton(name, "apply changes", width = '80%', 
+                   style = "color: #fff; background-color: #cc0000; border-color: #2e6da4")
+    }
+  })
+}
