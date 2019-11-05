@@ -348,6 +348,13 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
   }
   
   projections <- as.data.frame(projections)
+  if (!all(c(dimX, dimY, dimZ) %in% colnames(projections))) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Selected projections not available. Did you run normalization?", id = "tsnePlotERROR", type = "error", duration = NULL)
+    }
+    return(NULL)
+  }
+  
   projections$dbCluster <- as.factor(projections$dbCluster)
   
   if (dimCol == "sampleNames") {
