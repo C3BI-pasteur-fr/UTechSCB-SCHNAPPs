@@ -21,16 +21,16 @@ geneName2Index <- function(g_id, featureData) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("geneName2Index", id = "geneName2Index", duration = NULL)
   }
-  
+
   if (is.null(g_id)) {
     return(NULL)
   }
-  
+
   g_id <- toupper(g_id)
   g_id <- gsub(" ", "", g_id, fixed = TRUE)
   g_id <- strsplit(g_id, ",")
   g_id <- g_id[[1]]
-  
+
   notFound <- g_id[!g_id %in% toupper(featureData$symbol)]
   if (length(featureData$symbol) == length(notFound)) {
     # in case there is only one gene that is not available.
@@ -42,14 +42,14 @@ geneName2Index <- function(g_id, featureData) {
     }
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(paste("following genes were not found", notFound, collapse = " "),
-                       id = "moduleNotFound", type = "warning",
-                       duration = 20
+        id = "moduleNotFound", type = "warning",
+        duration = 20
       )
     }
   }
-  
+
   geneid <- unique(rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ]))
-  
+
   return(geneid)
 }
 
@@ -107,7 +107,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "Gene.count",
                              colors = NULL) {
   geneid <- geneName2Index(g_id, featureData)
-  
+
   if (length(geneid) == 0) {
     return(NULL)
   }
@@ -123,7 +123,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   #   expression <- Matrix::colSums(exprs(scEx_log)[geneid, ])
   # }
   # validate(need(is.na(sum(expression)) != TRUE, ""))
-  
+
   # geneid <- geneName2Index(geneNames, featureData)
   projections <- updateProjectionsWithUmiCount(
     dimX = dimX, dimY = dimY,
@@ -131,17 +131,17 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
+  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
     return(NULL)
   }
-  
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
+
+  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
     return(NULL)
   }
-  
+
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(
       ls(), "legend.position",
@@ -174,7 +174,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
-  
+
   suppressMessages(require(plotly))
   f <- list(
     family = "Courier New, monospace",
@@ -187,7 +187,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (divYBy != "None") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
   }
-  
+
   typeX <- typeY <- "linear"
   if (logx) {
     typeX <- "log"
@@ -215,7 +215,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     subsetData$"__dimXorder" <- rank(subsetData[, dimY])
     dimX <- "__dimXorder"
   }
-  
+
   if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
     subsetData[, dimX] <- as.character(subsetData[, dimX])
   }
@@ -225,7 +225,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
-  
+
   p1 <- plotly::plot_ly(
     data = subsetData, source = "subset",
     key = rownames(subsetData)
@@ -245,14 +245,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       title = gtitle,
       dragmode = "select"
     )
-  
-  
+
+
   if (is.factor(subsetData[, dimCol])) {
-    
+
   } else {
     p1 <- colorbar(p1, title = dimCol)
   }
-  
+
   selectedCells <- NULL
   if (length(grpN) > 0) {
     if (length(grpNs[rownames(subsetData), grpN]) > 0 & sum(grpNs[rownames(subsetData), grpN], na.rm = TRUE) > 0) {
@@ -367,27 +367,27 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
   # moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
   colTree <- input[[paste0(moduleName, "-showColTree")]]
-  
+
   if (is.null(heatmapData) | is.null(projections) | is.null(heatmapData$mat)) {
     return(NULL)
   }
-  
+
   heatmapData$filename <- NULL
-  
+
   # if (length(addColNames) > 0 & moreOptions) {
-    if (length(addColNames) > 0 ) {
-      heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+  if (length(addColNames) > 0) {
+    heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
   }
   # if (sum(orderColNames %in% colnames(projections)) > 0 & moreOptions) {
-    if (sum(orderColNames %in% colnames(projections)) > 0) {
-      heatmapData$cluster_cols <- FALSE
+  if (sum(orderColNames %in% colnames(projections)) > 0) {
+    heatmapData$cluster_cols <- FALSE
     colN <- rownames(psych::dfOrder(projections, orderColNames))
     colN <- colN[colN %in% colnames(heatmapData$mat)]
     heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
     # return()
   }
   # if (moreOptions) {
-    heatmapData$cluster_cols <- colTree
+  heatmapData$cluster_cols <- colTree
   # }
   heatmapData$fontsize <- 14
   system.time(do.call(TRONCO::pheatmap, heatmapData))
@@ -398,12 +398,12 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
   grpNs <- groupNames$namesDF
   grpN <- make.names(input$groupName)
-  
+
   dimY <- input[[paste0(moduleName, "-dimension_y")]]
   dimX <- input[[paste0(moduleName, "-dimension_x")]]
   dimCol <- input[[paste0(moduleName, "-dimension_col")]]
   clId <- input[[paste0(moduleName, "-clusters")]]
-  
+
   geneNames <- input[[paste0(moduleName, "-geneIds")]]
   geneNames2 <- input[[paste0(moduleName, "-geneIds2")]]
   logx <- input[[paste0(moduleName, "-logX")]]
@@ -412,13 +412,13 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   divYBy <- input[[paste0(moduleName, "-divideYBy")]]
   scols <- sampleCols$colPal
   ccols <- clusterCols$colPal
-  
-  
+
+
   if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
     return(NULL)
   }
-  
+
   featureData <- rowData(scEx_log)
   if (is.null(g_id) || nchar(g_id) == 0) {
     g_id <- featureData$symbol
@@ -427,8 +427,8 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (is.null(logy)) logy <- FALSE
   if (is.null(divXBy)) divXBy <- "None"
   if (is.null(divYBy)) divYBy <- "None"
-  
-  
+
+
   if (dimCol == "sampleNames") {
     myColors <- scols
   } else {
@@ -437,10 +437,10 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (dimCol == "dbCluster") {
     myColors <- ccols
   }
-  
+
   p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
-                         geneNames2, dimX, dimY, clId, grpN, legend.position,
-                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+    geneNames2, dimX, dimY, clId, grpN, legend.position,
+    grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
   )
   return(p1)
 }
@@ -459,7 +459,7 @@ checkShaCache <- function(moduleName = "traj_elpi_modules",
   retVal <- NULL
   message <- ""
   status <- "new"
-  
+
   shaStr <- ""
   idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
   infile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
@@ -524,24 +524,24 @@ getshaStr <- function(moduleParameters) {
     shaStr <- paste(
       shaStr,
       tryCatch(sha1(md, digits = 14),
-               warning = function(x) {
-                 # print("warning")
-                 # print(x)
-                 # print(idx)
-                 return(
-                   sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
-                 )
-               },
-               error = function(x) {
-                 if (class(md) == "SingleCellExperiment") {
-                   return(sha1(as.matrix(assays(md)[[1]])))
-                 } else {
-                   print(idx)
-                   return(
-                     sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
-                   )
-                 }
-               }
+        warning = function(x) {
+          # print("warning")
+          # print(x)
+          # print(idx)
+          return(
+            sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+          )
+        },
+        error = function(x) {
+          if (class(md) == "SingleCellExperiment") {
+            return(sha1(as.matrix(assays(md)[[1]])))
+          } else {
+            print(idx)
+            return(
+              sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+            )
+          }
+        }
       )
     )
   }
@@ -558,44 +558,44 @@ flattenCorrMatrix <- function(cormat, pmat) {
   data.frame(
     row = rownames(cormat)[row(cormat)[ut]],
     column = rownames(cormat)[col(cormat)[ut]],
-    cor  =(cormat)[ut],
+    cor = (cormat)[ut],
     p = pmat[ut]
   )
 }
 
 # record history in env
-# needs pdftk https://www.pdflabs.com/tools/pdftk-server/ 
+# needs pdftk https://www.pdflabs.com/tools/pdftk-server/
 # only save to history file if variable historyFile in schnappsEnv is set
-if (!all(c( "pdftools") %in% rownames(installed.packages()))){
-  recHistory <- function(...){
+if (!all(c("pdftools") %in% rownames(installed.packages()))) {
+  recHistory <- function(...) {
     return(NULL)
   }
-}else{
+} else {
   require(pdftools)
-  recHistory <- function(name, plot1){
-    if(!exists("historyFile", envir = .schnappsEnv)){
+  recHistory <- function(name, plot1) {
+    if (!exists("historyFile", envir = .schnappsEnv)) {
       return(NULL)
     }
-    if(!exists("history", envir = .schnappsEnv)){
-      .schnappsEnv$history = list()
+    if (!exists("history", envir = .schnappsEnv)) {
+      .schnappsEnv$history <- list()
     }
-    name = paste(name, date())
+    name <- paste(name, date())
     tmpF <- tempfile(fileext = ".pdf")
     plot1 <-
-      plot1%>% layout( title = name) 
-    if ("plotly" %in% class(plot1)){
+      plot1 %>% layout(title = name)
+    if ("plotly" %in% class(plot1)) {
       # requires orca bing installed (https://github.com/plotly/orca#installation)
-      withr::with_dir(dirname(tmpF), plotly::orca(p=plot1, file = basename(tmpF)))
-      if(file.exists(.schnappsEnv$historyFile)){
+      withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
+      if (file.exists(.schnappsEnv$historyFile)) {
         tmpF2 <- tempfile(fileext = ".pdf")
-         file.copy(.schnappsEnv$historyFile, tmpF2)
+        file.copy(.schnappsEnv$historyFile, tmpF2)
         pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile)
-      }else {
+      } else {
         file.copy(tmpF, .schnappsEnv$historyFile)
       }
       return(TRUE)
     }
-    
+
     # pdf(file = tmpF,onefile = TRUE)
     # ggsave(filename = tmpF, plot = plot1, device = pdf())
     # dev.off()
@@ -609,72 +609,130 @@ if (!all(c( "pdftools") %in% rownames(installed.packages()))){
 addColData <- function(allScEx_log, scEx) {
   cd1 <- colnames(colData(scEx))
   cd2 <- colnames(colData(allScEx_log))
-  
-  for (cc in setdiff(cd1,cd2)) {
+
+  for (cc in setdiff(cd1, cd2)) {
     lv <- NULL
     nCol <- NULL
-    switch(class(colData(scEx)[,cc]),
-           "factor" = {
-             levels(colData(scEx)[,cc]) = c(levels(colData(scEx)[,cc]) , "NA")
-             lv = levels(colData(scEx)[,cc])
-             nCol = data.frame(factor( rep("NA", nrow(colData(allScEx_log))), levels = lv))
-             colnames(nCol) = cc
-           },
-           "character" = {
-             nCol = data.frame(cc = rep("NA", nrow(colData(allScEx_log))), stringsAsFactors = F)
-             colnames(nCol) = cc
-           },
-           "numeric" = {
-             nCol = data.frame(cc = rep(0, nrow(colData(allScEx_log))))
-             colnames(nCol) = cc
-           }
+    switch(class(colData(scEx)[, cc]),
+      "factor" = {
+        levels(colData(scEx)[, cc]) <- c(levels(colData(scEx)[, cc]), "NA")
+        lv <- levels(colData(scEx)[, cc])
+        nCol <- data.frame(factor(rep("NA", nrow(colData(allScEx_log))), levels = lv))
+        colnames(nCol) <- cc
+      },
+      "character" = {
+        nCol <- data.frame(cc = rep("NA", nrow(colData(allScEx_log))), stringsAsFactors = F)
+        colnames(nCol) <- cc
+      },
+      "numeric" = {
+        nCol <- data.frame(cc = rep(0, nrow(colData(allScEx_log))))
+        colnames(nCol) <- cc
+      }
     )
-    colData(allScEx_log) = cbind(colData(allScEx_log), nCol)
-    
+    colData(allScEx_log) <- cbind(colData(allScEx_log), nCol)
   }
   return(allScEx_log)
 }
 
+# ( = "updatetsneParameters",  = c("calculated_gQC_tsneDim", "calculated_gQC_tsnePerplexity",
+#                                                                       "calculated_gQC_tsneTheta", "calculated_gQC_tsneSeed"))
 
-updateButtonUI = function(name, variables){
-  renderUI({
-    # inp <- isolate(reactiveValuesToList(get("input")))
-    # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), ls(envir = globalenv()), "name", "variables", ".schnappsEnv", "inp", "session"))
-    # cp =load(file = "~/SCHNAPPsDebug/render.RData")
-    # browser()
-    if (DEBUG) cat(file = stderr(), "updateButtonUI\n")
-    modified = FALSE
-    # input$updatetsneParameters
-    # input$gQC_tsneDim
-    # input$gQC_tsnePerplexity
-    # input$gQC_tsneTheta
-    # input$gQC_tsneSeed
-    # variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  )
-    for (var in variables) {
-      oldVar = paste0("calculated_", var)
-      currVar = var
-      if (!exists(oldVar, envir = .schnappsEnv)) {
-        # cat(file = stderr(), "modified1\n")
-        modified = TRUE
-        next()
-      }
-      if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
-        # cat(file = stderr(), "modified12\n")
-        modified = TRUE
-      }
-      # observe("input$gQC_tsnePerplexity", quoted = T)
+updateButtonColor <- function(buttonName, parameters) {
+  modified <- FALSE
+  for (var in parameters) {
+    oldVar <- paste0("calculated_", var)
+    currVar <- var
+    if (!exists(oldVar, envir = .schnappsEnv) | !exists(currVar, envir = .schnappsEnv)) {
+      cat(file = stderr(), green("modified1\n"))
+      modified <- TRUE
+      next()
     }
-    ob = quote("input$gQC_tsnePerplexity")
-    # observe(ob , quoted = TRUE)
-    # observe(quote(paste0("input$",currVar)), quoted = F)
-    if (!modified) {
-      # cat(file = stderr(), "\n\ntsne not modified\n\n\n")
-      actionButton(name, "apply changes", width = '80%', 
-                   style = "color: #fff; background-color: #00b300; border-color: #2e6da4")
+    if (is.null(get(oldVar, envir = .schnappsEnv)) | is.null(get(currVar, envir = .schnappsEnv))) {
+      if (!(is.null(get(oldVar, envir = .schnappsEnv)) & is.null(get(currVar, envir = .schnappsEnv)))) {
+        cat(file = stderr(), "modified2\n")
+        modified <- TRUE
+      }
     } else {
-      # cat(file = stderr(), "\n\ntsne modified\n\n\n")
-      actionButton(name, "apply changes", width = '80%', 
-                   style = "color: #fff; background-color: #cc0000; border-color: #2e6da4")
+      if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
+        cat(file = stderr(), "modified3\n")
+        modified <- TRUE
+      }
     }
-  })
+  }
+  if (!modified) {
+    cat(file = stderr(), "\n\ntsne not modified\n\n\n")
+    removeClass(buttonName, "red")
+    addClass(buttonName, "green")
+  } else {
+    cat(file = stderr(), "\n\ntsne modified4\n\n\n")
+    removeClass(buttonName, "green")
+    addClass(buttonName, "red")
+  }
 }
+
+# updateButtonUI = function(input, name, variables){
+#   # browser()
+#   if (is.null(input[[name]])){
+#     cat(file = stderr(), paste("\ncreating button: ", name,"\n"))
+#     return(renderUI({actionButton(inputId = name, label = "apply changes", width = '80%')}))
+#   }
+#
+#   renderUI({
+#     # inp <- isolate(reactiveValuesToList(get("input")))
+#     # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), ls(envir = globalenv()), "name", "variables", ".schnappsEnv", "inp", "session"))
+#     # cp =load(file = "~/SCHNAPPsDebug/render.RData")
+#     # browser()
+#     if (DEBUG) cat(file = stderr(), "updateButtonUI\n")
+#     modified = FALSE
+#     # input$updatetsneParameters
+#     # input$gQC_tsneDim
+#     # input$gQC_tsnePerplexity
+#     # input$gQC_tsneTheta
+#     # input$gQC_tsneSeed
+#     # variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  )
+#
+#     # create button if not exists
+#
+#     for (var in variables) {
+#       oldVar = paste0("calculated_", var)
+#       currVar = var
+#       if (!exists(oldVar, envir = .schnappsEnv)  | !exists(currVar, envir = .schnappsEnv)) {
+#         # cat(file = stderr(), "modified1\n")
+#         modified = TRUE
+#         next()
+#       }
+#       save(file = paste0("~/SCHNAPPsDebug/updateButtonUI", var,".RData"), list = c(
+#         "var", "variables", ".schnappsEnv", "name"
+#       ))
+#       cat(file = stderr(), paste("\noldVar: ", oldVar,"\n"))
+#       cat(file = stderr(), paste("noldVar: ", get(oldVar, envir = .schnappsEnv),"\n"))
+#       cat(file = stderr(), paste("currVar: ", currVar ,"\n"))
+#       cat(file = stderr(), paste("currVar: ", get(currVar, envir = .schnappsEnv),"\n"))
+#       if(is.null(get(oldVar, envir = .schnappsEnv)) | is.null(get(currVar, envir = .schnappsEnv))) {
+#         if (!(is.null(get(oldVar, envir = .schnappsEnv)) & is.null(get(currVar, envir = .schnappsEnv)))) {
+#           modified = TRUE
+#         }
+#       } else {
+#         if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
+#           # cat(file = stderr(), "modified12\n")
+#           modified = TRUE
+#         }
+#       }
+#       # observe("input$gQC_tsnePerplexity", quoted = T)
+#     }
+#     # ob = quote("input$gQC_tsnePerplexity")
+#     # observe(ob , quoted = TRUE)
+#     # observe(quote(paste0("input$",currVar)), quoted = F)
+#     if (!modified) {
+#       # cat(file = stderr(), "\n\ntsne not modified\n\n\n")
+#       addClass(name, "green")
+#       # updateActionButton(inputId = name, label = "apply changes", width = '80%',
+#       #              style = "color: #fff; background-color: #00b300; border-color: #2e6da4")
+#     } else {
+#       # cat(file = stderr(), "\n\ntsne modified\n\n\n")
+#       removeClass(name, "green")
+#       # updateActionButton(inputId = name, label = "apply changes", width = '80%',
+#       #              style = "color: #fff; background-color: #cc0000; border-color: #2e6da4")
+#     }
+#   })
+# }

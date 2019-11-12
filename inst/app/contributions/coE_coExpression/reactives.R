@@ -16,7 +16,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData")
-  
+
   #  create parameters used for pheatmap module
   genesin <- geneName2Index(genesin, featureData)
   if (is.null(genesin) | is.null(cells)) {
@@ -26,21 +26,21 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     return(NULL)
   }
   expression <- scEx_matrix[genesin, cells]
-  
+
   validate(need(
     is.na(sum(expression)) != TRUE,
     "Gene symbol incorrect or genes not expressed"
   ))
-  
+
   projections <- projections[order(as.numeric(as.character(projections$dbCluster))), ]
-  
+
   if (!("sampleNames" %in% colnames(projections))) {
     projections$sample <- 1
   }
   annotation <- data.frame(projections[cells, c("dbCluster", "sampleNames")])
   rownames(annotation) <- colnames(expression)
   colnames(annotation) <- c("Cluster", "sampleNames")
-  
+
   # For high-res displays, this will be greater than 1
   # pixelratio <- session$clientData$pixelratio
   pixelratio <- 1
@@ -55,14 +55,14 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   if (is.null(height)) {
     height <- 96 * 7
   }
-  
+
   nonZeroRows <- which(Matrix::rowSums(expression) > 0)
-  
+
   annCols <- list(
     "sampleNames" = sampCol,
     "Cluster" = ccols
   )
-  
+
   retVal <- list(
     mat = expression[nonZeroRows, order(annotation[, 1], annotation[, 2])],
     cluster_rows = TRUE,
@@ -84,14 +84,14 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     )))(6),
     annotation_colors = annCols
   )
-  
+
   # print debugging information on the console
   printTimeEnd(start.time, "inputData")
   # for automated shiny testing using shinytest
   exportTestValues(coE_heatmapFunc = {
     retVal
   })
-  
+
   # this is what is run in the module
   # do.call(TRONCO::pheatmap, retVal)
   return(retVal)
@@ -112,7 +112,7 @@ coE_heatmapSelectedReactive <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_heatmapSelectedReactive", id = "coE_heatmapSelectedReactive", duration = NULL)
   }
-  
+
   scEx_log <- scEx_log()
   projections <- projections()
   genesin <- input$coE_heatmapselected_geneids
@@ -123,9 +123,9 @@ coE_heatmapSelectedReactive <- reactive({
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
   # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
-  
+
   if (is.null(scEx_log) ||
-      is.null(projections) || is.null(scCells) || length(scCells) == 0 ) {
+    is.null(projections) || is.null(scCells) || length(scCells) == 0) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
     return(
       list(
@@ -140,20 +140,20 @@ coE_heatmapSelectedReactive <- reactive({
   # else {
   # output$coE_heatmapNull = NULL
   # }
-  
-  
+
+
   scEx_matrix <- assays(scEx_log)[[1]]
   featureData <- rowData(scEx_log)
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/selectedHeatmap.RData")
-  
+
   retval <- coE_heatmapFunc(featureData, scEx_matrix, projections, genesin,
-                            cells = scCells, sampCol = sampCol, ccols = ccols
+    cells = scCells, sampCol = sampCol, ccols = ccols
   )
-  
+
   exportTestValues(coE_heatmapSelectedReactive = {
     retVal
   })
@@ -178,7 +178,7 @@ coE_topExpGenesTable <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_topExpGenesTable", id = "coE_topExpGenesTable", duration = NULL)
   }
-  
+
   scEx_log <- scEx_log()
   projections <- projections()
   coEtgPerc <- input$coEtgPerc
@@ -188,7 +188,7 @@ coE_topExpGenesTable <- reactive({
   scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
   # coEtgMinExprShow <- input$coEtgMinExprShow
-  
+
   if (is.null(scEx_log) || is.null(scCells)) {
     return(NULL)
   }
@@ -196,7 +196,7 @@ coE_topExpGenesTable <- reactive({
     save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
-  
+
   featureData <- rowData(scEx_log)
   # we only work on cells that have been selected
   mat <- assays(scEx_log)[[1]][, scCells]
@@ -205,7 +205,7 @@ coE_topExpGenesTable <- reactive({
   # only genes that are expressed in coEtgPerc or more cells
   allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
   mat <- mat[allexpressed, ]
-  
+
   cv <- function(x) {
     sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)
   }
@@ -225,7 +225,7 @@ coE_topExpGenesTable <- reactive({
     rownames(outMat) <- make.unique(as.character(outMat$gene), sep = "___")
     retVal <- as.data.frame(outMat)
   }
-  
+
   exportTestValues(coE_topExpGenesTable = {
     retVal
   })
@@ -239,9 +239,9 @@ coE_topExpGenesTable <- reactive({
 #' coEtgPerc = genes shown have to be expressed in at least X % of cells
 #' coEtgMinExpr = genes shown have at least to X UMIs expressed
 coE_topExpCCTable <- reactive({
-  if (! "Hmisc" %in% rownames(installed.packages())) {
-    showNotification("Please install Hmisc", id = "hmiscError", type="error", duration = NULL)
-    return (NULL)
+  if (!"Hmisc" %in% rownames(installed.packages())) {
+    showNotification("Please install Hmisc", id = "hmiscError", type = "error", duration = NULL)
+    return(NULL)
   }
   require("Hmisc")
   if (DEBUG) cat(file = stderr(), "coE_topExpCCTable started.\n")
@@ -266,8 +266,8 @@ coE_topExpCCTable <- reactive({
   scCL <- levels(projections$dbCluster)
   scCells <- sc$selectedCells()
   # coE_topCCGenesShow <- input$coE_topCCGenesShow
-  
-  if (is.null(scEx_log) || is.null(scCells) ) {
+
+  if (is.null(scEx_log) || is.null(scCells)) {
     return(NULL)
   }
   featureData <- rowData(scEx_log)
@@ -275,12 +275,12 @@ coE_topExpCCTable <- reactive({
   if (is.null(genesin)) {
     return(NULL)
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_topExpCCTable.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_topExpCCTable.RData")
-  
+
   # get numeric columns from projections.
   nums <- unlist(lapply(projections, is.numeric))
   numProje <- projections[, nums]
@@ -293,7 +293,7 @@ coE_topExpCCTable <- reactive({
   # only genes that are expressed in coEtgPerc or more cells
   # allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
   # mat <- mat[allexpressed, ]
-  
+
   if (length(mat) == 0) {
     return(NULL)
   }
@@ -303,9 +303,9 @@ coE_topExpCCTable <- reactive({
   corrInput <- as.matrix(rbind(numProje, mat))
   # rownames(res2$r)
   res2 <- rcorr(t(corrInput))
-  
+
   flatMat <- flattenCorrMatrix(res2$r, res2$P)
-  
+
   retVal <- as.data.frame(flatMat[, ])
   # duplicated(retVal$row)
   rownames(retVal) <- make.unique(paste0(retVal$row, "__________", retVal$column), sep = "___")
@@ -335,7 +335,7 @@ finner <- function(xPerm, r, genesin, featureData, scEx_log, perms) {
     map <-
       rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
     # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
-    
+
     permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= 1) == length(comb[cIdx, 1:ncol(comb)])
     perms[permIdx] <- paste0(comb[cIdx, 1:ncol(comb)], collapse = "+")
   }
@@ -359,21 +359,21 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_geneGrp_vioFunc", id = "coE_geneGrp_vioFunc", duration = NULL)
   }
-  
+
   suppressMessages(require(gtools))
   suppressMessages(require(stringr))
-  
+
   genesin <- toupper(genesin)
   genesin <- gsub(" ", "", genesin, fixed = TRUE)
   genesin <- strsplit(genesin, ",")[[1]]
-  
+
   map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
-  
+
   if (length(map) == 0) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
@@ -385,12 +385,12 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
     }
     return(NULL)
   }
-  
+
   expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minExpr)
   ylabText <- "number genes from list"
-  
+
   if (coE_showPermutations) {
-    if("gtools" %in% rownames(installed.packages())) {
+    if ("gtools" %in% rownames(installed.packages())) {
       perms <- rep("", length(expression))
       ylabText <- "Permutations"
       xPerm <- length(genesin)
@@ -405,9 +405,9 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
           type = "warning",
           duration = NULL
         )
-      } 
+      }
       x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData, scEx, perms))
-      
+
       for (idx in 1:length(x)) {
         perms <- combinePermutations(perms, x[[idx]])
       }
@@ -419,7 +419,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
       perms <- as.integer(perms)
       projections <- cbind(projections, coExpVal = perms)
     } else {
-      if (!"gtools" %in% rownames(installed.packages())){
+      if (!"gtools" %in% rownames(installed.packages())) {
         showNotification(
           "please install gtools",
           id = "nogtools",
@@ -429,7 +429,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
       }
       return(NULL)
     }
-  }else {
+  } else {
     projections <- cbind(projections, coExpVal = expression)
     permsNames <- as.character(1:max(expression))
   }
@@ -438,15 +438,15 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
     n = 6, name =
       "RdYlBu"
   ))(length(levels(prj)))
-  
+
   if (dbCluster == "sampleNames") {
     mycolPal <- sampCol
   }
   if (dbCluster == "dbCluster") {
     mycolPal <- ccols
   }
-  
-  
+
+
   # p1 <- projections %>% plotly::plot_ly(
   #     x = prj,
   #     y = ~coExpVal,
@@ -473,11 +473,11 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   #
   # p1
   #
-  
-  
+
+
   p1 <-
     ggplot(projections, aes_string(prj, "coExpVal",
-                                   fill = factor(projections[, dbCluster])
+      fill = factor(projections[, dbCluster])
     )) +
     geom_violin(scale = "count") +
     scale_fill_manual(values = mycolPal, aesthetics = "fill") +
@@ -503,8 +503,8 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
       legend.position = "right"
     ) +
     xlab(dbCluster) + ylab(ylabText) +
-    scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames)) 
-  
+    scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames))
+
   # p1 <- ggplotly(p1)
   return(p1)
 }
@@ -513,7 +513,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
 #' iData = expression matrix, rows = genes
 #' cluster genes in SOM
 #' returns genes associated together within a som-node
-coE_somFunction <- function(iData, nSom, geneName, projections,clusterSOM = "dbCluster", clusterVal = "1") {
+coE_somFunction <- function(iData, nSom, geneName, projections, clusterSOM = "dbCluster", clusterVal = "1") {
   if (DEBUG) cat(file = stderr(), "coE_somFunction started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -525,19 +525,19 @@ coE_somFunction <- function(iData, nSom, geneName, projections,clusterSOM = "dbC
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_somFunction", id = "coE_somFunction", duration = NULL)
   }
-  
+
   suppressMessages(require(kohonen))
   suppressMessages(require(Rsomoclu))
   if (sum(geneName %in% rownames(iData)) == 0) {
     return(NULL)
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
-  
-  cols2use <- which (colnames(iData) %in% rownames(projections[projections[, clusterSOM] == clusterVal,]))
+
+  cols2use <- which(colnames(iData) %in% rownames(projections[projections[, clusterSOM] == clusterVal, ]))
   res2 <- Rsomoclu.train(
     input_data = iData[, cols2use],
     nSomX = nSom, nSomY = nSom,
@@ -551,21 +551,21 @@ coE_somFunction <- function(iData, nSom, geneName, projections,clusterSOM = "dbC
     scaleN = 0.01,
     scaleCooling = "linear"
   )
-  
+
   rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
   simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
-                                                res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
+    res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
   return(simGenes)
 }
 
 # SOM observers ----
 .schnappsEnv$coE_SOMGrp <- "sampleNames"
-observe({
+observe(label = "ob13", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_SOMGrp\n"))
   .schnappsEnv$coE_SOMGrp <- input$coE_SOMGrp
 })
 .schnappsEnv$coE_SOMSelection <- "1"
-observe({
+observe(label = "ob14", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_SOMSelection\n"))
   .schnappsEnv$coE_SOMSelection <- input$coE_SOMSelection
 })
@@ -583,14 +583,14 @@ coE_updateInputSOMt <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_updateInputSOMt", id = "coE_updateInputSOMt", duration = NULL)
   }
-  
+
   tsneData <- projections()
-  
+
   # Can use character(0) to remove all choices
   if (is.null(tsneData)) {
     return(NULL)
   }
-  
+
   coln <- colnames(tsneData)
   choices <- c()
   for (cn in coln) {
@@ -609,23 +609,6 @@ coE_updateInputSOMt <- reactive({
   )
 })
 
-observeEvent(input$coE_clusterSOM,{
-  projections <- projections()
-  if (DEBUG) cat(file = stderr(), "observeEvent: input$coE_clusterSOM.\n")
-  # Can use character(0) to remove all choices
-  if (is.null(projections)) {
-    return(NULL)
-  }
-  if(!input$coE_clusterSOM %in% colnames(projections)) return(NULL)
-  choicesVal = levels(projections[, input$coE_clusterSOM])
-  updateSelectInput(
-    session,
-    "coE_clusterValSOM",
-    choices = choicesVal,
-    selected = .schnappsEnv$coE_SOMSelection
-  )
-  
-})
 
 # coE_heatmapSOMReactive ----
 #' coE_heatmapSOMReactive
@@ -644,24 +627,24 @@ coE_heatmapSOMReactive <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_heatmapSOMReactive", id = "coE_heatmapSOMReactive", duration = NULL)
   }
-  
+
   if (!is.null(getDefaultReactiveDomain())) {
     removeNotification(id = "heatmapWarning")
   }
-  
+
   scEx_log <- scEx_log()
   projections <- projections()
   input$updateSOMParameters
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
   coE_updateInputSOMt()
-  
+
   genesin <- isolate(input$coE_geneSOM)
   nSOM <- isolate(input$coE_dimSOM)
   clusterSOM <- isolate(input$coE_clusterSOM)
   clusterVal <- isolate(input$coE_clusterValSOM)
-  
-  if (is.null(scEx_log) | input$updateSOMParameters == 0 ) {
+
+  if (is.null(scEx_log) | input$updateSOMParameters == 0) {
     return(
       list(
         src = "empty.png",
@@ -672,20 +655,22 @@ coE_heatmapSOMReactive <- reactive({
       )
     )
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData")
-  
+
   scEx_matrix <- as.matrix(assays(scEx_log)[[1]])
   featureData <- rowData(scEx_log)
   # go from readable gene name to ENSG number
   genesin <- geneName2Index(genesin, featureData)
-  
-  geneNames <- coE_somFunction(iData = scEx_matrix, nSom = nSOM, geneName = genesin, projections,
-                               clusterSOM = clusterSOM, clusterVal = clusterVal)
-  
+
+  geneNames <- coE_somFunction(
+    iData = scEx_matrix, nSom = nSOM, geneName = genesin, projections,
+    clusterSOM = clusterSOM, clusterVal = clusterVal
+  )
+
   # plot the genes found
   output$coE_somGenes <- renderText({
     paste(featureData[geneNames, "symbol"], collapse = ", ", sep = ",")
@@ -701,7 +686,7 @@ coE_heatmapSOMReactive <- reactive({
     }
     return(NULL)
   }
-  
+
   # create variables for heatmap module
   annotation <- data.frame(projections[, c("dbCluster", "sampleNames")])
   rownames(annotation) <- rownames(projections)
@@ -710,7 +695,7 @@ coE_heatmapSOMReactive <- reactive({
     "sampleNames" = sampCol,
     "Cluster" = ccols
   )
-  
+
   retVal <- list(
     mat = scEx_matrix[geneNames, , drop = FALSE],
     cluster_rows = TRUE,
@@ -732,7 +717,7 @@ coE_heatmapSOMReactive <- reactive({
     annotation_colors = annCols
   )
   # system.time(do.call(TRONCO::pheatmap, retVal))
-  
+
   exportTestValues(coE_heatmapSOMReactive = {
     retVal
   })
@@ -744,7 +729,7 @@ coE_heatmapSOMReactive <- reactive({
 #' Update x/y axis selection possibilities for violin plot
 #' could probably be an observer, but it works like this as well...
 .schnappsEnv$coE_vioGrp <- "sampleNames"
-observe({
+observe(label = "ob16", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
   .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
 })
@@ -761,14 +746,14 @@ coE_updateInputXviolinPlot <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_updateInputXviolinPlot", id = "coE_updateInputXviolinPlot", duration = NULL)
   }
-  
+
   tsneData <- projections()
-  
+
   # Can use character(0) to remove all choices
   if (is.null(tsneData)) {
     return(NULL)
   }
-  
+
   # Can also set the label and select items
   # updateSelectInput(
   #   session,
@@ -782,7 +767,7 @@ coE_updateInputXviolinPlot <- reactive({
   #   choices = colnames(tsneData),
   #   selected = colnames(tsneData)[2]
   # )
-  
+
   coln <- colnames(tsneData)
   choices <- c()
   for (cn in coln) {
@@ -817,13 +802,13 @@ coE_heatmapReactive <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_heatmapReactive", id = "coE_heatmapReactive", duration = NULL)
   }
-  
+
   scEx_log <- scEx_log()
   projections <- projections()
   genesin <- input$coE_heatmap_geneids
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
-  
+
   if (is.null(scEx_log) | is.null(projections)) {
     return(list(
       src = "empty.png",
@@ -833,12 +818,12 @@ coE_heatmapReactive <- reactive({
       alt = "heatmap should be here"
     ))
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/heatmap.RData")
-  
+
   featureData <- rowData(scEx_log)
   scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]])
   retVal <- coE_heatmapFunc(
@@ -846,7 +831,7 @@ coE_heatmapReactive <- reactive({
     projections = projections, genesin = genesin, cells = colnames(scEx_matrix),
     sampCol = sampCol, ccols = ccols
   )
-  
+
   exportTestValues(coE_heatmapReactive = {
     retVal
   })

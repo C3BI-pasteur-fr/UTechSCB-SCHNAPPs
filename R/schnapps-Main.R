@@ -1,6 +1,6 @@
-#' .schnappsEnv 
+#' .schnappsEnv
 #' Environment for package
-.schnappsEnv <- new.env(parent=emptyenv())
+.schnappsEnv <- new.env(parent = emptyenv())
 
 
 
@@ -8,38 +8,34 @@
 #'
 #' @details Shiny app for the analysis of single cell data
 #'
-#' 
+#'
 #' @param localContributionDir path to the directory(ies) that contain additional functionality
 #' @param defaultValueSingleGene single gene name to used as a default value.
 #' @param defaultValueMultiGenes comma separated list of gene names to be used as a default value.
-#' @param defaultValueRegExGene regular Expression used for gene selection 
+#' @param defaultValueRegExGene regular Expression used for gene selection
 #' @param DEBUG TRUE/FALSE whether to show debugging information on the console
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
-#' 
+#'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
 #' @importFrom shinyTree renderTree shinyTree
 #' @importFrom DT DTOutput dataTableProxy
 #' @importFrom dplyr '%>%'
 #' @importFrom shiny shinyApp runApp
-#' 
+#'
 #' @export schnapps
-#' 
+#'
 #' @examples
 #' # create example data
 #' data("scEx", package = "SCHNAPPs")
 #' save(file = "scEx.Rdata", list = "scEx")
 #' # use "scEx.Rdata" with load data functionality within the shiny app
-#'
-
 schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
-                       defaultValueSingleGene = "CD52",
-                       defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
-                       defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
-                       DEBUG = FALSE,
-                       DEBUGSAVE = FALSE
-
-                       ) {
+                     defaultValueSingleGene = "CD52",
+                     defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
+                     defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
+                     DEBUG = FALSE,
+                     DEBUGSAVE = FALSE) {
   # on.exit({
   #   rm(list = c(".SCHNAPPs_locContributionDir",
   #        ".SCHNAPPs_defaultValueSingleGene",
@@ -61,8 +57,8 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   scShinyUI <- NULL
   scShinyServer <- NULL
   packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
-  source(paste0(packagePath,  "/server.R"), local = TRUE)
-  source(paste0(packagePath,  "/ui.R"), local = TRUE)
+  source(paste0(packagePath, "/server.R"), local = TRUE)
+  source(paste0(packagePath, "/ui.R"), local = TRUE)
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
   runApp(app)
 }
@@ -82,4 +78,3 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
 #' @format A data frame with 53940 rows and 10 variables
 #' @source <http://www.diamondse.info/>
 "scEx"
-

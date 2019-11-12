@@ -1,16 +1,16 @@
 suppressMessages(require(magrittr))
-source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
+source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 menuList <- list(
   shinydashboard::menuItem("General QC",
-                           # id="generalQCID",
-                           tabName = "generalQC", icon = icon("thumbs-up"), startExpanded = FALSE,
-                           shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
-                           shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
-                           shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
-                           shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
-                           # ,
-                           # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
-                           # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
+    # id="generalQCID",
+    tabName = "generalQC", icon = icon("thumbs-up"), startExpanded = FALSE,
+    shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
+    shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
+    shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
+    shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
+    # ,
+    # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
+    # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
   )
 )
 
@@ -24,7 +24,7 @@ tabList <- list(
       plotOutput("gQC_plotUmiHist") %>% withSpinner()
     ))
   ),
-  
+
   shinydashboard::tabItem(
     "gQC_sampleHist",
     tags$h3("Histogram of cells per sample"),
@@ -34,7 +34,7 @@ tabList <- list(
       plotOutput("gQC_plotSampleHist") %>% withSpinner()
     ))
   ),
-  
+
   shinydashboard::tabItem(
     "gQC_variancePC",
     tags$h3("Variance of PCs"),
@@ -46,10 +46,11 @@ tabList <- list(
   ),
   tsnePlotTab = shinydashboard::tabItem(
     tabName = "gQC_tsnePlot",
+    shinyjs::useShinyjs(),
     fluidRow(div(h3("TSNE Plot"), align = "center")),
     br(),
     box(
-      title = "tSNE  parameters", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "tSNE  parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
           width = 6,
@@ -61,7 +62,7 @@ tabList <- list(
         )
       ),
       box(
-        title = "tSNE additional parameters", solidHeader = TRUE, width = 12, status = 'primary', 
+        title = "tSNE additional parameters", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
         column(
           width = 6,
@@ -73,57 +74,60 @@ tabList <- list(
         )
       ),
       fluidRow(
-        column(width = 12, offset = 1,
-               uiOutput("updatetsneParametersButton")
-               # actionButton("updatetsneParameters", "apply changes", width = '80%', 
-               #              style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        column(
+          width = 12, offset = 1,
+          # uiOutput("updatetsneParametersButton")
+          actionButton("updatetsneParameters", "apply changes", width = "80%")
+          # ,
+          #              style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
         )
       )
     ),
     box(
-      title = "3D plot", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "3D plot", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = FALSE,
       fluidRow(
         column(
-          width = 3, 
+          width = 3,
           selectInput("gQC_dim3D_x",
-                      label = "X",
-                      choices = c("tsne1", "tsne2", "tsne3"),
-                      selected = "tsne1"
-          )),
+            label = "X",
+            choices = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne1"
+          )
+        ),
         column(
           width = 3,
           selectInput("gQC_dim3D_y",
-                      label = "Y",
-                      choices = c("tsne1", "tsne2", "tsne3"),
-                      selected = "tsne2"
+            label = "Y",
+            choices = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne2"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_dim3D_z",
-                      label = "Z",
-                      choices = c("tsne1", "tsne2", "tsne3"),
-                      selected = "tsne3"
+            label = "Z",
+            choices = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne3"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_col3D",
-                      label = "colored by",
-                      choices = c("sampleNames"),
-                      selected = "sampleNames"
+            label = "colored by",
+            choices = c("sampleNames"),
+            selected = "sampleNames"
           )
         )
       ),
       fluidRow(column(
         width = 12,
         jqui_resizable(plotly::plotlyOutput("gQC_tsne_main"))
-      )) 
+      ))
     ),
     br(),
     box(
-      title = "Table with all projections", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "Table with all projections", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = FALSE, collapsed = FALSE,
       fluidRow(column(
         width = 12,
@@ -132,94 +136,105 @@ tabList <- list(
     )
   ),
   umapTab <- shinydashboard::tabItem(
-    
     tabName = "gQC_umapPlot",
     box(
-      title = "UMAP parameters", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "UMAP parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
-        column(width = 12, offset = 1,
-               actionButton("activateUMAP", "run UMAP", width = '80%', 
-                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        column(
+          width = 12, offset = 1,
+          actionButton("activateUMAP", "run UMAP",
+            width = "80%",
+            style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
+          )
         )
       ),
       br(),
       fluidRow(
-        column(width = 3,
-               selectInput("gQC_um_n_neighbors",
-                           label = "N Neighbors",
-                           choices = c(2:100), selected = "15"
-               )
+        column(
+          width = 3,
+          selectInput("gQC_um_n_neighbors",
+            label = "N Neighbors",
+            choices = c(2:100), selected = "15"
+          )
         ),
-        column(width = 3,
-               selectInput("gQC_um_n_components",
-                           label = "N components",
-                           choices = c(2:20), selected = "2"
-               )
+        column(
+          width = 3,
+          selectInput("gQC_um_n_components",
+            label = "N components",
+            choices = c(2:20), selected = "2"
+          )
         ),
-        column(width = 3,
-               selectInput("gQC_um_spread",
-                           label = "spread",
-                           choices = c(1:10), selected = "1"
-               )
+        column(
+          width = 3,
+          selectInput("gQC_um_spread",
+            label = "spread",
+            choices = c(1:10), selected = "1"
+          )
         ),
-        column(width = 3,
-               selectInput("gQC_um_local_connectivity",
-                           label = "local connectivity",
-                           choices = 1:20, selected = "1"
-               )
+        column(
+          width = 3,
+          selectInput("gQC_um_local_connectivity",
+            label = "local connectivity",
+            choices = 1:20, selected = "1"
+          )
         )
       ),
       box(
-        title = "Addition UMAP options", solidHeader = TRUE, width = 12,  status = 'primary', 
+        title = "Addition UMAP options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
-          column(width = 3,
-                 selectInput("gQC_um_randSeed",
-                             label = "random seed",
-                             choices = c(1:100), selected = "1"
-                 ),
-                 selectInput("gQC_um_init",
-                             label = "init",
-                             choices = c("spectral", "random"), selected = "spectral"
-                 )
+          column(
+            width = 3,
+            selectInput("gQC_um_randSeed",
+              label = "random seed",
+              choices = c(1:100), selected = "1"
+            ),
+            selectInput("gQC_um_init",
+              label = "init",
+              choices = c("spectral", "random"), selected = "spectral"
+            )
           ),
-          column(width = 3,
-                 selectInput(
-                   "gQC_um_negative_sample_rate",
-                   label = "negative sample rate",
-                   choices = c(1:50), selected = "5"
-                 ),
-                 selectInput("gQC_um_min_dist",
-                             label = "min dist",
-                             choices = seq(0.05, 0.5, 0.01), selected = "0.01"
-                 )
+          column(
+            width = 3,
+            selectInput(
+              "gQC_um_negative_sample_rate",
+              label = "negative sample rate",
+              choices = c(1:50), selected = "5"
+            ),
+            selectInput("gQC_um_min_dist",
+              label = "min dist",
+              choices = seq(0.05, 0.5, 0.01), selected = "0.01"
+            )
           ),
-          column(width = 3,
-                 selectInput("gQC_um_metric",
-                             label = "metric",
-                             choices = c("euclidean", "manhattan", "cosine", "hamming"),
-                             selected = "euclidean"
-                 ),
-                 selectInput("gQC_um_set_op_mix_ratio",
-                             label = "set op mix ratio",
-                             choices = seq(0, 1, 0.1), selected = "1"
-                 )
+          column(
+            width = 3,
+            selectInput("gQC_um_metric",
+              label = "metric",
+              choices = c("euclidean", "manhattan", "cosine", "hamming"),
+              selected = "euclidean"
+            ),
+            selectInput("gQC_um_set_op_mix_ratio",
+              label = "set op mix ratio",
+              choices = seq(0, 1, 0.1), selected = "1"
+            )
           ),
-          column(width = 3,
-                 selectInput("gQC_um_n_epochs",
-                             label = "epochs",
-                             choices = c(1:1000), selected = "200"
-                 ),
-                 selectInput(
-                   "gQC_um_bandwidth",
-                   label = "bandwidth",
-                   choices = c(1:20), selected = "1"
-                 )
+          column(
+            width = 3,
+            selectInput("gQC_um_n_epochs",
+              label = "epochs",
+              choices = c(1:1000), selected = "200"
+            ),
+            selectInput(
+              "gQC_um_bandwidth",
+              label = "bandwidth",
+              choices = c(1:20), selected = "1"
+            )
           ),
         )
       ), # additional options box
     ),
-    box(width = 12,
+    box(
+      width = 12,
       fluidRow(column(
         width = 12,
         clusterUI("gQC_umap_main")

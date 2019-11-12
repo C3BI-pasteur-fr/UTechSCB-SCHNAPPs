@@ -57,13 +57,14 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "coE_geneGrp_vio_plot")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "coE_geneGrp_vio_plot")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_geneGrp_vio_plot", id = "coE_geneGrp_vio_plot", duration = NULL)
   }
-  
+
   projections <- projections()
   scEx_log <- scEx_log()
   geneListStr <- input$coE_geneGrpVioIds
@@ -102,3 +103,26 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   })
   return(retVal)
 })
+
+observeEvent(
+  label = "ob15",
+  eventExpr = input$coE_clusterSOM,
+  handlerExpr = {
+    projections <- projections()
+    if (DEBUG) cat(file = stderr(), "observeEvent: input$coE_clusterSOM.\n")
+    # Can use character(0) to remove all choices
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (!input$coE_clusterSOM %in% colnames(projections)) {
+      return(NULL)
+    }
+    choicesVal <- levels(projections[, input$coE_clusterSOM])
+    updateSelectInput(
+      session,
+      "coE_clusterValSOM",
+      choices = choicesVal,
+      selected = .schnappsEnv$coE_SOMSelection
+    )
+  }
+)
