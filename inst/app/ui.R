@@ -7,7 +7,7 @@
 
 
 suppressMessages(require(shiny))
-source(paste0(packagePath,  "/toolTips.R"), local = TRUE)
+source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 suppressMessages(require(shinydashboard))
 suppressMessages(require(plotly))
 suppressMessages(require(shinythemes))
@@ -17,6 +17,7 @@ suppressMessages(require(edgeR))
 suppressMessages(require(pheatmap))
 suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
+suppressMessages(require(shinyjs))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -40,7 +41,7 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # }
 # input, cell/gene selection tabs
 # source('tabs.R',  local = TRUE)
-source(paste0(packagePath,  "/modulesUI.R"), local = FALSE)
+source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
 source(paste0(packagePath, "/tabs.R"), local = TRUE)
 # general tabs
 allTabs <- list(
@@ -72,8 +73,8 @@ allMenus <- list(
     tabName = "geneSelection", icon = icon("atom")
   ),
   shinydashboard::menuItem("rename projections",
-                           # id="geneSelectionID",
-                           tabName = "renameProj", icon = icon("signature")
+    # id="geneSelectionID",
+    tabName = "renameProj", icon = icon("signature")
   )
 )
 
@@ -146,7 +147,7 @@ scShinyUI <- shinyUI(
         allMenus
       ),
       htmlOutput("summaryStatsSideBar"),
-      
+
       downloadButton("report", "Generate report", class = "butt"),
       tags$head(tags$style(".butt{color: black !important;}")), #  font color
 
@@ -155,12 +156,15 @@ scShinyUI <- shinyUI(
       downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),
-      if (exists("historyFile", envir = .schnappsEnv)){
+      if (exists("historyFile", envir = .schnappsEnv)) {
         checkboxInput("save2History", "save to history file", FALSE)
       },
       verbatimTextOutput("save2Historystring")
     ), # dashboard side bar
     shinydashboard::dashboardBody(
+      shinyjs::useShinyjs(debug = TRUE),
+      inlineCSS(list(.red = "background: red")),
+      inlineCSS(list(.green = "background: green")),
       tags$div(
         allTabs,
         class = "tab-content"

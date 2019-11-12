@@ -1,12 +1,12 @@
 suppressMessages(library(magrittr))
-source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
+source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 
 menuList <- list(
-  shinydashboard::menuItem("Subcluster analysis", 
-                           icon = icon("bar-chart-o"),
-                           # id = 'subclusterID',
-                           tabName = "subcluster", startExpanded = FALSE,
-                           shinydashboard::menuSubItem("DGE analysis", tabName = "sCA_dge")
+  shinydashboard::menuItem("Subcluster analysis",
+    icon = icon("bar-chart-o"),
+    # id = 'subclusterID',
+    tabName = "subcluster", startExpanded = FALSE,
+    shinydashboard::menuSubItem("DGE analysis", tabName = "sCA_dge")
   )
 )
 # sCA_dge ----
@@ -14,7 +14,7 @@ tabList <- list(
   dgeTab = shinydashboard::tabItem(
     "sCA_dge",
     box(
-      title = "Differential expression", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "Differential expression", solidHeader = TRUE, width = 12, status = "primary",
       footer = {
         tags$ul(
           tags$li(
@@ -35,44 +35,47 @@ tabList <- list(
             strong("selection hint:"),
             paste('also check out "Gene.count" to verify that number genes per cell.')
           )
-        )}
-      ,
-      
+        )
+      },
       fluidRow(
-        column(width = 4,
-               uiOutput("sCA_dgeClustersSelection")
+        column(
+          width = 4,
+          uiOutput("sCA_dgeClustersSelection")
         ),
-        column(width = 4,
-               selectInput(
-                 "sCA_subscluster_x1",
-                 label = "X",
-                 choice = c("tsne1", "tsne2", "tsne3"),
-                 selected = "tsne1"
-               )
+        column(
+          width = 4,
+          selectInput(
+            "sCA_subscluster_x1",
+            label = "X",
+            choice = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne1"
+          )
         ),
-        column(width = 4,
-               selectInput(
-                 "sCA_subscluster_y1",
-                 label = "Y",
-                 choice = c("tsne1", "tsne2", "tsne3"),
-                 selected = "tsne2"
-               )
+        column(
+          width = 4,
+          selectInput(
+            "sCA_subscluster_y1",
+            label = "Y",
+            choice = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne2"
+          )
         )
       ),
       br(),
       fluidRow(
-        column(width = 6,
-               # plotly::plotlyOutput("sCA_dge_plot1")
-               plotOutput("sCA_dge_plot1", brush = brushOpts(
-                 id = "db1"
-               )) %>% withSpinner()
-        )
-        ,
-        column(width = 6,
-               # plotly::plotlyOutput("sCA_dge_plot2")
-               plotOutput("sCA_dge_plot2", brush = brushOpts(
-                 id = "db2"
-               )) %>% withSpinner()
+        column(
+          width = 6,
+          # plotly::plotlyOutput("sCA_dge_plot1")
+          plotOutput("sCA_dge_plot1", brush = brushOpts(
+            id = "db1"
+          )) %>% withSpinner()
+        ),
+        column(
+          width = 6,
+          # plotly::plotlyOutput("sCA_dge_plot2")
+          plotOutput("sCA_dge_plot2", brush = brushOpts(
+            id = "db2"
+          )) %>% withSpinner()
         )
       )
     ),
@@ -81,51 +84,61 @@ tabList <- list(
     #   list(
     #     tags$h3("Method to use for differential gene expression analysis"),
     box(
-      title = "DGE method", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "DGE method", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = FALSE,
       fluidRow(
-        column(width = 10, offset = 1,
-               radioButtons(
-                 inputId = "sCA_dgeRadioButton",
-                 label = "Method to use",
-                 choices = "dgeChoices",
-                 selected = "DE_logNormalization",
-                 width = "100%"
-               )
+        column(
+          width = 10, offset = 1,
+          radioButtons(
+            inputId = "sCA_dgeRadioButton",
+            label = "Method to use",
+            choices = "dgeChoices",
+            selected = "DE_logNormalization",
+            width = "100%"
+          )
         )
       )
     ),
-    
+
     box(
-      title = "Volcano plot", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "Volcano plot", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = FALSE, collapsed = FALSE,
       fluidRow(
-        column(width = 6,
-               numericInput(inputId = "sCA_volc_effectLimit",label = "x-axis threshold", value = 1, min = 0.0, max = 10000,
-                            step = 0.1)
+        column(
+          width = 6,
+          numericInput(
+            inputId = "sCA_volc_effectLimit", label = "x-axis threshold", value = 1, min = 0.0, max = 10000,
+            step = 0.1
+          )
         ),
-        column(width = 6,
-               numericInput(inputId = "sCA_volc_pval",label = "y-axis threshold", value = 5, min = 0.0, max = 110000,
-                            step = 0.1)
+        column(
+          width = 6,
+          numericInput(
+            inputId = "sCA_volc_pval", label = "y-axis threshold", value = 5, min = 0.0, max = 110000,
+            step = 0.1
+          )
         )
       ),
       fluidRow(
-        column(width = 12,
-               verbatimTextOutput("sCA_volc_selected")
+        column(
+          width = 12,
+          verbatimTextOutput("sCA_volc_selected")
         )
       ),
       fluidRow(
-        column(width = 12,
-               jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
+        column(
+          width = 12,
+          jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
         )
       )
     ),
     box(
-      title = "Differentially Expressed Genes", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "Differentially Expressed Genes", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = FALSE, collapsed = TRUE,
       fluidRow(
-        column(12,
-               tableSelectionUi("sCA_dgeTable")
+        column(
+          12,
+          tableSelectionUi("sCA_dgeTable")
         )
       )
     )

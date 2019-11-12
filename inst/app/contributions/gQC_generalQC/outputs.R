@@ -10,19 +10,19 @@ myZippedReportFiles <- c("gqcProjections.csv")
 .schnappsEnv$gQC_X2 <- "tsne2"
 .schnappsEnv$gQC_X3 <- "tsne3"
 .schnappsEnv$gQC_col <- "sampleNames"
-observe({
+observe(label = "ob2", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_dim3D_x\n")
   .schnappsEnv$gQC_X1 <- input$gQC_dim3D_x
 })
-observe({
+observe(label = "ob3", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_dim3D_y\n")
   .schnappsEnv$gQC_X2 <- input$gQC_dim3D_y
 })
-observe({
+observe(label = "ob4", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_dim3D_z\n")
   .schnappsEnv$gQC_X3 <- input$gQC_dim3D_z
 })
-observe({
+observe(label = "ob5", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_col3D\n")
   .schnappsEnv$gQC_col <- input$gQC_col3D
 })
@@ -70,19 +70,26 @@ gQC_update3DInput <- reactive({
     selected = .schnappsEnv$gQC_col
   )
 })
+
 # observe: cellNameTable_rows_selected ----
-observe({
+observe(label = "ob_tsneParams", {
   if (DEBUG) cat(file = stderr(), "observe tsneVars\n")
   out <- tsne()
   if (is.null(out)) {
-    .schnappsEnv$calculated_gQC_tsneDim = "NA"
+    .schnappsEnv$calculated_gQC_tsneDim <- "NA"
   }
+  input$updatetsneParameters
   assign("gQC_tsneDim", input$gQC_tsneDim, envir = .schnappsEnv)
   assign("gQC_tsnePerplexity", input$gQC_tsnePerplexity, envir = .schnappsEnv)
   assign("gQC_tsneTheta", input$gQC_tsneTheta, envir = .schnappsEnv)
   assign("gQC_tsneSeed", input$gQC_tsneSeed, envir = .schnappsEnv)
-  output$updatetsneParametersButton <- updateButtonUI(name = "updatetsneParameters",
-                                                      variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  ) )
+
+  updateButtonColor(buttonName = "updatetsneParameters", parameters = c(
+    "gQC_tsneDim", "gQC_tsnePerplexity",
+    "gQC_tsneTheta", "gQC_tsneSeed"
+  ))
+  # output$updatetsneParametersButton <- updateButtonUI(input = input, name = "updatetsneParameters",
+  #                                                     variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  ) )
 })
 
 # gQC_tsne_main ----

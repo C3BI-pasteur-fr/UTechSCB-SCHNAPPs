@@ -13,21 +13,22 @@ gQC_scaterReadsFunc <- function(scEx) {
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "gQC_scaterReadsFunc")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "gQC_scaterReadsFunc")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_scaterReadsFunc", id = "gQC_scaterReadsFunc", duration = NULL)
   }
-  
+
   if (is(assays(scEx)[[1]], "dgTMatrix")) {
-    assays(scEx)[["counts"]] = as(assays(scEx)[["counts"]], "dgCMatrix")
+    assays(scEx)[["counts"]] <- as(assays(scEx)[["counts"]], "dgCMatrix")
   }
-  
+
   # ercc <- rownames(scEx)[grepl("ERCC-", rownames(scEx), ignore.case = TRUE)]
-  # 
+  #
   # mt <- rownames(scEx)[grepl("^MT", rownames(scEx), ignore.case = TRUE)]
-  
+
   scEx <- scater::calculateQCMetrics(
     scEx
   )
@@ -42,7 +43,7 @@ gQC_scaterReadsFunc <- function(scEx) {
     # remove cells with unusual number of reads in MT genes
     # filter_by_MT
   )
-  
+
   return(scEx)
 }
 
@@ -54,21 +55,24 @@ scaterReads <- reactive({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "scaterReads")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "scaterReads")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("scaterReads", id = "scaterReads", duration = NULL)
   }
-  
+
   scEx <- scEx()
   # scEx_log = scEx_log()
   if (is.null(scEx)) {
     return(NULL)
   }
   retVal <- gQC_scaterReadsFunc(scEx)
-  
-  exportTestValues(scaterReads = {str(retVal)})  
+
+  exportTestValues(scaterReads = {
+    str(retVal)
+  })
   return(retVal)
 })
 
@@ -81,18 +85,19 @@ gQC_sampleHistFunc <- function(samples, scols) {
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "gQC_sampleHistFunc")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "gQC_sampleHistFunc")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_sampleHistFunc", id = "gQC_sampleHistFunc", duration = NULL)
   }
-  
+
   counts <- table(samples)
   barplot(counts,
-          main = "histogram of number of cell per sample",
-          xlab = "Samples",
-          col=scols
+    main = "histogram of number of cell per sample",
+    xlab = "Samples",
+    col = scols
   )
 }
 
@@ -106,26 +111,29 @@ projectionTable <- reactive({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "projectionTable")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "projectionTable")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("projectionTable", id = "projectionTable", duration = NULL)
   }
-  
+
   projections <- projections()
-  
+
   if (is.null(projections)) {
     return(NULL)
   }
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/projectionTable.RData")
-  
+
   printTimeEnd(start.time, "projectionTable")
-  exportTestValues(projectionTable = {projections})  
+  exportTestValues(projectionTable = {
+    projections
+  })
   return(projections)
 })
 
@@ -136,13 +144,13 @@ projectionTable <- reactive({
 # should be a module :
 # https://shiny.rstudio.com/articles/modules.html
 # https://stackoverflow.com/questions/43976128/create-a-reactive-function-outside-the-shiny-app
-# 
+#
 # I guess that modules are self-contained and one cannot retrieve information from the parent session
 # this means that I cannot create rectivity from within the module to inputs that are outside.
 
 # output$updatetsneParametersButton <- updateButtonUI(name = "updatetsneParameters",
 #                                                     variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  ) )
-# updateButton(name = "updatetsneParameters", 
+# updateButton(name = "updatetsneParameters",
 #                                                   )
 
 tsne <- reactive({
@@ -150,13 +158,14 @@ tsne <- reactive({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "tsne")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "tsne")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("tsne", id = "tsne", duration = NULL)
   }
-  
+
   pca <- pca()
   # only recalculate when button is pressed.
   input$updatetsneParameters
@@ -169,24 +178,28 @@ tsne <- reactive({
     if (DEBUG) cat(file = stderr(), "tsne: NULL\n")
     return(NULL)
   }
-  
+
   retVal <- tsneFunc(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_tsneSeed)
   if (is.null(tsne)) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(paste("Problem with tsne:", e),
-                       id = "gQC_tsneWarning",
-                       type = "error",
-                       duration = NULL
+        id = "gQC_tsneWarning",
+        type = "error",
+        duration = NULL
       )
     }
     return(NULL)
   }
-  .schnappsEnv$calculated_gQC_tsneDim = gQC_tsneDim
+
+  .schnappsEnv$calculated_gQC_tsneDim <- gQC_tsneDim
   .schnappsEnv$calculated_gQC_tsnePerplexity <- gQC_tsnePerplexity
   .schnappsEnv$calculated_gQC_tsneTheta <- gQC_tsneTheta
   .schnappsEnv$calculated_gQC_tsneSeed <- gQC_tsneSeed
-  
-  exportTestValues(tsne = {retVal})  
+  addClass("updatetsneParameters", "green")
+
+  exportTestValues(tsne = {
+    retVal
+  })
   return(retVal)
 })
 
@@ -195,13 +208,14 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "tsneFunc")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "tsneFunc")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("tsneFunc", id = "tsneFunc", duration = NULL)
   }
-  
+
   set.seed(seed = gQC_tsneSeed)
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls(), ls(envir = globalenv())))
@@ -209,16 +223,20 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   # load(file='~/SCHNAPPsDebug/tsne.RData')
   suppressMessages(require(parallel))
   suppressMessages(require(Rtsne))
-  np = dim(pca$x)[2]
-  tsne <- tryCatch({
-    Rtsne::Rtsne(
-      pca$x[,1:np], pca = FALSE, dims = gQC_tsneDim,
-      perplexity = gQC_tsnePerplexity,
-      theta = gQC_tsneTheta,
-      check_duplicates = FALSE, num_threads = detectCores()
-    )
-  },
-  error = function(e) {return(NULL)}
+  np <- dim(pca$x)[2]
+  tsne <- tryCatch(
+    {
+      Rtsne::Rtsne(
+        pca$x[, 1:np],
+        pca = FALSE, dims = gQC_tsneDim,
+        perplexity = gQC_tsnePerplexity,
+        theta = gQC_tsneTheta,
+        check_duplicates = FALSE, num_threads = detectCores()
+      )
+    },
+    error = function(e) {
+      return(NULL)
+    }
   )
   if (is.null(tsne)) {
     return(NULL)
@@ -237,13 +255,14 @@ umapReact <- reactive({
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "umapReact")
-    if (!is.null(getDefaultReactiveDomain()))
+    if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "umapReact")
+    }
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("umapReact", id = "umapReact", duration = NULL)
   }
-  
+
   # xaxis <- input$um_xaxis
   # yaxis <- input$um_yaxis
   # cellT <- input$um_ct
@@ -256,7 +275,7 @@ umapReact <- reactive({
   runUMAP <- input$activateUMAP
   scEx_log <- scEx_log()
   pca <- pca()
-  
+
   myseed <- isolate(input$gQC_um_randSeed)
   n_neighbors <- isolate(as.numeric(input$gQC_um_n_neighbors))
   n_components <- isolate(as.numeric(input$gQC_um_n_components))
@@ -271,7 +290,7 @@ umapReact <- reactive({
   negative_sample_rate <- isolate(as.numeric(input$gQC_um_negative_sample_rate))
   metric <- isolate(input$gQC_um_metric)
   spread <- isolate(as.numeric(input$gQC_um_spread))
-  
+
   if (is.null(scEx_log)) {
     if (DEBUG) cat(file = stderr(), "output$umap_react:NULL\n")
     return(NULL)
@@ -285,34 +304,36 @@ umapReact <- reactive({
     return(NULL)
   }
   umapData <- as.matrix(assays(scEx_log)[[1]])
-  compCases = complete.cases(umapData)
-  
+  compCases <- complete.cases(umapData)
+
   # TODO it might be possible to reuse nearest neighbor information to speeed up recomputations
   # with eg. new seed
-  
+
   set.seed(myseed)
   # embedding <- uwot::umap(t(as.matrix(assays(scEx_log)[[1]])),
   embedding <- uwot::umap(pca$x,
-                          n_neighbors = n_neighbors,
-                          n_components = n_components,
-                          n_epochs = n_epochs,
-                          # alpha = alpha,
-                          init = init,
-                          spread = spread,
-                          min_dist = min_dist,
-                          set_op_mix_ratio = set_op_mix_ratio,
-                          local_connectivity = local_connectivity,
-                          bandwidth = bandwidth,
-                          # gamma = gamma,
-                          negative_sample_rate = negative_sample_rate,
-                          metric = metric,
-                          n_threads = detectCores()
+    n_neighbors = n_neighbors,
+    n_components = n_components,
+    n_epochs = n_epochs,
+    # alpha = alpha,
+    init = init,
+    spread = spread,
+    min_dist = min_dist,
+    set_op_mix_ratio = set_op_mix_ratio,
+    local_connectivity = local_connectivity,
+    bandwidth = bandwidth,
+    # gamma = gamma,
+    negative_sample_rate = negative_sample_rate,
+    metric = metric,
+    n_threads = detectCores()
   )
-  embedding = as.data.frame(embedding)
-  colnames(embedding) = paste0("UMAP", 1:n_components)
-  rownames(embedding) = colnames(scEx_log)
-  
-  exportTestValues(umapReact = {embedding})  
+  embedding <- as.data.frame(embedding)
+  colnames(embedding) <- paste0("UMAP", 1:n_components)
+  rownames(embedding) <- colnames(scEx_log)
+
+  exportTestValues(umapReact = {
+    embedding
+  })
   return(embedding)
 })
 
@@ -346,7 +367,7 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("tsnePlot", id = "tsnePlot", duration = NULL)
   }
-  
+
   projections <- as.data.frame(projections)
   if (!all(c(dimX, dimY, dimZ) %in% colnames(projections))) {
     if (!is.null(getDefaultReactiveDomain())) {
@@ -354,9 +375,9 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
     }
     return(NULL)
   }
-  
+
   projections$dbCluster <- as.factor(projections$dbCluster)
-  
+
   if (dimCol == "sampleNames") {
     myColors <- scols
   } else {
@@ -365,7 +386,7 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
   if (dimCol == "dbCluster") {
     myColors <- ccols
   }
-  
+
   p <-
     plotly::plot_ly(
       projections,
@@ -388,4 +409,3 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
     )
   return(p)
 }
-

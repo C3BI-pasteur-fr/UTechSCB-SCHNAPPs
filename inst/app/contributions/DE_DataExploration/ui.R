@@ -3,22 +3,22 @@ suppressMessages(library(magrittr))
 # list of menu Items
 menuList <- list(
   shinydashboard::menuItem("Data Exploration",
-                           # id="dataExplorationID",
-                           tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
-                           shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
-                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
-                           # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
+    # id="dataExplorationID",
+    tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
+    shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
+    shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
+    # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
   )
 )
 
-source(paste0(packagePath,  "/modulesUI.R"), local = TRUE)
+source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 # list of tab Items
 tabList <- list(
   # DE_expression ----
   expressionTab = shinydashboard::tabItem(
     "DE_expression",
     box(
-      title = "Expression overview", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "Expression overview", solidHeader = TRUE, width = 12, status = "primary",
       footer = div(
         htmltools::p(strong("\tInformation:")),
         htmltools::tags$ul(
@@ -41,23 +41,26 @@ tabList <- list(
         )
       ),
       fluidRow(
-        column(width = 6,
-               fluidRow(
-                 column(width = 12,
-                        textInput("DE_gene_id", "Enter gene", value = defaultValueSingleGene),
-                        jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
-                 )
-               ),
-               
-        ), 
-        column(width = 6,
-               clusterUI("DE_expclusters")
+        column(
+          width = 6,
+          fluidRow(
+            column(
+              width = 12,
+              textInput("DE_gene_id", "Enter gene", value = defaultValueSingleGene),
+              jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
+            )
+          ),
+        ),
+        column(
+          width = 6,
+          clusterUI("DE_expclusters")
         )
       ),
       br(),
       fluidRow(
-        column(width = 12,
-               jqui_resizable( plotOutput("DE_gene_vio_plot") %>% withSpinner())
+        column(
+          width = 12,
+          jqui_resizable(plotOutput("DE_gene_vio_plot") %>% withSpinner())
         )
       )
     )
@@ -66,55 +69,59 @@ tabList <- list(
   DE_panelPlotTab = shinydashboard::tabItem(
     "DE_panelPlot",
     box(
-      title = "Panel Plot", solidHeader = TRUE, width = 12, status = 'primary', 
+      title = "Panel Plot", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
-        column(width = 12,
-               
-               footer = tags$ul(
-                 tags$li(
-                   strong("Panel plot"),
-                   ":Select a cluster. Enter",
-                   strong("ONE"),
-                   "or",
-                   strong("MULTIPLE"),
-                   "gene ids to visualize expression in all clusters"
-                 ),
-                 tags$li("If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to the count for that gene. Otherwise, all genes are used. Only in this case the check box 'same scale' is used.")
-               )
+        column(
+          width = 12,
+
+          footer = tags$ul(
+            tags$li(
+              strong("Panel plot"),
+              ":Select a cluster. Enter",
+              strong("ONE"),
+              "or",
+              strong("MULTIPLE"),
+              "gene ids to visualize expression in all clusters"
+            ),
+            tags$li("If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to the count for that gene. Otherwise, all genes are used. Only in this case the check box 'same scale' is used.")
+          )
         )
       ),
       fluidRow(
-        column(width = 3,
-               uiOutput("DE_clusterSelectionPanelPlot")
+        column(
+          width = 3,
+          uiOutput("DE_clusterSelectionPanelPlot")
         ),
-        column(width = 3,
-               selectInput("DE_dim_x",
-                           label = "X",
-                           choices = c("tsne1", "tsne2", "tsne3"),
-                           selected = "tsne1"
-               )
+        column(
+          width = 3,
+          selectInput("DE_dim_x",
+            label = "X",
+            choices = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne1"
+          )
         ),
-        column(width = 3,
-               selectInput("DE_dim_y",
-                           label = "Y",
-                           choices = c("tsne1", "tsne2", "tsne3"),
-                           selected = "tsne2"
-               )
-        ),column(
+        column(
+          width = 3,
+          selectInput("DE_dim_y",
+            label = "Y",
+            choices = c("tsne1", "tsne2", "tsne3"),
+            selected = "tsne2"
+          )
+        ), column(
           2,
           checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
         )
       ),
       fluidRow(
-        column(width = 12,
-               textInput("DE_panelplotids", "Comma seperated gene names", value = defaultValueMultiGenes)
+        column(
+          width = 12,
+          textInput("DE_panelplotids", "Comma seperated gene names", value = defaultValueMultiGenes)
         ),
       ),
       fluidRow(column(
         12,
-        jqui_resizable(plotOutput("DE_panelPlot") )
-      )
-      )
+        jqui_resizable(plotOutput("DE_panelPlot"))
+      ))
     )
   ),
   # DE_scaterQC ----

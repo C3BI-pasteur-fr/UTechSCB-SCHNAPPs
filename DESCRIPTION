@@ -16,6 +16,7 @@ Depends:
 Imports:
     dplyr,
     shiny,
+    shinyjs,
     colourpicker,
     DT, 
     knitr,

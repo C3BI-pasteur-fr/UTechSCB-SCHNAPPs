@@ -69,7 +69,7 @@ output$normalizationsParametersDynamic <- renderUI({
     return(NULL)
   }
   selectedChoice <- input$normalizationRadioButton
-  
+
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
@@ -78,11 +78,11 @@ output$normalizationsParametersDynamic <- renderUI({
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
   do.call("switch",
-          args = c(
-            selectedChoice,
-            normaliztionParameters,
-            h3("no parameters provided")
-          )
+    args = c(
+      selectedChoice,
+      normaliztionParameters,
+      h3("no parameters provided")
+    )
   )
 })
 
@@ -108,29 +108,37 @@ geneSelectionValues <- reactiveVal(
   )
 )
 
-observeEvent(input$updateCellSelectionParameters, {
-  cellSelectionValues(list(
-    minExpGenes = input$minExpGenes,
-    minGenes = input$minGenes,
-    maxGenes = input$maxGenes,
-    cellPatternRM = input$cellPatternRM,
-    cellKeep = input$cellKeep,
-    cellKeepOnly = input$cellKeepOnly,
-    cellsFiltersOut = input$cellsFiltersOut,
-    minNonExpGenes = input$minNonExpGenes
-  ))
-  if (DEBUG) cat(file = stderr(), "\nCellSelectionValues\n")
-})
+observeEvent(
+  label = "ob20",
+  eventExpr = input$updateCellSelectionParameters,
+  handlerExpr = {
+    cellSelectionValues(list(
+      minExpGenes = input$minExpGenes,
+      minGenes = input$minGenes,
+      maxGenes = input$maxGenes,
+      cellPatternRM = input$cellPatternRM,
+      cellKeep = input$cellKeep,
+      cellKeepOnly = input$cellKeepOnly,
+      cellsFiltersOut = input$cellsFiltersOut,
+      minNonExpGenes = input$minNonExpGenes
+    ))
+    if (DEBUG) cat(file = stderr(), "\nCellSelectionValues\n")
+  }
+)
 
-observeEvent(input$updateGeneSelectionParameters, {
-  geneSelectionValues(list(
-    selectIds = input$selectIds,
-    geneListSelection = input$geneListSelection,
-    minGenesGS = input$minGenesGS,
-    genesKeep = input$genesKeep
-  ))
-  if (DEBUG) cat(file = stderr(), "\ngeneSelectionValues\n")
-})
+observeEvent(
+  label = "ob21",
+  eventExpr = input$updateGeneSelectionParameters,
+  handlerExpr = {
+    geneSelectionValues(list(
+      selectIds = input$selectIds,
+      geneListSelection = input$geneListSelection,
+      minGenesGS = input$minGenesGS,
+      genesKeep = input$genesKeep
+    ))
+    if (DEBUG) cat(file = stderr(), "\ngeneSelectionValues\n")
+  }
+)
 
 
 # summaryStatsSideBar -----------------------------
@@ -177,7 +185,7 @@ output$summaryStatsSideBar <- renderUI({
     paste("Total number of reads: ", sum(assays(scEx)[["counts"]]))
   line6 <- paste("Memory used:", memoryUsed)
   line7 <-
-    paste("Normalization used:", normalizationRadioButton)
+    paste("Normalization selected:", normalizationRadioButton)
   htmlOut <- paste0(
     "Summary statistics of this dataset:",
     "<br/>",
@@ -205,11 +213,11 @@ output$summaryStatsSideBar <- renderUI({
   exportTestValues(summaryStatsSideBar = {
     htmlOut
   })
-  
+
   HTML(htmlOut)
 })
 
-if ("shinyBS" %in% rownames(installed.packages())){
+if ("shinyBS" %in% rownames(installed.packages())) {
   addPopover(
     session = session, id = "summaryStatsSideBar", title = "Data summary",
     content = "<ul><li>medium UMI: shows how many genes are  expressed in log2 space of normalized data</li> </ul> ",
@@ -359,7 +367,7 @@ output$descriptOfWorkOutput <- renderPrint({
 output$sampleColorSelection <- renderUI({
   scEx <- scEx()
   sampCol <- sampleCols$colPal
-  
+
   if (is.null(scEx)) {
     return(NULL)
   }
@@ -370,10 +378,10 @@ output$sampleColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
-  
+
   lev <- levels(colData(scEx)$sampleNames)
   # cols <- gg_fill_hue(length(lev))
-  
+
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -393,7 +401,7 @@ output$clusterColorSelection <- renderUI({
   scEx <- scEx()
   projections <- projections()
   clusterCol <- clusterCols$colPal
-  
+
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
@@ -404,10 +412,10 @@ output$clusterColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
-  
+
   lev <- levels(projections$dbCluster)
   # cols <- gg_fill_hue(length(lev))
-  
+
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -424,54 +432,58 @@ output$clusterColorSelection <- renderUI({
 
 
 # observe: input$updateColors ----
-observeEvent(input$updateColors, {
-  cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
-  scExx <- scEx()
-  projections <- projections()
-  
-  if (is.null(scExx) || is.null(projections)) {
-    return(NULL)
+observeEvent(
+  label = "ob22",
+  eventExpr = input$updateColors,
+  handlerExpr = {
+    cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
+    scExx <- scEx()
+    projections <- projections()
+
+    if (is.null(scExx) || is.null(projections)) {
+      return(NULL)
+    }
+    # sample colors
+    scols <- sampleCols$colPal
+
+    inCols <- list()
+    lev <- levels(colData(scExx)$sampleNames)
+
+    inCols <- lapply(seq_along(lev), function(i) {
+      input[[paste0("sampleNamecol", lev[i])]]
+    })
+    names(inCols) <- lev
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv())))
+      cat(file = stderr(), paste0("observeEvent save done\n"))
+    }
+    # load(file="~/SCHNAPPsDebug/updateColors.RData")
+
+    # isolate({
+    sampleCols$colPal <- unlist(inCols)
+    # })
+
+    # cluster colors
+    ccols <- clusterCols$colPal
+
+    inCols <- list()
+    lev <- levels(projections$dbCluster)
+
+    inCols <- lapply(seq_along(lev), function(i) {
+      input[[paste0("clusterNamecol", lev[i])]]
+    })
+    names(inCols) <- lev
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv())))
+      cat(file = stderr(), paste0("observeEvent 2 save done\n"))
+    }
+    # load(file="~/SCHNAPPsDebug/updateColors2.RData")
+
+    # isolate({
+    clusterCols$colPal <- unlist(inCols)
+    # })
   }
-  # sample colors
-  scols <- sampleCols$colPal
-  
-  inCols <- list()
-  lev <- levels(colData(scExx)$sampleNames)
-  
-  inCols <- lapply(seq_along(lev), function(i) {
-    input[[paste0("sampleNamecol", lev[i])]]
-  })
-  names(inCols) <- lev
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv())))
-    cat(file = stderr(), paste0("observeEvent save done\n"))
-  }
-  # load(file="~/SCHNAPPsDebug/updateColors.RData")
-  
-  # isolate({
-  sampleCols$colPal <- unlist(inCols)
-  # })
-  
-  # cluster colors
-  ccols <- clusterCols$colPal
-  
-  inCols <- list()
-  lev <- levels(projections$dbCluster)
-  
-  inCols <- lapply(seq_along(lev), function(i) {
-    input[[paste0("clusterNamecol", lev[i])]]
-  })
-  names(inCols) <- lev
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv())))
-    cat(file = stderr(), paste0("observeEvent 2 save done\n"))
-  }
-  # load(file="~/SCHNAPPsDebug/updateColors2.RData")
-  
-  # isolate({
-  clusterCols$colPal <- unlist(inCols)
-  # })
-})
+)
 
 # Nclusters ----
 output$Nclusters <- renderText({
@@ -511,7 +523,7 @@ output$countscsv <- downloadHandler(
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "RDSsave")
     }
-    
+
     scEx_log <- scEx_log()
     if (is.null(scEx_log)) {
       return(NULL)
@@ -540,13 +552,13 @@ output$RDSsave <- downloadHandler(
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "RDSsave")
     }
-    
+
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
     tsne <- tsne()
-    
+
     if (is.null(scEx)) {
       return(NULL)
     }
@@ -554,11 +566,11 @@ output$RDSsave <- downloadHandler(
       save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
-    
+
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
-    
+
     save(file = file, list = c("scEx"))
-    
+
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
@@ -566,7 +578,7 @@ output$RDSsave <- downloadHandler(
 # Report creation ------------------------------------------------------------------
 output$report <- downloadHandler(
   filename = "report.zip",
-  
+
   content = function(outZipFile) {
     outrepFile <- reacativeReport()
     file.copy(from = outrepFile, to = outZipFile)
@@ -624,117 +636,141 @@ scranWarning <- function() {
 }
 
 # handle long executions ----
-observeEvent(input$clusterMethod, {
-  if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
-  if (input$clusterMethod == "hclust") {
-    showModal(scranWarning())
-  } else {
-    clusterMethodReact$clusterMethod <- "igraph"
+observeEvent(
+  label = "ob23",
+  eventExpr = input$clusterMethod,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
+    if (input$clusterMethod == "hclust") {
+      showModal(scranWarning())
+    } else {
+      clusterMethodReact$clusterMethod <- "igraph"
+    }
   }
-})
+)
 
-observeEvent(input$clusterSource, {
-  if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterSource\n"))
-  # if (input$clusterSource == "logcounts") {
-  #   showModal(scranWarning())
-  # } else {
-  #   clusterMethodReact$clusterSource <- "counts"
-  # }
-  clusterMethodReact$clusterSource <- input$clusterSource
-})
-
-observeEvent(input$scranWarning_cancel, {
-  updateSelectInput(session, "clusterMethod",
-                    selected = "igraph"
-  )
-  # updateSelectInput(session, "clusterSource",
-  #                   selected = "counts"
-  # )
-  removeModal()
-})
-observeEvent(input$scranWarning_ok, {
-  if (input$clusterMethod == "hclust") {
-    clusterMethodReact$clusterMethod <- "hclust"
+observeEvent(
+  label = "ob24",
+  eventExpr = input$clusterSource,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterSource\n"))
+    # if (input$clusterSource == "logcounts") {
+    #   showModal(scranWarning())
+    # } else {
+    #   clusterMethodReact$clusterSource <- "counts"
+    # }
+    clusterMethodReact$clusterSource <- input$clusterSource
   }
-  # if (input$clusterSource == "normData") {
-  #   clusterMethodReact$clusterSource <- "normData"
-  # }
-  removeModal()
-})
+)
+
+observeEvent(
+  label = "ob25",
+  eventExpr = input$scranWarning_cancel,
+  handlerExpr = {
+    updateSelectInput(session, "clusterMethod",
+      selected = "igraph"
+    )
+    # updateSelectInput(session, "clusterSource",
+    #                   selected = "counts"
+    # )
+    removeModal()
+  }
+)
+observeEvent(
+  label = "ob26",
+  eventExpr = input$scranWarning_ok,
+  handlerExpr = {
+    if (input$clusterMethod == "hclust") {
+      clusterMethodReact$clusterMethod <- "hclust"
+    }
+    # if (input$clusterSource == "normData") {
+    #   clusterMethodReact$clusterSource <- "normData"
+    # }
+    removeModal()
+  }
+)
 
 # rename projections
-observe({
+observe(label = "ob27", {
   projections <- projections()
-  
+
   updateSelectInput(session, "oldPrj",
-                    choices = c(colnames(projections))
+    choices = c(colnames(projections))
   )
   updateSelectInput(session, "delPrj",
-                    choices = c(colnames(projectionsTable$newProjections))
+    choices = c(colnames(projectionsTable$newProjections))
   )
 })
 
-observe({
+observe(label = "ob28", {
   input$newPrj
   updateTextInput(session, "newPrj", value = make.names(input$newPrj))
 })
 
-observeEvent(input$delPrjsButton, {
-  if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
-  newPrjs <- projectionsTable$newProjections
-  delPrj <- input$delPrj
-  if (is.null(projections)) {
-    return(NULL)
+observeEvent(
+  label = "ob29",
+  eventExpr = input$delPrjsButton,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
+    newPrjs <- projectionsTable$newProjections
+    delPrj <- input$delPrj
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (!delPrj %in% colnames(newPrjs)) {
+      return(NULL)
+    }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = "~/SCHNAPPsDebug/delPrjsButton.RData",
+        list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      )
+    }
+    # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
+
+    projectionsTable$newProjections <- newPrjs[, -which(colnames(newPrjs) == delPrj), drop = FALSE]
   }
-  if (! delPrj %in% colnames(newPrjs)) {
-    return(NULL)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/delPrjsButton.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-    )
-  }
-  # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
-  
-  projectionsTable$newProjections = newPrjs[,-which(colnames(newPrjs) == delPrj), drop = FALSE]
-})
+)
 
 
-observeEvent(input$updatePrjsButton, {
-  if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
-  oldPrj <- input$oldPrj
-  newPrj <- input$newPrj
-  projections <- projections()
-  newPrjs <- projectionsTable$newProjections
-  
-  if (is.null(projections)) {
-    return(NULL)
+observeEvent(
+  label = "ob30",
+  eventExpr = input$updatePrjsButton,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
+    oldPrj <- input$oldPrj
+    newPrj <- input$newPrj
+    projections <- projections()
+    newPrjs <- projectionsTable$newProjections
+
+    if (is.null(projections)) {
+      return(NULL)
+    }
+
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
+        list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      )
+    }
+    # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
+    if (newPrj %in% colnames(projections)) {
+      showNotification(
+        "New column name already used",
+        type = "error",
+        duration = NULL
+      )
+      return(NULL)
+    }
+    if (ncol(newPrjs) == 0) {
+      newPrjs <- projections[, oldPrj, drop = FALSE]
+    } else {
+      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
+    }
+    colnames(newPrjs)[ncol(newPrjs)] <- newPrj
+    projectionsTable$newProjections <- newPrjs
   }
-  
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-    )
-  }
-  # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
-  if (newPrj %in% colnames(projections)) {
-    showNotification(
-      "New column name already used",
-      type = "error",
-      duration = NULL
-    )
-    return(NULL)
-  }
-  if (ncol(newPrjs) == 0) {
-    newPrjs <- projections[, oldPrj, drop = FALSE]
-  } else {
-    newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
-  }
-  colnames(newPrjs)[ncol(newPrjs)] <- newPrj
-  projectionsTable$newProjections <- newPrjs
-})
+)
 
 
 
