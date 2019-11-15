@@ -1339,6 +1339,7 @@ rawNormalization <- reactive({
   scEx <- scEx()
   names(assays(scEx)) <- "logcounts"
 
+  addClass("updateNormalization", "green")
   exportTestValues(rawNormalization = {
     str(scEx)
   })
@@ -1368,7 +1369,8 @@ scEx_log <- reactive({
   # update <- input$updateNormalization
   # don't update if parameters are changed
   normMethod <- isolate(input$normalizationRadioButton)
-
+  clicked <- input$updateNormalization
+  
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx_log:NULL\n")
@@ -1452,6 +1454,7 @@ scExLogMatrixDisplay <- reactive({
   if (dim(scEx)[1] > 20000) {
 
   }
+  retVal <- NULL
   if (!is.null(scEx_log)) {
     retVal <-
       data.frame(
@@ -1462,8 +1465,8 @@ scExLogMatrixDisplay <- reactive({
       retVal,
       as.matrix(assays(scEx_log)[[1]])
     )
-    rownames(retVal) <-
-      make.names(rowData(scEx)$symbol, unique = TRUE)
+    # rownames(retVal) <-
+    #   make.names(rowData(scEx)$symbol, unique = TRUE)
   }
 
   return(retVal)

@@ -447,9 +447,10 @@ observe(label = "observe DE_seuratRefBased", {
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
 
-  .schnappsEnv$DE_seuratRefBased_nfeatures <- input$nfeatures
-  .schnappsEnv$DE_seuratRefBased_k.filter <- input$k.filter
-  .schnappsEnv$DE_seuratRefBased_scaleFactor <- input$scalingFactor
+  # currentValues
+  .schnappsEnv$DE_seuratRefBased_nfeatures <- input$DE_seuratRefBased_nfeatures
+  .schnappsEnv$DE_seuratRefBased_k.filter <- input$DE_seuratRefBased_k.filter
+  .schnappsEnv$DE_seuratRefBased_scaleFactor <- input$DE_seuratRefBased_scaleFactor
 
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratRefBased_nfeatures", "DE_seuratRefBased_k.filter",
@@ -523,9 +524,9 @@ observe(label = "observe DE_seuratSCtransform", {
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
 
-  .schnappsEnv$calculated_DE_seuratSCtransform_nfeatures <- input$DE_seuratSCtransform_nfeatures
-  .schnappsEnv$calculated_DE_seuratSCtransform_k.filter <- input$DE_seuratSCtransform_k.filter
-  .schnappsEnv$calculated_DE_seuratSCtransform_scaleFactor <- input$DE_seuratSCtransform_scaleFactor
+  .schnappsEnv$DE_seuratSCtransform_nfeatures <- input$DE_seuratSCtransform_nfeatures
+  .schnappsEnv$DE_seuratSCtransform_k.filter <- input$DE_seuratSCtransform_k.filter
+  .schnappsEnv$DE_seuratSCtransform_scaleFactor <- input$DE_seuratSCtransform_scaleFactor
 
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratSCtransform_nfeatures",
@@ -572,10 +573,10 @@ observe(label = "observe DE_seuratStandard", {
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
 
-  .schnappsEnv$calculated_DE_seuratStandard_dims <- input$DE_seuratStandard_dims
-  .schnappsEnv$calculated_DE_seuratStandard_anchorF <- input$DE_seuratStandard_anchorF
-  .schnappsEnv$calculated_DE_seuratStandard_kF <- input$DE_seuratStandard_kF
-  .schnappsEnv$calculated_DE_seuratStandard_k.weight <- input$DE_seuratStandard_k.weight
+  .schnappsEnv$DE_seuratStandard_dims <- input$DE_seuratStandard_dims
+  .schnappsEnv$DE_seuratStandard_anchorF <- input$DE_seuratStandard_anchorF
+  .schnappsEnv$DE_seuratStandard_kF <- input$DE_seuratStandard_kF
+  .schnappsEnv$DE_seuratStandard_k.weight <- input$DE_seuratStandard_k.weight
 
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratStandard_dims",
@@ -585,7 +586,30 @@ observe(label = "observe DE_seuratStandard", {
   ))
 })
 
+# obs.updateNormalization DE_logNormalization ----
+observe(label = "obs.updateNormalization", {
+  buttonPressed <- input$updateNormalization
+  radioButtonVal <- isolate(input$normalizationRadioButton)
+  if (!exists("DE_logNormalizationButtonOldVal", envir = .schnappsEnv)) {
+    .schnappsEnv$DE_logNormalizationButtonOldVal <- 0
+  }
+  if (is.null(radioButtonVal)) {
+    radioButtonVal <- ""
+  }
+  if (is.null(buttonPressed)) {
+    buttonPressed <- 0
+  }
+  
+  # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
+  if (radioButtonVal == "DE_logNormalization" &
+      !.schnappsEnv$DE_logNormalizationButtonOldVal == buttonPressed) {
+    cat(file = stderr(), green(paste("\n=====changing value\n")))
+    DE_logNormalizationButton(buttonPressed)
+    .schnappsEnv$DE_logNormalizationButtonOldVal <- buttonPressed
+  }
+})
 
+# if no parameters the second observer is not needed
 
 
 # obs.updateNormalization DE_logGeneNormalization ----
