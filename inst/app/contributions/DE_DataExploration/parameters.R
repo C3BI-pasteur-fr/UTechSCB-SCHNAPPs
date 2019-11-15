@@ -292,6 +292,7 @@ DE_seuratSCtransform <- reactive({
   retVal <- DE_seuratSCtransformFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, scalingFactor = scalingFactor)
 
   if (is.null(retVal)) {
+    if (DEBUG) green(cat(file = stderr(), "An error occurred during Seurat normalization, please check console\n"))
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
   }
 
@@ -532,6 +533,11 @@ DE_logNormalizationGenefunc <- function(scEx, inputGenes, scalingFactor = 10000)
 # DE_logNormalization ----
 #' DE_logNormalization
 #' reactive for normalizing data according to seurat
+DE_logNormalizationButton <- reactiveVal(
+  value = NULL,
+  label = "pressed"
+)
+
 DE_logNormalization <- reactive(label = "rlogNorm", {
   if (DEBUG) cat(file = stderr(), "DE_logNormalization started.\n")
   start.time <- base::Sys.time()
@@ -546,7 +552,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   }
 
   scEx <- scEx()
-  input$updateNormalization
+  DE_logNormalizationButton()
 
   if (is.null(scEx)) {
     if (DEBUG) {
