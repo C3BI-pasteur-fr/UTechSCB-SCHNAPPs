@@ -6,7 +6,7 @@
   .schnappsEnv <- new.env(parent=emptyenv())
 # }
 
-  localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
+  localContributionDir = "~/Rstudio/scShinyHub-github/bjContributions/"
   # localContributionDir = ""
   defaultValueSingleGene = "LYZ"
 defaultValueMultiGenes = "Gzmb, prf1, ifng, pdcd1, havcr2, lag3, tsc22d3, zfp36l2"

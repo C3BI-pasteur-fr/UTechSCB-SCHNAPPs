@@ -139,6 +139,7 @@ output$summaryStatsSideBar <- renderUI({
     cat(file = stderr(), "output$summaryStatsSideBar\n")
   }
   scEx <- scEx()
+  scEx_log <- scEx_log()
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "output$summaryStatsSideBar:NULL\n")
@@ -167,6 +168,8 @@ output$summaryStatsSideBar <- renderUI({
   line0 <- paste(infile, " _ ", annFile)
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
+  line1a <- paste("No. of cells (log): ", dim(scEx_log)[2], sep = "\t")
+  line2a <- paste("No. of genes (log): ", dim(scEx_log)[1], sep = "\t")
   line3 <- paste("Median UMIs per cell: ", medianUMI, sep = "\t")
   line4 <-
     paste("Median Genes with min 1 UMI: ", medianENSG, sep = "\t")
@@ -184,6 +187,10 @@ output$summaryStatsSideBar <- renderUI({
     line1,
     "<br/>",
     line2,
+    "<br/>",
+    line1a,
+    "<br/>",
+    line2a,
     "<br/>",
     line3,
     "<br/>",
@@ -313,72 +320,6 @@ callModule(
   gsRMGenesTable
 )
 
-
-
-# output$gsSelectedGenes <- renderText({
-#   if (DEBUG) {
-#     cat(file = stderr(), "gsSelectedGenes\n")
-#   }
-#   dataTables <- inputData()
-#   useGenes <- useGenes()
-#   useCells <- useCells()
-#   selectedGenesTable_rows_selected <-
-#     input$selectedGenesTable_rows_selected
-#   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
-#     return(NULL)
-#   }
-#   if (.schnappsEnv$DEBUGSAVE) {
-#     save(
-#       file = "~/SCHNAPPsDebug/gsSelectedGenes.RData",
-#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-#     )
-#   }
-#   # load("~/SCHNAPPsDebug/gsSelectedGenes.RData")
-#
-#   # scEx <- as.matrix(exprs(dataTables$scEx))
-#   fd <- rowData(dataTables$scEx)
-#   dt <- fd[useGenes, c("symbol", "Description")]
-#   retVal <- paste0(dt$symbol[selectedGenesTable_rows_selected], ",")
-#   exportTestValues(gsSelectedGenes = {
-#     retVal
-#   })
-#   return(retVal)
-# })
-
-# gsrmGenes -----------------
-# Print names of removed genes for gene selection
-# output$gsrmGenes <- renderText({
-#   if (DEBUG) {
-#     cat(file = stderr(), "gsrmGenes\n")
-#   }
-#   dataTables <- inputData()
-#   useGenes <- useGenes()
-#   useCells <- useCells()
-#   removedGenesTable_rows_selected <-
-#     input$removedGenesTable_rows_selected
-#   if (is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
-#     return(NULL)
-#   }
-#   if (.schnappsEnv$DEBUGSAVE) {
-#     save(
-#       file = "~/SCHNAPPsDebug/gsrmGenes.RData",
-#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
-#     )
-#   }
-#   # load("~/SCHNAPPsDebug/gsrmGenes.RData")
-#   useGenes <- !useGenes
-#   # scEx <- as.matrix(exprs(dataTables$scEx))
-#   fd <- rowData(dataTables$scEx)
-#   dt <- fd[useGenes, c("symbol", "Description")]
-#   if (DEBUG) {
-#     cat(file = stderr(), "gsrmGenes: done\n")
-#   }
-#   retVal <- paste0(dt$symbol[removedGenesTable_rows_selected], ",")
-#   exportTestValues(gsrmGenes = {
-#     retVal
-#   })
-#   return(retVal)
-# })
 
 # DEBUGSAVEstring ----
 output$DEBUGSAVEstring <- renderText({
@@ -607,8 +548,22 @@ output$countscsv <- downloadHandler(
   filename = paste0("counts.", Sys.Date(), ".csv"),
   content = function(file) {
     if (DEBUG) {
-      cat(file = stderr(), paste("countcsv: \n"))
+      cat(file = stderr(), "RDSsave started.\n")
     }
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "RDSsave")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "RDSsave")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("RDSsave", id = "RDSsave", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "RDSsave")
+    }
+    
     scEx_log <- scEx_log()
     if (is.null(scEx_log)) {
       return(NULL)
@@ -622,7 +577,20 @@ output$RDSsave <- downloadHandler(
   filename = paste0("project.", Sys.Date(), ".RData"),
   content = function(file) {
     if (DEBUG) {
-      cat(file = stderr(), paste("RDSsave: \n"))
+      cat(file = stderr(), "RDSsave started.\n")
+    }
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "RDSsave")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "RDSsave")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("RDSsave", id = "RDSsave", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "RDSsave")
     }
     
     scEx <- scEx()
@@ -642,9 +610,6 @@ output$RDSsave <- downloadHandler(
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
     
     save(file = file, list = c("scEx"))
-    if (DEBUG) {
-      cat(file = stderr(), paste("RDSsave:done \n"))
-    }
     
     # write.csv(as.matrix(exprs(scEx)), file)
   }
@@ -665,7 +630,7 @@ returnNull <- function() {
   return(NULL)
 }
 
-# uncommented because it is corrently not used
+# commented out because it is corrently not used
 # # forceCalc -----# handling expensive calcualtions
 # forceCalc <- shiny::observe({
 #   if (DEBUG) cat(file = stderr(), paste0("observe: goCalc\n"))

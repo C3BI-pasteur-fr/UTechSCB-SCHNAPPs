@@ -27,9 +27,37 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   if (is(subsetData[,db1$mapping$y], "logical")) {
     subsetData[,db1$mapping$y] = as.numeric(subsetData[,db1$mapping$y]) + 1
   }
-  cells.1 <- rownames(shiny::brushedPoints(subsetData, db1))
-  cells.2 <- rownames(shiny::brushedPoints(subsetData, db2))
+
+  # factors and brushedPoints don't work together.
+  # so we change a factor into a numeric
+  # TODO WHY is discrete_limits set/misused?????
+  if (is(subsetData[,db1$mapping$x], "factor")) {
+    subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x])
+    db1$domain$discrete_limits = NULL
+  }
+  if (is(subsetData[,db1$mapping$y], "factor")) {
+    subsetData[,db1$mapping$y] = as.numeric(subsetData[,db1$mapping$y])
+    db1$domain$discrete_limits = NULL
+  }
+  db1$domain$discrete_limits = NULL
+  db2$domain$discrete_limits = NULL
+  
+  # factors and brushedPoints don't work together.
+  # so we change a factor into a numeric
+  if (is(subsetData[,db2$mapping$x], "factor")) {
+    subsetData[,db2$mapping$x] = as.numeric(subsetData[,db2$mapping$x])
+    db2$domain$discrete_limits = NULL
+  }
+  if (is(subsetData[,db2$mapping$y], "factor")) {
+    subsetData[,db2$mapping$y] = as.numeric(subsetData[,db2$mapping$y])
+    db2$domain$discrete_limits = NULL
+  }
+  
+  cells.1 <- rownames(shiny::brushedPoints(df = subsetData, brush = db1))
+  cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
   retVal <- list(c1 = cells.1, c2 = cells.2)
+  # save(file = "~/SCHNAPPsDebug/sCA_getCells.RData", list = c( ls()))
+  # cp = load("~/SCHNAPPsDebug/sCA_getCells.RData")
   return(retVal)
 }
 
@@ -87,7 +115,9 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox"){
   # creates object @assays$RNA@data and @assays$RNA@counts
   seurDat <- CreateSeuratObject(counts = assays(scEx)[[1]],
                                 meta.data = meta.data)
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[rownames(seurDat@assays$RNA@data),]
+  # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
   
   markers <- Seurat::FindMarkers(seurDat@assays$RNA@data, 
                                  cells.1 = cells.1,
@@ -423,12 +453,42 @@ subCluster2Dplot <- function() {
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/sCA_dge_plot2.RData", list = c(ls(envir = globalenv(), ls())))
+      save(file = "~/SCHNAPPsDebug/sCA_dge_plot2.RData", list = c( ls()))
     }
-    # load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")
-    
+    # cp = load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")
     
     subsetData <- subset(projections, dbCluster %in% c1)
+#     xAxis <- list(
+#       title = x1,
+#       titlefont = f
+#     )
+#     yAxis <- list(
+#       title = y1,
+#       titlefont = f
+#     )
+#     
+#     p1 <- plotly::plot_ly(
+#       data = subsetData, source = "subset",
+#       key = rownames(subsetData)
+#     ) %>%
+#       add_trace(
+#         x = ~ get(x1),
+#         # x = ~ get(dimX),
+#         # y = ~ get(dimY),
+#         y = ~ get(y1),
+#         type = "scatter", mode = "markers",
+#         text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+#         # color = ~ get(dimCol),
+#         colors = colors,
+#         showlegend = TRUE
+#       ) %>%
+#       layout(
+#         xaxis = xAxis,
+#         yaxis = yAxis,
+#         # title = "gtitle",
+#         dragmode = "select"
+#       )
+# p1
     p1 <-
       ggplot(subsetData,
              aes_string(x = x1, y = y1),
@@ -453,8 +513,9 @@ subCluster2Dplot <- function() {
         axis.title.x = element_text(face = "bold", size = 16),
         axis.title.y = element_text(face = "bold", size = 16),
         legend.position = "none"
-      ) +
-      ggtitle(c1)
+      )
+# +
+    #   ggtitle(c1)
     p1
   })
 }
