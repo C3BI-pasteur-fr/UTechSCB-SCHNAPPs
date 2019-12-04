@@ -137,6 +137,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     return(NULL)
   }
   
+  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))){
+    return(NULL)
+  }
   
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
@@ -364,7 +367,7 @@ DiffExpTest <- function(expression, cells.1, cells.2, genes.use = NULL, print.ba
 heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   addColNames <- input[[paste0(moduleName, "-ColNames")]]
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
-  moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
+  # moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
   colTree <- input[[paste0(moduleName, "-showColTree")]]
   
   if (is.null(heatmapData) | is.null(projections) | is.null(heatmapData$mat)) {
@@ -373,19 +376,21 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   
   heatmapData$filename <- NULL
   
-  if (length(addColNames) > 0 & moreOptions) {
-    heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+  # if (length(addColNames) > 0 & moreOptions) {
+    if (length(addColNames) > 0 ) {
+      heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
   }
-  if (sum(orderColNames %in% colnames(projections)) > 0 & moreOptions) {
-    heatmapData$cluster_cols <- FALSE
+  # if (sum(orderColNames %in% colnames(projections)) > 0 & moreOptions) {
+    if (sum(orderColNames %in% colnames(projections)) > 0) {
+      heatmapData$cluster_cols <- FALSE
     colN <- rownames(psych::dfOrder(projections, orderColNames))
     colN <- colN[colN %in% colnames(heatmapData$mat)]
     heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
     # return()
   }
-  if (moreOptions) {
+  # if (moreOptions) {
     heatmapData$cluster_cols <- colTree
-  }
+  # }
   heatmapData$fontsize <- 14
   system.time(do.call(TRONCO::pheatmap, heatmapData))
 }

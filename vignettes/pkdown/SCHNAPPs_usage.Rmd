@@ -44,6 +44,9 @@ The application is started from the command line in R using schnapps().
 
 ```
 library(SCHNAPPs)
+# create example data
+save(file = "filename.RData", "singleCellExperiementObject")
+# use "filename.RData" with load data functionality within the shiny app
 schnapps()
 ```
 
@@ -488,11 +491,11 @@ knitr::include_graphics('images/coexpressionSelected3.png')
 ##### Violin plot
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - Violin plot', echo=FALSE}
-knitr::include_graphics('images/coexpressionVioloin1.png')
+knitr::include_graphics('images/coexpressionViolin1.png')
 ```
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - Violin plot with permutations', echo=FALSE}
-knitr::include_graphics('images/coexpressionVioloin2.png')
+knitr::include_graphics('images/coexpressionViolin2.png')
 ```
 
 

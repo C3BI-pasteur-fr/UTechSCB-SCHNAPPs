@@ -1025,12 +1025,21 @@ gsRMGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
+
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
-  dt <- fd[useGenes, c("symbol", "Description")]
+  dt <- fd[useGenes, ]
   dt$rowSums <- Matrix::rowSums(scEx[useGenes, useCells])
   dt$rowSamples <- Matrix::rowSums(scEx[useGenes, useCells] > 0)
   
+  # get the order of the frist two columns correct
+  firstCol <- which(colnames(dt) == "symbol")
+  firstCol <- c(firstCol, which(colnames(dt) == "Description"))
+  # those we created so we know they are there
+  firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
+  colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
+  dt <- dt[, colOrder]
+
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
@@ -1218,7 +1227,7 @@ scExFunc <-
       showNotification(
         "not enough genes left",
         type = "warning",
-        id = "scExFunc1",
+        id = "scExFunc2",
         duration = NULL
       )
       return(NULL)
@@ -1354,8 +1363,12 @@ scEx_log <- reactive({
   
   scEx <- scEx()
   dataTables <- inputData()
-  normMethod <- input$normalizationRadioButton
   whichscLog <- input$whichscLog
+  # update if button is clicked
+  update <- input$updateNormalization
+  # don't update if parameters are changed
+  normMethod <- isolate(input$normalizationRadioButton)
+  
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "scEx_log:NULL\n")
@@ -1435,7 +1448,7 @@ scExLogMatrixDisplay <- reactive({
   }
   retVal <-
     data.frame(
-      symbol = make.names(rowData(scEx)$symbol[rownames(scEx_log)], unique = TRUE),
+      symbol = make.names(rowData(scEx_log)$symbol, unique = TRUE),
       stringsAsFactors = FALSE
     )
   if (!is.null(scEx_log)) {
@@ -1578,13 +1591,15 @@ pca <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
-  rank <- input$pcaRank
-  pcaN <- input$pcaN
-  center <- input$pcaCenter
-  scale <- input$pcaScale
-  pcaGenes <- input$genes4PCA
   scEx_log <- scEx_log()
-  
+  # only redo calculations if button is pressed.
+  input$updatePCAParameters
+  rank <- isolate(input$pcaRank)
+  pcaN <- isolate(input$pcaN)
+  center <- isolate(input$pcaCenter)
+  scale <- isolate(input$pcaScale)
+  pcaGenes <- isolate(input$genes4PCA)
+   
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "pca:NULL\n")
@@ -1745,17 +1760,19 @@ scran_Cluster <- reactive({
     removeNotification(id = "dbClusterError")
   }
   
-  pca <- pca()
+  # react to the following changes
+  input$updateClusteringParameters
   scEx <- scEx()
   scEx_log <- scEx_log()
-  seed <- input$seed
-  # kNr <- input$kNr
-  useRanks <- input$useRanks
+  pca <- pca()
   
-  clusterSource <- clusterMethodReact$clusterSource
-  geneSelectionClustering <- input$geneSelectionClustering
-  minClusterSize <- input$minClusterSize
-  clusterMethod <- clusterMethodReact$clusterMethod
+  # ignore these changes
+  seed <- isolate(input$seed)
+  useRanks <- isolate(input$useRanks)
+  clusterSource <- isolate(clusterMethodReact$clusterSource)
+  geneSelectionClustering <- isolate(input$geneSelectionClustering)
+  minClusterSize <- isolate(input$minClusterSize)
+  clusterMethod <- isolate(clusterMethodReact$clusterMethod)
   
   if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
     if (DEBUG) {
@@ -1817,6 +1834,7 @@ dbCluster <- reactive({
     showNotification("dbCluster", id = "dbCluster", duration = NULL)
   }
   
+  input$updateClusteringParameters
   # kNr <- input$kNr
   clustering <- scran_Cluster()
   
@@ -1967,7 +1985,11 @@ projections <- reactive({
         #   stop("error: ", proj[1], "didn't produce a result")
         # }
       }
-      
+      if (!length(colnames(projections)) == length(cn)) {
+        save(file = "~/SCHNAPPsDebug/projectionsError2.RData", list = c(ls(), ls(envir = globalenv())))
+        stop("error: ", proj[1], "didn't produce a result, please send file ~/SCHNAPPsDebug/projectionsError2.RData to bernd")
+        
+      }
       colnames(projections) <- cn
       if (DEBUG) cat(file = stderr(), paste("colnames ", paste0(colnames(projections), collapse = " "), "\n"))
       if (DEBUG) cat(file = stderr(), paste("observe this: ", proj[2], "\n"))
@@ -2047,7 +2069,7 @@ initializeGroupNames <- reactive({
         none = rep(FALSE, dim(scEx)[2])
       )
     rownames(df) <- colnames(scEx)
-    groupNames[["namesDF"]] <- df
+    groupNames$namesDF <- df
   })
 })
 

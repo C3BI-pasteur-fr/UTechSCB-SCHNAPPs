@@ -151,7 +151,7 @@ scShinyUI <- shinyUI(
       tags$head(tags$style(".butt{color: black !important;}")), #  font color
 
       # bookmarkButton(id = "bookmark1"),
-      downloadButton("countscsv", "Download counts.csv", class = "butt"),
+      downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
       downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),

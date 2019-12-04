@@ -145,10 +145,12 @@ tsne <- reactive({
   }
   
   pca <- pca()
-  gQC_tsneDim <- input$gQC_tsneDim
-  gQC_tsnePerplexity <- input$gQC_tsnePerplexity
-  gQC_tsneTheta <- input$gQC_tsneTheta
-  gQC_tsneSeed <- input$gQC_tsneSeed
+  # only recalculate when button is pressed.
+  input$updatetsneParameters
+  gQC_tsneDim <- isolate(input$gQC_tsneDim)
+  gQC_tsnePerplexity <- isolate(input$gQC_tsnePerplexity)
+  gQC_tsneTheta <- isolate(input$gQC_tsneTheta)
+  gQC_tsneSeed <- isolate(input$gQC_tsneSeed)
   
   if (is.null(pca)) {
     if (DEBUG) cat(file = stderr(), "tsne: NULL\n")
@@ -225,10 +227,7 @@ umapReact <- reactive({
     showNotification("umapReact", id = "umapReact", duration = NULL)
   }
   
-  scEx_log <- scEx_log()
-  pca <- pca()
-  myseed <- input$gQC_um_randSeed
-  # xaxis <- input$um_xaxis
+   # xaxis <- input$um_xaxis
   # yaxis <- input$um_yaxis
   # cellT <- input$um_ct
   # inputCT <- input$um_inputCT
@@ -238,20 +237,23 @@ umapReact <- reactive({
   # UMAP1 <- input$um_umap1
   # UMAP2 <- input$um_umap2
   runUMAP <- input$activateUMAP
+  scEx_log <- scEx_log()
+  pca <- pca()
   
-  n_neighbors <- as.numeric(input$gQC_um_n_neighbors)
-  n_components <- as.numeric(input$gQC_um_n_components)
-  n_epochs <- as.numeric(input$gQC_um_n_epochs)
-  alpha <- as.numeric(input$um_alpha)
-  init <- input$gQC_um_init
-  min_dist <- as.numeric(input$gQC_um_min_dist)
-  set_op_mix_ratio <- as.numeric(input$gQC_um_set_op_mix_ratio)
-  local_connectivity <- as.numeric(input$gQC_um_local_connectivity)
-  bandwidth <- as.numeric(input$gQC_um_bandwidth)
-  gamma <- as.numeric(input$um_gamma)
-  negative_sample_rate <- as.numeric(input$gQC_um_negative_sample_rate)
-  metric <- input$gQC_um_metric
-  spread <- as.numeric(input$gQC_um_spread)
+  myseed <- isolate(input$gQC_um_randSeed)
+  n_neighbors <- isolate(as.numeric(input$gQC_um_n_neighbors))
+  n_components <- isolate(as.numeric(input$gQC_um_n_components))
+  n_epochs <- isolate(as.numeric(input$gQC_um_n_epochs))
+  alpha <- isolate(as.numeric(input$um_alpha))
+  init <- isolate(input$gQC_um_init)
+  min_dist <- isolate(as.numeric(input$gQC_um_min_dist))
+  set_op_mix_ratio <- isolate(as.numeric(input$gQC_um_set_op_mix_ratio))
+  local_connectivity <- isolate(as.numeric(input$gQC_um_local_connectivity))
+  bandwidth <- isolate(as.numeric(input$gQC_um_bandwidth))
+  gamma <- isolate(as.numeric(input$um_gamma))
+  negative_sample_rate <- isolate(as.numeric(input$gQC_um_negative_sample_rate))
+  metric <- isolate(input$gQC_um_metric)
+  spread <- isolate(as.numeric(input$gQC_um_spread))
   
   if (is.null(scEx_log)) {
     if (DEBUG) cat(file = stderr(), "output$umap_react:NULL\n")
