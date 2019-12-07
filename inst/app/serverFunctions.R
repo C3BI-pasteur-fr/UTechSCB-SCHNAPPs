@@ -257,9 +257,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   
   selectedCells <- NULL
   if (length(grpN) > 0) {
-    if (length(grpNs[rownames(subsetData), grpN]) > 0 & sum(grpNs[rownames(subsetData), grpN], na.rm = TRUE) > 0) {
+    if (length(grpNs[rownames(subsetData), grpN] == "TRUE") > 0 & sum(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE) > 0) {
       grpNSub <- grpNs[rownames(subsetData), ]
-      selectedCells <- rownames(grpNSub[grpNSub[, grpN], ])
+      selectedCells <- rownames(grpNSub[grpNSub[, grpN] == "TRUE", ])
     }
   }
   if (!is.null(selectedCells)) {

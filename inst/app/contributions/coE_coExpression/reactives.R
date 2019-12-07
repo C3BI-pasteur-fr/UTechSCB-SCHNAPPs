@@ -286,6 +286,7 @@ coE_topExpCCTable <- reactive({
   numProje <- projections[, nums]
   # colnames(numProje)
   genesin <- unique(genesin)
+  scCells <- scCells[scCells %in% colnames(assays(scEx_log)[[1]])]
   # we only work on cells that have been selected
   mat <- assays(scEx_log)[[1]][genesin, scCells, drop = FALSE]
   # only genes that express at least coEtgminExpr UMIs

@@ -229,7 +229,7 @@ clusterServer <- function(input, output, session,
       }
       if (!namedGroup == "plot") {
         if (namedGroup %in% colnames(grpNs)) {
-          return(rownames(grpNs[grpNs[, namedGroup], ]))
+          return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ]))
         } else {
           return(NULL)
         }
@@ -242,10 +242,11 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
     cells.names <- brushedPs$key
+    cells.names <- cells.names[cells.names %in% colnames(scEx_log)]
     cells.names <- unique(cells.names[!is.na(cells.names)])
-    if (DEBUG) {
-      cat(file = stderr(), paste("curveNumbers:", unique(brushedPs$curveNumber), "\n"))
-    }
+    # if (DEBUG) {
+    #   cat(file = stderr(), paste("curveNumbers:", unique(brushedPs$curveNumber), "\n"))
+    # }
     printTimeEnd(start.time, "selectedCellNames")
     exportTestValues(selectedCellNames = {
       cells.names
@@ -304,7 +305,7 @@ clusterServer <- function(input, output, session,
         
         subsetData <- subset(projections, dbCluster %in% inpClusters)
         grpSubset <- grpNs[rownames(subsetData), ]
-        grpVal <- rownames(grpSubset[grpSubset[, grpN], ])
+        grpVal <- rownames(grpSubset[grpSubset[, grpN] == "TRUE", ])
         if (length(grpVal) > 0) {
           return(grpVal)
         }
@@ -544,7 +545,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "save: changeGroups\n")
       save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv())))
       cat(file = stderr(), "done save: changeGroups\n")
-      browser()
+      # browser()
     }
     # load(file="~/SCHNAPPsDebug/changeGroups.RData")
     # in case the cell selection has changed
@@ -556,6 +557,7 @@ clusterServer <- function(input, output, session,
       grpNs[rownames(visibleCells), grpN] <- FALSE
     }
     grpNs[cells.names, grpN] <- TRUE
+    grpNs[, grpN]  <- as.factor(grpNs[, grpN] )
     # Set  reactive value
     # cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
     groupNames$namesDF <- grpNs
@@ -618,7 +620,7 @@ clusterServer <- function(input, output, session,
     inpClusters <- levels(projections$dbCluster)
     
     subsetData <- subset(projections, dbCluster %in% inpClusters)
-    retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN]))
+    retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN] == "TRUE"))
     
     exportTestValues(DummyReactive = {
       retVal
