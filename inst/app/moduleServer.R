@@ -118,7 +118,29 @@ clusterServer <- function(input, output, session,
     }
   })
   
-  
+  # observe save  2 history ----
+  observe({
+    clicked = input$save2Hist
+    if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
+    myns <- session$ns("-")
+    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    start.time <- base::Sys.time()
+    if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "save2Hist")
+      }
+    )
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    
+    add2history(type = "renderPlotly", 
+                plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
+                comment = paste(myns))
+    
+  })
   # clusterServer - updateInput ----
   # updateInput <-
   observe({
@@ -416,7 +438,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
     
-    # load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."));.schnappsEnv$DEBUGSAVE=FALSE
+    # load("/Users/bernd/SCHNAPPsDebug/clusterPlot-coE_selected--.RData");.schnappsEnv$DEBUGSAVE=FALSE
     if (is.null(g_id) || nchar(g_id) == 0) {
       g_id <- featureData$symbol
     }
@@ -448,7 +470,7 @@ clusterServer <- function(input, output, session,
     # save p1 to .schnappsEnv for saving to history
     .schnappsEnv[[paste0("historyPlot-",myns)]] <- p1
     
-    
+    # add2history(type = "renderPlotly", plotData = p1, comment = paste(myns))
     # if (save2History) recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
     printTimeEnd(start.time, "clusterPlot")
@@ -797,6 +819,27 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   
+  observe({
+    clicked  = input$save2HistTabUi
+    myns <- session$ns("cellNameTable")
+    if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi \n")
+    start.time <- base::Sys.time()
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "save2Hist")
+      }
+    )
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    add2history(type = "renderDT", comment = "Table",  
+                tableData = .schnappsEnv[[paste0("historyPlot-",myns)]] )
+    
+  })
+  
+  
   output$rowSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
     start.time <- Sys.time()
@@ -1026,6 +1069,31 @@ pHeatMapModule <- function(input, output, session,
   
   outfilePH <- NULL
   
+  # observe save 2 history ----
+  observe({
+    clicked <- input$save2HistHM
+    if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
+    myns <- ns("pHeatMap")
+    # browser()
+    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    start.time <- base::Sys.time()
+    if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "save2Hist")
+      }
+    )
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    
+    add2history(type = "tronco", 
+                plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
+                comment = paste(myns))
+    
+  })
+  
   # pHeatMapModule - updateInput ----
   # updateInput <-
   # this is calling projections during loading of data
@@ -1177,6 +1245,8 @@ pHeatMapModule <- function(input, output, session,
     heatmapData$width = pWidth / 72
     heatmapData$height = pHeight / 72
     do.call(TRONCO::pheatmap, heatmapData)
+    
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- heatmapData
     # library(seriation)
     # hm <- hmap(x, method = "HC_ward", main = "HC_ward")
     
@@ -1191,7 +1261,6 @@ pHeatMapModule <- function(input, output, session,
     #   height <- 96 * 7
     # }
     outfilePH <- outfile
-    .schnappsEnv[[paste0("historyPlot-",myns)]] <- outfile
     return(list(
       src = outfilePH,
       contentType = "image/png",

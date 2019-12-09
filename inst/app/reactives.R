@@ -1313,7 +1313,7 @@ scEx <- reactive({
     maxG = maxG
   )
   scEx = retVal
-  add2history(type = "save", scEx = retVal)
+  add2history(type = "save", comment = "scEx", scEx = retVal)
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
   })
@@ -1389,7 +1389,7 @@ scEx_log <- reactive({
   } else {
     scEx_log <- do.call(normMethod, args = list())
   }
-  add2history(type = "save", scEx_log = scEx_log)
+  add2history(type = "save", comment = "scEx_log", scEx_log = scEx_log)
   
   exportTestValues(scEx_log = {
     assays(scEx_log)["logcounts"]
@@ -2030,7 +2030,7 @@ projections <- reactive({
     projections$sampleNames <- "1"
   }
   
-  add2history(type = "save", projections = projections)
+  add2history(type = "save", comment = "projections", projections = projections)
   
   exportTestValues(projections = {
     projections

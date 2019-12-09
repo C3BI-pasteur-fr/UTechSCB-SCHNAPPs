@@ -510,6 +510,27 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   return(p1)
 }
 
+# save to history violoin observer ----
+observe({
+  clicked  = input$save2HistVio
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "violin plot",  
+              plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
+  
+})
+
+
 #' coE_somFunction
 #' iData = expression matrix, rows = genes
 #' cluster genes in SOM
