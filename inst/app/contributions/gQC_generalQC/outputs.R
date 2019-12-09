@@ -152,10 +152,13 @@ output$gQC_plotUmiHist <- renderPlot({
 
   dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
   dat$sample <- colData(scEx)$sampleNames
-  ggplot(data = dat, aes(counts, fill = sample)) +
+  retVal <- ggplot(data = dat, aes(counts, fill = sample)) +
     geom_histogram(bins = 50) +
     labs(title = "Histogram for raw counts", x = "count", y = "Frequency") +
     scale_fill_manual(values = scols, aesthetics = "fill")
+  
+  .schnappsEnv[["gQC_plotUmiHist"]] <- retVal
+  return(retVal)
 })
 
 output$gQC_plotSampleHist <- renderPlot({
@@ -181,7 +184,9 @@ output$gQC_plotSampleHist <- renderPlot({
     save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file = "~/SCHNAPPsDebug/sampleHist.RData")
-  gQC_sampleHistFunc(sampleInf, scols)
+  retVal <- gQC_sampleHistFunc(sampleInf, scols)
+  .schnappsEnv[["gQC_plotSampleHist"]] <- retVal
+  return(retVal)
 })
 
 output$gQC_variancePCA <- renderPlot({
@@ -196,12 +201,23 @@ output$gQC_variancePCA <- renderPlot({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_variancePCA", id = "gQC_variancePCA", duration = NULL)
   }
-
-  if (DEBUG) cat(file = stderr(), "output$gQC_variancePCA\n")
-  h2("Variances of PCs")
   pca <- pca()
   if (is.null(pca)) {
     return(NULL)
   }
-  barplot(pca$var_pcs, main = "Variance captured by first PCs")
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData", list = c(ls(), ls(envir = globalenv())))
+  }
+  # load(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData")
+  
+  # h2("Variances of PCs")
+
+ 
+  
+  df <- data.frame(var = pca$var_pcs, pc = 1:length(pca$var_pcs))
+  retVal <- ggplot(data = df,aes(x=pc, y=var)) + geom_bar(stat = "identity")  
+  .schnappsEnv[["gQC_variancePCA"]] <- retVal
+  return(retVal)
+  # barplot(pca$var_pcs, main = "Variance captured by first PCs")
 })

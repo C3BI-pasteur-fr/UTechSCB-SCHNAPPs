@@ -118,7 +118,9 @@ tabList <- list(
         column(width = 12,
                jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
         )
-      )
+      ),
+      br(),
+      actionButton("save2HistVolc", "save to history")
     ),
     box(
       title = "Differentially Expressed Genes", solidHeader = TRUE, width = 12, status = 'primary', 

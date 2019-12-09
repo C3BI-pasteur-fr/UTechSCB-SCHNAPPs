@@ -101,6 +101,7 @@ clusterUI <- function(id) {
                  actionButton(ns("changeGroups"), "change current selection"),
                  checkboxInput(ns("showCells"), "show cell names", FALSE),
                  verbatimTextOutput(ns("cellSelection")),
+                 actionButton(ns("save2Hist"), "save to history"),
                  uiOutput(ns("additionalOptions")) # TODO:is this still needed???
           )
         )
@@ -133,7 +134,7 @@ tableSelectionUi <- function(id) {
           downloadButton(ns("download_cellNameTable"), "Download table")
           ),
           column(width = 3,
-                 actionButton(ns("refreshtable"), "Refresh table"),
+                 actionButton(ns("save2HistTabUi"), "Save to history"),
                  )
         ),
         fluidRow(
@@ -214,7 +215,8 @@ pHeatMapUI <- function(id) {
            fluidRow(
              column(width = 12,
                     # uiOutput(ns("additionalOptions")),
-                    downloadButton(ns("download_pHeatMapUI"), "Download PlotData")
+                    downloadButton(ns("download_pHeatMapUI"), "Download PlotData"),
+                    actionButton(ns("save2HistHM"), "save to history")
                     
              )
            )

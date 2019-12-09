@@ -103,6 +103,14 @@ tabList <- list(
         ),column(
           2,
           checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
+        ),
+        column(
+          2,
+          selectInput("DE_nCol",
+                      label = "number of columns for plot",
+                      choices = c(1:10),
+                      selected = 4
+          )
         )
       ),
       fluidRow(
@@ -114,7 +122,9 @@ tabList <- list(
         12,
         jqui_resizable(plotOutput("DE_panelPlot") )
       )
-      )
+      ),
+      br(),
+      actionButton("save2HistPanel", "save to history")
     )
   ),
   # DE_scaterQC ----
@@ -131,7 +141,10 @@ tabList <- list(
           offset = 1,
           imageOutput("DE_scaterQC") %>% withSpinner() # PNG output with temp file
         )
-      )
+      ),      
+      br(),
+      actionButton("save2HistScater", "save to history")
+      
     )
   )
 )

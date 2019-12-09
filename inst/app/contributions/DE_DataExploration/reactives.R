@@ -1,5 +1,45 @@
 suppressMessages(require(ggplot2))
 
+
+observe({
+  clicked  = input$save2HistScater
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "scater plot",  
+              plotData = .schnappsEnv[["DE_scaterPNG"]])
+  
+})
+
+observe({
+  clicked  = input$save2HistPanel
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistPanel \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "Panel plot",  
+              plotData = .schnappsEnv[["DE_panelPlot"]])
+  
+})
+
+
 # DE_scaterPNG ----
 #' DE_scaterPNG 
 #' reactive to plot highest expressed genes
@@ -79,7 +119,7 @@ DE_scaterPNG <- reactive({
     alt = "Scater plot should be here"
   )
   # end calculation
-  
+  .schnappsEnv[["DE_scaterPNG"]] <- p1
   printTimeEnd(start.time, "DE_scaterPNG")
   exportTestValues(DE_scaterPNG = {retVal})  
   return(retVal)

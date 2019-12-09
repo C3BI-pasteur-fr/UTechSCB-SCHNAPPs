@@ -519,3 +519,25 @@ subCluster2Dplot <- function() {
     p1
   })
 }
+
+# save to history violoin observer ----
+observe({
+  clicked  = input$save2HistVolc
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVolc \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlotly", comment = "volcano plot",  
+              plotData = .schnappsEnv[["sCA_volcanoPlot"]])
+  
+})
+
+

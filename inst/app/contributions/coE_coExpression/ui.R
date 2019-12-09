@@ -150,7 +150,9 @@ tabList <- list(
       fluidRow(column(width = 12,
                       # jqui_resizable(plotly::plotlyOutput("coE_geneGrp_vio_plot") )
                       jqui_resizable(plotOutput("coE_geneGrp_vio_plot") )
-      ))
+      )),
+      br(),
+      actionButton("save2HistVio", "save to history")
     )
   ),
   # SOMcluster ----

@@ -96,8 +96,8 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     sampCol = sampCol,
     ccols = ccols
   )
-
-  exportTestValues(coE_geneGrp_vio_plot = {
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
+   exportTestValues(coE_geneGrp_vio_plot = {
     retVal
   })
   return(retVal)
