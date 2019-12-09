@@ -124,7 +124,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     }
     # TODO ??? clean directory??
   }
-
+  
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
       packagePath <- "inst/app"
@@ -138,10 +138,33 @@ scShinyServer <- shinyServer(function(input, output, session) {
     "Readme.txt", "report.html", "sessionData.RData",
     "normalizedCounts.csv", "variables.used.txt"
   )
-
+  
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
-
+  
+  ### history setup
+  if (exists("historyPath", envir = .schnappsEnv)) {
+    if (!is.null(x = .schnappsEnv$historyPath)) {
+      if (!dir.exists(.schnappsEnv$historyPath)){
+        dir.create(.schnappsEnv$historyPath, recursive = T)
+      }  
+      if (!exists("historyFile", envir = .schnappsEnv)) {
+        .schnappsEnv$historyFile = "history2.Rmd"
+      }
+      if (is.null(.schnappsEnv$historyFile)) {
+        .schnappsEnv$historyFile = "history2.Rmd"
+      }
+      .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath,"/", basename(.schnappsEnv$historyFile))
+      line=paste0("---\ntitle: \"history\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n" )
+      write(line,file=.schnappsEnv$historyFile,append=FALSE)
+      
+    } else {
+      rm("historyPath", envir = .schnappsEnv)
+    }
+    }
+  
+  
   # TODO check if file exists
+  # TODO as parameter to load user specified information
   # TODO have this as an option to load other files
   if (file.exists(paste0(packagePath, "/geneLists.RData"))) {
     base::load(file = paste0(packagePath, "/geneLists.RData"))
@@ -150,7 +173,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
       geneLists <- list(emtpy = list())
     }
   }
-
+  
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   # base calculations that are quite expensive to calculate
   # display name, reactive name to be executed
@@ -159,7 +182,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     c("scran_Cluster", "scran_Cluster"),
     c("projections", "projections")
   )
-
+  
   # base projections
   # display name, reactive to calculate projections
   projectionFunctions <- list(
@@ -169,18 +192,18 @@ scShinyServer <- shinyServer(function(input, output, session) {
     c("before filter", "beforeFilterPrj")
   )
   .schnappsEnv$projectionFunctions <- projectionFunctions
-
+  
   # differential expression functions
   # used in subcluster analysis
   .schnappsEnv$diffExpFunctions <- list()
   diffExpFunctions <- list()
-
+  
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
   base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
   base::source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
   base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
-
+  
   # bookmarking ----
   # couldn't get bookmarking to work, esp. with the input file
   # setBookmarkExclude(c("bookmark1"))
@@ -192,7 +215,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   #   if (DEBUG) cat(file = stderr(), paste("bookmarking: DONE\n"))
   # })
   # Need to exclude the buttons from themselves being bookmarked
-
+  
   # load contribution reactives ----
   # parse all reactives.R files under contributions to include in application
   uiFiles <- base::dir(
@@ -205,12 +228,12 @@ scShinyServer <- shinyServer(function(input, output, session) {
     myProjections <- NULL
     myDiffExpFunctions <- NULL
     base::source(fp, local = TRUE)
-
+    
     heavyCalculations <- append2list(myHeavyCalculations, heavyCalculations)
     projectionFunctions <- append2list(myProjections, projectionFunctions)
     diffExpFunctions <- append2list(myDiffExpFunctions, diffExpFunctions)
   }
-
+  
   # update diffExpression radiobutton
   dgeChoices <- c()
   if (length(diffExpFunctions) > 0) {
@@ -229,7 +252,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     choices = dgeChoices
   )
   .schnappsEnv$diffExpFunctions <- diffExpFunctions
-
+  
   # load contribution outputs ----
   # parse all outputs.R files under contributions to include in application
   uiFiles <- base::dir(

@@ -688,3 +688,28 @@ addColData <- function(allScEx_log, scEx) {
   }
   return(allScEx_log)
 }
+
+add2history <- function(type, ...) {
+  
+  if (! exists("historyPath", envir = .schnappsEnv)) {
+    # if this variable is not set we are not saving
+    return(NULL)
+  }
+  
+  varnames=lapply(substitute(list(...))[-1], deparse)
+  arg = list(...)
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/add2history.RData')
+  if (type == "save") {
+    # browser()
+    tfile = tempfile(pattern = paste0(names(varnames[1]),"."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    assign(names(varnames[1]), arg[1])
+    save(file = tfile, list = c(varnames[[1]]))
+    
+    line=paste0("```{R}\n#load ", names(varnames[1]),"\nload(file = \"", basename(tfile), "\")\n```\n" )
+    write(line,file=.schnappsEnv$historyFile,append=TRUE)
+  }
+}
+

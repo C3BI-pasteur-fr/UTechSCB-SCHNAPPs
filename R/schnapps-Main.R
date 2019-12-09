@@ -37,7 +37,9 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                        defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
                        defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
                        DEBUG = FALSE,
-                       DEBUGSAVE = FALSE
+                       DEBUGSAVE = FALSE,
+                      historyPath = NULL,
+                     historyFile = NULL
 
                        ) {
   # on.exit({
@@ -57,6 +59,9 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
   assign("DEBUG", DEBUG, envir = .schnappsEnv)
   assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+  assign("historyPath", historyPath, envir = .schnappsEnv)
+  assign("historyFile", historyFile, envir = .schnappsEnv)
+  
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL
   scShinyServer <- NULL
