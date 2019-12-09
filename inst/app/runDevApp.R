@@ -6,14 +6,14 @@
   .schnappsEnv <- new.env(parent=emptyenv())
 # }
 
-  localContributionDir = "~/Rstudio/scShinyHub-github/bjContributions/"
+  localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
   # localContributionDir = ""
-  defaultValueSingleGene = "LYZ"
-defaultValueMultiGenes = "Gzmb, prf1, ifng, pdcd1, havcr2, lag3, tsc22d3, zfp36l2"
+  defaultValueSingleGene = "S100A4"
+defaultValueMultiGenes = "S100A4, S100A8, SH3BGRL3"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
 DEBUGSAVE = F
-historyFile = "~/Rstudio/Schnapps/history.File.pdf"
+historyPath = "~/Rstudio/Schnapps/history"
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -27,7 +27,7 @@ assign("defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
 assign("defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
 assign("DEBUG", DEBUG, envir = .schnappsEnv)
 assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
-assign("historyFile", historyFile, envir = .schnappsEnv)
+assign("historyPath", historyPath, envir = .schnappsEnv)
 ls(.schnappsEnv)
 
 devscShinyApp = TRUE
