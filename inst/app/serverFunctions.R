@@ -397,6 +397,7 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
 
 # twoDplotFromModule ----
 #' function to be used in markdown docs to ease the plotting of the clusterServer module
+# TODO relies on reactive groupNames, should be a variable! Same goes for input$groupName!
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
   grpNs <- groupNames$namesDF
   grpN <- make.names(input$groupName)
@@ -706,9 +707,9 @@ add2history <- function(type, comment = "", ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[1])
     save(file = tfile, list = c(names(varnames[1])))
-
+    # the load is commented out because it is not used at the moment and only takes time to load
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
+      "```{R}\n#load ", names(varnames[1]), "\n#load(file = \"", basename(tfile),
       "\")\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)

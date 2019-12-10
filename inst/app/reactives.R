@@ -1025,7 +1025,7 @@ gsRMGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
-
+  
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
   dt <- fd[useGenes, ]
@@ -1039,7 +1039,7 @@ gsRMGenesTable <- reactive({
   firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
   colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
   dt <- dt[, colOrder]
-
+  
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
@@ -1601,7 +1601,7 @@ pca <- reactive({
   center <- isolate(input$pcaCenter)
   scale <- isolate(input$pcaScale)
   pcaGenes <- isolate(input$genes4PCA)
-   
+  
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "pca:NULL\n")
@@ -2039,7 +2039,7 @@ projections <- reactive({
 })
 
 # initializeGroupNames ----
-# TODO shouldn't this be an observer???
+# TODO shouldn't this be an observer??? or just a function???
 initializeGroupNames <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "initializeGroupNames started.\n")
@@ -2062,22 +2062,31 @@ initializeGroupNames <- reactive({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
-  }
-  # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
   isolate({
-    df <-
-      data.frame(
-        all = rep(TRUE, dim(scEx)[2]),
-        none = rep(FALSE, dim(scEx)[2])
-      )
-    rownames(df) <- colnames(scEx)
-    groupNames$namesDF <- df
+    grpNs <- groupNames$namesDF
+    # if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
+    # }
+    # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
+    # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
+    # this will invalidate all previous selections.
+    if (is_empty(data.frame()) | !all(colnames(scEx) %in% rownames(grpNs))) {
+      df <-
+        data.frame(
+          all = rep(TRUE, dim(scEx)[2]),
+          none = rep(FALSE, dim(scEx)[2])
+        )
+      rownames(df) <- colnames(scEx)
+      groupNames$namesDF <- df
+    } else {
+      groupNames$namesDF = groupNames$namesDF[colnames(scEx),]
+    }
   })
 })
 
+# since initializeGroupNames depends on scEx only this will be set when the org data is changed.
 observe(initializeGroupNames())
+
 # sample --------
 sample <- reactive({
   if (DEBUG) {
