@@ -148,7 +148,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
         dir.create(.schnappsEnv$historyPath, recursive = T)
       }  
       if (!exists("historyFile", envir = .schnappsEnv)) {
-        .schnappsEnv$historyFile = "history2.Rmd"
+        .schnappsEnv$historyFile = paste0("history.",format(Sys.time(), "%Y-%b-%d.%H.%M"),".Rmd")
       }
       if (is.null(.schnappsEnv$historyFile)) {
         .schnappsEnv$historyFile = "history2.Rmd"
@@ -177,6 +177,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   # base calculations that are quite expensive to calculate
   # display name, reactive name to be executed
+  # TODO do we still need this?
   heavyCalculations <- list(
     c("pca", "pca"),
     c("scran_Cluster", "scran_Cluster"),
