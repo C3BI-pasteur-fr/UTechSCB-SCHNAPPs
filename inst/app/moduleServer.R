@@ -327,6 +327,12 @@ clusterServer <- function(input, output, session,
         
         subsetData <- subset(projections, dbCluster %in% inpClusters)
         grpSubset <- grpNs[rownames(subsetData), ]
+        if (!grpN %in% colnames(grpSubset)) {
+          if (!is.null(getDefaultReactiveDomain())) {
+            showNotification("group name is not available", id = "nogrpN", duration = NULL, type = "error")
+          }
+          return(NULL)
+        }
         grpVal <- rownames(grpSubset[grpSubset[, grpN] == "TRUE", ])
         if (length(grpVal) > 0) {
           return(grpVal)
