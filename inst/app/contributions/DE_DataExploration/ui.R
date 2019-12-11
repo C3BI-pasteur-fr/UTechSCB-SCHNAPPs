@@ -85,8 +85,16 @@ tabList <- list(
       ),
       fluidRow(
         column(width = 3,
-               uiOutput("DE_clusterSelectionPanelPlot")
+               # uiOutput("DE_clusterSelectionPanelPlot")
+               selectInput(inputId = "DE_clusterPP", label = "Clusters/Factor to use", 
+                           choices = c("dbCluster", "sampleNames"),
+                           selected = "dbCluster")
         ),
+        column(width = 3,
+               selectInput(inputId = "DE_PPGrp", label = "Values to use",
+                           choices = c("1","2"), selected = "1", multiple = TRUE)
+        )),
+      fluidRow(
         column(width = 3,
                selectInput("DE_dim_x",
                            label = "X",
