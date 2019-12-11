@@ -155,9 +155,9 @@ scShinyUI <- shinyUI(
       downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),
-      if (exists("historyFile", envir = .schnappsEnv)){
+      if (exists("historyPath", envir = .schnappsEnv)){
         # checkboxInput("save2History", "save to history file", FALSE)
-        actionButton("save2History", "Save current plots to history")
+        actionButton("comment2History", "Add comment to history")
       }
       # ,
       # verbatimTextOutput("save2Historystring")

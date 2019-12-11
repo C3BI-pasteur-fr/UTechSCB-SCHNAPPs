@@ -152,18 +152,19 @@ output$DE_panelPlot <- renderPlot({
   }
   if (DEBUG) cat(file = stderr(), "output$DE_panelPlot\n")
 
+  clicked <- input$updatePanelPlot
   scEx_log <- scEx_log()
   projections <- projections()
   coE_updateInputPPt()
-  genesin <- input$DE_panelplotids
+  genesin <- isolate(input$DE_panelplotids)
   # cl4 <- input$DE_clusterSelectionPanelPlot
-  ppgrp <- input$DE_PPGrp
-  ppCluster <- input$DE_clusterPP
+  ppgrp <- isolate(input$DE_PPGrp)
+  ppCluster <- isolate(input$DE_clusterPP)
 
-  dimx4 <- input$DE_dim_x
-  dimy4 <- input$DE_dim_y
-  sameScale <- input$DE_panelplotSameScale
-  nCol <- as.numeric(input$DE_nCol)
+  dimx4 <- isolate(input$DE_dim_x)
+  dimy4 <- isolate(input$DE_dim_y)
+  sameScale <- isolate(input$DE_panelplotSameScale)
+  nCol <- isolate(as.numeric(input$DE_nCol))
 
   if (is.null(scEx_log) | is.null(projections) | is.null(ppgrp)) {
     return(NULL)
