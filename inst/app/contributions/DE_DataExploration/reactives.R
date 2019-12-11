@@ -12,31 +12,32 @@ observe({
   .schnappsEnv$DE_clusterPP <- input$DE_clusterPP
 })
 
-# coE_updateInputSOMt ====
-coE_updateInputPPt <- reactive({
-  if (DEBUG) cat(file = stderr(), "coE_updateInputPPt started.\n")
+# DE_updateInputPPt ====
+DE_updateInputPPt <- reactive({
+  if (DEBUG) cat(file = stderr(), "DE_updateInputPPt started.\n")
   start.time <- base::Sys.time()
   on.exit({
-    printTimeEnd(start.time, "coE_updateInputPPt")
+    printTimeEnd(start.time, "DE_updateInputPPt")
     if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "coE_updateInputPPt")
+      removeNotification(id = "DE_updateInputPPt")
     }
   })
   if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("coE_updateInputPPt", id = "coE_updateInputPPt", duration = NULL)
+    showNotification("DE_updateInputPPt", id = "DE_updateInputPPt", duration = NULL)
   }
-  
   tsneData <- projections()
   
   # Can use character(0) to remove all choices
   if (is.null(tsneData)) {
     return(NULL)
   }
+  save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls(), ls(envir = globalenv())))
+  # load(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata")
   
   coln <- colnames(tsneData)
   choices <- c()
   for (cn in coln) {
-    if (length(levels(as.factor(tsneData[, cn]))) < 20) {
+    if (length(levels(as.factor(tsneData[, cn]))) < 50) {
       choices <- c(choices, cn)
     }
   }
@@ -45,7 +46,7 @@ coE_updateInputPPt <- reactive({
   }
   updateSelectInput(
     session,
-    "coE_clusterPP",
+    "DE_clusterPP",
     choices = choices,
     selected = .schnappsEnv$DE_PPGrp
   )
