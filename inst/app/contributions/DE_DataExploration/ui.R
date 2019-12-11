@@ -84,6 +84,12 @@ tabList <- list(
         )
       ),
       fluidRow(
+        column(width = 12, offset = 1,
+               actionButton("updatePanelPlot", "apply changes", width = '80%', 
+                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        )
+      ),
+      fluidRow(
         column(width = 3,
                # uiOutput("DE_clusterSelectionPanelPlot")
                selectInput(inputId = "DE_clusterPP", label = "Clusters/Factor to use", 

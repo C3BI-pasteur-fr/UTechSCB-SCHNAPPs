@@ -703,6 +703,16 @@ add2history <- function(type, comment = "", ...) {
     save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/add2history.RData')
+  if (type == "text") {
+    cat(file = stderr(), paste0("history text: \n"))
+    assign(names(varnames[1]), arg[1])
+    line <- paste0(
+      "\n", get(names(varnames[1])), "\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    
+  }
+  
   if (type == "save") {
     # browser()
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")

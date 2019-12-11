@@ -36,6 +36,41 @@ if ("crayon" %in% rownames(installed.packages()) == FALSE) {
 }
 
 
+# add comment to history ----
+
+commentModal <- function(failed = FALSE) {
+  modalDialog(
+    # TODO
+    #  mce not working, maybe this helps eventually: https://github.com/twbs/bootstrap/issues/549
+    # if ("shinyMCE" %in% rownames(installed.packages())) {
+    #   shinyMCE::tinyMCE(
+    #     "Comment4history",
+    #     "Please describe your work. This will be included in the history"
+    #   )
+    # } else {
+      textInput("Comment4history", "Please describe your work. This will be included in the history")
+    # }
+,
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("commentok", "OK")
+    )
+  )
+}
+
+# Show modal when button is clicked.
+observeEvent(input$comment2History, {
+  showModal(commentModal())
+})
+# When OK button is pressed, attempt to load the data set. If successful,
+# remove the modal. If not show another modal, but this time with a failure
+# message.
+observeEvent(input$commentok, {
+  cat(file = stderr(), paste0("commentok: \n"))
+  comment <- input$Comment4history
+  add2history(type = "text", comment = "",  text2add = comment)
+  removeModal()
+})
 # inputDataFunc ----
 # loads singleCellExperiment
 #   only counts, rowData, and colData are used. Everything else needs to be recomputed
