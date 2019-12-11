@@ -155,7 +155,7 @@ output$DE_panelPlot <- renderPlot({
   clicked <- input$updatePanelPlot
   scEx_log <- scEx_log()
   projections <- projections()
-  coE_updateInputPPt()
+  DE_updateInputPPt()
   genesin <- isolate(input$DE_panelplotids)
   # cl4 <- input$DE_clusterSelectionPanelPlot
   ppgrp <- isolate(input$DE_PPGrp)
