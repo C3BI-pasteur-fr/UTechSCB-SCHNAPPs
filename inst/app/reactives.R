@@ -2064,9 +2064,9 @@ initializeGroupNames <- reactive({
   }
   isolate({
     grpNs <- groupNames$namesDF
-    # if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
-    # }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
+    }
     # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
     # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
     # this will invalidate all previous selections.

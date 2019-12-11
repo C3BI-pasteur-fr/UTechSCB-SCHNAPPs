@@ -33,6 +33,7 @@ Imports:
     shinyTree,
     shinyWidgets,
     SingleCellExperiment,
+    ggpubr,
     SummarizedExperiment,
     threejs,
     tidyverse,

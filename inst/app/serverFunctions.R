@@ -698,6 +698,7 @@ add2history <- function(type, comment = "", ...) {
 
   varnames <- lapply(substitute(list(...))[-1], deparse)
   arg <- list(...)
+  if(is.null(arg[[1]])) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()))
   }

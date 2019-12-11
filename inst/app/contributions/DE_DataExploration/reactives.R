@@ -1,6 +1,77 @@
 suppressMessages(require(ggplot2))
 
 
+.schnappsEnv$coE_PPGrp <- "sampleNames"
+observe({
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_PPGrp\n"))
+  .schnappsEnv$DE_PPGrp <- input$DE_PPGrp
+})
+.schnappsEnv$coE_PPSelection <- "1"
+observe({
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_clusterPP\n"))
+  .schnappsEnv$DE_clusterPP <- input$DE_clusterPP
+})
+
+# coE_updateInputSOMt ====
+coE_updateInputPPt <- reactive({
+  if (DEBUG) cat(file = stderr(), "coE_updateInputPPt started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_updateInputPPt")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_updateInputPPt")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_updateInputPPt", id = "coE_updateInputPPt", duration = NULL)
+  }
+  
+  tsneData <- projections()
+  
+  # Can use character(0) to remove all choices
+  if (is.null(tsneData)) {
+    return(NULL)
+  }
+  
+  coln <- colnames(tsneData)
+  choices <- c()
+  for (cn in coln) {
+    if (length(levels(as.factor(tsneData[, cn]))) < 20) {
+      choices <- c(choices, cn)
+    }
+  }
+  if (length(choices) == 0) {
+    choices <- c("no valid columns")
+  }
+  updateSelectInput(
+    session,
+    "coE_clusterPP",
+    choices = choices,
+    selected = .schnappsEnv$DE_PPGrp
+  )
+})
+
+observeEvent(input$DE_clusterPP,{
+  projections <- projections()
+  if (DEBUG) cat(file = stderr(), "observeEvent: input$DE_clusterPP\n")
+  # Can use character(0) to remove all choices
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  if(!input$DE_clusterPP %in% colnames(projections)) return(NULL)
+  choicesVal = levels(projections[, input$DE_clusterPP])
+  updateSelectInput(
+    session,
+    "DE_PPGrp",
+    choices = choicesVal,
+    selected = .schnappsEnv$DE_clusterPP
+  )
+  
+})
+
+
+
+
 observe({
   clicked  = input$save2HistScater
   if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
@@ -38,6 +109,8 @@ observe({
               plotData = .schnappsEnv[["DE_panelPlot"]])
   
 })
+
+
 
 
 # DE_scaterPNG ----
