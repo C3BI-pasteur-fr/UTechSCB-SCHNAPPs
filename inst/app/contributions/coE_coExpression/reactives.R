@@ -808,7 +808,7 @@ coE_updateInputXviolinPlot <- reactive({
   coln <- colnames(tsneData)
   choices <- c()
   for (cn in coln) {
-    if (length(levels(as.factor(tsneData[, cn]))) < 20) {
+    if (length(levels(as.factor(tsneData[, cn]))) < 50) {
       choices <- c(choices, cn)
     }
   }
