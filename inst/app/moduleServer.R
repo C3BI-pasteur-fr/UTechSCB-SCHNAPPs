@@ -215,7 +215,7 @@ clusterServer <- function(input, output, session,
     scEx_log <- scEx_log()
     scEx <- scEx()
     namedGroup <- input$groupNames
-    grpN <- make.names(input$groupName)
+    grpN <- make.names(input$groupName, unique = TRUE)
     grpNs <- groupNames$namesDF
     
     if (is.null(projections) | is.null(brushedPs)) {
@@ -289,8 +289,8 @@ clusterServer <- function(input, output, session,
         if (DEBUG) cat(file = stderr(), paste("selectedCellNames is null\n"))
         retVal <- NULL
       }
-      grpN <- make.names(input$groupName)
-      grpSelected <- make.names(input$groupNames)
+      grpN <- make.names(input$groupName, unique = TRUE)
+      grpSelected <- make.names(input$groupNames, unique = TRUE)
       grpNs <- groupNames$namesDF
       if (length(grpN) == 0 | length(grpNs) == 0) {
         if (DEBUG) cat(file = stderr(), "reactiveValues: grpN empty\n")
@@ -401,7 +401,7 @@ clusterServer <- function(input, output, session,
     tdata <- tData()
     projections <- projections()
     grpNs <- groupNames$namesDF
-    grpN <- make.names(input$groupName)
+    grpN <- make.names(input$groupName, unique = TRUE)
     
     # returnValues$cluster <- input$clusters
     dimY <- input$dimension_y
@@ -634,7 +634,7 @@ clusterServer <- function(input, output, session,
       showNotification("nCellsVisibleSelected", id = "nCellsVisibleSelected", duration = NULL)
     }
     
-    grpN <- make.names(input$groupName)
+    grpN <- make.names(input$groupName, unique = TRUE)
     grpNs <- groupNames$namesDF
     # inpClusters <- input$clusters
     projections <- projections()
@@ -764,8 +764,8 @@ clusterServer <- function(input, output, session,
     scEx_log <- scEx_log()
     # moreOptions <- input$moreOptions
     retVal <- selectedCellNames()
-    grpN <- make.names(input$groupName)
-    grpSelected <- make.names(input$groupNames)
+    grpN <- make.names(input$groupName, unique = TRUE)
+    grpSelected <- make.names(input$groupNames, unique = TRUE)
     grpNs <- groupNames$namesDF
     myns <- ns("cellSelection")
 

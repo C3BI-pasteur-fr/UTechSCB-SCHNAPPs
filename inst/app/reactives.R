@@ -1971,6 +1971,8 @@ projections <- reactive({
   projections <- pd
   
   if (!is.null(pca)) {
+    comColNames = colnames(projections) %in% colnames(pca$x)
+    colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
     projections <- cbind(projections, pca$x[rownames(projections),])
   }
   
@@ -1996,9 +1998,9 @@ projections <- reactive({
       # browser()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (is(tmp, "data.frame")) {
-        cn <- make.names(c(colnames(projections), colnames(tmp)))
+        cn <- make.names(c(colnames(projections), colnames(tmp)), unique = TRUE)
       } else {
-        cn <- make.names(c(colnames(projections), make.names(proj[1])))
+        cn <- make.names(c(colnames(projections), make.names(proj[1])), unique = TRUE)
       }
       if (length(tmp) == 0) {
         next()

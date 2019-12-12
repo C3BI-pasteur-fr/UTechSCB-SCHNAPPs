@@ -400,7 +400,7 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
 # TODO relies on reactive groupNames, should be a variable! Same goes for input$groupName!
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
   grpNs <- groupNames$namesDF
-  grpN <- make.names(input$groupName)
+  grpN <- make.names(input$groupName, unique = TRUE)
 
   dimY <- input[[paste0(moduleName, "-dimension_y")]]
   dimX <- input[[paste0(moduleName, "-dimension_x")]]
