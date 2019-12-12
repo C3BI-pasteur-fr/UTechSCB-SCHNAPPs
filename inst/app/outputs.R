@@ -728,7 +728,7 @@ observe({
 
 observe({
   input$newPrj
-  updateTextInput(session, "newPrj", value = make.names(input$newPrj))
+  updateTextInput(session, "newPrj", value = make.names(input$newPrj, unique = TRUE))
 })
 
 observeEvent(input$delPrjsButton, {

@@ -31,7 +31,7 @@ DE_updateInputPPt <- reactive({
   if (is.null(tsneData)) {
     return(NULL)
   }
-  save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls(), ls(envir = globalenv())))
+  # save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls(), ls(envir = globalenv())))
   # load(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata")
   
   coln <- colnames(tsneData)
