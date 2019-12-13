@@ -50,7 +50,9 @@ myNormalizationParameters <- list(
                  label = "Scaling to use for transformed data",
                  min = 1, max = 30000, step = 10,
                  value = 1000
-    )
+    ),
+    textInput("DE_seuratSCtransformm_keepfeatures", "comma separated list of genes keep", value = "")
+    
   ),
   DE_seuratRefBased = tagList(
     numericInput("DE_seuratRefBased_nfeatures",
@@ -66,11 +68,14 @@ myNormalizationParameters <- list(
                  label = "Scaling to use for transformed data",
                  min = 1, max = 30000, step = 10,
                  value = 1000
-    )
+    ),
+    textInput("DE_seuratRefBased_keepfeatures", "comma separated list of genes keep", value = "")
   )
 )
 
-DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalingFactor = 1000) {
+# DE_seuratRefBasedFunc ----
+DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, 
+                                  scalingFactor = 1000, keep.features = "") {
   require(Seurat)
   cellMeta <- colData(scEx)
   # split in different samples
@@ -85,8 +90,13 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalin
   }
   integrated <- tryCatch(
     {
-      # save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+      load(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData")
       features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)
+     
+      keep.features = keep.features[keep.features %in% rownames(scEx)]
+      features = unique(c(features, keep.features))
+
       seur.list <- PrepSCTIntegration(
         object.list = seur.list, anchor.features = features,
         verbose = TRUE
@@ -94,6 +104,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalin
       # take the sample with the highest number of cells as reference
       reference_dataset <- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]
       
+ 
       anchors <- FindIntegrationAnchors(
         object.list = seur.list, normalization.method = "SCT",
         anchor.features = features, verbose = TRUE, k.filter = k.filter,
@@ -132,6 +143,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalin
   return(scEx_bcnorm)
 }
 
+# DE_seuratRefBased ----
 DE_seuratRefBased <- reactive({
   if (DEBUG) cat(file = stderr(), "DE_seuratRefBased started.\n")
   start.time <- base::Sys.time()
@@ -146,9 +158,10 @@ DE_seuratRefBased <- reactive({
   }
   
   scEx <- scEx()
-  nfeatures <- input$DE_seuratRefBased_nfeatures
-  k.filter <- input$DE_seuratRefBased_k.filter
-  scalingFactor <- input$DE_seuratRefBased_scaleFactor
+  nfeatures <- isolate(input$DE_seuratRefBased_nfeatures)
+  k.filter <- isolate(input$DE_seuratRefBased_k.filter)
+  scalingFactor <- isolate(input$DE_seuratRefBased_scaleFactor)
+  geneNames <-  input$DE_seuratRefBased_keepfeatures
   
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -161,11 +174,14 @@ DE_seuratRefBased <- reactive({
   }
   # load(file="~/SCHNAPPsDebug/DE_seuratRefBased.RData")
   
+  featureData <- rowData(scEx)
+  geneid <- geneName2Index(geneNames, featureData)
   
   
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratRefBasedFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, scalingFactor = scalingFactor)
+  retVal <- DE_seuratRefBasedFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, 
+                                  scalingFactor = scalingFactor, keep.features = geneid)
   
   if (is.null(retVal)) {
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
@@ -177,8 +193,9 @@ DE_seuratRefBased <- reactive({
   return(retVal)
 })
 
-# =======
-DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100, scalingFactor = 1000) {
+# DE_seuratSCtransformFunc =======
+DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100, 
+                                     scalingFactor = 1000, keep.features = "") {
   require(Seurat)
   cellMeta <- colData(scEx)
   # split in different samples
@@ -195,14 +212,20 @@ DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100, sca
       }
       
       features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)
+      keep.features = keep.features[keep.features %in% rownames(scEx)]
+      features = unique(c(features, keep.features))
+      
       seur.list <- PrepSCTIntegration(
         object.list = seur.list, anchor.features = features,
         verbose = TRUE
       )
+      
       anchors <- FindIntegrationAnchors(
         object.list = seur.list, normalization.method = "SCT",
         anchor.features = features, verbose = TRUE, k.filter = k.filter
       )
+      keep.features = keep.features[keep.features %in% rownames(scEx)]
+      anchors = unique(c(anchors, keep.features))
       integrated <- IntegrateData(
         anchorset = anchors, normalization.method = "SCT",
         verbose = TRUE
@@ -238,6 +261,7 @@ DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100, sca
   return(scEx_bcnorm)
 }
 
+# DE_seuratSCtransform ----
 DE_seuratSCtransform <- reactive({
   if (DEBUG) cat(file = stderr(), "DE_seuratSCtransform started.\n")
   start.time <- base::Sys.time()
@@ -255,6 +279,7 @@ DE_seuratSCtransform <- reactive({
   nfeatures <- input$DE_seuratSCtransform_nfeatures
   k.filter <- input$DE_seuratSCtransform_k.filter
   scalingFactor <- input$DE_seuratSCtransform_scaleFactor
+  geneNames <-  input$DE_seuratSCtransformm_keepfeatures
   
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -263,15 +288,17 @@ DE_seuratSCtransform <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratSCtransform.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_seuratSCtransform.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_seuratSCtransform.RData")
   
-  
+  featureData <- rowData(scEx)
+  geneid <- geneName2Index(geneNames, featureData)
   
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratSCtransformFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, scalingFactor = scalingFactor)
+  retVal <- DE_seuratSCtransformFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, 
+                                     scalingFactor = scalingFactor, keep.features = geneid)
   
   if (is.null(retVal)) {
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
