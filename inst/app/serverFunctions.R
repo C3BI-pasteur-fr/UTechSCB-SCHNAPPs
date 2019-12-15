@@ -351,8 +351,11 @@ set.ifnull <- function(x, y) {
   return(x)
 }
 
-expMean <- function(x) {
-  return(log(mean(exp(x) - 1) + 1))
+expMean <- function(x, normFactor = 1) {
+  if (is.null(normFactor)){
+    normFactor = 1
+  }
+  return(log(mean(exp(x/normFactor) - 1) + 1)*normFactor)
 }
 
 
