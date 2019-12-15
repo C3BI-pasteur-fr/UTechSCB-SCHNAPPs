@@ -173,7 +173,7 @@ DE_seuratRefBased <- reactive({
     save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/DE_seuratRefBased.RData")
-  
+  .schnappsEnv$normalizationFactor = scalingFactor
   featureData <- rowData(scEx)
   geneid <- geneName2Index(geneNames, featureData)
   
@@ -291,7 +291,7 @@ DE_seuratSCtransform <- reactive({
     save(file = "~/SCHNAPPsDebug/DE_seuratSCtransform.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_seuratSCtransform.RData")
-  
+  .schnappsEnv$normalizationFactor <- scalingFactor
   featureData <- rowData(scEx)
   geneid <- geneName2Index(geneNames, featureData)
   
@@ -447,7 +447,7 @@ DE_logGeneNormalization <- reactive({
   # TODO ?? define scaling factor somewhere else???
   sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
   retVal <- DE_logNormalizationGenefunc(scEx, inputGenes, scalingFactor = sfactor)
-  
+  .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logGeneNormalization = {
     assays(retVal)[["logcounts"]]
   })
@@ -531,7 +531,7 @@ DE_logNormalization <- reactive({
   # TODO ?? define scaling factor somewhere else???
   sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
   retVal <- DE_logNormalizationfunc(scEx, scalingFactor = sfactor)
-  
+  .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logNormalization = {
     assays(retVal)[["logcounts"]]
   })
