@@ -312,6 +312,26 @@ generalParametersTab <- shinydashboard::tabItem(
     checkbsTT(item = "tabsetPCA"),
   ),
   fluidRow(
+    box(
+      title = "DimPlot for PCA", solidHeader = TRUE, width = 12,  status = 'primary', collapsible = TRUE, collapsed = TRUE,
+      # The id lets us use input$tabset1 on the server to find the current tab
+      id = "dimPlotPCA",
+      fluidRow(
+        column(12,
+               offset = 1,
+               actionButton("updateDimPlot", "generate plot", width = '80%', 
+                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        ),
+      ),
+      fluidRow(
+        column(width = 12,
+               jqui_resizable(plotOutput("dimPlotPCA"))
+        )
+      ),
+      checkbsTT(item = "dimPlotPCA"),
+    )
+  ),
+  fluidRow(
     tabBox(
       title = "Parameters for clustering", width = 12,
       id = "tabsetCluster",

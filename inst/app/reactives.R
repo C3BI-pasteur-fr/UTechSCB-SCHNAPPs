@@ -36,6 +36,79 @@ if ("crayon" %in% rownames(installed.packages()) == FALSE) {
 }
 
 
+# <- reactive({
+output$dimPlotPCA <- renderPlot({
+  if (DEBUG) {
+    cat(file = stderr(), "dimPlotPCA started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "dimPlotPCA")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "dimPlotPCA")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("dimPlotPCA", id = "dimPlotPCA", duration = NULL)
+  }
+  
+  input$updateDimPlot
+  scEx_log <- isolate(scEx_log())
+  scEx <- isolate(scEx())
+  pca <- isolate(pca())
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "dimPlotPCA:NULL\n")
+    }
+    return(0)
+  }
+  # if (.schnappsEnv$DEBUGSAVE) {
+  save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
+  # }
+  # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
+  
+  # return NuLL because it is not working correctly
+  return(NULL)
+  
+  scEx = scEx[rownames(pca$rotation),]
+  scEx_log = scEx_log[rownames(pca$rotation),]
+  
+  cellMeta = colData(scEx_log)
+  rData = rowData(scEx)
+  meta.data = cellMeta[,"sampleNames", drop = FALSE]
+  dat = assays(scEx)[[1]][rownames(scEx_log),]
+  rownames(dat) = rData[rownames(scEx_log),"symbol"]
+  rownames(pca$rotation) = rData[rownames(pca$rotation),"symbol"]
+  seurDat <- CreateSeuratObject(
+    counts = dat,
+    meta.data = meta.data
+  )
+  
+  # TODO use scEx_log
+  logDat = assays(scEx_log)[[1]]
+  rData = rowData(scEx_log)
+  rownames(logDat) = rData$symbol
+  seurDat@assays$RNA@data = as(logDat,"dgCMatrix")
+  # seurDat <- NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
+  # seurDat <- FindVariableFeatures(seurDat, selection.method = "vst", nfeatures = 2000)
+  
+  # recalculating because createDimReducObject is not working
+  all.genes <- rownames(seurDat)
+  seurDat <- ScaleData(seurDat, features = all.genes)
+  seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
+  
+  colnames(pca$x) = str_replace(colnames(pca$x), "PC", "PC_")
+
+  # not working
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$rotation, loadings = pca$x[colnames(seurDat),], stdev = pca$var_pcs, key = "PC_", assay = "RNA")
+  seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
+  
+  # DimPlot(seurDat, reduction = "pca")
+  
+  d = DimHeatmap(seurDat, dims = 1:15, cells = NULL, balanced = TRUE, fast = FALSE, projected = TRUE, reduction = "pca")
+  d
+})
+
 # add comment to history ----
 
 commentModal <- function(failed = FALSE) {
@@ -48,9 +121,9 @@ commentModal <- function(failed = FALSE) {
     #     "Please describe your work. This will be included in the history"
     #   )
     # } else {
-      textInput("Comment4history", "Please describe your work. This will be included in the history")
+    textInput("Comment4history", "Please describe your work. This will be included in the history")
     # }
-,
+    ,
     footer = tagList(
       modalButton("Cancel"),
       actionButton("commentok", "OK")
@@ -1495,7 +1568,7 @@ scExLogMatrixDisplay <- reactive({
     )
   }
   rownames(retVal) <-
-    make.names(rowData(scEx)$symbol, unique = TRUE)
+    retVal$symbol
   
   return(retVal)
 })
@@ -1519,7 +1592,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
   genesin <- geneName2Index(pcaGenes, featureData)
@@ -1576,23 +1649,44 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
-    BiocSingular::runPCA(
-      # t(assays(scEx_log)[["logcounts"]]),
-      scEx_log[genesin, ],
-      ncomponents = rank,
-      ntop = pcaN,
-      exprs_values = "logcounts",
-      # rank = rank,
-      #  center = center,
-      scale = scale
-      # ,
-      # method = "irlba",
-      # BPPARAM = bpparam(),
-      # BPPARAM = SnowParam(workers = 3, type = "SOCK),
-      # BPPARAM = MulticoreParam(
-      #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
-      # BSPARAM = IrlbaParam()
-    )
+    x <- assays(scEx_log)[["logcounts"]]
+    genesin = genesin[genesin %in% rownames(scEx_log)]
+    if (is.null(genesin) || length(genesin) == 0) {
+      genesin <- rownames(scEx_log)
+    }
+    x <- as.matrix(x)[genesin, , drop = FALSE]
+    rv <- rowVars((as.matrix(x)))
+    if (scale) {
+      keep <- rv >= (1e-8 * .schnappsEnv$normalizationFactor)
+      x <- x[keep,,drop=FALSE]/sqrt(rv[keep])
+      rv <- rep(1, nrow(x))
+    }
+    if (DEBUG) {
+      cat(file = stderr(), paste("pcaFunc keeping: ",nrow(x)," rows.\n")
+    }
+    x <- t(x)
+    # TODO for the rotation we might have less genes. is this handled correctly?
+    pca <- runPCA(x, rank=rank, get.rotation=TRUE)
+    rownames(pca$rotation) = genesin[keep]
+    rownames(pca$x) = colnames(scEx_log)
+    pca
+    # BiocSingular::runPCA(
+    #   x,
+    #   # scEx_log[genesin, ],
+    #   # ncomponents = rank,
+    #   ntop = pcaN,
+    #   # exprs_values = "logcounts",
+    #   rank = rank,
+    #   #  center = center,
+    #   scale = scale
+    #   # ,
+    #   # method = "irlba",
+    #   # BPPARAM = bpparam(),
+    #   # BPPARAM = SnowParam(workers = 3, type = "SOCK),
+    #   # BPPARAM = MulticoreParam(
+    #   #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
+    #   # BSPARAM = IrlbaParam()
+    # )
   })
   
   if (is.null(scaterPCA)) {
@@ -1603,13 +1697,14 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
   #
   # rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
-    # x =  scaterPCA$x,
-    x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    # var_pcs = scaterPCA$sdev
-    var_pcs = attr(
-      SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-      "percentVar"
-    )
+    x =  scaterPCA$x,
+    # x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    var_pcs = scaterPCA$sdev,
+    rotation = scaterPCA$rotation
+    # var_pcs = attr(
+    #   SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    #   "percentVar"
+    # )
   ))
 }
 
