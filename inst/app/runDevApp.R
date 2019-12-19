@@ -8,8 +8,8 @@
 
   localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
   # localContributionDir = ""
-  defaultValueSingleGene = "S100A4"
-defaultValueMultiGenes = "S100A4, S100A8, SH3BGRL3"
+  defaultValueSingleGene = "itgae"
+defaultValueMultiGenes = " itgae, cd69, itga1"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
 DEBUGSAVE = F
