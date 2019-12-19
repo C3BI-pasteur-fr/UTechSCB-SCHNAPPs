@@ -1592,7 +1592,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv())))
   }
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
   genesin <- geneName2Index(pcaGenes, featureData)
@@ -1649,44 +1649,23 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
-    x <- assays(scEx_log)[["logcounts"]]
-    genesin = genesin[genesin %in% rownames(scEx_log)]
-    if (is.null(genesin) || length(genesin) == 0) {
-      genesin <- rownames(scEx_log)
-    }
-    x <- as.matrix(x)[genesin, , drop = FALSE]
-    rv <- rowVars((as.matrix(x)))
-    if (scale) {
-      keep <- rv >= (1e-8 * .schnappsEnv$normalizationFactor)
-      x <- x[keep,,drop=FALSE]/sqrt(rv[keep])
-      rv <- rep(1, nrow(x))
-    }
-    if (DEBUG) {
-      cat(file = stderr(), paste("pcaFunc keeping: ",nrow(x)," rows.\n")
-    }
-    x <- t(x)
-    # TODO for the rotation we might have less genes. is this handled correctly?
-    pca <- runPCA(x, rank=rank, get.rotation=TRUE)
-    rownames(pca$rotation) = genesin[keep]
-    rownames(pca$x) = colnames(scEx_log)
-    pca
-    # BiocSingular::runPCA(
-    #   x,
-    #   # scEx_log[genesin, ],
-    #   # ncomponents = rank,
-    #   ntop = pcaN,
-    #   # exprs_values = "logcounts",
-    #   rank = rank,
-    #   #  center = center,
-    #   scale = scale
-    #   # ,
-    #   # method = "irlba",
-    #   # BPPARAM = bpparam(),
-    #   # BPPARAM = SnowParam(workers = 3, type = "SOCK),
-    #   # BPPARAM = MulticoreParam(
-    #   #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
-    #   # BSPARAM = IrlbaParam()
-    # )
+    BiocSingular::runPCA(
+      # t(assays(scEx_log)[["logcounts"]]),
+      scEx_log[genesin, ],
+      ncomponents = rank,
+      ntop = pcaN,
+      exprs_values = "logcounts",
+      # rank = rank,
+      #  center = center,
+      scale = scale
+      # ,
+      # method = "irlba",
+      # BPPARAM = bpparam(),
+      # BPPARAM = SnowParam(workers = 3, type = "SOCK),
+      # BPPARAM = MulticoreParam(
+      #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
+      # BSPARAM = IrlbaParam()
+    )
   })
   
   if (is.null(scaterPCA)) {
@@ -1697,17 +1676,15 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
   #
   # rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
-    x =  scaterPCA$x,
-    # x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    var_pcs = scaterPCA$sdev,
-    rotation = scaterPCA$rotation
-    # var_pcs = attr(
-    #   SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    #   "percentVar"
-    # )
+    # x =  scaterPCA$x,
+    x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    # var_pcs = scaterPCA$sdev
+    var_pcs = attr(
+      SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+      "percentVar"
+    )
   ))
 }
-
 # pca ----
 pca <- reactive({
   if (DEBUG) {
