@@ -133,14 +133,16 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
-    return(NULL)
+  if (dimY == "histogram") {
+    if (!all(c(dimX, dimCol) %in% colnames(projections))) {
+      return(NULL)
+    }
+  } else {
+    if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
+      return(NULL)
+    }
   }
-
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
-    return(NULL)
-  }
-
+  
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "exprs"
 
@@ -186,7 +188,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (divXBy != "None") {
     subsetData[, dimX] <- subsetData[, dimX] / subsetData[, divXBy]
   }
-  if (divYBy != "None") {
+  if (divYBy != "None" & dimY != "histogram") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
   }
 
@@ -200,8 +202,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
     typeX <- NULL
   }
-  if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
-    typeY <- NULL
+  if (dimY != "histogram"){
+    if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
+      typeY <- NULL
+    }
+  } else {
+    typeX = NULL
   }
   xAxis <- list(
     title = dimX,
@@ -216,14 +222,41 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (dimX == "barcode") {
     subsetData$"__dimXorder" <- rank(subsetData[, dimY])
     dimX <- "__dimXorder"
+    if (dimY == "histogram"){
+      # Error message
+      return(NULL)
+    }
   }
-
-  if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
-    subsetData[, dimX] <- as.character(subsetData[, dimX])
+  # save(file = "~/SCHNAPPsDebug/2dplot.RData", list = ls())
+  # load("~/SCHNAPPsDebug/2dplot.RData")
+  
+  if (dimY != "histogram"){
+    if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
+      subsetData[, dimX] <- as.character(subsetData[, dimX])
+    }
+    if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
+      subsetData[, dimY] <- as.character(subsetData[, dimY])
+    }
+  } else {
+    # if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
+    #   # barchart
+    #   # subsetData[, dimX] <- as.character(subsetData[, dimX])
+    # } else {
+      # histogram
+      p <- plot_ly( x=~subsetData[, dimX], type = "histogram") %>%
+        layout(
+          xaxis = xAxis,
+          yaxis = yAxis,
+          title = gtitle,
+          dragmode = "select"
+        )
+      return (p)
+      # %>%
+      #   layout(yaxis=list(type='linear'))
+    # }
+    
   }
-  if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
-    subsetData[, dimY] <- as.character(subsetData[, dimY])
-  }
+  
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)

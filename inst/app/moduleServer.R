@@ -164,7 +164,7 @@ clusterServer <- function(input, output, session,
                       selected = .schnappsEnv$dim1
     )
     updateSelectInput(session, "dimension_y",
-                      choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
+                      choices = c(colnames(projections), "histogram", "UmiCountPerGenes", "UmiCountPerGenes2"),
                       selected = .schnappsEnv$dim2
     )
     updateSelectInput(session, "dimension_col",
