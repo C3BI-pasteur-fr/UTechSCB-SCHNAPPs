@@ -90,8 +90,8 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
   }
   integrated <- tryCatch(
     {
-      save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
-      load(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData")
+      # save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+      # load(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData")
       features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)
      
       keep.features = keep.features[keep.features %in% rownames(scEx)]
