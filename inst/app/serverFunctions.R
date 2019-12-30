@@ -167,6 +167,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   } else {
     subsetData <- projections
   }
+  #ensure that the highest values are plotted last.
+  if (dimCol %in% colnames(subsetData)){
+    if (is.numeric(subsetData[,dimCol])){
+      subsetData <- subsetData[order(subsetData[,dimCol]),]
+    }
+  }
   # subsetData$dbCluster = factor(subsetData$dbCluster)
   # if there are more than 18 samples ggplot cannot handle different shapes and we ignore the
   # sample information
