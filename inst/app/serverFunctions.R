@@ -133,12 +133,17 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
+  
+  # histogram as y and cellDensity as color is not allowed
+  
   if (dimY == "histogram") {
     if (!all(c(dimX, dimCol) %in% colnames(projections))) {
       return(NULL)
     }
   } else {
-    if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
+    # need to do proper checking of possibilities
+    # removing dimCol for now
+    if (!all(c(dimX, dimY) %in% colnames(projections))) {
       return(NULL)
     }
   }
@@ -255,6 +260,10 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       #   layout(yaxis=list(type='linear'))
     # }
     
+  }
+  
+  if (dimCol == "cellDensity") {
+    subsetData$cellDensity <- get_density(subsetData[,dimX], subsetData[,dimY], n = 100)
   }
   
   # dimCol = "Gene.count"
@@ -814,3 +823,20 @@ add2history <- function(type, comment = "", ...) {
     
   }
 }
+
+
+
+
+# Get density of points in 2 dimensions. ----
+# @param x A numeric vector.
+# @param y A numeric vector.
+# @param n Create a square n by n grid to compute density.
+# @return The density within each square.
+get_density <- function(x, y, ...) {
+  dens <- MASS::kde2d(x, y, ...)
+  ix <- findInterval(x, dens$x)
+  iy <- findInterval(y, dens$y)
+  ii <- cbind(ix, iy)
+  return(dens$z[ii])
+}
+
