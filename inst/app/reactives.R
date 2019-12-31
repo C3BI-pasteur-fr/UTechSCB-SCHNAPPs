@@ -1573,7 +1573,7 @@ scExLogMatrixDisplay <- reactive({
   return(retVal)
 })
 
-pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) {
+pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, maxGenes = 1000) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1653,6 +1653,12 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
     genesin = genesin[genesin %in% rownames(scEx_log)]
     x <- as.matrix(x)[genesin, , drop = FALSE]
     rv <- rowVars((as.matrix(x)))
+    if (maxGenes > 0) {
+      keep1 <- order(rv, decreasing = TRUE)[1:maxGenes]
+      genesin = genesin[keep1]
+      x = as.matrix(x)[keep1, , drop = FALSE]
+      rv <- rowVars((as.matrix(x)))
+    }
     if (scale) {
       keep <- rv >= 1e-8
       x <- x[keep,,drop=FALSE]/sqrt(rv[keep])
