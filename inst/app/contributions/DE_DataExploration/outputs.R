@@ -8,7 +8,7 @@ source(paste0(packagePath, "/reactives.R"), local = TRUE)
 callModule(
   clusterServer,
   "DE_expclusters",
-  projections,
+  deProjTable,
   reactive(input$DE_gene_id)
 )
 
@@ -85,6 +85,12 @@ output$DE_gene_vio_plot <- renderPlot({
   g_id <- input$DE_gene_id
   ccols <- clusterCols$colPal
 
+  selectedCells <- DE_Exp_dataInput()
+  cellNs <- selectedCells$cellNames()
+  sampdesc <- selectedCells$selectionDescription()
+  prj <- isolate(selectedCells$ProjectionUsed())
+  prjVals <- isolate(selectedCells$ProjectionValsUsed())
+  
   if (is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), "output$DE_gene_vio_plot:NULL\n")
     return(NULL)
@@ -95,7 +101,7 @@ output$DE_gene_vio_plot <- renderPlot({
   # load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
 
 
-  p1 <- DE_geneViolinFunc(scEx_log, g_id, projections, ccols)
+  p1 <- DE_geneViolinFunc(scEx_log[, cellNs], g_id, projections[cellNs, ], ccols)
 
   printTimeEnd(start.time, "DE_gene_vio_plot")
   exportTestValues(DE_gene_vio_plot = {
@@ -133,6 +139,18 @@ output$DE_clusterSelectionPanelPlot <- renderUI({
   }
 })
 
+
+
+dePanelCellSelection <- callModule(
+  cellSelectionModule,
+  "DE_PanelPlotCellSelection"
+)
+
+DE_Exp_dataInput <- callModule(
+  cellSelectionModule,
+  "DE_Exp_dataInput"
+)
+
 # DE_panelPlot ----
 #' DE_panelPlot
 #' plot multiple panels for a given list of genes
@@ -158,15 +176,19 @@ output$DE_panelPlot <- renderPlot({
   DE_updateInputPPt()
   genesin <- isolate(input$DE_panelplotids)
   # cl4 <- input$DE_clusterSelectionPanelPlot
-  ppgrp <- isolate(input$DE_PPGrp)
-  ppCluster <- isolate(input$DE_clusterPP)
+  # ppgrp <- isolate(input$DE_PPGrp)
+  # ppCluster <- isolate(input$DE_clusterPP)
+
+  selectedCells <- isolate(dePanelCellSelection())
+  cellNs <- isolate(selectedCells$cellNames())
+  sampdesc <- isolate(selectedCells$selectionDescription())
 
   dimx4 <- isolate(input$DE_dim_x)
   dimy4 <- isolate(input$DE_dim_y)
   sameScale <- isolate(input$DE_panelplotSameScale)
   nCol <- isolate(as.numeric(input$DE_nCol))
 
-  if (is.null(scEx_log) | is.null(projections) | is.null(ppgrp)) {
+  if (is.null(scEx_log) | is.null(projections) | is.null(cellNs)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -238,7 +260,7 @@ output$DE_panelPlot <- renderPlot({
   # } else {
   for (i in 1:length(genesin)) {
     geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-    subsetTSNE <- projections[projections[, ppCluster] %in% ppgrp, ]
+    subsetTSNE <- projections[cellNs, ]
 
     Col <- rbPal(10)[
       as.numeric(
@@ -257,7 +279,7 @@ output$DE_panelPlot <- renderPlot({
     plotCol <- Col[rownames(subsetTSNE)]
     if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
       projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
-      subsetTSNE <- projections[projections[, ppCluster] %in% ppgrp, ]
+      subsetTSNE <- projections[cellNs, ]
     }
 
     plotIdx <- plotIdx + 1
@@ -289,7 +311,7 @@ output$DE_panelPlot <- renderPlot({
     )
   retVal <-
     annotate_figure(retVal,
-      top = text_grob(paste("using projection", ppCluster, "with elements", paste(ppgrp, collapse = ", ")))
+      top = text_grob(sampdesc)
     )
   printTimeEnd(start.time, "DE_panelPlot")
   exportTestValues(DE_panelPlot = {
@@ -337,7 +359,12 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   scEx_log <- scEx_log()
   g_id <- input$DE_gene_id
   projections <- projections()
-
+  selectedCells <- DE_Exp_dataInput()
+  cellNs <- selectedCells$cellNames()
+  sampdesc <- selectedCells$selectionDescription()
+  prj <- isolate(selectedCells$ProjectionUsed())
+  prjVals <- isolate(selectedCells$ProjectionValsUsed())
+  
   if (is.null(scEx_log) | is.null(projections)) {
     return(NULL)
   }
@@ -346,7 +373,7 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   }
   # load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
 
-  retVal <- DE_dataExpltSNEPlot(scEx_log, g_id, projections)
+  retVal <- DE_dataExpltSNEPlot(scEx_log[,cellNs], g_id, projections[cellNs, ])
 
   printTimeEnd(start.time, "DE_dataExpltSNEPlot")
   exportTestValues(DE_dataExpltSNEPlot = {

@@ -20,7 +20,7 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   }
   
   dbCluster = projections$dbCluster
-  subsetData <- subset(projections, dbCluster %in% cl1)
+  subsetData <- projections[cl1,]
   if (is(subsetData[,db1$mapping$x], "logical")) {
     subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
   }
@@ -326,7 +326,14 @@ sCA_dge <- reactive({
   scEx_log <- scEx_log()
   scEx <- scEx()
   projections <- projections()
-  cl1 <- input$sCA_dgeClustersSelection
+  # cl1 <- input$sCA_dgeClustersSelection
+  # selectedCells <- isolate(dePanelCellSelection())
+  # cellNs <- isolate(selectedCells$cellNames())
+  # sampdesc <- isolate(selectedCells$selectionDescription())
+  selectedCells <- sCA_dataInp()
+  cellNs <- selectedCells$cellNames()
+  sampdesc <- selectedCells$selectionDescription()
+  
   db1 <- input$db1
   db2 <- input$db2
   method <- input$sCA_dgeRadioButton
@@ -341,7 +348,7 @@ sCA_dge <- reactive({
   
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions)== method)/2)
   dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
-  gCells <- sCA_getCells(projections, cl1, db1, db2)
+  gCells <- sCA_getCells(projections, cellNs, db1, db2)
   
   # in case we need counts and not normalized counts
   if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson")) {
@@ -400,7 +407,7 @@ observe({
 
 # subcluster axes ----
 # update axes in subcluster analysis
-updateInputSubclusterAxes <- reactive({
+observeEvent(projections(), {
   if (DEBUG) cat(file = stderr(), "updateInputSubclusterAxes started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -461,8 +468,14 @@ subCluster2Dplot <- function() {
     projections <- projections()
     x1 <- input$sCA_subscluster_x1
     y1 <- input$sCA_subscluster_y1
-    c1 <- input$sCA_dgeClustersSelection
-    
+    # c1 <- input$sCA_dgeClustersSelection
+    # selectedCells <- isolate(dePanelCellSelection())
+    # cellNs <- isolate(selectedCells$cellNames())
+    # sampdesc <- isolate(selectedCells$selectionDescription())
+    selectedCells <- sCA_dataInp()
+    cellNs <- selectedCells$cellNames()
+    sampdesc <- selectedCells$selectionDescription()
+    prjs <- selectedCells$ProjectionUsed()
     if (is.null(projections)) {
       return(NULL)
     }
@@ -471,7 +484,7 @@ subCluster2Dplot <- function() {
     }
     # cp = load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")
     
-    subsetData <- subset(projections, dbCluster %in% c1)
+    subsetData <- projections[cellNs,]
 #     xAxis <- list(
 #       title = x1,
 #       titlefont = f
@@ -506,13 +519,13 @@ subCluster2Dplot <- function() {
     p1 <-
       ggplot(subsetData,
              aes_string(x = x1, y = y1),
-             color = "dbCluster"
+             color = prjs
       ) +
-      geom_point(aes(colour = dbCluster)) +
+      geom_point(aes(colour = get(prjs))) +
       geom_point(
         shape = 1,
         size = 4,
-        aes(colour = dbCluster)
+        aes(colour = get(prjs))
       ) +
       theme_bw() +
       theme(
@@ -527,9 +540,7 @@ subCluster2Dplot <- function() {
         axis.title.x = element_text(face = "bold", size = 16),
         axis.title.y = element_text(face = "bold", size = 16),
         legend.position = "none"
-      )
-# +
-    #   ggtitle(c1)
+      ) + ggtitle(sampdesc)
     p1
   })
 }

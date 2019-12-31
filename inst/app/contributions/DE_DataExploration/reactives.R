@@ -1,5 +1,17 @@
 suppressMessages(require(ggplot2))
 
+deProjTable <- reactive({
+  projections <- projections()
+  selectedCells <- DE_Exp_dataInput()
+  cellNs <- selectedCells$cellNames()
+  
+  if (DEBUG) cat(file = stderr(), "observeEvent: input$DE_clusterPP\n")
+  # Can use character(0) to remove all choices
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  projections[cellNs, ]
+})
 
 .schnappsEnv$coE_PPGrp <- "sampleNames"
 observe({
@@ -110,7 +122,6 @@ observe({
               plotData = .schnappsEnv[["DE_panelPlot"]])
   
 })
-
 
 
 

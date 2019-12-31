@@ -37,43 +37,44 @@ tabList <- list(
           )
         )}
       ,
-      
-      fluidRow(
-        column(width = 4,
-               uiOutput("sCA_dgeClustersSelection")
-        ),
-        column(width = 4,
-               selectInput(
-                 "sCA_subscluster_x1",
-                 label = "X",
-                 choice = c("tsne1", "tsne2", "tsne3"),
-                 selected = "tsne1"
-               )
-        ),
-        column(width = 4,
-               selectInput(
-                 "sCA_subscluster_y1",
-                 label = "Y",
-                 choice = c("tsne1", "tsne2", "tsne3"),
-                 selected = "tsne2"
-               )
-        )
+      cellSelectionUI("sCA_dataInput"),
+      box(width = 6,
+          fluidRow(
+            column(width = 6,
+                   selectInput(
+                     "sCA_subscluster_x1",
+                     label = "X",
+                     choices = c("tsne1", "tsne2", "tsne3"),
+                     selected = "tsne1"
+                   )
+            ),
+            column(width = 6,
+                   selectInput(
+                     "sCA_subscluster_y1",
+                     label = "Y",
+                     choices = c("tsne1", "tsne2", "tsne3"),
+                     selected = "tsne2"
+                   )
+            )
+          )
       ),
       br(),
-      fluidRow(
-        column(width = 6,
-               # plotly::plotlyOutput("sCA_dge_plot1")
-               plotOutput("sCA_dge_plot1", brush = brushOpts(
-                 id = "db1"
-               )) %>% withSpinner()
-        )
-        ,
-        column(width = 6,
-               # plotly::plotlyOutput("sCA_dge_plot2")
-               plotOutput("sCA_dge_plot2", brush = brushOpts(
-                 id = "db2"
-               )) %>% withSpinner()
-        )
+      box(width = 12,
+          fluidRow(
+            column(width = 6,
+                   # plotly::plotlyOutput("sCA_dge_plot1")
+                   plotOutput("sCA_dge_plot1", brush = brushOpts(
+                     id = "db1"
+                   )) %>% withSpinner()
+            )
+            ,
+            column(width = 6,
+                   # plotly::plotlyOutput("sCA_dge_plot2")
+                   plotOutput("sCA_dge_plot2", brush = brushOpts(
+                     id = "db2"
+                   )) %>% withSpinner()
+            )
+          )
       )
     ),
     # shinydashboard::tabItem(
