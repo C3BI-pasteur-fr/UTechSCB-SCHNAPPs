@@ -36,6 +36,114 @@ if ("crayon" %in% rownames(installed.packages()) == FALSE) {
 }
 
 
+# <- reactive({
+output$dimPlotPCA <- renderPlot({
+  if (DEBUG) {
+    cat(file = stderr(), "dimPlotPCA started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "dimPlotPCA")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "dimPlotPCA")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("dimPlotPCA", id = "dimPlotPCA", duration = NULL)
+  }
+  
+  input$updateDimPlot
+  scEx_log <- isolate(scEx_log())
+  scEx <- isolate(scEx())
+  pca <- isolate(pca())
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "dimPlotPCA:NULL\n")
+    }
+    return(0)
+  }
+  # if (.schnappsEnv$DEBUGSAVE) {
+  save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
+  # }
+  # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
+  
+  # return NuLL because it is not working correctly
+  return(NULL)
+  
+  scEx = scEx[rownames(pca$rotation),]
+  scEx_log = scEx_log[rownames(pca$rotation),]
+  
+  cellMeta = colData(scEx_log)
+  rData = rowData(scEx)
+  meta.data = cellMeta[,"sampleNames", drop = FALSE]
+  dat = assays(scEx)[[1]][rownames(scEx_log),]
+  rownames(dat) = rData[rownames(scEx_log),"symbol"]
+  rownames(pca$rotation) = rData[rownames(pca$rotation),"symbol"]
+  seurDat <- CreateSeuratObject(
+    counts = dat,
+    meta.data = meta.data
+  )
+  
+  # TODO use scEx_log
+  logDat = assays(scEx_log)[[1]]
+  rData = rowData(scEx_log)
+  rownames(logDat) = rData$symbol
+  seurDat@assays$RNA@data = as(logDat,"dgCMatrix")
+  # seurDat <- NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
+  # seurDat <- FindVariableFeatures(seurDat, selection.method = "vst", nfeatures = 2000)
+  
+  # recalculating because createDimReducObject is not working
+  all.genes <- rownames(seurDat)
+  seurDat <- ScaleData(seurDat, features = all.genes)
+  seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
+  
+  colnames(pca$x) = str_replace(colnames(pca$x), "PC", "PC_")
+
+  # not working
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$rotation, loadings = pca$x[colnames(seurDat),], stdev = pca$var_pcs, key = "PC_", assay = "RNA")
+  seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
+  
+  # DimPlot(seurDat, reduction = "pca")
+  
+  d = DimHeatmap(seurDat, dims = 1:15, cells = NULL, balanced = TRUE, fast = FALSE, projected = TRUE, reduction = "pca")
+  d
+})
+
+# add comment to history ----
+
+commentModal <- function(failed = FALSE) {
+  modalDialog(
+    # TODO
+    #  mce not working, maybe this helps eventually: https://github.com/twbs/bootstrap/issues/549
+    # if ("shinyMCE" %in% rownames(installed.packages())) {
+    #   shinyMCE::tinyMCE(
+    #     "Comment4history",
+    #     "Please describe your work. This will be included in the history"
+    #   )
+    # } else {
+    textInput("Comment4history", "Please describe your work. This will be included in the history")
+    # }
+    ,
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("commentok", "OK")
+    )
+  )
+}
+
+# Show modal when button is clicked.
+observeEvent(input$comment2History, {
+  showModal(commentModal())
+})
+# When OK button is pressed, attempt to load the data set. If successful,
+# remove the modal. If not show another modal, but this time with a failure
+# message.
+observeEvent(input$commentok, {
+  cat(file = stderr(), paste0("commentok: \n"))
+  comment <- input$Comment4history
+  add2history(type = "text", comment = "",  text2add = comment)
+  removeModal()
+})
 # inputDataFunc ----
 # loads singleCellExperiment
 #   only counts, rowData, and colData are used. Everything else needs to be recomputed
@@ -1025,7 +1133,7 @@ gsRMGenesTable <- reactive({
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
-
+  
   scEx <- assays(dataTables$scEx)[[1]]
   fd <- rowData(dataTables$scEx)
   dt <- fd[useGenes, ]
@@ -1039,7 +1147,7 @@ gsRMGenesTable <- reactive({
   firstCol <- firstCol <- c(firstCol, which(colnames(dt) %in% c("rowSums", "rowSamples")))
   colOrder <- c(firstCol, (1:ncol(dt))[-firstCol])
   dt <- dt[, colOrder]
-
+  
   # dt <- dt[dt$rowSums < minGenes, ]
   exportTestValues(removedGenesTable = {
     as.data.frame(dt)
@@ -1312,8 +1420,8 @@ scEx <- reactive({
     minG = minG,
     maxG = maxG
   )
-
-
+  scEx = retVal
+  add2history(type = "save", comment = "scEx", scEx = retVal)
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
   })
@@ -1397,6 +1505,8 @@ scEx_log <- reactive({
   }
   .schnappsEnv$calculated_normalizationRadioButton <- normMethod
 
+  add2history(type = "save", comment = "scEx_log", scEx_log = scEx_log)
+  
   exportTestValues(scEx_log = {
     assays(scEx_log)["logcounts"]
   })
@@ -1468,11 +1578,13 @@ scExLogMatrixDisplay <- reactive({
     # rownames(retVal) <-
     #   make.names(rowData(scEx)$symbol, unique = TRUE)
   }
-
+  rownames(retVal) <-
+    retVal$symbol
+  
   return(retVal)
 })
 
-pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) {
+pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, maxGenes = 100) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1491,7 +1603,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
   }
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/pcaFunc.RData")
   genesin <- geneName2Index(pcaGenes, featureData)
@@ -1548,23 +1660,41 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
     }
-    BiocSingular::runPCA(
-      # t(assays(scEx_log)[["logcounts"]]),
-      scEx_log[genesin, ],
-      ncomponents = rank,
-      ntop = pcaN,
-      exprs_values = "logcounts",
-      # rank = rank,
-      #  center = center,
-      scale = scale
-      # ,
-      # method = "irlba",
-      # BPPARAM = bpparam(),
-      # BPPARAM = SnowParam(workers = 3, type = "SOCK),
-      # BPPARAM = MulticoreParam(
-      #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
-      # BSPARAM = IrlbaParam()
-    )
+    x <- assays(scEx_log)[["logcounts"]]
+    genesin = genesin[genesin %in% rownames(scEx_log)]
+    x <- as.matrix(x)[genesin, , drop = FALSE]
+    rv <- rowVars((as.matrix(x)))
+    if (scale) {
+      if(maxGenes > 0) {
+        keep <- order(rv, decreasing = TRUE)[1:maxGenes]
+      } else {
+        keep <- rv >= 1e-8
+      }
+      x <- x[keep,,drop=FALSE]/sqrt(rv[keep])
+      rv <- rep(1, nrow(x))
+    }
+    x <- t(x)
+    pca <- runPCA(x, rank=rank, get.rotation=TRUE)
+    rownames(pca$rotation) = genesin[keep]
+    rownames(pca$x) = colnames(scEx_log)
+    pca
+    # BiocSingular::runPCA(
+    #   x,
+    #   # scEx_log[genesin, ],
+    #   # ncomponents = rank,
+    #   ntop = pcaN,
+    #   # exprs_values = "logcounts",
+    #   rank = rank,
+    #   #  center = center,
+    #   scale = scale
+    #   # ,
+    #   # method = "irlba",
+    #   # BPPARAM = bpparam(),
+    #   # BPPARAM = SnowParam(workers = 3, type = "SOCK),
+    #   # BPPARAM = MulticoreParam(
+    #   #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
+    #   # BSPARAM = IrlbaParam()
+    # )
   })
 
   if (is.null(scaterPCA)) {
@@ -1575,16 +1705,16 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN) 
   #
   # rownames(scaterPCA$x) = colnames(scEx_log)
   return(list(
-    # x =  scaterPCA$x,
-    x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-    # var_pcs = scaterPCA$sdev
-    var_pcs = attr(
-      SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
-      "percentVar"
-    )
+    x =  scaterPCA$x,
+    # x = SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    var_pcs = scaterPCA$sdev,
+    rotation = scaterPCA$rotation
+    # var_pcs = attr(
+    #   SingleCellExperiment::reducedDim(scaterPCA, "PCA"),
+    #   "percentVar"
+    # )
   ))
 }
-
 # pca ----
 pca <- reactive({
   if (DEBUG) {
@@ -1943,7 +2073,9 @@ projections <- reactive({
   projections <- pd
 
   if (!is.null(pca)) {
-    projections <- cbind(projections, pca$x[rownames(projections), ])
+    comColNames = colnames(projections) %in% colnames(pca$x)
+    colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
+    projections <- cbind(projections, pca$x[rownames(projections),])
   }
 
   withProgress(message = "Performing projections", value = 0, {
@@ -1968,9 +2100,9 @@ projections <- reactive({
       # browser()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (is(tmp, "data.frame")) {
-        cn <- make.names(c(colnames(projections), colnames(tmp)))
+        cn <- make.names(c(colnames(projections), colnames(tmp)), unique = TRUE)
       } else {
-        cn <- make.names(c(colnames(projections), make.names(proj[1])))
+        cn <- make.names(c(colnames(projections), make.names(proj[1])), unique = TRUE)
       }
       if (length(tmp) == 0) {
         next()
@@ -2036,7 +2168,8 @@ projections <- reactive({
   if (!"sampleNames" %in% colnames(projections)) {
     projections$sampleNames <- "1"
   }
-
+  add2history(type = "save", comment = "projections", projections = projections)
+  
   exportTestValues(projections = {
     projections
   })
@@ -2044,7 +2177,7 @@ projections <- reactive({
 })
 
 # initializeGroupNames ----
-# TODO shouldn't this be an observer???
+# TODO shouldn't this be an observer??? or just a function???
 initializeGroupNames <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "initializeGroupNames started.\n")
@@ -2067,22 +2200,31 @@ initializeGroupNames <- reactive({
   if (is.null(scEx)) {
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
-  }
-  # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
   isolate({
-    df <-
-      data.frame(
-        all = rep(TRUE, dim(scEx)[2]),
-        none = rep(FALSE, dim(scEx)[2])
-      )
-    rownames(df) <- colnames(scEx)
-    groupNames$namesDF <- df
+    grpNs <- groupNames$namesDF
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls(), ls(envir = globalenv())))
+    }
+    # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
+    # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
+    # this will invalidate all previous selections.
+    if (is_empty(data.frame()) | !all(colnames(scEx) %in% rownames(grpNs))) {
+      df <-
+        data.frame(
+          all = rep(TRUE, dim(scEx)[2]),
+          none = rep(FALSE, dim(scEx)[2])
+        )
+      rownames(df) <- colnames(scEx)
+      groupNames$namesDF <- df
+    } else {
+      groupNames$namesDF = groupNames$namesDF[colnames(scEx),]
+    }
   })
 })
 
-observe(label = "ob1", initializeGroupNames())
+# since initializeGroupNames depends on scEx only this will be set when the org data is changed.
+observe(initializeGroupNames())
+
 # sample --------
 sample <- reactive({
   if (DEBUG) {

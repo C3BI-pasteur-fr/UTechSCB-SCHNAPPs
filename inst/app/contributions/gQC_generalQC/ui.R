@@ -22,7 +22,10 @@ tabList <- list(
       10,
       offset = 1,
       plotOutput("gQC_plotUmiHist") %>% withSpinner()
-    ))
+    )),
+    br(),
+    actionButton("save2Histumi", "save to history")
+    
   ),
 
   shinydashboard::tabItem(
@@ -32,7 +35,9 @@ tabList <- list(
       10,
       offset = 1,
       plotOutput("gQC_plotSampleHist") %>% withSpinner()
-    ))
+    )),
+    br(),
+    actionButton("save2HistSample", "save to history")
   ),
 
   shinydashboard::tabItem(
@@ -42,8 +47,11 @@ tabList <- list(
       10,
       offset = 1,
       plotOutput("gQC_variancePCA") %>% withSpinner()
-    ))
+    )),
+    br(),
+    actionButton("save2Histvar", "save to history")
   ),
+  
   tsnePlotTab = shinydashboard::tabItem(
     tabName = "gQC_tsnePlot",
     shinyjs::useShinyjs(),

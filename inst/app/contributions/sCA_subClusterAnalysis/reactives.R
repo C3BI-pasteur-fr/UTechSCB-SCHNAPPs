@@ -90,7 +90,7 @@ myDiffExpFunctions <- list(
 #' Seurat FindMarkers
 #'
 #' cellMeta = colData(scEx)
-sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test = "wilcox") {
+sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFact = 1){
   if (DEBUG) cat(file = stderr(), "sCA_seuratFindMarkers started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -107,7 +107,7 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test = "wilcox") {
     showNotification("Please install DESeq2", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData')
 
@@ -120,23 +120,24 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test = "wilcox") {
     meta.data = meta.data
   )
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes <- which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
-  seurDat@assays$RNA@data <- as(assays(scEx)[[1]], "dgCMatrix")[useGenes, ]
-
-  markers <- Seurat::FindMarkers(seurDat@assays$RNA@data,
-    cells.1 = cells.1,
-    cells.2 = cells.2,
-    min.pct = 0,
-    test.use = test
-    # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
-    # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
-    # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
-    # test.use = "t"      # p_val avg_logFC pct.1 pct.2 p_val_adj
-    # test.use = "negbinom" # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
-    # test.use = "poisson"  # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
-    # test.use = "LR"     # p_val  avg_logFC pct.1 pct.2 p_val_adj
-    # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
-    # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  
+  markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
+                                 cells.1 = cells.1,
+                                 cells.2 = cells.2,
+                                 min.pct = 0,
+                                 test.use = test,
+                                 logfc.threshold = 0.001
+                                 # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
+                                 # test.use = "t"      # p_val avg_logFC pct.1 pct.2 p_val_adj
+                                 # test.use = "negbinom" # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "poisson"  # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
+                                 # test.use = "LR"     # p_val  avg_logFC pct.1 pct.2 p_val_adj
+                                 # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
+                                 # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
   )
   if (nrow(markers) > 0) {
     markers$symbol <- rData[rownames(markers), "symbol"]
@@ -148,23 +149,27 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test = "wilcox") {
 }
 
 
-sCA_dge_s_wilcox <- function(scEx_log, cells.1, cells.2) {
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test = "wilcox")
+sCA_dge_s_wilcox <- function(scEx_log, cells.1, cells.2){
+  normFact = .schnappsEnv$normalizationFactor
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="wilcox", normFact)
 }
-sCA_dge_s_bimod <- function(scEx_log, cells.1, cells.2) {
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test = "bimod")
+sCA_dge_s_bimod <- function(scEx_log, cells.1, cells.2){
+  normFact = .schnappsEnv$normalizationFactor
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="bimod")
 }
-sCA_dge_s_t <- function(scEx_log, cells.1, cells.2) {
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test = "t")
+sCA_dge_s_t <- function(scEx_log, cells.1, cells.2){
+  normFact = .schnappsEnv$normalizationFactor
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="t", normFact)
 }
-sCA_dge_s_LR <- function(scEx_log, cells.1, cells.2) {
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test = "LR")
+sCA_dge_s_LR<- function(scEx_log, cells.1, cells.2){
+  normFact = .schnappsEnv$normalizationFactor
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="LR", normFact)
 }
-sCA_dge_s_negbinom <- function(scEx_log, cells.1, cells.2) {
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test = "negbinom")
+sCA_dge_s_negbinom <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="negbinom", normFact = 1)
 }
-sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2) {
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test = "poisson")
+sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2){
+  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="poisson", normFact = 1)
 }
 
 
@@ -198,7 +203,13 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   group.info[cells.2, "group"] <- "Group2"
   group.info[, "group"] <- factor(x = group.info[, "group"])
   group.info$wellKey <- rownames(x = group.info)
-  data.use <- assays(scEx_log)[[1]][, rownames(group.info)]
+  # TODO how to handle data / transformation ?
+  # it uses non-transformed org data. What happens if we loaded normalized data?
+  # can back tronsform the data in counts?
+  if (is.null(.schnappsEnv$normalizationFactor)) {
+    .schnappsEnv$normalizationFactor = 1
+  }
+  data.use = assays(scEx_log)[[1]][,rownames(group.info)]
   dds1 <- DESeq2::DESeqDataSetFromMatrix(
     countData = data.use,
     colData = group.info,
@@ -252,8 +263,10 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
   genes.use <- rownames(subsetExpression)
   # expMean exponential mean
-  data.1 <- apply(subsetExpression[genes.use, cells.1], 1, expMean)
-  data.2 <- apply(subsetExpression[genes.use, cells.2], 1, expMean)
+  dat <- subsetExpression[genes.use, cells.1]
+  data.1 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
+  dat <- subsetExpression[genes.use, cells.2]
+  data.2 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
   total.diff <- (data.1 - data.2)
 
   genes.diff <- names(which(abs(total.diff) > .2))
@@ -283,7 +296,7 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
     showNotification("sCA_dge_ttest", id = "sCA_dge_ttest", duration = NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
 
@@ -294,9 +307,10 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
 
   p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
   p_val[is.na(p_val)] <- 1
-
-  data.1 <- apply(subsetExpression[genes.use, cells.1], 1, expMean)
-  data.2 <- apply(subsetExpression[genes.use, cells.2], 1, expMean)
+  dat <- subsetExpression[genes.use, cells.1]
+  data.1 <- apply(dat, 1, function(x) expMean(x, normFactor = .schnappsEnv$normalizationFactor))
+  dat <- subsetExpression[genes.use, cells.2]
+  data.2 <- apply(dat, 1, function(x) expMean(x, normFactor = .schnappsEnv$normalizationFactor))
   avg_diff <- (data.1 - data.2)
 
   retVal <- data.frame(p_val = p_val, avg_diff = avg_diff, symbol = featureData[names(p_val), "symbol"])
@@ -340,8 +354,8 @@ sCA_dge <- reactive({
   gCells <- sCA_getCells(projections, cl1, db1, db2)
 
   # in case we need counts and not normalized counts
-  if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_poisson", "sCA_dge_s_poisson")) {
-    scEx_log <- scEx
+  if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson")) {
+    scEx_log = scEx
   }
   retVal <- do.call(dgeFunc, args = list(
     scEx_log = scEx_log,
@@ -535,3 +549,25 @@ subCluster2Dplot <- function() {
     p1
   })
 }
+
+# save to history violoin observer ----
+observe({
+  clicked  = input$save2HistVolc
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVolc \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlotly", comment = "volcano plot",  
+              plotData = .schnappsEnv[["sCA_volcanoPlot"]])
+  
+})
+
+

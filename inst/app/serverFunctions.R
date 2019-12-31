@@ -1,5 +1,7 @@
 suppressMessages(library(magrittr))
 require(digest)
+
+# printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
   if (DEBUG) {
@@ -8,7 +10,7 @@ printTimeEnd <- function(start.time, messtr) {
 }
 
 
-# some comments removed because they cause too much traffic
+# some comments removed because they cause too much traffic ----
 geneName2Index <- function(g_id, featureData) {
   # if (DEBUG) cat(file = stderr(), "geneName2Index started.\n")
   # start.time <- base::Sys.time()
@@ -53,7 +55,7 @@ geneName2Index <- function(g_id, featureData) {
   return(geneid)
 }
 
-
+# updateProjectionsWithUmiCount ----
 updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NULL, scEx, projections) {
   featureData <- rowData(scEx)
   # if ((dimY == "UmiCountPerGenes") | (dimX == "UmiCountPerGenes")) {
@@ -88,7 +90,7 @@ updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NU
 }
 
 
-# append to heavyCalculations
+# append to heavyCalculations ----
 append2list <- function(myHeavyCalculations, heavyCalculations) {
   for (hc in myHeavyCalculations) {
     if (length(hc) == 2 & is.character(hc[1]) & is.character(hc[2])) {
@@ -131,12 +133,19 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
-    return(NULL)
-  }
 
-  if (!all(c(dimX, dimY, dimCol) %in% colnames(projections))) {
-    return(NULL)
+  # histogram as y and cellDensity as color is not allowed
+  
+  if (dimY == "histogram") {
+    if (!all(c(dimX, dimCol) %in% colnames(projections))) {
+      return(NULL)
+    }
+  } else {
+    # need to do proper checking of possibilities
+    # removing dimCol for now
+    if (!all(c(dimX, dimY) %in% colnames(projections))) {
+      return(NULL)
+    }
   }
 
   projections <- cbind(projections, expression)
@@ -157,6 +166,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     subsetData <- subset(projections, dbCluster %in% clId)
   } else {
     subsetData <- projections
+  }
+  #ensure that the highest values are plotted last.
+  if (dimCol %in% colnames(subsetData)){
+    if (is.numeric(subsetData[,dimCol])){
+      subsetData <- subsetData[order(subsetData[,dimCol]),]
+    }
   }
   # subsetData$dbCluster = factor(subsetData$dbCluster)
   # if there are more than 18 samples ggplot cannot handle different shapes and we ignore the
@@ -184,7 +199,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (divXBy != "None") {
     subsetData[, dimX] <- subsetData[, dimX] / subsetData[, divXBy]
   }
-  if (divYBy != "None") {
+  if (divYBy != "None" & dimY != "histogram") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
   }
 
@@ -198,8 +213,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
     typeX <- NULL
   }
-  if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
-    typeY <- NULL
+  if (dimY != "histogram"){
+    if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
+      typeY <- NULL
+    }
+  } else {
+    typeX = NULL
   }
   xAxis <- list(
     title = dimX,
@@ -214,14 +233,45 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (dimX == "barcode") {
     subsetData$"__dimXorder" <- rank(subsetData[, dimY])
     dimX <- "__dimXorder"
+    if (dimY == "histogram"){
+      # Error message
+      return(NULL)
+    }
   }
-
-  if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
-    subsetData[, dimX] <- as.character(subsetData[, dimX])
+  # save(file = "~/SCHNAPPsDebug/2dplot.RData", list = ls())
+  # load("~/SCHNAPPsDebug/2dplot.RData")
+  
+  if (dimY != "histogram"){
+    if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
+      subsetData[, dimX] <- as.character(subsetData[, dimX])
+    }
+    if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
+      subsetData[, dimY] <- as.character(subsetData[, dimY])
+    }
+  } else {
+    # if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
+    #   # barchart
+    #   # subsetData[, dimX] <- as.character(subsetData[, dimX])
+    # } else {
+      # histogram
+      p <- plot_ly( x=~subsetData[, dimX], type = "histogram") %>%
+        layout(
+          xaxis = xAxis,
+          yaxis = yAxis,
+          title = gtitle,
+          dragmode = "select"
+        )
+      return (p)
+      # %>%
+      #   layout(yaxis=list(type='linear'))
+    # }
+    
   }
-  if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
-    subsetData[, dimY] <- as.character(subsetData[, dimY])
+  
+  if (dimCol == "cellDensity") {
+    subsetData$cellDensity <- get_density(subsetData[,dimX], subsetData[,dimY], n = 100)
   }
+  
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
@@ -255,9 +305,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
 
   selectedCells <- NULL
   if (length(grpN) > 0) {
-    if (length(grpNs[rownames(subsetData), grpN]) > 0 & sum(grpNs[rownames(subsetData), grpN], na.rm = TRUE) > 0) {
+    if (length(grpNs[rownames(subsetData), grpN] == "TRUE") > 0 & sum(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE) > 0) {
       grpNSub <- grpNs[rownames(subsetData), ]
-      selectedCells <- rownames(grpNSub[grpNSub[, grpN], ])
+      selectedCells <- rownames(grpNSub[grpNSub[, grpN] == "TRUE", ])
     }
   }
   if (!is.null(selectedCells)) {
@@ -305,11 +355,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
 
 
 # functions should go in external file
-
+# n_fun ----
 n_fun <- function(x) {
   return(data.frame(y = -0.5, label = paste0(length(x), "\ncells")))
 }
-
+#' diffLRT ----
 diffLRT <- function(x, y, xmin = 1) {
   lrtX <- bimodLikData(x)
   lrtY <- bimodLikData(y)
@@ -349,8 +399,11 @@ set.ifnull <- function(x, y) {
   return(x)
 }
 
-expMean <- function(x) {
-  return(log(mean(exp(x) - 1) + 1))
+expMean <- function(x, normFactor = 1) {
+  if (is.null(normFactor)){
+    normFactor = 1
+  }
+  return(log(mean(exp(x/normFactor) - 1) + 1)*normFactor)
 }
 
 
@@ -395,9 +448,10 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
 
 # twoDplotFromModule ----
 #' function to be used in markdown docs to ease the plotting of the clusterServer module
+# TODO relies on reactive groupNames, should be a variable! Same goes for input$groupName!
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
   grpNs <- groupNames$namesDF
-  grpN <- make.names(input$groupName)
+  grpN <- make.names(input$groupName, unique = TRUE)
 
   dimY <- input[[paste0(moduleName, "-dimension_y")]]
   dimX <- input[[paste0(moduleName, "-dimension_x")]]
@@ -563,17 +617,19 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
+
+# recHistory ----
 # record history in env
 # needs pdftk https://www.pdflabs.com/tools/pdftk-server/
 # only save to history file if variable historyFile in schnappsEnv is set
-if (!all(c("pdftools") %in% rownames(installed.packages()))) {
+if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages()))) {
   recHistory <- function(...) {
     return(NULL)
   }
 } else {
   require(pdftools)
-  recHistory <- function(name, plot1) {
-    if (!exists("historyFile", envir = .schnappsEnv)) {
+  recHistory <- function(name, plot1, envir = .schnappsEnv) {
+    if (!exists("historyFile", envir = envir)) {
       return(NULL)
     }
     if (!exists("history", envir = .schnappsEnv)) {
@@ -581,21 +637,72 @@ if (!all(c("pdftools") %in% rownames(installed.packages()))) {
     }
     name <- paste(name, date())
     tmpF <- tempfile(fileext = ".pdf")
-    plot1 <-
-      plot1 %>% layout(title = name)
-    if ("plotly" %in% class(plot1)) {
-      # requires orca bing installed (https://github.com/plotly/orca#installation)
-      withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
-      if (file.exists(.schnappsEnv$historyFile)) {
-        tmpF2 <- tempfile(fileext = ".pdf")
-        file.copy(.schnappsEnv$historyFile, tmpF2)
-        pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile)
-      } else {
-        file.copy(tmpF, .schnappsEnv$historyFile)
+    cat(file = stderr(), paste0("history tmp File: ", tmpF, "\n"))
+    # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls(), ls(envir = globalenv())))
+    # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
+    clP <- class(plot1)
+    cat(file = stderr(), paste0("class: ", clP[1], "\n"))
+    # here we create a PDF file for a given plot that is then combined later
+    created <- FALSE
+    switch(clP[1],
+      "plotly" = {
+        cat(file = stderr(), paste0("plotly\n"))
+        plot1 <- plot1 %>% layout(title = name)
+        if ("plotly" %in% class(plot1)) {
+          # requires orca bing installed (https://github.com/plotly/orca#installation)
+          withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
+        }
+        created <- TRUE
+      },
+      "character" = {
+        # in case this is a link to a file:
+        cat(file = stderr(), paste0("character\n"))
+        if (file.exists(plot1)) {
+          if (tools::file_ext(plot1) == "png") {
+            pdf(tmpF)
+            img <- png::readPNG(plot1)
+            plot(1:2, type = "n")
+            rasterImage(img, 1.2, 1.27, 1.8, 1.73, interpolate = FALSE)
+            dev.off()
+          }
+          created <- TRUE
+        }
+      },
+      "datatables" = {
+        # # // this takes too long
+        # cat(file = stderr(), paste0("datatables\n"))
+        # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls(), ls(envir = globalenv())))
+        # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
+        #
+        # pdf(tmpF)
+        # if (nrow(img) > 20) {
+        #   maxrow = 20
+        # } else {
+        #   maxrow = nrow(plot1)
+        # }
+        # gridExtra::grid.table(img[maxrow],)
+        # dev.off()
+        # created = TRUE
       }
-      return(TRUE)
+    )
+
+    if (!created) {
+      return(FALSE)
     }
 
+    if (file.exists(.schnappsEnv$historyFile)) {
+      tmpF2 <- tempfile(fileext = ".pdf")
+      file.copy(.schnappsEnv$historyFile, tmpF2)
+      tryCatch(
+        pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile),
+        error = function(x) {
+          cat(file = stderr(), paste0("problem while combining PDF files:", x, "\n"))
+        }
+      )
+    } else {
+      file.copy(tmpF, .schnappsEnv$historyFile)
+    }
+    return(TRUE)
     # pdf(file = tmpF,onefile = TRUE)
     # ggsave(filename = tmpF, plot = plot1, device = pdf())
     # dev.off()
@@ -736,3 +843,110 @@ updateButtonColor <- function(buttonName, parameters) {
 #     }
 #   })
 # }
+
+add2history <- function(type, comment = "", ...) {
+  if (!exists("historyPath", envir = .schnappsEnv)) {
+    # if this variable is not set we are not saving
+    return(NULL)
+  }
+
+  varnames <- lapply(substitute(list(...))[-1], deparse)
+  arg <- list(...)
+  if(is.null(arg[[1]])) return(NULL)
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/add2history.RData')
+  if (type == "text") {
+    cat(file = stderr(), paste0("history text: \n"))
+    assign(names(varnames[1]), arg[1])
+    line <- paste0(
+      "\n", get(names(varnames[1])), "\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    
+  }
+  
+  if (type == "save") {
+    # browser()
+    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    assign(names(varnames[1]), arg[1])
+    save(file = tfile, list = c(names(varnames[1])))
+    # the load is commented out because it is not used at the moment and only takes time to load
+    line <- paste0(
+      "```{R}\n#load ", names(varnames[1]), "\n#load(file = \"", basename(tfile),
+      "\")\n```\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+  }
+
+  if (type == "renderPlotly") {
+    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    assign(names(varnames[1]), arg[1])
+    save(file = tfile, list = c(names(varnames[1])))
+
+    line <- paste0(
+      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
+      "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+  }
+  
+  if (type == "tronco") {
+    # browser()
+    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    assign(names(varnames[1]), arg[[1]])
+    save(file = tfile, list = c(names(varnames[1])))
+    
+    line <- paste0(
+      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "\n", names(varnames[1]) ,"$filename <- NULL \n",
+      "\ndo.call(TRONCO::pheatmap, ", names(varnames[1]), ")\n```\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+  }
+  
+  if (type == "renderPlot") {
+    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    assign(names(varnames[1]), arg[[1]])
+    save(file = tfile, list = c(names(varnames[1])))
+    
+    line <- paste0(
+      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "\n", names(varnames[1]), "\n```\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    
+  }
+  
+  if (type == "renderDT") {
+    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    assign(names(varnames[1]), arg[[1]])
+    save(file = tfile, list = c(names(varnames[1])))
+    
+    line <- paste0(
+      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "\n", names(varnames[1]), "\n```\n"
+    )
+    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    
+  }
+}
+
+
+
+
+# Get density of points in 2 dimensions. ----
+# @param x A numeric vector.
+# @param y A numeric vector.
+# @param n Create a square n by n grid to compute density.
+# @return The density within each square.
+get_density <- function(x, y, ...) {
+  dens <- MASS::kde2d(x, y, ...)
+  ix <- findInterval(x, dens$x)
+  iy <- findInterval(y, dens$y)
+  ii <- cbind(ix, iy)
+  return(dens$z[ii])
+}
+
+

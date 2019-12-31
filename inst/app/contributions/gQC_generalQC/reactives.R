@@ -4,6 +4,68 @@ suppressMessages(require(SingleCellExperiment))
 
 # here we define reactive values/variables
 
+# save to history violoin observer ----
+observe({
+  clicked  = input$save2Histumi
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "UMI histogram",  
+              plotData = .schnappsEnv[["gQC_plotUmiHist"]])
+  
+})
+
+
+# save to history save2HistSample observer ----
+observe({
+  clicked  = input$save2HistSample
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "Sample histogram",  
+              plotData = .schnappsEnv[["gQC_plotSampleHist"]])
+  
+})
+
+# save to history save2HistSample observer ----
+observe({
+  clicked  = input$save2Histvar
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "PC variance",  
+              plotData = .schnappsEnv[["gQC_variancePCA"]])
+  
+})
+
+
 # gQC_scaterReadsFunc ----
 #' gQC_scaterReadsFunc
 #' calculate the QC metrix and return updated singleCellExperiment object
@@ -94,11 +156,14 @@ gQC_sampleHistFunc <- function(samples, scols) {
   }
 
   counts <- table(samples)
-  barplot(counts,
-    main = "histogram of number of cell per sample",
-    xlab = "Samples",
-    col = scols
-  )
+  df <- as.data.frame(counts)
+  ggplot(data = df,aes(x=samples, y=Freq, fill=samples)) + geom_bar(stat = "identity")  + 
+     scale_color_manual(values=scols) 
+  # barplot(counts,
+  #         main = "histogram of number of cell per sample",
+  #         xlab = "Samples",
+  #         col=scols
+  # )
 }
 
 

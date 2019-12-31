@@ -156,10 +156,13 @@ scShinyUI <- shinyUI(
       downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),
-      if (exists("historyFile", envir = .schnappsEnv)) {
-        checkboxInput("save2History", "save to history file", FALSE)
-      },
-      verbatimTextOutput("save2Historystring")
+      if (exists("historyPath", envir = .schnappsEnv)){
+        # checkboxInput("save2History", "save to history file", FALSE)
+        actionButton("comment2History", "Add comment to history")
+      }
+      # ,
+      # verbatimTextOutput("save2Historystring")
+      # ,verbatimTextOutput("currentTabInfo")
     ), # dashboard side bar
     shinydashboard::dashboardBody(
       shinyjs::useShinyjs(debug = TRUE),

@@ -286,6 +286,7 @@ coE_topExpCCTable <- reactive({
   numProje <- projections[, nums]
   # colnames(numProje)
   genesin <- unique(genesin)
+  scCells <- scCells[scCells %in% colnames(assays(scEx_log)[[1]])]
   # we only work on cells that have been selected
   mat <- assays(scEx_log)[[1]][genesin, scCells, drop = FALSE]
   # only genes that express at least coEtgminExpr UMIs
@@ -508,6 +509,27 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   # p1 <- ggplotly(p1)
   return(p1)
 }
+
+# save to history violoin observer ----
+observe({
+  clicked  = input$save2HistVio
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  
+  add2history(type = "renderPlot", comment = "violin plot",  
+              plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
+  
+})
+
 
 #' coE_somFunction
 #' iData = expression matrix, rows = genes
@@ -771,7 +793,7 @@ coE_updateInputXviolinPlot <- reactive({
   coln <- colnames(tsneData)
   choices <- c()
   for (cn in coln) {
-    if (length(levels(as.factor(tsneData[, cn]))) < 20) {
+    if (length(levels(as.factor(tsneData[, cn]))) < 50) {
       choices <- c(choices, cn)
     }
   }

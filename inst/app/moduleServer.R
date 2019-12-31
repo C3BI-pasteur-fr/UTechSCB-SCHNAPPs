@@ -118,6 +118,29 @@ clusterServer <- function(input, output, session,
     }
   })
 
+  # observe save  2 history ----
+  observe({
+    clicked = input$save2Hist
+    if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
+    myns <- session$ns("-")
+    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    start.time <- base::Sys.time()
+    if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "save2Hist")
+      }
+    )
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    
+    add2history(type = "renderPlotly", 
+                plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
+                comment = paste(myns))
+    
+  })
 
   # clusterServer - updateInput ----
   # updateInput <-
@@ -142,12 +165,12 @@ clusterServer <- function(input, output, session,
       selected = .schnappsEnv$dim1
     )
     updateSelectInput(session, "dimension_y",
-      choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-      selected = .schnappsEnv$dim2
+                      choices = c(colnames(projections), "histogram", "UmiCountPerGenes", "UmiCountPerGenes2"),
+                      selected = .schnappsEnv$dim2
     )
     updateSelectInput(session, "dimension_col",
-      choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-      selected = .schnappsEnv$dimCol
+                      choices = c(colnames(projections), "cellDensity" ,"UmiCountPerGenes", "UmiCountPerGenes2"),
+                      selected = .schnappsEnv$dimCol
     )
 
     updateSelectInput(session, "divideXBy",
@@ -193,7 +216,7 @@ clusterServer <- function(input, output, session,
     scEx_log <- scEx_log()
     scEx <- scEx()
     namedGroup <- input$groupNames
-    grpN <- make.names(input$groupName)
+    grpN <- make.names(input$groupName, unique = TRUE)
     grpNs <- groupNames$namesDF
 
     if (is.null(projections) | is.null(brushedPs)) {
@@ -229,7 +252,7 @@ clusterServer <- function(input, output, session,
       }
       if (!namedGroup == "plot") {
         if (namedGroup %in% colnames(grpNs)) {
-          return(rownames(grpNs[grpNs[, namedGroup], ]))
+          return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ]))
         } else {
           return(NULL)
         }
@@ -242,10 +265,11 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
     cells.names <- brushedPs$key
+    cells.names <- cells.names[cells.names %in% colnames(scEx_log)]
     cells.names <- unique(cells.names[!is.na(cells.names)])
-    if (DEBUG) {
-      cat(file = stderr(), paste("curveNumbers:", unique(brushedPs$curveNumber), "\n"))
-    }
+    # if (DEBUG) {
+    #   cat(file = stderr(), paste("curveNumbers:", unique(brushedPs$curveNumber), "\n"))
+    # }
     printTimeEnd(start.time, "selectedCellNames")
     exportTestValues(selectedCellNames = {
       cells.names
@@ -266,8 +290,8 @@ clusterServer <- function(input, output, session,
         if (DEBUG) cat(file = stderr(), paste("selectedCellNames is null\n"))
         retVal <- NULL
       }
-      grpN <- make.names(input$groupName)
-      grpSelected <- make.names(input$groupNames)
+      grpN <- make.names(input$groupName, unique = TRUE)
+      grpSelected <- make.names(input$groupNames, unique = TRUE)
       grpNs <- groupNames$namesDF
       if (length(grpN) == 0 | length(grpNs) == 0) {
         if (DEBUG) cat(file = stderr(), "reactiveValues: grpN empty\n")
@@ -304,7 +328,13 @@ clusterServer <- function(input, output, session,
 
         subsetData <- subset(projections, dbCluster %in% inpClusters)
         grpSubset <- grpNs[rownames(subsetData), ]
-        grpVal <- rownames(grpSubset[grpSubset[, grpN], ])
+        if (!grpN %in% colnames(grpSubset)) {
+          if (!is.null(getDefaultReactiveDomain())) {
+            showNotification("group name is not available", id = "nogrpN", duration = NULL, type = "error")
+          }
+          return(NULL)
+        }
+        grpVal <- rownames(grpSubset[grpSubset[, grpN] == "TRUE", ])
         if (length(grpVal) > 0) {
           return(grpVal)
         }
@@ -373,7 +403,7 @@ clusterServer <- function(input, output, session,
     projections <- projections()
     grpNs <- groupNames$namesDF
     grpN <- make.names(input$groupName)
-
+    grpN <- make.names(input$groupName, unique = TRUE)
     # returnValues$cluster <- input$clusters
     dimY <- input$dimension_y
     dimX <- input$dimension_x
@@ -395,6 +425,7 @@ clusterServer <- function(input, output, session,
     }
     if (is.null(scEx) | is.null(tdata)) {
       if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return(NULL)
     }
     # in case the normalization is not done
@@ -414,7 +445,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
 
-    # load(file=paste0("~/SCHNAPPsDebug/clusterPlot", "ns", ".RData", collapse = "."));.schnappsEnv$DEBUGSAVE=FALSE
+    # load("/Users/bernd/SCHNAPPsDebug/clusterPlot-coE_selected--.RData");.schnappsEnv$DEBUGSAVE=FALSE
     if (is.null(g_id) || nchar(g_id) == 0) {
       g_id <- featureData$symbol
     }
@@ -442,9 +473,16 @@ clusterServer <- function(input, output, session,
       geneNames2, dimX, dimY, clId, grpN, legend.position,
       grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
     )
-    if (save2History) recHistory(myns, p1)
+    
+    # save p1 to .schnappsEnv for saving to history
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- p1
+    
+    # add2history(type = "renderPlotly", plotData = p1, comment = paste(myns))
+    # if (save2History) recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
     printTimeEnd(start.time, "clusterPlot")
+    # browser()
+    # .schnappsEnv[[paste0()]] <- p
     exportTestValues(clusterPlot = {
       p1
     })
@@ -536,7 +574,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "save: changeGroups\n")
       save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv())))
       cat(file = stderr(), "done save: changeGroups\n")
-      browser()
+      # browser()
     }
     # load(file="~/SCHNAPPsDebug/changeGroups.RData")
     # in case the cell selection has changed
@@ -548,6 +586,7 @@ clusterServer <- function(input, output, session,
       grpNs[rownames(visibleCells), grpN] <- FALSE
     }
     grpNs[cells.names, grpN] <- TRUE
+    grpNs[, grpN]  <- as.factor(grpNs[, grpN] )
     # Set  reactive value
     # cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
     groupNames$namesDF <- grpNs
@@ -595,8 +634,9 @@ clusterServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("nCellsVisibleSelected", id = "nCellsVisibleSelected", duration = NULL)
     }
+    
+    grpN <- make.names(input$groupName, unique = TRUE)
 
-    grpN <- make.names(input$groupName)
     grpNs <- groupNames$namesDF
     # inpClusters <- input$clusters
     projections <- projections()
@@ -610,8 +650,9 @@ clusterServer <- function(input, output, session,
     inpClusters <- levels(projections$dbCluster)
 
     subsetData <- subset(projections, dbCluster %in% inpClusters)
-    retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN]))
 
+    retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN] == "TRUE"))
+    
     exportTestValues(DummyReactive = {
       retVal
     })
@@ -726,15 +767,17 @@ clusterServer <- function(input, output, session,
     scEx_log <- scEx_log()
     # moreOptions <- input$moreOptions
     retVal <- selectedCellNames()
-    grpN <- make.names(input$groupName)
-    grpSelected <- make.names(input$groupNames)
+    grpN <- make.names(input$groupName, unique = TRUE)
+    grpSelected <- make.names(input$groupNames, unique = TRUE)
     grpNs <- groupNames$namesDF
-
+    myns <- ns("cellSelection")
 
     if (!myshowCells) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return("")
     }
     if (is.null(projections)) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -757,6 +800,8 @@ clusterServer <- function(input, output, session,
     # cells.names <- cells.names[!is.na(cells.names)]
     retVal <- paste(retVal, collapse = ", ")
 
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- retVal
+    
     exportTestValues(ClusterCellSelection = {
       retVal
     })
@@ -783,6 +828,27 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
 
+  observe({
+    clicked  = input$save2HistTabUi
+    myns <- session$ns("cellNameTable")
+    if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi \n")
+    start.time <- base::Sys.time()
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "save2Hist")
+      }
+    )
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    add2history(type = "renderDT", comment = "Table",  
+                tableData = .schnappsEnv[[paste0("historyPlot-",myns)]] )
+    
+  })
+  
+  
   output$rowSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
     start.time <- Sys.time()
@@ -802,7 +868,7 @@ tableSelectionServer <- function(input, output, session,
     selectedRows <- input$cellNameTable_rows_selected
     scEx <- scEx()
     # update if expanded and not showing
-    input$refreshtable
+    # input$refreshtable
 
     # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
     inputData <- NULL
@@ -896,6 +962,7 @@ tableSelectionServer <- function(input, output, session,
 
   # renderDT cellNameTable ----
   output$cellNameTable <- DT::renderDT({
+    myns <- session$ns("cellNameTable")
     if (DEBUG) cat(file = stderr(), "output$cellNameTable\n")
     start.time <- base::Sys.time()
     on.exit(
@@ -915,6 +982,7 @@ tableSelectionServer <- function(input, output, session,
     selectedRows <- input$cellNameTable_rows_selected
     # searchStr <-
     if (is.null(dataTables)) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -958,22 +1026,24 @@ tableSelectionServer <- function(input, output, session,
         }
       }
       # if (DEBUG) cat(file = stderr(), paste(colState$search,"\n"))
+      dtout <- DT::datatable(dataTables,
+                             rownames = F,
+                             filter = "top",
+                             selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
+                             options = list(
+                               orderClasses = TRUE,
+                               autoWidth = TRUE,
+                               scrollX = TRUE,
+                               pageLength = get(ns("pageLength"), envir = .schnappsEnv),
+                               search = colState$search,
+                               searchCols = searchColList,
+                               stateSave = TRUE,
+                               order = get(ns("colOrder"), envir = .schnappsEnv)
+                             )
+      )
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- dtout
       return(
-        DT::datatable(dataTables,
-          rownames = F,
-          filter = "top",
-          selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
-          options = list(
-            orderClasses = TRUE,
-            autoWidth = TRUE,
-            scrollX = TRUE,
-            pageLength = get(ns("pageLength"), envir = .schnappsEnv),
-            search = colState$search,
-            searchCols = searchColList,
-            stateSave = TRUE,
-            order = get(ns("colOrder"), envir = .schnappsEnv)
-          )
-        )
+        dtout
       )
     } else {
       return(warning("test"))
@@ -1012,6 +1082,31 @@ pHeatMapModule <- function(input, output, session,
 
   outfilePH <- NULL
 
+  # observe save 2 history ----
+  observe({
+    clicked <- input$save2HistHM
+    if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
+    myns <- ns("pHeatMap")
+    # browser()
+    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    start.time <- base::Sys.time()
+    if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "save2Hist")
+      }
+    )
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    
+    add2history(type = "tronco", 
+                plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
+                comment = paste(myns))
+    
+  })
+  
   # pHeatMapModule - updateInput ----
   # updateInput <-
   # this is calling projections during loading of data
@@ -1075,6 +1170,7 @@ pHeatMapModule <- function(input, output, session,
     # moreOptions <- input$moreOptions
     colTree <- input$showColTree
     scale <- input$normRow
+    myns <- ns("pHeatMap")
     save2History <- input$save2History
     pWidth <- input$heatmapWidth
     pHeight <- input$heatmapHeight
@@ -1089,6 +1185,7 @@ pHeatMapModule <- function(input, output, session,
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
 
     if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
+      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
       return(list(
         src = "empty.png",
         contentType = "image/png",
@@ -1161,6 +1258,8 @@ pHeatMapModule <- function(input, output, session,
     heatmapData$width <- pWidth / 72
     heatmapData$height <- pHeight / 72
     do.call(TRONCO::pheatmap, heatmapData)
+    
+    .schnappsEnv[[paste0("historyPlot-",myns)]] <- heatmapData
     # library(seriation)
     # hm <- hmap(x, method = "HC_ward", main = "HC_ward")
 
@@ -1174,7 +1273,7 @@ pHeatMapModule <- function(input, output, session,
     # if (is.null(height)) {
     #   height <- 96 * 7
     # }
-    outfilePH <<- outfile
+    outfilePH <- outfile
     return(list(
       src = outfilePH,
       contentType = "image/png",

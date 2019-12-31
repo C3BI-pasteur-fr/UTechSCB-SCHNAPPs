@@ -339,14 +339,19 @@ output$DEBUGSAVEstring <- renderText({
   }
 })
 
-output$save2Historystring <- renderText({
-  if (DEBUG) {
-    .schnappsEnv$saveHistorycheckbox <- input$save2History
-    saveHistorycheckbox <- input$save2History
-  } else {
-    NULL
-  }
-})
+# output$currentTabInfo <- renderText({
+#   # browser()
+#   str(input$sideBarID)
+# })
+
+# output$save2Historystring <- renderText({
+#   if (DEBUG) {
+#     .schnappsEnv$saveHistorycheckbox <- input$save2History
+#     saveHistorycheckbox <- input$save2History
+#   } else {
+#     NULL
+#   }
+# })
 
 # cellSelectionMod ----
 callModule(tableSelectionServer, "cellSelectionMod", inputSample)
@@ -430,6 +435,53 @@ output$clusterColorSelection <- renderUI({
   })
 })
 
+# history store to file ----
+#' 
+
+askComment <- function(failed = FALSE) {
+  modalDialog(
+    textInput("HistComment", "add a comment", value = paste("created at ",date())),
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("HistCommentok", "OK")
+    )
+  )
+}
+observeEvent(input$HistCommentok, {
+  if (DEBUG) {
+    cat(file = stderr(), "writing history.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "HistCommentok")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "HistCommentok")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("writing history", id = "HistCommentok", duration = NULL)
+  }
+  
+  panelLinkHistory = list("coexpressionSelected" = "coE")
+  id <- input$sideBarID
+  cat(file = stderr(), paste0("observeEvent input$save2History\n"))
+  save(file = "~/SCHNAPPsDebug/save2History.RData", list = c(ls(), ls(envir = globalenv())))
+  # cp =load(file="~/SCHNAPPsDebug/save2History.RData")
+  lsS = ls(envir = .schnappsEnv)
+  for (pl in lsS[grep(paste0("^historyPlot-",panelLinkHistory[[id]]), lsS)]) {
+    cat(file = stderr(), paste0("writing to history: ",pl ,"\n"))
+    sp <- strsplit(  pl, "-" )[[1]]
+    recHistory(sp[[length(sp)]], .schnappsEnv[[pl]], envir = .schnappsEnv)
+    
+  }
+  
+  removeModal()
+  
+})
+
+observeEvent(input$save2History, {
+  showModal(askComment())
+})
 
 # observe: input$updateColors ----
 observeEvent(
@@ -704,7 +756,7 @@ observe(label = "ob27", {
 
 observe(label = "ob28", {
   input$newPrj
-  updateTextInput(session, "newPrj", value = make.names(input$newPrj))
+  updateTextInput(session, "newPrj", value = make.names(input$newPrj, unique = TRUE))
 })
 
 observeEvent(

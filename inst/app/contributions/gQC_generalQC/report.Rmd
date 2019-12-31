@@ -269,7 +269,7 @@ ccols : `r clusterCols$colPal`
 ```{r gqc_UMAP, echo=TRUE}
 DEBUGSAVE <- FALSE
 grpNs <- groupNames$namesDF
-grpN <- make.names(input$groupName)
+grpN <- make.names(input$groupName, unique = TRUE)
 
 dimY <- input$"gQC_umap_main-dimension_y"
 dimX <- input$"gQC_umap_main-dimension_x"

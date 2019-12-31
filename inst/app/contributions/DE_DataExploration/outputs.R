@@ -28,7 +28,7 @@ observe(label = "ob18", {
   .schnappsEnv$DE_Y1 <- input$DE_dim_y
 })
 
-DE_updateInputExpPanel <- reactive({
+observe({
   if (DEBUG) cat(file = stderr(), "DE_updateInputExpPanel started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -59,7 +59,7 @@ DE_updateInputExpPanel <- reactive({
     choices = colnames(projections),
     selected = .schnappsEnv$DE_Y1
   )
-  return(TRUE)
+  # return(TRUE)
 })
 
 
@@ -152,15 +152,21 @@ output$DE_panelPlot <- renderPlot({
   }
   if (DEBUG) cat(file = stderr(), "output$DE_panelPlot\n")
 
+  clicked <- input$updatePanelPlot
   scEx_log <- scEx_log()
   projections <- projections()
-  genesin <- input$DE_panelplotids
-  cl4 <- input$DE_clusterSelectionPanelPlot
-  dimx4 <- input$DE_dim_x
-  dimy4 <- input$DE_dim_y
-  sameScale <- input$DE_panelplotSameScale
+  DE_updateInputPPt()
+  genesin <- isolate(input$DE_panelplotids)
+  # cl4 <- input$DE_clusterSelectionPanelPlot
+  ppgrp <- isolate(input$DE_PPGrp)
+  ppCluster <- isolate(input$DE_clusterPP)
 
-  if (is.null(scEx_log) | is.null(projections) | is.null(cl4)) {
+  dimx4 <- isolate(input$DE_dim_x)
+  dimy4 <- isolate(input$DE_dim_y)
+  sameScale <- isolate(input$DE_panelplotSameScale)
+  nCol <- isolate(as.numeric(input$DE_nCol))
+
+  if (is.null(scEx_log) | is.null(projections) | is.null(ppgrp)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -193,69 +199,104 @@ output$DE_panelPlot <- renderPlot({
       ylim <- NULL
     }
   }
-  if (cl4 == "All") {
-    for (i in 1:length(genesin)) {
-      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-      Col <- rbPal(10)[
-        as.numeric(
-          cut(
-            as.numeric(
-              assays(scEx_log)[[1]][
-                rownames(featureData[geneIdx, ]),
-              ]
-            ),
-            breaks = 10
-          )
+  plotList <- list()
+  plotIdx <- 0
+  # if (cl4 == "All") {
+  #   for (i in 1:length(genesin)) {
+  #     geneIdx <- which(toupper(featureData$symbol) == genesin[i])
+  #     Col <- rbPal(10)[
+  #       as.numeric(
+  #         cut(
+  #           as.numeric(
+  #             assays(scEx_log)[[1]][
+  #               rownames(featureData[geneIdx, ]),
+  #               ]
+  #           ),
+  #           breaks = 10
+  #         )
+  #       )
+  #       ]
+  #     plotIdx = plotIdx +1
+  #
+  #     plotList[[plotIdx]] = ggplot(projections, aes_string(x=dimx4, y=dimy4))
+  #     if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
+  #       projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
+  #       plotList[[plotIdx]] = plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
+  #     } else{
+  #       plotList[[plotIdx]] = plotList[[plotIdx]] + geom_point(color = Col, show.legend = FALSE) + ggtitle(genesin[i])
+  #
+  #     }
+  #     if (!is.null(ylim)) {
+  #       plotList[[plotIdx]] = plotList[[plotIdx]]  + ylim(ylim)
+  #     }
+  #     # plot(projections[, dimx4], projections[, dimy4],
+  #     #      col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
+  #     # )
+  #     # title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
+  #     if (DEBUG) cat(file = stderr(), genesin[i])
+  #   }
+  # } else {
+  for (i in 1:length(genesin)) {
+    geneIdx <- which(toupper(featureData$symbol) == genesin[i])
+    subsetTSNE <- projections[projections[, ppCluster] %in% ppgrp, ]
+
+    Col <- rbPal(10)[
+      as.numeric(
+        cut(
+          as.numeric(
+            assays(scEx_log)[[1]][
+              rownames(featureData[geneIdx, ]),
+            ]
+          ),
+          breaks = 10
         )
-      ]
-      if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
-        projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
-      }
-
-      plot(projections[, dimx4], projections[, dimy4],
-        col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
       )
-      title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
-      if (DEBUG) cat(file = stderr(), genesin[i])
+    ]
+
+    names(Col) <- rownames(projections)
+    plotCol <- Col[rownames(subsetTSNE)]
+    if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
+      projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
+      subsetTSNE <- projections[projections[, ppCluster] %in% ppgrp, ]
     }
-  } else {
-    for (i in 1:length(genesin)) {
-      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-      subsetTSNE <- subset(projections, dbCluster == cl4)
 
-      Col <- rbPal(10)[
-        as.numeric(
-          cut(
-            as.numeric(
-              assays(scEx_log)[[1]][
-                rownames(featureData[geneIdx, ]),
-              ]
-            ),
-            breaks = 10
-          )
-        )
-      ]
+    plotIdx <- plotIdx + 1
 
-      names(Col) <- rownames(projections)
-      plotCol <- Col[rownames(subsetTSNE)]
-      if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
-        projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
-        subsetTSNE <- subset(projections, dbCluster == cl4)
-      }
-
-      plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
-        col = plotCol, pch = 16, frame.plot = TRUE,
-        ann = FALSE, ylim = ylim
-      )
-      title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
-      if (DEBUG) cat(file = stderr(), cl4)
+    plotList[[plotIdx]] <- ggplot(subsetTSNE, aes_string(x = dimx4, y = dimy4))
+    if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
+      subsetTSNE[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, rownames(subsetTSNE), drop = FALSE])
+      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
+    } else {
+      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_point(color = plotCol, show.legend = FALSE) + ggtitle(genesin[i])
     }
+    if (!is.null(ylim)) {
+      plotList[[plotIdx]] <- plotList[[plotIdx]] + ylim(ylim)
+    }
+    # plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
+    #      col = plotCol, pch = 16, frame.plot = TRUE,
+    #      ann = FALSE, ylim = ylim
+    # )
+    # title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
+    # if (DEBUG) cat(file = stderr(), ppgrp)
   }
-
+  # }
+  require(ggpubr)
+  retVal <-
+    ggarrange(
+      plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),
+      label.x = "test", legend = "right",
+      common.legend = T
+    )
+  retVal <-
+    annotate_figure(retVal,
+      top = text_grob(paste("using projection", ppCluster, "with elements", paste(ppgrp, collapse = ", ")))
+    )
   printTimeEnd(start.time, "DE_panelPlot")
   exportTestValues(DE_panelPlot = {
     ls()
   })
+  .schnappsEnv[["DE_panelPlot"]] <- retVal
+  retVal
 })
 
 
