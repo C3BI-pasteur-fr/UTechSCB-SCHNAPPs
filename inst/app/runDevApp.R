@@ -9,8 +9,9 @@
   localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
   # localContributionDir = ""
   defaultValueSingleGene = "itgae"
-defaultValueMultiGenes = " itgae, cd69, itga1"
-defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
+  defaultValueMultiGenes = " itgae, cd69, itga1"
+  defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
+  defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
