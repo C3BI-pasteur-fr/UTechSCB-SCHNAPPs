@@ -40,7 +40,10 @@ callModule(
   coE_topExpCCTable
 )
 
-
+coE_SOM_dataInput <- callModule(
+  cellSelectionModule,
+  "coE_SOM_dataInput"
+)
 
 
 # SOM heatmap module -----
