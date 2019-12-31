@@ -205,6 +205,8 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   )
   # retVal
 
+  .schnappsEnv[["sCA_volcanoPlot"]] <- retVal
+  
   exportTestValues(dgeVolcanoPlot = {
     str(retVal)
   })

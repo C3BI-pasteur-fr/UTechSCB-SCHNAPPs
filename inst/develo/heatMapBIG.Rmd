@@ -1,0 +1,82 @@
+---
+title: "heaptmapBIG"
+author: "Bernd Jagla"
+date: "9/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+load("~/Downloads/pHeatMap_data/sessionData.RData")
+```
+
+
+```{r cars, fig.height=80, fig.width=10}
+     if (is.null(scale)) {
+      heatmapData$scale = "none"
+    } else {
+      heatmapData$scale = "row"
+    }
+    if (length(addColNames) > 0 & moreOptions) {
+        heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+      }
+      if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
+        heatmapData$cluster_cols <- FALSE
+        colN <- rownames(psych::dfOrder(proje, orderColNames))
+        colN <- colN[colN %in% colnames(heatmapData$mat)]
+        heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
+      }
+do.call(TRONCO::pheatmap, heatmapData)
+
+
+```
+
+```{r}
+library("PerformanceAnalytics")
+chart.Correlation(heatmapData$mat, histogram=TRUE, pch=19)
+```
+
+
+```{r}
+library("Hmisc")
+colnames(heatmapData$mat)
+rownames(proje)
+colnames(proje)
+nums <- unlist(lapply(proje, is.numeric))
+numProje = proje[,nums]
+colnames(numProje)
+
+numProje <- t(numProje)[,colnames(heatmapData$mat)]
+rownames(numProje)
+corrInput <- as.matrix(rbind(numProje,heatmapData$mat))
+rownames(corrInput)
+res2 <- rcorr(t(corrInput))
+# res2
+sum(rownames(res2$P) %in% colnames(proje[, nums]))
+# ++++++++++++++++++++++++++++
+# flattenCorrMatrix
+# ++++++++++++++++++++++++++++
+# cormat : matrix of the correlation coefficients
+# pmat : matrix of the correlation p-values
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+cormat = res2$r
+pmat = res2$P
+ut <- upper.tri(upper.tri(res2$r))
+
+
+flatMat <- flattenCorrMatrix(res2$r, res2$P)
+flatMat[flatMat$column %in% colnames(proje[, nums]) & 
+        (!flatMat$row %in% colnames(proje[, nums]))  , ]
+flatMat = flatMat[order(flatMat$cor, decreasing = F),]
+DT::datatable(flatMat[flatMat$row == "PC5" &
+                        flatMat$p < 0.005,])
+
+```
+

@@ -115,7 +115,7 @@ dimY <- `r input$"coE_selected-dimension_y"`
 
 DEBUGSAVE <- FALSE
 grpNs <- groupNames$namesDF
-grpN <- make.names(input$groupName)
+grpN <- make.names(input$groupName, unique = TRUE)
 
 dimY <- input$"coE_selected-dimension_y"
 dimX <- input$"coE_selected-dimension_x"
