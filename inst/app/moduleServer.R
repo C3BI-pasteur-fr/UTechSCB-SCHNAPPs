@@ -135,13 +135,12 @@ clusterServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
-    
+
     add2history(type = "renderPlotly", 
                 plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
                 comment = paste(myns))
     
   })
-
   # clusterServer - updateInput ----
   # updateInput <-
   observe(label = "ob41", {
@@ -402,8 +401,8 @@ clusterServer <- function(input, output, session,
     tdata <- tData()
     projections <- projections()
     grpNs <- groupNames$namesDF
-    grpN <- make.names(input$groupName)
     grpN <- make.names(input$groupName, unique = TRUE)
+
     # returnValues$cluster <- input$clusters
     dimY <- input$dimension_y
     dimX <- input$dimension_x
@@ -636,7 +635,6 @@ clusterServer <- function(input, output, session,
     }
     
     grpN <- make.names(input$groupName, unique = TRUE)
-
     grpNs <- groupNames$namesDF
     # inpClusters <- input$clusters
     projections <- projections()
@@ -650,7 +648,6 @@ clusterServer <- function(input, output, session,
     inpClusters <- levels(projections$dbCluster)
 
     subsetData <- subset(projections, dbCluster %in% inpClusters)
-
     retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN] == "TRUE"))
     
     exportTestValues(DummyReactive = {
