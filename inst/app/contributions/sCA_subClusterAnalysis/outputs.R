@@ -37,7 +37,7 @@ sCA_dgeTableReac <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/output_dge.RData")
   featureData <- rowData(scEx)
@@ -90,7 +90,7 @@ output$sCA_dgeClustersSelection <- renderUI({
 
   if (DEBUG) cat(file = stderr(), "output$sCA_dgeClustersSelection\n")
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(envir = globalenv(), ls(), ls(envir = .schnappsEnv))))
+    save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(), ls(envir = .schnappsEnv)))
   }
   # load(file="~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData")
 
@@ -132,7 +132,7 @@ output$sCA_volc_selected <- renderText({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_volc_selected.RData", list = c(ls(envir = globalenv()), ls()))
+    save(file = "~/SCHNAPPsDebug/sCA_volc_selected.RData", list = ls())
   }
   # load(file=paste0("~/SCHNAPPsDebug/sCA_volc_selected.RData"))
   # cells.names <- brushedPs$key
@@ -166,7 +166,7 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/sCA_volcanoPlot.RData")
   if ("p_val_adj" %in% colnames(DGEdata)) {

@@ -23,7 +23,7 @@ Imports:
     manhattanly,
     mclust,
     pheatmap,
-    psych,
+    psychTools,
     rmarkdown,
     Rsomoclu,
     scater,

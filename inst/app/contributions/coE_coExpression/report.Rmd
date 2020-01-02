@@ -205,7 +205,7 @@ orderColNames : `r input$'coE_heatmapSelectedModule-orderNames'`
 
 
 ```{r coE_heatmapSelectedModule, echo=TRUE, eval=TRUE}
-# save(file = "~/SCHNAPPsDebug/selectedHeatmap.1.RData", list = c(ls(), ls(envir = globalenv())))
+# save(file = "~/SCHNAPPsDebug/selectedHeatmap.1.RData", list = c(ls()))
 genesin <- input$coE_heatmapselected_geneids
 
 # get selected cells

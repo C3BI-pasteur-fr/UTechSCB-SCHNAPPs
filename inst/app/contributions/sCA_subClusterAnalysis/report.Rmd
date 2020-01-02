@@ -93,7 +93,7 @@ if (is.null(input$db1) | is.null(input$db2)) {
   ymax <- input$db2$ymax
 
   subsetData <- subset(projections, dbCluster %in% inpCl1)
-  # save(file = "~/SCHNAPPsDebug/dge.Rmd.RData", list = c(ls(),ls(envir = globalenv())))
+  # save(file = "~/SCHNAPPsDebug/dge.Rmd.RData", list = c(ls()))
   # load(file = "~/SCHNAPPsDebug/dge.Rmd.RData")
   p1 <-
     ggplot(subsetData,

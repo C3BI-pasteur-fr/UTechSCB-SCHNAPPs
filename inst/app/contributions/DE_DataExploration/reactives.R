@@ -31,7 +31,7 @@ DE_updateInputPPt <- reactive({
   if (is.null(tsneData)) {
     return(NULL)
   }
-  # save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls(), ls(envir = globalenv())))
+  # save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls()))
   # load(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata")
   
   coln <- colnames(tsneData)
@@ -153,7 +153,7 @@ DE_scaterPNG <- reactive({
   height <- session$clientData$output_plot_height
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/scater.Rmd')
 

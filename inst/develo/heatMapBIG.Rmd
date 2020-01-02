@@ -21,7 +21,7 @@ load("~/Downloads/pHeatMap_data/sessionData.RData")
       }
       if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
         heatmapData$cluster_cols <- FALSE
-        colN <- rownames(psych::dfOrder(proje, orderColNames))
+        colN <- rownames(psychTools::dfOrder(proje, orderColNames))
         colN <- colN[colN %in% colnames(heatmapData$mat)]
         heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
       }
