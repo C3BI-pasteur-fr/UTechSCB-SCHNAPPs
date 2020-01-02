@@ -26,7 +26,7 @@ for (fp in parFiles) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls())
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParameters.RData')
@@ -73,7 +73,7 @@ output$normalizationsParametersDynamic <- renderUI({
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls())
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
@@ -169,7 +169,7 @@ output$summaryStatsSideBar <- renderUI({
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls())
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
@@ -250,7 +250,7 @@ output$geneListSelection <- shinyTree::renderTree({
 #   if (.schnappsEnv$DEBUGSAVE) {
 #     save(
 #       file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
-#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+#       list = c("normaliztionParameters", ls())
 #     )
 #   }
 #   # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
@@ -294,7 +294,7 @@ output$geneListSelection <- shinyTree::renderTree({
 #   if (.schnappsEnv$DEBUGSAVE) {
 #     save(
 #       file = "~/SCHNAPPsDebug/removedGenesTable.RData",
-#       list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+#       list = c("normaliztionParameters", ls())
 #     )
 #   }
 #   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
@@ -379,7 +379,7 @@ output$sampleColorSelection <- renderUI({
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls())
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
@@ -413,7 +413,7 @@ output$clusterColorSelection <- renderUI({
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
-      list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+      list = c("normaliztionParameters", ls())
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
@@ -465,7 +465,7 @@ observeEvent(input$HistCommentok, {
   panelLinkHistory = list("coexpressionSelected" = "coE")
   id <- input$sideBarID
   cat(file = stderr(), paste0("observeEvent input$save2History\n"))
-  save(file = "~/SCHNAPPsDebug/save2History.RData", list = c(ls(), ls(envir = globalenv())))
+  save(file = "~/SCHNAPPsDebug/save2History.RData", list = c(ls()))
   # cp =load(file="~/SCHNAPPsDebug/save2History.RData")
   lsS = ls(envir = .schnappsEnv)
   for (pl in lsS[grep(paste0("^historyPlot-",panelLinkHistory[[id]]), lsS)]) {
@@ -506,7 +506,7 @@ observeEvent(
     })
     names(inCols) <- lev
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls()))
       cat(file = stderr(), paste0("observeEvent save done\n"))
     }
     # load(file="~/SCHNAPPsDebug/updateColors.RData")
@@ -526,7 +526,7 @@ observeEvent(
     })
     names(inCols) <- lev
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls()))
       cat(file = stderr(), paste0("observeEvent 2 save done\n"))
     }
     # load(file="~/SCHNAPPsDebug/updateColors2.RData")
@@ -544,7 +544,7 @@ output$Nclusters <- renderText({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls()))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/Nclusters.RData")
@@ -615,7 +615,7 @@ output$RDSsave <- downloadHandler(
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
 
@@ -775,7 +775,7 @@ observeEvent(
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/delPrjsButton.RData",
-        list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+        list = c("normaliztionParameters", ls())
       )
     }
     # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
@@ -802,7 +802,7 @@ observeEvent(
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
-        list = c("normaliztionParameters", ls(), ls(envir = globalenv()))
+        list = c("normaliztionParameters", ls())
       )
     }
     # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")

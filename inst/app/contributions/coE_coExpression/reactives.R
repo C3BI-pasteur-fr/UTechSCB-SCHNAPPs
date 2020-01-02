@@ -13,7 +13,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     showNotification("coE_heatmapFunc", id = "coE_heatmapFunc", duration = NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData")
 
@@ -146,7 +146,7 @@ coE_heatmapSelectedReactive <- reactive({
   featureData <- rowData(scEx_log)
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/selectedHeatmap.RData")
 
@@ -193,7 +193,7 @@ coE_topExpGenesTable <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
 
@@ -371,7 +371,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
 
@@ -555,7 +555,7 @@ coE_somFunction <- function(iData, nSom, geneName, projections, clusterSOM = "db
   }
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
 
@@ -679,7 +679,7 @@ coE_heatmapSOMReactive <- reactive({
   }
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/coE_heatmapSOMReactive.RData")
 
@@ -842,7 +842,7 @@ coE_heatmapReactive <- reactive({
   }
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/heatmap.RData")
 

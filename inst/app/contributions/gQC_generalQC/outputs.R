@@ -120,7 +120,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
 
@@ -167,7 +167,7 @@ output$gQC_plotUmiHist <- renderPlot({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData")
 
@@ -202,7 +202,7 @@ output$gQC_plotSampleHist <- renderPlot({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/sampleHist.RData")
   retVal <- gQC_sampleHistFunc(sampleInf, scols)
@@ -228,7 +228,7 @@ output$gQC_variancePCA <- renderPlot({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData")
   

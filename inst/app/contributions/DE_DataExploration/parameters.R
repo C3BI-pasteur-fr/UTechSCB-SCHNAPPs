@@ -90,7 +90,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
   }
   integrated <- tryCatch(
     {
-      # save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+      # save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls()))
       # load(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData")
       features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)
      
@@ -176,7 +176,7 @@ DE_seuratRefBased <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_seuratRefBased.RData")
   .schnappsEnv$normalizationFactor = scalingFactor
@@ -420,7 +420,7 @@ DE_seuratStandard <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratStandard.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_seuratStandard.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_seuratStandard.RData")
 
@@ -487,7 +487,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_logGeneNormalization.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_logGeneNormalization.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_logGeneNormalization.RData")
 
@@ -589,7 +589,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
 

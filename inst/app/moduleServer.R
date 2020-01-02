@@ -3,7 +3,7 @@ if (DEBUG) {
 }
 
 source(paste0(packagePath, "/reactives.R"), local = TRUE)
-suppressMessages(library(psych))
+suppressMessages(library(psychTools))
 suppressMessages(library(magrittr))
 suppressMessages(library(dplyr))
 
@@ -227,7 +227,7 @@ clusterServer <- function(input, output, session,
 
     if (.schnappsEnv$DEBUGSAVE) {
       if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: saving\n")
-      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position", ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position"))
     }
     # load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
 
@@ -307,7 +307,7 @@ clusterServer <- function(input, output, session,
 
       if (.schnappsEnv$DEBUGSAVE) {
         cat(file = stderr(), paste("selectedCell: saving\n"))
-        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls(), ls(envir = globalenv())))
+        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls()))
       }
       # load(file="~/SCHNAPPsDebug/clusterServerreturnValues.RData")
       # in case no normalization is done:
@@ -439,7 +439,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving\n"))
       save(
         file = paste0("~/SCHNAPPsDebug/clusterPlot-", ns("-"), ".RData", collapse = "."),
-        list = c(ls(envir = globalenv()), ls(), "legend.position")
+        list = c(ls(), "legend.position")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
@@ -571,7 +571,7 @@ clusterServer <- function(input, output, session,
     }
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "save: changeGroups\n")
-      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls()))
       cat(file = stderr(), "done save: changeGroups\n")
       # browser()
     }
@@ -642,7 +642,7 @@ clusterServer <- function(input, output, session,
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls()))
     }
     # load(file="~/SCHNAPPsDebug/nCellsVisibleSelected.RData")
     inpClusters <- levels(projections$dbCluster)
@@ -729,7 +729,7 @@ clusterServer <- function(input, output, session,
     # }
 
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls(), ls(envir = globalenv())))
+      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls()))
     }
     # load(file="~/SCHNAPPsDebug/additionalOptions.RData")
 
@@ -778,7 +778,7 @@ clusterServer <- function(input, output, session,
       return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls(envir = globalenv()), ls()))
+      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls()))
     }
     # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
 
@@ -884,7 +884,7 @@ tableSelectionServer <- function(input, output, session,
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellSelection-", ns("bkup"), ".RData", collapse = "."),
-        list = c(ls(), ls(envir = globalenv()))
+        list = c(ls())
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."))
@@ -927,7 +927,7 @@ tableSelectionServer <- function(input, output, session,
       if (.schnappsEnv$DEBUGSAVE) {
         save(
           file = paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."),
-          list = c(ls(), ls(envir = globalenv()))
+          list = c(ls())
         )
       }
       # load(file=paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."))
@@ -985,8 +985,8 @@ tableSelectionServer <- function(input, output, session,
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = paste0("~/SCHNAPPsDebug/cellNameTable-", nsStr, ".RData", collapse = "."),
-        # list = c(ls(), ls(envir = globalenv()),ls(envir = .schnappsEnv))
-        list = c(ls(), ls(envir = globalenv()))
+        # list = c(ls(),ls(envir = .schnappsEnv))
+        list = c(ls())
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."))
@@ -1176,7 +1176,7 @@ pHeatMapModule <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
-      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), ls(envir = globalenv()), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
+      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
     }
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
@@ -1217,7 +1217,7 @@ pHeatMapModule <- function(input, output, session,
     # if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
     if (sum(orderColNames %in% colnames(proje)) > 0) {
       heatmapData$cluster_cols <- FALSE
-      colN <- rownames(psych::dfOrder(proje, orderColNames))
+      colN <- rownames(psychTools::dfOrder(proje, orderColNames))
       colN <- colN[colN %in% colnames(heatmapData$mat)]
       heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
       # return()
@@ -1304,7 +1304,7 @@ pHeatMapModule <- function(input, output, session,
   #
   #
   #   if (.schnappsEnv$DEBUGSAVE) {
-  #     save(file = "~/SCHNAPPsDebug/heatMapadditionalOptions.RData", list = c(ls(), ls(envir = globalenv())))
+  #     save(file = "~/SCHNAPPsDebug/heatMapadditionalOptions.RData", list = c(ls()))
   #   }
   #   # load(file="~/SCHNAPPsDebug/heatMapadditionalOptions.RData")
   #
@@ -1340,7 +1340,6 @@ pHeatMapModule <- function(input, output, session,
       if (.schnappsEnv$DEBUGSAVE) {
         save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c(
           "outfilePH", ls(),
-          ls(envir = globalenv()),
           ls(.schnappsEnv)
         ))
       }
@@ -1365,7 +1364,7 @@ pHeatMapModule <- function(input, output, session,
       # if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
       if (sum(orderColNames %in% colnames(proje)) > 0) {
         heatmapData$cluster_cols <- FALSE
-        colN <- rownames(psych::dfOrder(proje, orderColNames))
+        colN <- rownames(psychTools::dfOrder(proje, orderColNames))
         colN <- colN[colN %in% colnames(heatmapData$mat)]
         heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
       }

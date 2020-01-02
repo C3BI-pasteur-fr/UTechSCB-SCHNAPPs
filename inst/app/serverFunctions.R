@@ -152,10 +152,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   names(projections)[ncol(projections)] <- "exprs"
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", list = c(
-      ls(), "legend.position",
-      ls(envir = globalenv())
-    ))
+    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", 
+         list = c(ls(), "legend.position")
+         )
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
@@ -434,7 +433,7 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   # if (sum(orderColNames %in% colnames(projections)) > 0 & moreOptions) {
   if (sum(orderColNames %in% colnames(projections)) > 0) {
     heatmapData$cluster_cols <- FALSE
-    colN <- rownames(psych::dfOrder(projections, orderColNames))
+    colN <- rownames(psychTools::dfOrder(projections, orderColNames))
     colN <- colN[colN %in% colnames(heatmapData$mat)]
     heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
     # return()
@@ -638,7 +637,7 @@ if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages())))
     name <- paste(name, date())
     tmpF <- tempfile(fileext = ".pdf")
     cat(file = stderr(), paste0("history tmp File: ", tmpF, "\n"))
-    # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls(), ls(envir = globalenv())))
+    # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
     # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
     clP <- class(plot1)
     cat(file = stderr(), paste0("class: ", clP[1], "\n"))
@@ -671,7 +670,7 @@ if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages())))
       "datatables" = {
         # # // this takes too long
         # cat(file = stderr(), paste0("datatables\n"))
-        # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls(), ls(envir = globalenv())))
+        # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
         # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
         #
         # pdf(tmpF)
@@ -786,7 +785,7 @@ updateButtonColor <- function(buttonName, parameters) {
 #
 #   renderUI({
 #     # inp <- isolate(reactiveValuesToList(get("input")))
-#     # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), ls(envir = globalenv()), "name", "variables", ".schnappsEnv", "inp", "session"))
+#     # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), "name", "variables", ".schnappsEnv", "inp", "session"))
 #     # cp =load(file = "~/SCHNAPPsDebug/render.RData")
 #     # browser()
 #     if (DEBUG) cat(file = stderr(), "updateButtonUI\n")

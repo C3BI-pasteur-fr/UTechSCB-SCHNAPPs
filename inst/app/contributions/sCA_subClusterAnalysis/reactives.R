@@ -193,7 +193,7 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
     showNotification("Please install DESeq2", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
 
@@ -254,7 +254,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
     showNotification("sCA_dge_CellViewfunc", id = "sCA_dge_CellViewfunc", duration = NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
 
@@ -345,7 +345,7 @@ sCA_dge <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ls(envir = globalenv()), ".schnappsEnv"))
+    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
 
@@ -435,7 +435,7 @@ updateInputSubclusterAxes <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/updateInputSubclusterAxes.RData")
   # if (length(gn) > 0) {
