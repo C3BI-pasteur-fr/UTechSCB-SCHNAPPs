@@ -143,14 +143,12 @@ tableSelectionUi <- function(id) {
         )),
       fluidRow(
         column(width = 3,
-               actionButton(ns("save2HistTabUi"), "Save to history"),
-        )
-        # ,
-        # column(
-        #   width = 3,
-        #   actionButton(ns("refreshtable"), "Refresh table"),
-        # )
+          downloadButton(ns("download_cellNameTable"), "Download table")
+          ),
+          column(width = 3,
+                 actionButton(ns("save2HistTabUi"), "Save to history"),
       )
+    )
     ),
     box(
       width = 12,

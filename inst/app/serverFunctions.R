@@ -844,6 +844,7 @@ updateButtonColor <- function(buttonName, parameters) {
 #   })
 # }
 
+
 add2history <- function(type, comment = "", ...) {
   if (!exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
@@ -948,5 +949,4 @@ get_density <- function(x, y, ...) {
   ii <- cbind(ix, iy)
   return(dens$z[ii])
 }
-
 

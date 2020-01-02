@@ -147,6 +147,7 @@ DE_seuratRefBasedButton <- reactiveVal(
   label = "DE_seuratRefBasedButton",
   value = ""
 )
+
 # DE_seuratRefBased ----
 DE_seuratRefBased <- reactive({
   if (DEBUG) cat(file = stderr(), "DE_seuratRefBased started.\n")
@@ -166,6 +167,7 @@ DE_seuratRefBased <- reactive({
   nfeatures <- isolate(input$DE_seuratRefBased_nfeatures)
   k.filter <- isolate(input$DE_seuratRefBased_k.filter)
   scalingFactor <- isolate(input$DE_seuratRefBased_scaleFactor)
+  geneNames <-  isolate(input$DE_seuratRefBased_keepfeatures)
 
   if (is.null(scEx) | runThis == "") {
     if (DEBUG) {
@@ -274,6 +276,7 @@ DE_seuratSCtransformButton <- reactiveVal(
   label = "DE_seuratSCtransformButton",
   value = ""
 )
+
 # DE_seuratSCtransform ----
 DE_seuratSCtransform <- reactive({
   if (DEBUG) cat(file = stderr(), "DE_seuratSCtransform started.\n")
@@ -293,6 +296,7 @@ DE_seuratSCtransform <- reactive({
   nfeatures <- isolate(input$DE_seuratSCtransform_nfeatures)
   k.filter <- isolate(input$DE_seuratSCtransform_k.filter)
   scalingFactor <- isolate(input$DE_seuratSCtransform_scaleFactor)
+  geneNames <-  isolate(input$DE_seuratSCtransformm_keepfeatures)
 
   if (is.null(scEx) | runThis == "") {
     if (DEBUG) {
@@ -501,6 +505,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
 
   # turn normalization button green
   addClass("updateNormalization", "green")
+
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logGeneNormalization = {
     assays(retVal)[["logcounts"]]

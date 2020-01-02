@@ -2170,6 +2170,8 @@ projections <- reactive({
   }
   add2history(type = "save", comment = "projections", projections = projections)
   
+  add2history(type = "save", comment = "projections", projections = projections)
+  
   exportTestValues(projections = {
     projections
   })
