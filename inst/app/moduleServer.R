@@ -1195,7 +1195,10 @@ pHeatMapModule <- function(input, output, session,
       pWidth <- 800
       pHeight <- 300
     }
-
+    if(!is(heatmapData$mat, 'matrix') & !is(heatmapData$mat, 'Matrix')){
+      cat(file = stderr(), "!!!!! output$pHeatMapModule:mat is not a matrix\n")
+      heatmapData$mat <- as.matrix(t(heatmapData$mat))
+    }
     if (is.null(scale)) {
       heatmapData$scale <- "none"
     } else {
@@ -1218,7 +1221,11 @@ pHeatMapModule <- function(input, output, session,
     if (sum(orderColNames %in% colnames(proje)) > 0) {
       heatmapData$cluster_cols <- FALSE
       colN <- rownames(psychTools::dfOrder(proje, orderColNames))
-      colN <- colN[colN %in% colnames(heatmapData$mat)]
+      matN <- colnames(heatmapData$mat)
+      if (is.null(matN)) {
+        matN = names(heatmapData$mat)
+      }
+      colN <- colN[colN %in% matN]
       heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
       # return()
     }
@@ -1243,7 +1250,13 @@ pHeatMapModule <- function(input, output, session,
       heatmapData$mat <- heatmapData$mat[1:1000, ]
       heatmapData$gaps_row <- heatmapData$gaps_row[heatmapData$gaps_row < 1000]
     }
-    if (nrow(heatmapData$mat) == 0) {
+    if (nrow(heatmapData$mat) < 2) {
+      showNotification(
+        "Less than two rows to display",
+        id = "pHeatMapPlotWARNING",
+        type = "warning",
+        duration = 20
+      )
       return(list(
         src = "empty.png",
         contentType = "image/png",

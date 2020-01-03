@@ -56,7 +56,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     height <- 96 * 7
   }
 
-  nonZeroRows <- which(Matrix::rowSums(expression) > 0)
+  # nonZeroRows <- which(Matrix::rowSums(expression) > 0)
 
   annCols <- list(
     "sampleNames" = sampCol,
@@ -64,7 +64,8 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   )
 
   retVal <- list(
-    mat = expression[nonZeroRows, order(annotation[, 1], annotation[, 2])],
+    # mat = expression[nonZeroRows, order(annotation[, 1], annotation[, 2])],
+    mat = expression[, order(annotation[, 1], annotation[, 2])],
     cluster_rows = TRUE,
     cluster_cols = FALSE,
     # scale = "row",
