@@ -186,32 +186,30 @@ tabList <- list(
         )
       ),
       fluidRow(
-        column(
-          width = 3,
-          numericInput("coE_dimSOM", "number of nodes per dimension",
-            20,
-            min = 2, max = 100
+        cellSelectionUI("coE_SOM_dataInput"),
+        box(
+          fluidRow(
+            column(width = 3,
+                   numericInput("coE_dimSOM", "number of nodes per dimension",
+                                20,
+                                min = 2, max = 100
+                   )
+            ), 
+            column(width = 3,
+                   textInput("coE_geneSOM", "Gene of interest", value = defaultValueSingleGene)
+            )
           )
         ),
-        column(
-          width = 3,
-          textInput("coE_geneSOM", "Gene of interest", value = defaultValueSingleGene)
-        ),
-        column(
-          width = 3,
-          selectInput(
-            inputId = "coE_clusterSOM", label = "Clusters/Factor to use",
-            choices = c("dbCluster", "sampleName"),
-            selected = "dbCluster"
-          )
-        ),
-        column(
-          width = 3,
-          selectInput(
-            inputId = "coE_clusterValSOM", label = "Values to use",
-            choices = c("1", "2"), selected = "1", multiple = TRUE
-          )
-        )
+        
+        # column(width = 3,
+        #        selectInput(inputId = "coE_clusterSOM", label = "Clusters/Factor to use", 
+        #                    choices = c("dbCluster", "sampleName"),
+        #                    selected = "dbCluster")
+        # ),
+        # column(width = 3,
+        #        selectInput(inputId = "coE_clusterValSOM", label = "Values to use",
+        #                    choices = c("1","2"), selected = "1", multiple = TRUE)
+        # )
       ),
       br(),
       fluidRow(

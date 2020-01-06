@@ -69,46 +69,52 @@ callModule(
   sCA_dgeTableReac
 )
 
+sCA_dataInp <- callModule(
+  cellSelectionModule,
+  "sCA_dataInput"
+)
 
 
 # sub cluster analysis ( used for 2 panels )
-output$sCA_dgeClustersSelection <- renderUI({
-  if (DEBUG) cat(file = stderr(), "sCA_dgeClustersSelection started.\n")
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "sCA_dgeClustersSelection")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "sCA_dgeClustersSelection")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("sCA_dgeClustersSelection", id = "sCA_dgeClustersSelection", duration = NULL)
-  }
 
-  projections <- projections()
-  up1 <- updateInputSubclusterAxes()
+# output$sCA_dgeClustersSelection <- renderUI({
+#   if (DEBUG) cat(file = stderr(), "sCA_dgeClustersSelection started.\n")
+#   start.time <- base::Sys.time()
+#   on.exit({
+#     printTimeEnd(start.time, "sCA_dgeClustersSelection")
+#     if (!is.null(getDefaultReactiveDomain())) {
+#       removeNotification(id = "sCA_dgeClustersSelection")
+#     }
+#   })
+#   if (!is.null(getDefaultReactiveDomain())) {
+#     showNotification("sCA_dgeClustersSelection", id = "sCA_dgeClustersSelection", duration = NULL)
+#   }
+# 
+#   projections <- projections()
+#   up1 <- updateInputSubclusterAxes()
+# 
+#   if (DEBUG) cat(file = stderr(), "output$sCA_dgeClustersSelection\n")
+#   if (.schnappsEnv$DEBUGSAVE) {
+#     save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(envir = globalenv(), ls(), ls(envir = .schnappsEnv))))
+#   }
+#   # load(file="~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData")
+# 
+# 
+#   if (is.null(projections)) {
+#     tags$span(style = "color:red", "Please load data first")
+#   } else {
+#     noOfClusters <- levels(as.factor(projections$dbCluster))
+#     # noOfClusters <- max(as.numeric(as.character(projections$dbCluster)))
+#     selectizeInput(
+#       "sCA_dgeClustersSelection",
+#       label = "Cluster",
+#       choices = noOfClusters,
+#       selected = .schnappsEnv$subClusterClusters,
+#       multiple = TRUE
+#     )
+#   }
+# })
 
-  if (DEBUG) cat(file = stderr(), "output$sCA_dgeClustersSelection\n")
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData", list = c(ls(), ls(envir = .schnappsEnv)))
-  }
-  # load(file="~/SCHNAPPsDebug/sCA_dgeClustersSelection.RData")
-
-
-  if (is.null(projections)) {
-    tags$span(style = "color:red", "Please load data first")
-  } else {
-    noOfClusters <- levels(as.factor(projections$dbCluster))
-    # noOfClusters <- max(as.numeric(as.character(projections$dbCluster)))
-    selectizeInput(
-      "sCA_dgeClustersSelection",
-      label = "Cluster",
-      choices = noOfClusters,
-      selected = .schnappsEnv$subClusterClusters,
-      multiple = TRUE
-    )
-  }
-})
 
 output$sCA_volc_selected <- renderText({
   if (DEBUG) cat(file = stderr(), "sCA_volc_selected started.\n")

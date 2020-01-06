@@ -1,6 +1,6 @@
 suppressMessages(library(magrittr))
 require(digest)
-
+require(psychTools)
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
@@ -433,7 +433,7 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   # if (sum(orderColNames %in% colnames(projections)) > 0 & moreOptions) {
   if (sum(orderColNames %in% colnames(projections)) > 0) {
     heatmapData$cluster_cols <- FALSE
-    colN <- rownames(psychTools::dfOrder(projections, orderColNames))
+    colN <- rownames(dfOrder(projections, orderColNames))
     colN <- colN[colN %in% colnames(heatmapData$mat)]
     heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
     # return()

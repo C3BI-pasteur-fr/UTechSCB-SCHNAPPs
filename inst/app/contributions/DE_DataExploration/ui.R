@@ -40,6 +40,10 @@ tabList <- list(
           )
         )
       ),
+      br(),
+      cellSelectionUI("DE_Exp_dataInput"),
+      br(),
+      box(width = 12,
       fluidRow(
         column(
           width = 6,
@@ -55,7 +59,7 @@ tabList <- list(
           width = 6,
           clusterUI("DE_expclusters")
         )
-      ),
+      )),
       br(),
       fluidRow(
         column(
@@ -88,48 +92,60 @@ tabList <- list(
         )
       ),
       fluidRow(
-        column(width = 12, offset = 1,
-               actionButton("updatePanelPlot", "apply changes", width = '80%', 
-                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        column(
+          width = 12, offset = 1,
+          actionButton("updatePanelPlot", "apply changes",
+            width = "80%",
+            style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
+          )
         )
       ),
-      fluidRow(
-        column(width = 3,
-               # uiOutput("DE_clusterSelectionPanelPlot")
-               selectInput(inputId = "DE_clusterPP", label = "Clusters/Factor to use", 
-                           choices = c("dbCluster", "sampleNames"),
-                           selected = "dbCluster")
-        ),
-        column(width = 3,
-               selectInput(inputId = "DE_PPGrp", label = "Values to use",
-                           choices = c("1","2"), selected = "1", multiple = TRUE)
-        )),
-      fluidRow(
-        column(width = 3,
-               selectInput("DE_dim_x",
-                           label = "X",
-                           choices = c("tsne1", "tsne2", "tsne3"),
-                           selected = "tsne1"
-               )
-        ),
-        column(
-          width = 3,
-          selectInput("DE_dim_y",
-            label = "Y",
-            choices = c("tsne1", "tsne2", "tsne3"),
-            selected = "tsne2"
+      br(),
+      cellSelectionUI("DE_PanelPlotCellSelection"),
+
+      # fluidRow(
+      #   column(width = 3,
+      #          # uiOutput("DE_clusterSelectionPanelPlot")
+      #          selectInput(inputId = "DE_clusterPP", label = "Clusters/Factor to use",
+      #                      choices = c("dbCluster", "sampleNames"),
+      #                      selected = "dbCluster")
+      #   ),
+      #   column(width = 3,
+      #          selectInput(inputId = "DE_PPGrp", label = "Values to use",
+      #                      choices = c("1","2"), selected = "1", multiple = TRUE)
+      #   )),
+      box(width = 6, 
+        fluidRow(
+          column(
+            width = 6,
+            selectInput("DE_dim_x",
+              label = "X",
+              choices = c("tsne1", "tsne2", "tsne3"),
+              selected = "tsne1"
+            )
+          ),
+          column(
+            width = 6,
+            selectInput("DE_dim_y",
+              label = "Y",
+              choices = c("tsne1", "tsne2", "tsne3"),
+              selected = "tsne2"
+            )
           )
-        ), column(
-          2,
-          checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
         ),
-        column(
-          2,
-          selectInput("DE_nCol",
-                      label = "number of columns for plot",
-                      choices = c(1:10),
-                      selected = 4
-          )
+        fluidRow(
+          column(
+            width = 4,
+            checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
+          ),
+          column(
+            width = 8,
+            selectInput("DE_nCol",
+              label = "number of columns for plot",
+              choices = c(1:10),
+              selected = 4
+            )
+          ), align = 'right'
         )
       ),
       fluidRow(
@@ -140,9 +156,8 @@ tabList <- list(
       ),
       fluidRow(column(
         12,
-        jqui_resizable(plotOutput("DE_panelPlot") )
-      )
-      ),
+        jqui_resizable(plotOutput("DE_panelPlot"))
+      )),
       br(),
       actionButton("save2HistPanel", "save to history")
     )
@@ -161,10 +176,9 @@ tabList <- list(
           offset = 1,
           imageOutput("DE_scaterQC") %>% withSpinner() # PNG output with temp file
         )
-      ),      
+      ),
       br(),
       actionButton("save2HistScater", "save to history")
-      
     )
   )
 )

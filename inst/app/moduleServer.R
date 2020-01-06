@@ -6,6 +6,7 @@ source(paste0(packagePath, "/reactives.R"), local = TRUE)
 suppressMessages(library(psychTools))
 suppressMessages(library(magrittr))
 suppressMessages(library(dplyr))
+require(psychTools)
 
 #' clusterServer
 #'
@@ -56,7 +57,7 @@ clusterServer <- function(input, output, session,
   #   mod_cl1 <<- input$clusters
   # })
 
-  observe(label = "ob31", {
+  observe({
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
     .schnappsEnv$dim1 <- input$dimension_x
   })
@@ -120,10 +121,10 @@ clusterServer <- function(input, output, session,
 
   # observe save  2 history ----
   observe({
-    clicked = input$save2Hist
+    clicked <- input$save2Hist
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- session$ns("-")
-    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     start.time <- base::Sys.time()
     if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
     on.exit(
@@ -136,10 +137,11 @@ clusterServer <- function(input, output, session,
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
 
-    add2history(type = "renderPlotly", 
-                plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
-                comment = paste(myns))
-    
+    add2history(
+      type = "renderPlotly",
+      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
+      comment = paste(myns)
+    )
   })
   # clusterServer - updateInput ----
   # updateInput <-
@@ -164,12 +166,12 @@ clusterServer <- function(input, output, session,
       selected = .schnappsEnv$dim1
     )
     updateSelectInput(session, "dimension_y",
-                      choices = c(colnames(projections), "histogram", "UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = .schnappsEnv$dim2
+      choices = c(colnames(projections), "histogram", "UmiCountPerGenes", "UmiCountPerGenes2"),
+      selected = .schnappsEnv$dim2
     )
     updateSelectInput(session, "dimension_col",
-                      choices = c(colnames(projections), "cellDensity" ,"UmiCountPerGenes", "UmiCountPerGenes2"),
-                      selected = .schnappsEnv$dimCol
+      choices = c(colnames(projections), "cellDensity", "UmiCountPerGenes", "UmiCountPerGenes2"),
+      selected = .schnappsEnv$dimCol
     )
 
     updateSelectInput(session, "divideXBy",
@@ -424,7 +426,7 @@ clusterServer <- function(input, output, session,
     }
     if (is.null(scEx) | is.null(tdata)) {
       if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
-      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
       return(NULL)
     }
     # in case the normalization is not done
@@ -472,10 +474,10 @@ clusterServer <- function(input, output, session,
       geneNames2, dimX, dimY, clId, grpN, legend.position,
       grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
     )
-    
+
     # save p1 to .schnappsEnv for saving to history
-    .schnappsEnv[[paste0("historyPlot-",myns)]] <- p1
-    
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- p1
+
     # add2history(type = "renderPlotly", plotData = p1, comment = paste(myns))
     # if (save2History) recHistory(myns, p1)
     # event_register(p1, 'plotly_selected')
@@ -585,7 +587,7 @@ clusterServer <- function(input, output, session,
       grpNs[rownames(visibleCells), grpN] <- FALSE
     }
     grpNs[cells.names, grpN] <- TRUE
-    grpNs[, grpN]  <- as.factor(grpNs[, grpN] )
+    grpNs[, grpN] <- as.factor(grpNs[, grpN])
     # Set  reactive value
     # cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
     groupNames$namesDF <- grpNs
@@ -633,7 +635,7 @@ clusterServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("nCellsVisibleSelected", id = "nCellsVisibleSelected", duration = NULL)
     }
-    
+
     grpN <- make.names(input$groupName, unique = TRUE)
     grpNs <- groupNames$namesDF
     # inpClusters <- input$clusters
@@ -649,7 +651,7 @@ clusterServer <- function(input, output, session,
 
     subsetData <- subset(projections, dbCluster %in% inpClusters)
     retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN] == "TRUE"))
-    
+
     exportTestValues(DummyReactive = {
       retVal
     })
@@ -770,11 +772,11 @@ clusterServer <- function(input, output, session,
     myns <- ns("cellSelection")
 
     if (!myshowCells) {
-      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
       return("")
     }
     if (is.null(projections)) {
-      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
       return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -796,9 +798,8 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- cells.names[!is.na(cells.names)]
     retVal <- paste(retVal, collapse = ", ")
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- retVal
 
-    .schnappsEnv[[paste0("historyPlot-",myns)]] <- retVal
-    
     exportTestValues(ClusterCellSelection = {
       retVal
     })
@@ -826,7 +827,7 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
 
   observe({
-    clicked  = input$save2HistTabUi
+    clicked <- input$save2HistTabUi
     myns <- session$ns("cellNameTable")
     if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi \n")
     start.time <- base::Sys.time()
@@ -839,13 +840,14 @@ tableSelectionServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
-    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
-    add2history(type = "renderDT", comment = "Table",  
-                tableData = .schnappsEnv[[paste0("historyPlot-",myns)]] )
-    
+    req(.schnappsEnv[[paste0("historyPlot-", myns)]])
+    add2history(
+      type = "renderDT", comment = "Table",
+      tableData = .schnappsEnv[[paste0("historyPlot-", myns)]]
+    )
   })
-  
-  
+
+
   output$rowSelection <- renderText({
     if (DEBUG) cat(file = stderr(), "cellSelection\n")
     start.time <- Sys.time()
@@ -915,29 +917,25 @@ tableSelectionServer <- function(input, output, session,
 
   proxy <- DT::dataTableProxy("cellNameTable")
 
-  observeEvent(
-    label = "ob43",
-    eventExpr = input$selectAll,
-    handlerExpr = {
-      if (DEBUG) cat(file = stderr(), "observe input$selectAll\n")
-      ipSelect <- input$selectAll
-      # prox <- proxy
-      allrows <- input$cellNameTable_rows_all
+  observeEvent(input$selectAll, {
+    if (DEBUG) cat(file = stderr(), "observe input$selectAll\n")
+    ipSelect <- input$selectAll
+    # prox <- proxy
+    allrows <- input$cellNameTable_rows_all
 
-      if (.schnappsEnv$DEBUGSAVE) {
-        save(
-          file = paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."),
-          list = c(ls())
-        )
-      }
-      # load(file=paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."))
-      if (ipSelect) {
-        proxy %>% DT::selectRows(selected = allrows)
-      } else {
-        proxy %>% DT::selectRows(selected = NULL)
-      }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."),
+        list = c(ls(), ls(envir = globalenv()))
+      )
     }
-  )
+    # load(file=paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."))
+    if (ipSelect) {
+      proxy %>% DT::selectRows(selected = allrows)
+    } else {
+      proxy %>% DT::selectRows(selected = NULL)
+    }
+  })
 
   # observe: cellNameTable_rows_selected ----
   observe(label = "ob44", {
@@ -979,7 +977,7 @@ tableSelectionServer <- function(input, output, session,
     selectedRows <- input$cellNameTable_rows_selected
     # searchStr <-
     if (is.null(dataTables)) {
-      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -1024,21 +1022,21 @@ tableSelectionServer <- function(input, output, session,
       }
       # if (DEBUG) cat(file = stderr(), paste(colState$search,"\n"))
       dtout <- DT::datatable(dataTables,
-                             rownames = F,
-                             filter = "top",
-                             selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
-                             options = list(
-                               orderClasses = TRUE,
-                               autoWidth = TRUE,
-                               scrollX = TRUE,
-                               pageLength = get(ns("pageLength"), envir = .schnappsEnv),
-                               search = colState$search,
-                               searchCols = searchColList,
-                               stateSave = TRUE,
-                               order = get(ns("colOrder"), envir = .schnappsEnv)
-                             )
+        rownames = F,
+        filter = "top",
+        selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
+        options = list(
+          orderClasses = TRUE,
+          autoWidth = TRUE,
+          scrollX = TRUE,
+          pageLength = get(ns("pageLength"), envir = .schnappsEnv),
+          search = colState$search,
+          searchCols = searchColList,
+          stateSave = TRUE,
+          order = get(ns("colOrder"), envir = .schnappsEnv)
+        )
       )
-      .schnappsEnv[[paste0("historyPlot-",myns)]] <- dtout
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- dtout
       return(
         dtout
       )
@@ -1085,7 +1083,7 @@ pHeatMapModule <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- ns("pHeatMap")
     # browser()
-    req(.schnappsEnv[[paste0("historyPlot-",myns)]])
+    req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     start.time <- base::Sys.time()
     if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
     on.exit(
@@ -1097,13 +1095,14 @@ pHeatMapModule <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
-    
-    add2history(type = "tronco", 
-                plotData = .schnappsEnv[[paste0("historyPlot-",myns)]], 
-                comment = paste(myns))
-    
+
+    add2history(
+      type = "tronco",
+      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
+      comment = paste(myns)
+    )
   })
-  
+
   # pHeatMapModule - updateInput ----
   # updateInput <-
   # this is calling projections during loading of data
@@ -1182,7 +1181,7 @@ pHeatMapModule <- function(input, output, session,
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
 
     if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
-      .schnappsEnv[[paste0("historyPlot-",myns)]] <- NULL
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
       return(list(
         src = "empty.png",
         contentType = "image/png",
@@ -1268,8 +1267,8 @@ pHeatMapModule <- function(input, output, session,
     heatmapData$width <- pWidth / 72
     heatmapData$height <- pHeight / 72
     do.call(TRONCO::pheatmap, heatmapData)
-    
-    .schnappsEnv[[paste0("historyPlot-",myns)]] <- heatmapData
+
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- heatmapData
     # library(seriation)
     # hm <- hmap(x, method = "HC_ward", main = "HC_ward")
 
@@ -1392,6 +1391,131 @@ pHeatMapModule <- function(input, output, session,
     }
   )
 }
+
+cellSelectionModule <- function(input, output, session) {
+  if (DEBUG) cat(file = stderr(), paste("cellSelectionModule", session$ns("test"), "\n"))
+  ns <- session$ns
+
+
+  # init valuse for Env to remember selections
+  # and observe/save if changed
+
+  assign(ns("Mod_PPGrp"), "sampleNames", envir = .schnappsEnv)
+  observe({
+    if (DEBUG) cat(file = stderr(), paste0("observe: DE_PPGrp\n"))
+    assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
+  })
+
+  assign(ns("Mod_clusterPP"), "1", envir = .schnappsEnv)
+  observe({
+    if (DEBUG) cat(file = stderr(), paste0("observe: DE_clusterPP\n"))
+    assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
+  })
+
+
+
+  # Mod_updateInputPPt if projections changed ====
+  observe({
+    if (DEBUG) cat(file = stderr(), "Mod_updateInputPPt started.\n")
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "Mod_updateInputPPt")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "Mod_updateInputPPt")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Mod_updateInputPPt", id = "Mod_updateInputPPt", duration = NULL)
+    }
+    projections <- projections()
+
+    # Can use character(0) to remove all choices
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    # save(file = "~/SCHNAPPsDebug/Mod_updateInputPPt", list = c(ls(), ls(envir = globalenv())))
+    # load(file = "~/SCHNAPPsDebug/Mod_updateInputPPt")
+
+    coln <- colnames(projections)
+    choices <- c()
+    for (cn in coln) {
+      if (length(levels(as.factor(projections[, cn]))) < 50) {
+        choices <- c(choices, cn)
+      }
+    }
+    if (length(choices) == 0) {
+      choices <- c("no valid columns")
+    }
+    updateSelectInput(
+      session,
+      "Mod_clusterPP",
+      choices = choices,
+      selected = get(ns("Mod_PPGrp"), envir = .schnappsEnv)
+    )
+  })
+
+  observeEvent(input$Mod_clusterPP, {
+    projections <- projections()
+    if (DEBUG) cat(file = stderr(), "observeEvent: input$Mod_clusterPP\n")
+    # Can use character(0) to remove all choices
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (!input$Mod_clusterPP %in% colnames(projections)) {
+      return(NULL)
+    }
+    choicesVal <- levels(projections[, input$Mod_clusterPP])
+    updateSelectInput(
+      session,
+      "Mod_PPGrp",
+      choices = choicesVal,
+      selected = get(ns("Mod_clusterPP"), envir = .schnappsEnv)
+    )
+  })
+
+
+  returnValues <- reactiveValues(
+    # return cell names
+    # return description of selection
+    cellNames = reactive({
+      prjNames <- input$Mod_clusterPP
+      prjVals <- input$Mod_PPGrp
+      projections <- projections()
+      req(projections)
+
+      if (.schnappsEnv$DEBUGSAVE) {
+        save(file = "~/SCHNAPPsDebug/cellSelectionModule.RData", list = c(ls()))
+      }
+      # cp = load(file = "~/SCHNAPPsDebug/cellSelectionModule.RData")
+      retVal <- rownames(projections[projections[, prjNames] %in% prjVals, ])
+      retVal
+    }),
+    selectionDescription = reactive({
+      prjNames <- input$Mod_clusterPP
+      prjVals <- input$Mod_PPGrp
+
+      if (.schnappsEnv$DEBUGSAVE) {
+        save(file = "~/SCHNAPPsDebug/selectionDescription.RData", list = c(ls()))
+      }
+      # cp = load(file = "~/SCHNAPPsDebug/selectionDescription.RData")
+      retVal <- paste("projections: ", prjNames, "with levels:", paste(prjVals, collapse = ", "))
+      retVal
+    }),
+    ProjectionUsed = reactive({
+      prjNames <- input$Mod_clusterPP
+      prjNames
+    }),
+    ProjectionValsUsed = reactive({
+      prjGrp <- input$Mod_PPGrp
+      prjGrp
+    })
+  )
+
+  return(reactive({
+    returnValues
+  }))
+}
+
 
 if (DEBUG) {
   cat(file = stderr(), "done loading Module server.\n")
