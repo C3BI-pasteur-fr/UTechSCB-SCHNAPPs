@@ -69,7 +69,7 @@ output$normalizationsParametersDynamic <- renderUI({
     return(NULL)
   }
   selectedChoice <- input$normalizationRadioButton
-
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(
       file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
@@ -78,11 +78,11 @@ output$normalizationsParametersDynamic <- renderUI({
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
   do.call("switch",
-    args = c(
-      selectedChoice,
-      normaliztionParameters,
-      h3("no parameters provided")
-    )
+          args = c(
+            selectedChoice,
+            normaliztionParameters,
+            h3("no parameters provided")
+          )
   )
 })
 
@@ -123,8 +123,59 @@ observeEvent(
       minNonExpGenes = input$minNonExpGenes
     ))
     if (DEBUG) cat(file = stderr(), "\nCellSelectionValues\n")
+    updateButtonColor(buttonName = "updateCellSelectionParameters", parameters = c(
+      "minExpGenes", "minGenes", "minNonExpGenes", 
+      "maxGenes", "cellPatternRM", "cellKeep", "cellKeepOnly", "cellsFiltersOut"
+    ))
+    
   }
 )
+
+observe(label = "ob_cellSelection",
+        {
+          if (DEBUG) cat(file = stderr(), "observe ob_cellSelection\n")
+          setRedGreenButtonCurrent(
+            vars = list(
+              c("minExpGenes", input$minExpGenes),
+              c("minGenes", input$minGenes),
+              c("maxGenes", input$maxGenes),
+              c("cellPatternRM", input$cellPatternRM),
+              c("cellKeep", input$cellKeep),
+              c("cellKeepOnly", input$cellKeepOnly),
+              c("cellsFiltersOut", input$cellsFiltersOut),
+              c("minNonExpGenes", input$minNonExpGenes)
+            )
+          )
+          
+          updateButtonColor(buttonName = "updateCellSelectionParameters", parameters = c(
+            "minExpGenes", "minGenes", "minNonExpGenes", 
+            "maxGenes", "cellPatternRM", "cellKeep", "cellKeepOnly", "cellsFiltersOut"
+          ))
+        })
+
+# observe: clustering Button ----
+observe(label = "ob_clusteringParams", {
+  if (DEBUG) cat(file = stderr(), "observe ob_clusteringParams\n")
+  
+  input$updateClusteringParameters
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("seed", input$seed),
+      c("useRanks", input$useRanks),
+      c("clusterSource", clusterMethodReact$clusterSource),
+      c("geneSelectionClustering", input$geneSelectionClustering),
+      c("minClusterSize", input$minClusterSize),
+      c("clusterMethod", clusterMethodReact$clusterMethod)
+    )
+  )
+  
+  updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
+    "seed", "useRanks", "minClusterSize", "clusterMethod",
+    "clusterSource", "geneSelectionClustering"
+  ))
+})
+
+
 
 observeEvent(
   label = "ob21",
@@ -137,9 +188,32 @@ observeEvent(
       genesKeep = input$genesKeep
     ))
     if (DEBUG) cat(file = stderr(), "\ngeneSelectionValues\n")
+    updateButtonColor(buttonName = "updateGeneSelectionParameters", parameters = c(
+      "selectIds", "geneListSelection",
+      "minGenesGS", "genesKeep"
+    ))
+    
   }
 )
 
+observe(label = "ob_geneSelection", 
+        {
+          if (DEBUG) cat(file = stderr(), "observe ob_geneSelection\n")
+          setRedGreenButtonCurrent(
+            vars = list(
+              c("selectIds", input$selectIds),
+              c("geneListSelection", input$geneListSelection),
+              c("minGenesGS", input$minGenesGS),
+              c("genesKeep", input$genesKeep)
+            )
+          )
+          
+          updateButtonColor(buttonName = "updateGeneSelectionParameters", parameters = c(
+            "selectIds", "geneListSelection",
+            "minGenesGS", "genesKeep"
+          ))
+          
+        })
 
 # summaryStatsSideBar -----------------------------
 output$summaryStatsSideBar <- renderUI({
@@ -213,7 +287,7 @@ output$summaryStatsSideBar <- renderUI({
   exportTestValues(summaryStatsSideBar = {
     htmlOut
   })
-
+  
   HTML(htmlOut)
 })
 
@@ -372,7 +446,7 @@ output$descriptOfWorkOutput <- renderPrint({
 output$sampleColorSelection <- renderUI({
   scEx <- scEx()
   sampCol <- sampleCols$colPal
-
+  
   if (is.null(scEx)) {
     return(NULL)
   }
@@ -383,10 +457,10 @@ output$sampleColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
-
+  
   lev <- levels(colData(scEx)$sampleNames)
   # cols <- gg_fill_hue(length(lev))
-
+  
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -406,7 +480,7 @@ output$clusterColorSelection <- renderUI({
   scEx <- scEx()
   projections <- projections()
   clusterCol <- clusterCols$colPal
-
+  
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
@@ -417,10 +491,10 @@ output$clusterColorSelection <- renderUI({
     )
   }
   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
-
+  
   lev <- levels(projections$dbCluster)
   # cols <- gg_fill_hue(length(lev))
-
+  
   # New IDs "colX1" so that it partly coincide with input$select...
   lapply(seq_along(lev), function(i) {
     colourpicker::colourInput(
@@ -491,16 +565,16 @@ observeEvent(
     cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
     scExx <- scEx()
     projections <- projections()
-
+    
     if (is.null(scExx) || is.null(projections)) {
       return(NULL)
     }
     # sample colors
     scols <- sampleCols$colPal
-
+    
     inCols <- list()
     lev <- levels(colData(scExx)$sampleNames)
-
+    
     inCols <- lapply(seq_along(lev), function(i) {
       input[[paste0("sampleNamecol", lev[i])]]
     })
@@ -510,17 +584,17 @@ observeEvent(
       cat(file = stderr(), paste0("observeEvent save done\n"))
     }
     # load(file="~/SCHNAPPsDebug/updateColors.RData")
-
+    
     # isolate({
     sampleCols$colPal <- unlist(inCols)
     # })
-
+    
     # cluster colors
     ccols <- clusterCols$colPal
-
+    
     inCols <- list()
     lev <- levels(projections$dbCluster)
-
+    
     inCols <- lapply(seq_along(lev), function(i) {
       input[[paste0("clusterNamecol", lev[i])]]
     })
@@ -530,12 +604,50 @@ observeEvent(
       cat(file = stderr(), paste0("observeEvent 2 save done\n"))
     }
     # load(file="~/SCHNAPPsDebug/updateColors2.RData")
-
+    
     # isolate({
     clusterCols$colPal <- unlist(inCols)
     # })
+    setRedGreenButton(
+      vars = list(
+        c("sampleNamecol", sampleCols$colPal),
+        c("clusterCols", clusterCols$colPal)
+      ),
+      button = "updateColors"
+    )
   }
 )
+
+# observe: color selection----
+observe(label = "ob_colorParams", {
+  if (DEBUG) cat(file = stderr(), "observe color Vars\n")
+  
+  input$updateColors
+  scExx <- scEx()
+  projections <- projections()
+  if (is.null(scExx) || is.null(projections)) {
+    return(NULL)
+  }
+  
+  lev <- levels(projections$dbCluster)
+  ccols <- lapply(seq_along(lev), function(i) {
+    input[[paste0("clusterNamecol", lev[i])]]
+  })
+  lev <- levels(colData(scExx)$sampleNames)
+  scols <- lapply(seq_along(lev), function(i) {
+    input[[paste0("sampleNamecol", lev[i])]]
+  })
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("sampleNamecol", unlist(scols)),
+      c("clusterCols", unlist(ccols))
+    )
+  )
+  
+  updateButtonColor(buttonName = "updateColors", parameters = c(
+    "sampleNamecol", "clusterCols"
+  ))
+})
 
 # Nclusters ----
 output$Nclusters <- renderText({
@@ -575,7 +687,7 @@ output$countscsv <- downloadHandler(
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "RDSsave")
     }
-
+    
     scEx_log <- scEx_log()
     if (is.null(scEx_log)) {
       return(NULL)
@@ -604,13 +716,13 @@ output$RDSsave <- downloadHandler(
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "RDSsave")
     }
-
+    
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
     tsne <- tsne()
-
+    
     if (is.null(scEx)) {
       return(NULL)
     }
@@ -618,11 +730,11 @@ output$RDSsave <- downloadHandler(
       save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
-
+    
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
-
+    
     save(file = file, list = c("scEx"))
-
+    
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
@@ -630,7 +742,7 @@ output$RDSsave <- downloadHandler(
 # Report creation ------------------------------------------------------------------
 output$report <- downloadHandler(
   filename = "report.zip",
-
+  
   content = function(outZipFile) {
     outrepFile <- reacativeReport()
     file.copy(from = outrepFile, to = outZipFile)
@@ -720,7 +832,7 @@ observeEvent(
   eventExpr = input$scranWarning_cancel,
   handlerExpr = {
     updateSelectInput(session, "clusterMethod",
-      selected = "igraph"
+                      selected = "igraph"
     )
     # updateSelectInput(session, "clusterSource",
     #                   selected = "counts"
@@ -745,12 +857,12 @@ observeEvent(
 # rename projections
 observe(label = "ob27", {
   projections <- projections()
-
+  
   updateSelectInput(session, "oldPrj",
-    choices = c(colnames(projections))
+                    choices = c(colnames(projections))
   )
   updateSelectInput(session, "delPrj",
-    choices = c(colnames(projectionsTable$newProjections))
+                    choices = c(colnames(projectionsTable$newProjections))
   )
 })
 
@@ -779,7 +891,7 @@ observeEvent(
       )
     }
     # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
-
+    
     projectionsTable$newProjections <- newPrjs[, -which(colnames(newPrjs) == delPrj), drop = FALSE]
   }
 )
@@ -794,11 +906,11 @@ observeEvent(
     newPrj <- input$newPrj
     projections <- projections()
     newPrjs <- projectionsTable$newProjections
-
+    
     if (is.null(projections)) {
       return(NULL)
     }
-
+    
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
@@ -822,6 +934,36 @@ observeEvent(
     colnames(newPrjs)[ncol(newPrjs)] <- newPrj
     projectionsTable$newProjections <- newPrjs
   }
+)
+
+observe(label = "ob_pca",
+        {
+          if (DEBUG) cat(file = stderr(), "observe ob_pca\n")
+          # out <- pca()
+          # if (is.null(out)) {
+          #   .schnappsEnv$calculated_gQC_tsneDim <- "NA"
+          # }
+          input$updatePCAParameters
+ 
+          setRedGreenButtonCurrent(
+            vars = list(
+              c("pcaRank", input$pcaRank),
+              c("pcaN", input$pcaN),
+              c("pcaCenter", input$pcaCenter),
+              c("pcaScale", input$pcaScale),
+              c("genes4PCA", input$genes4PCA)
+            )
+          )
+          
+          updateButtonColor(
+            buttonName = "updatePCAParameters", 
+            parameters = c(
+              "pcaRank", "pcaN",
+              "pcaCenter", "pcaScale", "genes4PCA"
+            )
+          )
+          
+        }
 )
 
 

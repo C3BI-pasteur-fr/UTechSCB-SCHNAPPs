@@ -116,7 +116,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # if (length(geneid) == 1) {
   #   expression <- exprs(scEx_log)[geneid, ,drop=FALSE]
   # } else {
-  expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, , drop = FALSE])
+  expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, rownames(projections), drop = FALSE])
   # }
   validate(need(is.na(sum(expression)) != TRUE, ""))
   # if (length(geneid) == 1) {
@@ -184,7 +184,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     return(NULL)
   }
   # subsetData$shape = as.factor(1)
-  gtitle <- paste(g_id, clId, sep = "-Cluster", collapse = " ")
+  gtitle <- paste(g_id, collapse = " ")
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
@@ -744,10 +744,15 @@ addColData <- function(allScEx_log, scEx) {
 #                                                                       "calculated_gQC_tsneTheta", "calculated_gQC_tsneSeed"))
 
 updateButtonColor <- function(buttonName, parameters) {
+  # save(file = "~/SCHNAPPsDebug/updateButtonColor.RData", list = c(ls(), ".schnappsEnv"))
+  # load("~/SCHNAPPsDebug/updateButtonColor.RData")
   modified <- FALSE
   for (var in parameters) {
     oldVar <- paste0("calculated_", var)
     currVar <- var
+    if( var == "coE_SOM_dataInput-Mod_PPGrp") {
+      # browser()
+    }
     if (!exists(oldVar, envir = .schnappsEnv) | !exists(currVar, envir = .schnappsEnv)) {
       cat(file = stderr(), green("modified1\n"))
       modified <- TRUE
@@ -759,20 +764,52 @@ updateButtonColor <- function(buttonName, parameters) {
         modified <- TRUE
       }
     } else {
+      if (is.na(get(oldVar, envir = .schnappsEnv)) | is.na(get(currVar, envir = .schnappsEnv))){
+        if (!(is.na(get(oldVar, envir = .schnappsEnv)) & is.na(get(currVar, envir = .schnappsEnv)))){
+          # browser()
+          cat(file = stderr(), "modified3a\n")
+          modified <- TRUE
+        }
+      } else
       if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
+        # browser()
         cat(file = stderr(), "modified3\n")
+        cat(file = stderr(), oldVar)
+        cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
+        cat(file = stderr(), get(currVar, envir = .schnappsEnv))
         modified <- TRUE
       }
     }
   }
   if (!modified) {
-    cat(file = stderr(), "\n\ntsne not modified\n\n\n")
+    cat(file = stderr(), "\n\nnot modified\n\n\n")
     removeClass(buttonName, "red")
     addClass(buttonName, "green")
   } else {
-    cat(file = stderr(), "\n\ntsne modified4\n\n\n")
+    cat(file = stderr(), "\n\nmodified4\n\n\n")
     removeClass(buttonName, "green")
     addClass(buttonName, "red")
+  }
+}
+
+setRedGreenButton <- function(vars = list(), button = "") {
+  for (v1 in vars) {
+    # if (is.null(v1[2])) {
+    #   assign(paste0("calculated_", v1[1]), "NULL", envir = .schnappsEnv)
+    # }else {
+      assign(paste0("calculated_", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
+    # }
+  }
+  addClass(button, "green")
+}
+
+setRedGreenButtonCurrent <- function(vars = list()) {
+  for (v1 in vars) {
+    # if (is.null(v1[2])) {
+    #   assign(paste0("", v1[1]), "NULL", envir = .schnappsEnv)
+    # }else {
+      assign(paste0("", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
+    # }
   }
 }
 

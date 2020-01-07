@@ -766,6 +766,16 @@ coE_heatmapSOMReactive <- reactive({
   )
   # system.time(do.call(TRONCO::pheatmap, retVal))
 
+  setRedGreenButton(
+    vars = list(
+      c("coE_geneSOM", isolate(input$coE_geneSOM)),
+      c("coE_dimSOM", nSOM),
+      c("coE_SOM_dataInput-Mod_PPGrp", prjVals),
+      c("coE_SOM_dataInput-Mod_clusterPP", prj)
+    ),
+    button = "updateSOMParameters"
+  )
+
   exportTestValues(coE_heatmapSOMReactive = {
     retVal
   })

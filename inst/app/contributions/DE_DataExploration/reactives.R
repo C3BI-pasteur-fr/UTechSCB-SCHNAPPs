@@ -1,5 +1,6 @@
 suppressMessages(require(ggplot2))
-
+# deProjTable ----
+# for 2D plot in ExpressionPanel
 deProjTable <- reactive({
   projections <- projections()
   selectedCells <- DE_Exp_dataInput()
@@ -7,9 +8,10 @@ deProjTable <- reactive({
   
   if (DEBUG) cat(file = stderr(), "observeEvent: input$DE_clusterPP\n")
   # Can use character(0) to remove all choices
-  if (is.null(projections)) {
+  if (is.null(projections) | is.null(cellNs)) {
     return(NULL)
   }
+  cellNs <- which(cellNs %in% rownames(projections))
   projections[cellNs, ]
 })
 

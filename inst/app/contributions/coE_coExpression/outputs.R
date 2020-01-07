@@ -107,25 +107,49 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   return(retVal)
 })
 
-observeEvent(
-  label = "ob15",
-  eventExpr = input$coE_clusterSOM,
-  handlerExpr = {
-    projections <- projections()
-    if (DEBUG) cat(file = stderr(), "observeEvent: input$coE_clusterSOM.\n")
-    # Can use character(0) to remove all choices
-    if (is.null(projections)) {
-      return(NULL)
-    }
-    if (!input$coE_clusterSOM %in% colnames(projections)) {
-      return(NULL)
-    }
-    choicesVal <- levels(projections[, input$coE_clusterSOM])
-    updateSelectInput(
-      session,
-      "coE_clusterValSOM",
-      choices = choicesVal,
-      selected = .schnappsEnv$coE_SOMSelection
-    )
-  }
-)
+# # observer for coE_clusterValSOM ----
+# observeEvent(
+#   label = "ob15",
+#   eventExpr = input$coE_clusterSOM,
+#   handlerExpr = {
+#     projections <- projections()
+#     if (DEBUG) cat(file = stderr(), "observeEvent: input$coE_clusterSOM.\n")
+#     # Can use character(0) to remove all choices
+#     if (is.null(projections)) {
+#       return(NULL)
+#     }
+#     if (!input$coE_clusterSOM %in% colnames(projections)) {
+#       return(NULL)
+#     }
+#     choicesVal <- levels(projections[, input$coE_clusterSOM])
+#     updateSelectInput(
+#       session,
+#       "coE_clusterValSOM",
+#       choices = choicesVal,
+#       selected = .schnappsEnv$coE_SOMSelection
+#     )
+#   }
+# )
+
+# observer of button Color SOM ----
+observe(label = "ob_somParameter", 
+        {
+          if (DEBUG) cat(file = stderr(), "ob_somParameter\n")
+          # browser()
+          input$updateSOMParameters
+          setRedGreenButtonCurrent(
+            vars = list(
+              c("coE_geneSOM", input$coE_geneSOM),
+              c("coE_dimSOM", input$coE_dimSOM),
+              c("coE_SOM_dataInput-Mod_PPGrp", input$'coE_SOM_dataInput-Mod_PPGrp'),
+              c("coE_SOM_dataInput-Mod_clusterPP", input$'coE_SOM_dataInput-Mod_clusterPP')
+            )
+          )
+          updateButtonColor(buttonName = "updateSOMParameters", parameters = c(
+            "coE_geneSOM", "coE_dimSOM",
+            "coE_SOM_dataInput-Mod_PPGrp", "coE_SOM_dataInput-Mod_clusterPP"
+          ))
+          
+        })
+
+

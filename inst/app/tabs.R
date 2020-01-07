@@ -141,10 +141,7 @@ geneSelectionTab <- shinydashboard::tabItem(
   fluidRow(
     column(
       width = 12, offset = 1,
-      actionButton("updateGeneSelectionParameters", "apply changes",
-        width = "80%",
-        style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-      )
+      actionButton("updateGeneSelectionParameters", "apply changes", width = "80%")
     )
   ),
   checkbsTT("updateGeneSelectionParameters"),
@@ -208,10 +205,7 @@ cellSelectionTab <- shinydashboard::tabItem(
   fluidRow(
     column(
       width = 12, offset = 1,
-      actionButton("updateCellSelectionParameters", "apply changes",
-        width = "80%",
-        style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-      )
+      actionButton("updateCellSelectionParameters", "apply changes", width = "80%")
     )
   ),
   checkbsTT("updateCellSelectionParameters"),
@@ -328,10 +322,7 @@ generalParametersTab <- shinydashboard::tabItem(
       fluidRow(
         column(
           width = 12, offset = 1,
-          actionButton("updatePCAParameters", "apply changes",
-            width = "80%",
-            style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-          )
+          actionButton("updatePCAParameters", "apply changes", width = "80%")
         )
       )
     ),
@@ -395,10 +386,7 @@ generalParametersTab <- shinydashboard::tabItem(
       fluidRow(
         column(
           width = 12, offset = 1,
-          actionButton("updateClusteringParameters", "apply changes",
-            width = "80%",
-            style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-          )
+          actionButton("updateClusteringParameters", "apply changes", width = "80%")
         )
       )
     )
@@ -425,10 +413,7 @@ generalParametersTab <- shinydashboard::tabItem(
     collapsible = TRUE, collapsed = TRUE,
     fluidRow(column(
       width = 12, offset = 1,
-      actionButton("updateColors", "Update colours",
-        icon = icon("update"), width = "80%",
-        style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-      )
+      actionButton("updateColors", "apply changes", width = "80%")
     )),
     br(),
     fluidRow(
