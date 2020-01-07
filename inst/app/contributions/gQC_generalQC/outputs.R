@@ -71,6 +71,43 @@ gQC_update3DInput <- reactive({
   )
 })
 
+# observer of UMAP button ----
+observe(label = "ob_UMAPParams", {
+  # save(file = "~/SCHNAPPsDebug/ob_UMAPParams.RData", list = c(ls(), ".schnappsEnv"))
+  # load("~/SCHNAPPsDebug/updateButtonColor.RData")
+  # browser()
+  if (DEBUG) cat(file = stderr(), "observe umapVars\n")
+  
+  input$activateUMAP
+  setRedGreenButtonCurrent(
+      vars = list(
+        c("gQC_um_randSeed", input$gQC_um_randSeed),
+        c("gQC_um_n_neighbors", input$gQC_um_n_neighbors),
+        c("gQC_um_n_components", input$gQC_um_n_components),
+        c("gQC_um_n_epochs", input$gQC_um_n_epochs),
+        # c("um_alpha", input$um_alpha),
+        c("gQC_um_init", input$gQC_um_init),
+        c("gQC_um_min_dist", input$gQC_um_min_dist),
+        c("gQC_um_set_op_mix_ratio", input$gQC_um_set_op_mix_ratio),
+        c("gQC_um_local_connectivity", input$gQC_um_local_connectivity),
+        c("gQC_um_bandwidth", input$gQC_um_bandwidth),
+        c("um_gamma", input$um_gamma),
+        c("gQC_um_negative_sample_rate", input$gQC_um_negative_sample_rate),
+        c("gQC_um_metric", input$gQC_um_metric),
+        c("gQC_um_spread", input$gQC_um_spread)
+      )
+    )
+    
+  updateButtonColor(buttonName = "activateUMAP", parameters = c(
+    "gQC_um_randSeed", "gQC_um_n_neighbors", "gQC_um_n_components", "gQC_um_n_epochs", 
+    "gQC_um_init", "gQC_um_min_dist", "gQC_um_set_op_mix_ratio", 
+    "gQC_um_local_connectivity", "gQC_um_bandwidth", "um_gamma", 
+    "gQC_um_negative_sample_rate", "gQC_um_metric", "gQC_um_spread"
+  ))
+})
+
+
+
 # observe: cellNameTable_rows_selected ----
 observe(label = "ob_tsneParams", {
   if (DEBUG) cat(file = stderr(), "observe tsneVars\n")
@@ -79,17 +116,19 @@ observe(label = "ob_tsneParams", {
     .schnappsEnv$calculated_gQC_tsneDim <- "NA"
   }
   input$updatetsneParameters
-  assign("gQC_tsneDim", input$gQC_tsneDim, envir = .schnappsEnv)
-  assign("gQC_tsnePerplexity", input$gQC_tsnePerplexity, envir = .schnappsEnv)
-  assign("gQC_tsneTheta", input$gQC_tsneTheta, envir = .schnappsEnv)
-  assign("gQC_tsneSeed", input$gQC_tsneSeed, envir = .schnappsEnv)
 
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("gQC_tsneDim", input$gQC_tsneDim),
+      c("gQC_tsnePerplexity", input$gQC_tsnePerplexity),
+      c("gQC_tsneTheta", input$gQC_tsneTheta),
+      c("gQC_tsneSeed", input$gQC_tsneSeed)
+    )
+  )
   updateButtonColor(buttonName = "updatetsneParameters", parameters = c(
     "gQC_tsneDim", "gQC_tsnePerplexity",
     "gQC_tsneTheta", "gQC_tsneSeed"
   ))
-  # output$updatetsneParametersButton <- updateButtonUI(input = input, name = "updatetsneParameters",
-  #                                                     variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  ) )
 })
 
 # gQC_tsne_main ----

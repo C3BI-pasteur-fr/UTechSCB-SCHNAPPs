@@ -94,10 +94,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12, offset = 1,
-          actionButton("updatePanelPlot", "apply changes",
-            width = "80%",
-            style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-          )
+          actionButton("updatePanelPlot", "apply changes", width = "80%")
         )
       ),
       br(),

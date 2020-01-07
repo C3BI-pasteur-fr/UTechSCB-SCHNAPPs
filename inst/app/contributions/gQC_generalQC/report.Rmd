@@ -220,7 +220,7 @@ n_components : `r as.numeric(input$gQC_um_n_components)`
 
 n_epochs : `r as.numeric(input$gQC_um_n_epochs)`
 
-alpha : `r as.numeric(input$um_alpha)`
+alpha : `r #as.numeric(input$um_alpha)`
 
 init : `r input$gQC_um_init`
 

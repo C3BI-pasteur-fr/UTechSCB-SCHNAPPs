@@ -91,7 +91,7 @@ output$DE_gene_vio_plot <- renderPlot({
   prj <- isolate(selectedCells$ProjectionUsed())
   prjVals <- isolate(selectedCells$ProjectionValsUsed())
   
-  if (is.null(scEx_log) | is.null(projections)) {
+  if (is.null(scEx_log) | is.null(projections) | is.null(cellNs)) {
     if (DEBUG) cat(file = stderr(), "output$DE_gene_vio_plot:NULL\n")
     return(NULL)
   }
@@ -150,6 +150,33 @@ DE_Exp_dataInput <- callModule(
   cellSelectionModule,
   "DE_Exp_dataInput"
 )
+
+# Panel plot button observer ----
+#observe: cellNameTable_rows_selected ----
+  observe(label = "ob_panelPlotParams", {
+    if (DEBUG) cat(file = stderr(), "observe ob_panelPlotParams\n")
+    
+    input$updatePanelPlot
+    setRedGreenButtonCurrent(
+      vars = list(
+        c("DE_panelplotids", (input$DE_panelplotids)),
+        c("DE_dim_x", (input$DE_dim_x)),
+        c("DE_dim_y", (input$DE_dim_y)),
+        c("DE_panelplotSameScale", (input$DE_panelplotSameScale)),
+        c("DE_nCol", (input$DE_nCol)),
+        c("DE_PanelPlotCellSelection-Mod_clusterPP", (input$`DE_PanelPlotCellSelection-Mod_clusterPP`)),
+        c("DE_PanelPlotCellSelection-Mod_PPGrp", (input$`DE_PanelPlotCellSelection-Mod_PPGrp`))
+      )
+    )
+    
+    updateButtonColor(buttonName = "updatePanelPlot", parameters = c(
+      "DE_panelplotids", "DE_dim_x", "DE_dim_y", "DE_panelplotSameScale", 
+      "DE_nCol", "DE_PanelPlotCellSelection-Mod_clusterPP", "DE_PanelPlotCellSelection-Mod_PPGrp"
+    ))
+  })
+
+
+
 
 # DE_panelPlot ----
 #' DE_panelPlot
@@ -313,6 +340,20 @@ output$DE_panelPlot <- renderPlot({
     annotate_figure(retVal,
       top = text_grob(sampdesc)
     )
+  setRedGreenButton(
+    vars = list(
+      c("DE_panelplotids", isolate(input$DE_panelplotids)),
+      c("DE_dim_x", isolate(input$DE_dim_x)),
+      c("DE_dim_y", isolate(input$DE_dim_y)),
+      c("DE_panelplotSameScale", isolate(input$DE_panelplotSameScale)),
+      c("DE_nCol", isolate(input$DE_nCol)),
+      c("DE_PanelPlotCellSelection-Mod_clusterPP", isolate(input$`DE_PanelPlotCellSelection-Mod_clusterPP`)),
+      c("DE_PanelPlotCellSelection-Mod_PPGrp", isolate(input$`DE_PanelPlotCellSelection-Mod_PPGrp`))
+    ),
+    button = "updatePanelPlot"
+  )
+  
+  
   printTimeEnd(start.time, "DE_panelPlot")
   exportTestValues(DE_panelPlot = {
     ls()
@@ -365,7 +406,7 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   prj <- isolate(selectedCells$ProjectionUsed())
   prjVals <- isolate(selectedCells$ProjectionValsUsed())
   
-  if (is.null(scEx_log) | is.null(projections)) {
+  if (is.null(scEx_log) | is.null(projections) | is.null(cellNs) ) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -516,10 +557,14 @@ observe(label = "observe DE_seuratRefBased", {
   }
 
   # currentValues
-  .schnappsEnv$DE_seuratRefBased_nfeatures <- input$DE_seuratRefBased_nfeatures
-  .schnappsEnv$DE_seuratRefBased_k.filter <- input$DE_seuratRefBased_k.filter
-  .schnappsEnv$DE_seuratRefBased_scaleFactor <- input$DE_seuratRefBased_scaleFactor
-
+ setRedGreenButtonCurrent(
+    vars = list(
+      c("DE_seuratRefBased_nfeatures", input$DE_seuratRefBased_nfeatures),
+      c("DE_seuratRefBased_k.filter", input$DE_seuratRefBased_k.filter),
+      c("DE_seuratRefBased_scaleFactor", input$DE_seuratRefBased_scaleFactor)
+    )
+  )
+  
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratRefBased_nfeatures", "DE_seuratRefBased_k.filter",
     "DE_seuratRefBased_scaleFactor"
@@ -592,9 +637,13 @@ observe(label = "observe DE_seuratSCtransform", {
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
 
-  .schnappsEnv$DE_seuratSCtransform_nfeatures <- input$DE_seuratSCtransform_nfeatures
-  .schnappsEnv$DE_seuratSCtransform_k.filter <- input$DE_seuratSCtransform_k.filter
-  .schnappsEnv$DE_seuratSCtransform_scaleFactor <- input$DE_seuratSCtransform_scaleFactor
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("DE_seuratSCtransform_nfeatures", input$DE_seuratSCtransform_nfeatures),
+      c("DE_seuratSCtransform_k.filter", input$DE_seuratSCtransform_k.filter),
+      c("DE_seuratSCtransform_scaleFactor", input$DE_seuratSCtransform_scaleFactor)
+    )
+  )
 
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratSCtransform_nfeatures",
@@ -641,10 +690,14 @@ observe(label = "observe DE_seuratStandard", {
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
 
-  .schnappsEnv$DE_seuratStandard_dims <- input$DE_seuratStandard_dims
-  .schnappsEnv$DE_seuratStandard_anchorF <- input$DE_seuratStandard_anchorF
-  .schnappsEnv$DE_seuratStandard_kF <- input$DE_seuratStandard_kF
-  .schnappsEnv$DE_seuratStandard_k.weight <- input$DE_seuratStandard_k.weight
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("DE_seuratStandard_dims", input$DE_seuratStandard_dims),
+      c("DE_seuratStandard_anchorF", input$DE_seuratStandard_anchorF),
+      c("DE_seuratStandard_kF", input$DE_seuratStandard_kF),
+      c("DE_seuratStandard_k.weight", input$DE_seuratStandard_k.weight)
+    )
+  )
 
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratStandard_dims",
@@ -727,8 +780,12 @@ observe(label = "oblogGene", {
     .schnappsEnv$calculated_DE_geneIds_norm <- "NOT AVAILABLE"
   }
 
-  .schnappsEnv$DE_geneIds_norm <- input$DE_geneIds_norm
-  # Here, we create the actual button
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("DE_geneIds_norm", input$DE_geneIds_norm)
+    )
+  )
+ # Here, we create the actual button
   updateButtonColor(buttonName = "updateNormalization", parameters = c("DE_geneIds_norm"))
   # output$updateNormalizationButton <- updateButtonUI(input = input, name = "updateNormalization",
   #                                                    variables = c("DE_geneIds_norm"))

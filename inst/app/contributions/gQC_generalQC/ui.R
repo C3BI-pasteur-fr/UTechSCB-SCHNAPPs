@@ -2,15 +2,15 @@ suppressMessages(require(magrittr))
 source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 menuList <- list(
   shinydashboard::menuItem("General QC",
-    # id="generalQCID",
-    tabName = "generalQC", icon = icon("thumbs-up"), startExpanded = FALSE,
-    shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
-    shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
-    shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
-    shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
-    # ,
-    # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
-    # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
+                           # id="generalQCID",
+                           tabName = "generalQC", icon = icon("thumbs-up"), startExpanded = FALSE,
+                           shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
+                           shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
+                           shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
+                           shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
+                           # ,
+                           # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
+                           # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
   )
 )
 
@@ -27,7 +27,7 @@ tabList <- list(
     actionButton("save2Histumi", "save to history")
     
   ),
-
+  
   shinydashboard::tabItem(
     "gQC_sampleHist",
     tags$h3("Histogram of cells per sample"),
@@ -39,7 +39,7 @@ tabList <- list(
     br(),
     actionButton("save2HistSample", "save to history")
   ),
-
+  
   shinydashboard::tabItem(
     "gQC_variancePC",
     tags$h3("Variance of PCs"),
@@ -98,33 +98,33 @@ tabList <- list(
         column(
           width = 3,
           selectInput("gQC_dim3D_x",
-            label = "X",
-            choices = c("tsne1", "tsne2", "tsne3"),
-            selected = "tsne1"
+                      label = "X",
+                      choices = c("tsne1", "tsne2", "tsne3"),
+                      selected = "tsne1"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_dim3D_y",
-            label = "Y",
-            choices = c("tsne1", "tsne2", "tsne3"),
-            selected = "tsne2"
+                      label = "Y",
+                      choices = c("tsne1", "tsne2", "tsne3"),
+                      selected = "tsne2"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_dim3D_z",
-            label = "Z",
-            choices = c("tsne1", "tsne2", "tsne3"),
-            selected = "tsne3"
+                      label = "Z",
+                      choices = c("tsne1", "tsne2", "tsne3"),
+                      selected = "tsne3"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_col3D",
-            label = "colored by",
-            choices = c("sampleNames"),
-            selected = "sampleNames"
+                      label = "colored by",
+                      choices = c("sampleNames"),
+                      selected = "sampleNames"
           )
         )
       ),
@@ -150,10 +150,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12, offset = 1,
-          actionButton("activateUMAP", "run UMAP",
-            width = "80%",
-            style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-          )
+          shinyWidgets::actionBttn("activateUMAP", "apply changes", style = "bordered")
         )
       ),
       br(),
@@ -161,29 +158,29 @@ tabList <- list(
         column(
           width = 3,
           selectInput("gQC_um_n_neighbors",
-            label = "N Neighbors",
-            choices = c(2:100), selected = "15"
+                      label = "N Neighbors",
+                      choices = c(2:100), selected = "15"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_n_components",
-            label = "N components",
-            choices = c(2:20), selected = "2"
+                      label = "N components",
+                      choices = c(2:20), selected = "2"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_spread",
-            label = "spread",
-            choices = c(1:10), selected = "1"
+                      label = "spread",
+                      choices = c(1:10), selected = "1"
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_local_connectivity",
-            label = "local connectivity",
-            choices = 1:20, selected = "1"
+                      label = "local connectivity",
+                      choices = 1:20, selected = "1"
           )
         )
       ),
@@ -194,12 +191,12 @@ tabList <- list(
           column(
             width = 3,
             selectInput("gQC_um_randSeed",
-              label = "random seed",
-              choices = c(1:100), selected = "1"
+                        label = "random seed",
+                        choices = c(1:100), selected = "1"
             ),
             selectInput("gQC_um_init",
-              label = "init",
-              choices = c("spectral", "random"), selected = "spectral"
+                        label = "init",
+                        choices = c("spectral", "random"), selected = "spectral"
             )
           ),
           column(
@@ -210,27 +207,27 @@ tabList <- list(
               choices = c(1:50), selected = "5"
             ),
             selectInput("gQC_um_min_dist",
-              label = "min dist",
-              choices = seq(0.05, 0.5, 0.01), selected = "0.01"
+                        label = "min dist",
+                        choices = seq(0.05, 0.5, 0.01), selected = "0.01"
             )
           ),
           column(
             width = 3,
             selectInput("gQC_um_metric",
-              label = "metric",
-              choices = c("euclidean", "manhattan", "cosine", "hamming"),
-              selected = "euclidean"
+                        label = "metric",
+                        choices = c("euclidean", "manhattan", "cosine", "hamming"),
+                        selected = "euclidean"
             ),
             selectInput("gQC_um_set_op_mix_ratio",
-              label = "set op mix ratio",
-              choices = seq(0, 1, 0.1), selected = "1"
+                        label = "set op mix ratio",
+                        choices = seq(0, 1, 0.1), selected = "1"
             )
           ),
           column(
             width = 3,
             selectInput("gQC_um_n_epochs",
-              label = "epochs",
-              choices = c(1:1000), selected = "200"
+                        label = "epochs",
+                        choices = c(1:1000), selected = "200"
             ),
             selectInput(
               "gQC_um_bandwidth",

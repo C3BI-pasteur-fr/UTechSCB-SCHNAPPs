@@ -166,8 +166,8 @@ scShinyUI <- shinyUI(
     ), # dashboard side bar
     shinydashboard::dashboardBody(
       shinyjs::useShinyjs(debug = TRUE),
-      inlineCSS(list(.red = "background: red")),
-      inlineCSS(list(.green = "background: green")),
+      inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
+      inlineCSS(list(.green = "background-color: lightgreen")),
       tags$div(
         allTabs,
         class = "tab-content"
