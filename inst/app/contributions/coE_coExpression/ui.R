@@ -66,6 +66,13 @@ tabList <- list(
           collapsible = FALSE, collapsed = TRUE,
           fluidRow(
             column(
+              width = 12, offset = 1,
+              actionButton("updateHeatMapSelectedParameters", "apply changes", width = "80%")
+            )
+          ),
+          br(),
+          fluidRow(
+            column(
               width = 12,
               pHeatMapUI("coE_heatmapSelectedModule")
             )
@@ -82,7 +89,13 @@ tabList <- list(
               )
             )
           ),
-          # fluidRow(checkboxInput(inputId = "coEtgMinExprShow", label = "calc min expressing genes", value = FALSE)),
+          fluidRow(
+            column(
+              width = 12, offset = 1,
+              actionButton("updateMinExprSelectedParameters", "apply changes", width = "80%")
+            )
+          ),
+          br(),
           fluidRow(
             column(
               width = 3,
@@ -115,6 +128,13 @@ tabList <- list(
               )
             )
           ),
+          fluidRow(
+            column(
+              width = 12, offset = 1,
+              actionButton("updatetopCCGenesSelectedParameters", "apply changes", width = "80%")
+            )
+          ),
+          br(),
           fluidRow(
             column(
               width = 12,

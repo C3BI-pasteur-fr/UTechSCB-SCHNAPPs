@@ -146,20 +146,37 @@ DE_scaterPNG <- reactive({
   }
   if (DEBUG) cat(file = stderr(), "DE_scaterPNG\n")
 
-  runScater <- input$runScater
+  clicked <- input$runScater
+  cat(file = stderr(), paste("DE_scaterPNG", clicked, "\n"))
   # takes too long, commenting out for course
-  if (!runScater) {
+  # if (is.null(.schnappsEnv$scaterRan)){
+  #   .schnappsEnv$scaterRan = 0
+  #   return(list(
+  #     src = "",
+  #     contentType = "image/png",
+  #     width = 10,
+  #     height = 10,
+  #     alt = "Scater plot will be here when 'apply changes' is checked"
+  #   ))
+  # }
+  if (clicked < 1) {
     return(list(
       src = "",
       contentType = "image/png",
       width = 10,
       height = 10,
-      alt = "Scater plot will be here when 'run scater' is checked"
+      alt = "Scater plot will be here when 'apply changes' is checked"
     ))
   }
-  scaterReads <- scaterReads()
+  scaterReads <- isolate(scaterReads())
   if (is.null(scaterReads)) {
-    return(NULL)
+      return(list(
+        src = "",
+        contentType = "image/png",
+        width = 10,
+        height = 10,
+        alt = "Scater plot will be here when 'apply changes' is clicked"
+      ))
   }
 
 
@@ -208,6 +225,14 @@ DE_scaterPNG <- reactive({
   )
   # end calculation
   .schnappsEnv[["DE_scaterPNG"]] <- p1
+  
+  setRedGreenButton(
+    vars = list(
+      c("scaterRan", 1)
+    ),
+    button = "runScater"
+  )
+  
   printTimeEnd(start.time, "DE_scaterPNG")
   exportTestValues(DE_scaterPNG = {
     retVal

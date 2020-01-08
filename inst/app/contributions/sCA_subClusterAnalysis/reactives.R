@@ -340,13 +340,17 @@ sCA_dge <- reactive({
   # selectedCells <- isolate(dePanelCellSelection())
   # cellNs <- isolate(selectedCells$cellNames())
   # sampdesc <- isolate(selectedCells$selectionDescription())
-  selectedCells <- sCA_dataInp()
-  cellNs <- selectedCells$cellNames()
-  sampdesc <- selectedCells$selectionDescription()
   
-  db1 <- input$db1
-  db2 <- input$db2
-  method <- input$sCA_dgeRadioButton
+  clicked <- input$updateDGEParameters
+  selectedCells <- isolate(sCA_dataInp())
+  cellNs <- isolate(selectedCells$cellNames())
+  sampdesc <- isolate(selectedCells$selectionDescription())
+  prj <- isolate(selectedCells$ProjectionUsed())
+  prjVals <- isolate(selectedCells$ProjectionValsUsed())
+  
+  db1 <- isolate(input$db1)
+  db2 <- isolate(input$db2)
+  method <- isolate(input$sCA_dgeRadioButton)
 
   if (is.null(scEx_log) | is.null(projections) || is.null(db1) || is.null(db2)) {
     return(NULL)
@@ -378,6 +382,19 @@ sCA_dge <- reactive({
   # update reactiveValue
   sCA_selectedDge$sCA_dgeTable <- retVal
 
+  setRedGreenButton(
+    vars = list(
+      # c("sCA_dataInpSelected_cells", isolate(sCA_dataInp()$selectedCells())),
+      c("db1", isolate(input$db1)),
+      c("db2", isolate(input$db2)),
+      c("sCA_dgeRadioButton", isolate(input$sCA_dgeRadioButton)),
+      c("sCA_dataInput-Mod_PPGrp", prjVals),
+      c("sCA_dataInput-Mod_clusterPP", prj)
+      
+    ),
+    button = "updateDGEParameters"
+  )
+  
   exportTestValues(sCA_dge = {
     retVal
   })

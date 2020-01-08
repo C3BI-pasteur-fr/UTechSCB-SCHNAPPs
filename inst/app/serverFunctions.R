@@ -743,9 +743,12 @@ addColData <- function(allScEx_log, scEx) {
 # ( = "updatetsneParameters",  = c("calculated_gQC_tsneDim", "calculated_gQC_tsnePerplexity",
 #                                                                       "calculated_gQC_tsneTheta", "calculated_gQC_tsneSeed"))
 
+# updateButtonColor ----
 updateButtonColor <- function(buttonName, parameters) {
-  # save(file = "~/SCHNAPPsDebug/updateButtonColor.RData", list = c(ls(), ".schnappsEnv"))
-  # load("~/SCHNAPPsDebug/updateButtonColor.RData")
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/updateButtonColor.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/updateButtonColor.RData')
   modified <- FALSE
   for (var in parameters) {
     oldVar <- paste0("calculated_", var)
@@ -792,7 +795,12 @@ updateButtonColor <- function(buttonName, parameters) {
   }
 }
 
+# setRedGreenButton ----
 setRedGreenButton <- function(vars = list(), button = "") {
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/setRedGreenButton.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/setRedGreenButton.RData')
   for (v1 in vars) {
     # if (is.null(v1[2])) {
     #   assign(paste0("calculated_", v1[1]), "NULL", envir = .schnappsEnv)
@@ -803,7 +811,12 @@ setRedGreenButton <- function(vars = list(), button = "") {
   addClass(button, "green")
 }
 
+# setRedGreenButtonCurrent ----
 setRedGreenButtonCurrent <- function(vars = list()) {
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/setRedGreenButtonCurrent.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/setRedGreenButtonCurrent.RData')
   for (v1 in vars) {
     # if (is.null(v1[2])) {
     #   assign(paste0("", v1[1]), "NULL", envir = .schnappsEnv)

@@ -53,6 +53,59 @@ callModule(
   coE_heatmapSOMReactive
 )
 
+# observe: updateHeatMapSelectedParameters ----
+observe(label = "ob_HeatMapSelectedParams", {
+  if (DEBUG) cat(file = stderr(), "observe HeatMapSelected\n")
+  input$updateHeatMapSelectedParameters
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("coE_heatmapselected_geneids", input$coE_heatmapselected_geneids),
+      c("coE_heatmapselected_cells", coE_selctedCluster()$selectedCells()),
+      c("coE_heatmapselected_sampcolPal", sampleCols$colPal),
+      c("coE_heatmapselected_cluscolPal", clusterCols$colPal)
+    )
+  )
+  
+  updateButtonColor(buttonName = "updateHeatMapSelectedParameters", parameters = c(
+    "coE_heatmapselected_geneids", "coE_heatmapselected_cells",
+    "coE_heatmapselected_sampcolPal", "coE_heatmapselected_cluscolPal"
+  ))
+})
+
+# observe: updatetopCCGenesSelectedParameters ----
+observe(label = "ob_updatetopCCGenesSelectedParams", {
+  if (DEBUG) cat(file = stderr(), "observe ob_updatetopCCGenesSelectedParams\n")
+  input$updatetopCCGenesSelectedParameters
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("coE_heatmapselected_geneids", input$coE_heatmapselected_geneids),
+      c("coE_heatmapselected_cells", coE_selctedCluster()$selectedCells())
+    )
+  )
+  
+  updateButtonColor(buttonName = "updatetopCCGenesSelectedParameters", parameters = c(
+    "coE_heatmapselected_geneids", "coE_heatmapselected_cells"
+    ))
+})
+
+# observe: updateMinExprSelectedParameters ----
+observe(label = "ob_MinExprParams", {
+  if (DEBUG) cat(file = stderr(), "observe MinExprVars\n")
+  input$updateMinExprSelectedParameters
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("coEtgPerc",(input$coEtgPerc)),
+      c("coEtgMinExpr",(input$coEtgMinExpr)),
+      c("coE_heatmapselected_cells", coE_selctedCluster()$selectedCells())
+    )
+  )
+  
+  updateButtonColor(buttonName = "updateMinExprSelectedParameters", parameters = c(
+    "coEtgPerc", "coEtgMinExpr", "coE_heatmapselected_cells"
+  ))
+})
+
+
 # EXPLORE TAB VIOLIN PLOT ------------------------------------------------------------------
 # output$coE_geneGrp_vio_plot <- plotly::renderPlotly({
 output$coE_geneGrp_vio_plot <- renderPlot({

@@ -3,11 +3,11 @@ suppressMessages(library(magrittr))
 # list of menu Items
 menuList <- list(
   shinydashboard::menuItem("Data Exploration",
-    # id="dataExplorationID",
-    tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
-    shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
-    shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
-    # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
+                           # id="dataExplorationID",
+                           tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
+                           shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
+                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
+                           # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
   )
 )
 
@@ -44,22 +44,22 @@ tabList <- list(
       cellSelectionUI("DE_Exp_dataInput"),
       br(),
       box(width = 12,
-      fluidRow(
-        column(
-          width = 6,
           fluidRow(
             column(
-              width = 12,
-              textInput("DE_gene_id", "Enter gene", value = defaultValueSingleGene),
-              jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
+              width = 6,
+              fluidRow(
+                column(
+                  width = 12,
+                  textInput("DE_gene_id", "Enter gene", value = defaultValueSingleGene),
+                  jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
+                )
+              ),
+            ),
+            column(
+              width = 6,
+              clusterUI("DE_expclusters")
             )
-          ),
-        ),
-        column(
-          width = 6,
-          clusterUI("DE_expclusters")
-        )
-      )),
+          )),
       br(),
       fluidRow(
         column(
@@ -77,7 +77,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-
+          
           footer = tags$ul(
             tags$li(
               strong("Panel plot"),
@@ -99,7 +99,7 @@ tabList <- list(
       ),
       br(),
       cellSelectionUI("DE_PanelPlotCellSelection"),
-
+      
       # fluidRow(
       #   column(width = 3,
       #          # uiOutput("DE_clusterSelectionPanelPlot")
@@ -112,38 +112,38 @@ tabList <- list(
       #                      choices = c("1","2"), selected = "1", multiple = TRUE)
       #   )),
       box(width = 6, 
-        fluidRow(
-          column(
-            width = 6,
-            selectInput("DE_dim_x",
-              label = "X",
-              choices = c("tsne1", "tsne2", "tsne3"),
-              selected = "tsne1"
+          fluidRow(
+            column(
+              width = 6,
+              selectInput("DE_dim_x",
+                          label = "X",
+                          choices = c("tsne1", "tsne2", "tsne3"),
+                          selected = "tsne1"
+              )
+            ),
+            column(
+              width = 6,
+              selectInput("DE_dim_y",
+                          label = "Y",
+                          choices = c("tsne1", "tsne2", "tsne3"),
+                          selected = "tsne2"
+              )
             )
           ),
-          column(
-            width = 6,
-            selectInput("DE_dim_y",
-              label = "Y",
-              choices = c("tsne1", "tsne2", "tsne3"),
-              selected = "tsne2"
-            )
+          fluidRow(
+            column(
+              width = 4,
+              checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
+            ),
+            column(
+              width = 8,
+              selectInput("DE_nCol",
+                          label = "number of columns for plot",
+                          choices = c(1:10),
+                          selected = 4
+              )
+            ), align = 'right'
           )
-        ),
-        fluidRow(
-          column(
-            width = 4,
-            checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
-          ),
-          column(
-            width = 8,
-            selectInput("DE_nCol",
-              label = "number of columns for plot",
-              choices = c(1:10),
-              selected = 4
-            )
-          ), align = 'right'
-        )
       ),
       fluidRow(
         column(
@@ -162,20 +162,26 @@ tabList <- list(
   # DE_scaterQC ----
   DE_scaterQCTab = shinydashboard::tabItem(
     "DE_scaterQC",
-    tags$ul(
-      tags$li(
-        strong("Scater QC plots")
+    box(
+      title = "Quality control plot from the scater package", solidHeader = TRUE, 
+      width = 12, status = "primary", height = "1627px",
+      fluidRow(
+        column(12, offset = 1,
+               actionButton("runScater", "apply changes", width = "80%")
+        )
       ),
-      checkboxInput("runScater", "run scater plot", FALSE),
+      br(),
       fluidRow(
         column(
           10,
-          offset = 1,
+          offset = 1, height = "627px",
           imageOutput("DE_scaterQC") %>% withSpinner() # PNG output with temp file
         )
       ),
       br(),
       actionButton("save2HistScater", "save to history")
     )
+    
+    
   )
 )
