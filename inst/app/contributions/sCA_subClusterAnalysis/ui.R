@@ -60,7 +60,7 @@ tabList <- list(
           )
       ),
       br(),
-      box(width = 12,
+       box(width = 12,
           fluidRow(
             column(width = 6,
                    # plotly::plotlyOutput("sCA_dge_plot1")
@@ -78,10 +78,14 @@ tabList <- list(
           )
       )
     ),
-    # shinydashboard::tabItem(
-    #   "diffExpMethod",
-    #   list(
-    #     tags$h3("Method to use for differential gene expression analysis"),
+    br(),
+    box(width = 12,
+        fluidRow(
+          column(width = 12, offset = 1,
+                 actionButton("updateDGEParameters", "apply changes", width = "80%")
+          )
+        )),
+    br(),
     box(
       title = "DGE method", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = FALSE,

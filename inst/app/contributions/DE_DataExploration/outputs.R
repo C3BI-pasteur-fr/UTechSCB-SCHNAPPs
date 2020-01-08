@@ -62,7 +62,18 @@ observe({
   # return(TRUE)
 })
 
-
+observe({
+  scEx <- scEx()
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("scaterRan", 0)
+    )
+  )
+  
+  updateButtonColor(buttonName = "runScater", parameters = c(
+    "scaterRan"
+  ))
+})
 
 
 # EXPLORE TAB VIOLIN PLOT ----
@@ -377,7 +388,13 @@ output$DE_scaterQC <- renderImage({
   if (DEBUG) cat(file = stderr(), "output$DE_scaterQC\n")
   scaterReads <- scaterReads()
   if (is.null(scaterReads)) {
-    return(NULL)
+    return(list(
+      src = "",
+      contentType = "image/png",
+      width = 10,
+      height = 10,
+      alt = "Scater plot will be here when 'run scater' is checked"
+    ))
   }
 
   DE_scaterPNG()

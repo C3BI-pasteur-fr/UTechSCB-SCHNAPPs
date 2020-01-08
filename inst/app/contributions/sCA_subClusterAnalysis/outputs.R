@@ -74,6 +74,30 @@ sCA_dataInp <- callModule(
   "sCA_dataInput"
 )
 
+# observer for button ----
+observe(label = "ob_DGEParams", {
+  if (DEBUG) cat(file = stderr(), "observe DGEVars\n")
+  input$updateDGEParameters
+  selectedCells <- sCA_dataInp()
+  prj <- selectedCells$ProjectionUsed()
+  prjVals <- selectedCells$ProjectionValsUsed()
+  
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("db1", input$db1),
+      c("db2", input$db2),
+      c("sCA_dgeRadioButton", input$sCA_dgeRadioButton),
+      c("sCA_dataInput-Mod_PPGrp", prjVals),
+      c("sCA_dataInput-Mod_clusterPP", prj)
+    )
+  )
+  
+  updateButtonColor(buttonName = "updateDGEParameters", parameters = c(
+    "db1", "db2", "sCA_dgeRadioButton", 
+    "sCA_dataInput-Mod_PPGrp", "sCA_dataInput-Mod_clusterPP"
+  ))
+})
+
 
 # sub cluster analysis ( used for 2 panels )
 
