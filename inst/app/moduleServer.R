@@ -1170,6 +1170,7 @@ pHeatMapModule <- function(input, output, session,
     save2History <- input$save2History
     pWidth <- input$heatmapWidth
     pHeight <- input$heatmapHeight
+    colPal <- input$colPal
     
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
@@ -1266,6 +1267,14 @@ pHeatMapModule <- function(input, output, session,
     }
     heatmapData$width <- pWidth / 72
     heatmapData$height <- pHeight / 72
+    
+    if (colPal == "none") {
+      #use the supplied colors
+    } else {
+      heatmapData$color =  colorRampPalette(rev(brewer.pal(n = 7, name =
+                                                             colPal)))(100)
+    }
+    
     do.call(TRONCO::pheatmap, heatmapData)
     
     .schnappsEnv[[paste0("historyPlot-", myns)]] <- heatmapData
