@@ -236,6 +236,15 @@ pHeatMapUI <- function(id) {
               label = "height of image in pixel",
               min = 200, max = 20000, step = 10,
               value = 300
+            ),
+            selectInput(
+              ns("colPal"),
+              label = "color palette to choose from",
+              choices = c("none", "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", 
+                          "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", 
+                          "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
+              selected = "none",
+              multiple = FALSE
             )
           )
         ),
