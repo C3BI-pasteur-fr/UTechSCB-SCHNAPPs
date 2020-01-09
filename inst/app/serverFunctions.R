@@ -743,19 +743,16 @@ addColData <- function(allScEx_log, scEx) {
 # ( = "updatetsneParameters",  = c("calculated_gQC_tsneDim", "calculated_gQC_tsnePerplexity",
 #                                                                       "calculated_gQC_tsneTheta", "calculated_gQC_tsneSeed"))
 
-# updateButtonColor ----
-updateButtonColor <- function(buttonName, parameters) {
+# valuesChanged ----
+valuesChanged <- function(parameters) {
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateButtonColor.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/valuesChanged.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/updateButtonColor.RData')
+  # load(file='~/SCHNAPPsDebug/valuesChanged.RData')
   modified <- FALSE
   for (var in parameters) {
     oldVar <- paste0("calculated_", var)
     currVar <- var
-    if( var == "coE_SOM_dataInput-Mod_PPGrp") {
-      # browser()
-    }
     if (!exists(oldVar, envir = .schnappsEnv) | !exists(currVar, envir = .schnappsEnv)) {
       cat(file = stderr(), green("modified1\n"))
       modified <- TRUE
@@ -774,22 +771,36 @@ updateButtonColor <- function(buttonName, parameters) {
           modified <- TRUE
         }
       } else
-      if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
-        # browser()
-        cat(file = stderr(), "modified3\n")
-        cat(file = stderr(), oldVar)
-        cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
-        cat(file = stderr(), get(currVar, envir = .schnappsEnv))
-        modified <- TRUE
-      }
+        if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
+          # browser()
+          cat(file = stderr(), "modified3\n")
+          cat(file = stderr(), oldVar)
+          cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
+          cat(file = stderr(), get(currVar, envir = .schnappsEnv))
+          modified <- TRUE
+        }
     }
   }
   if (!modified) {
     cat(file = stderr(), "\n\nnot modified\n\n\n")
-    removeClass(buttonName, "red")
-    addClass(buttonName, "green")
   } else {
     cat(file = stderr(), "\n\nmodified4\n\n\n")
+  }
+  return(modified)
+}
+
+
+# updateButtonColor ----
+updateButtonColor <- function(buttonName, parameters) {
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/updateButtonColor.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/updateButtonColor.RData')
+  modified <- valuesChanged(parameters)
+  if (!modified) {
+     removeClass(buttonName, "red")
+    addClass(buttonName, "green")
+  } else {
     removeClass(buttonName, "green")
     addClass(buttonName, "red")
   }
