@@ -144,6 +144,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   ### history setup
   if (exists("historyPath", envir = .schnappsEnv)) {
     if (!is.null(x = .schnappsEnv$historyPath)) {
+      .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
       if (!dir.exists(.schnappsEnv$historyPath)){
         dir.create(.schnappsEnv$historyPath, recursive = T)
       }  
