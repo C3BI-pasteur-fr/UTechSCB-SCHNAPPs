@@ -1406,7 +1406,7 @@ cellSelectionModule <- function(input, output, session) {
     assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
   })
   
-  assign(ns("Mod_clusterPP"), "1", envir = .schnappsEnv)
+  assign(ns("Mod_clusterPP"), "dbCluster", envir = .schnappsEnv)
   observe({
     if (DEBUG) cat(file = stderr(), paste0("observe: DE_clusterPP\n"))
     assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
