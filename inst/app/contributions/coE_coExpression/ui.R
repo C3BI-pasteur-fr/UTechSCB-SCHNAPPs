@@ -202,6 +202,7 @@ tabList <- list(
           actionButton("updateSOMParameters", "apply changes", width = "80%")
         )
       ),
+      br(),
       fluidRow(
         cellSelectionUI("coE_SOM_dataInput"),
         box(

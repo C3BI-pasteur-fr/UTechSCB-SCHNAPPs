@@ -1409,15 +1409,15 @@ cellSelectionModule <- function(input, output, session) {
   # init valuse for Env to remember selections
   # and observe/save if changed
   
-  assign(ns("Mod_PPGrp"), "dbCluster", envir = .schnappsEnv)
+  assign(ns("Mod_PPGrp"), "1", envir = .schnappsEnv)
   observe({
-    if (DEBUG) cat(file = stderr(), paste0("observe: DE_PPGrp\n"))
+    if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp\n"))
     assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
   })
   
   assign(ns("Mod_clusterPP"), "dbCluster", envir = .schnappsEnv)
   observe({
-    if (DEBUG) cat(file = stderr(), paste0("observe: DE_clusterPP\n"))
+    if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP\n"))
     assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
   })
   
@@ -1459,7 +1459,7 @@ cellSelectionModule <- function(input, output, session) {
       session,
       "Mod_clusterPP",
       choices = choices,
-      selected = get(ns("Mod_PPGrp"), envir = .schnappsEnv)
+      selected = get(ns("Mod_clusterPP"), envir = .schnappsEnv)
     )
   })
   
@@ -1479,7 +1479,7 @@ cellSelectionModule <- function(input, output, session) {
       session,
       "Mod_PPGrp",
       choices = choicesVal,
-      selected = get(ns("Mod_clusterPP"), envir = .schnappsEnv)
+      selected = get(ns("Mod_PPGrp"), envir = .schnappsEnv)
     )
   })
   

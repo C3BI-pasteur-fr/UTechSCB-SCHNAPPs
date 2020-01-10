@@ -386,7 +386,7 @@ generalParametersTab <- shinydashboard::tabItem(
       fluidRow(
         column(12, offset = 0, textOutput("Nclusters"))
       ),
-      checkbsTT(item = ""),
+      # checkbsTT(item = ""),
       fluidRow(
         column(
           width = 12, offset = 1,
