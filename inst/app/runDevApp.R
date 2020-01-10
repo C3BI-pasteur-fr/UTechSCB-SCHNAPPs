@@ -6,7 +6,7 @@
   .schnappsEnv <- new.env(parent=emptyenv())
 # }
 
-  localContributionDir = "~/Rstudio/scShinyHubContributionsBJ/"
+  localContributionDir = "~/Rstudio/scShinyHub-github/bjContributions/"
   # localContributionDir = ""
   defaultValueSingleGene = "itgae" # CD52
   defaultValueMultiGenes = " itgae, cd69, itga1" # CD52, S100A9, S100A4
@@ -37,7 +37,7 @@ source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-
+options(shiny.reactlog=TRUE)
 runApp(app)
 
 # schnapps(
