@@ -354,6 +354,7 @@ generalParametersTab <- shinydashboard::tabItem(
       title = "Parameters for clustering", width = 12,
       id = "tabsetCluster",
       tabPanel("Scran clustering",
+               value = "scran_Cluster", # name of reactive to be used
         width = 12,
         fluidRow(
           column(
@@ -378,11 +379,14 @@ generalParametersTab <- shinydashboard::tabItem(
           )
         ),
         checkbsTT(item = "geneSelectionClustering"),
-        fluidRow(
-          column(12, offset = 0, textOutput("Nclusters"))
-        ),
-        checkbsTT(item = "")
+      ), # Scran clustering tab Panel
+      # tabPanel("Seurat clustering",
+      #          width = 12,
+      #          fluidRow()),
+      fluidRow(
+        column(12, offset = 0, textOutput("Nclusters"))
       ),
+      checkbsTT(item = ""),
       fluidRow(
         column(
           width = 12, offset = 1,
