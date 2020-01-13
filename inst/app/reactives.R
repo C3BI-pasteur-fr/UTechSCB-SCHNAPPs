@@ -68,7 +68,7 @@ output$dimPlotPCA <- renderPlot({
   # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
   
   # return NuLL because it is not working correctly
-  return(NULL)
+  # return(NULL)
   
   scEx = scEx[rownames(pca$rotation),]
   scEx_log = scEx_log[rownames(pca$rotation),]
@@ -94,18 +94,24 @@ output$dimPlotPCA <- renderPlot({
   
   # recalculating because createDimReducObject is not working
   all.genes <- rownames(seurDat)
-  seurDat <- ScaleData(seurDat, features = all.genes)
-  seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
+  # seurDat <- ScaleData(seurDat, features = all.genes)
+  # seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
   
   colnames(pca$x) = str_replace(colnames(pca$x), "PC", "PC_")
-  
+  # pca.res = irlba(A=t(x=seurDat@assays$RNA@data), nv=50)
   # not working
-  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$rotation, loadings = pca$x[colnames(seurDat),], stdev = pca$var_pcs, key = "PC_", assay = "RNA")
-  seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
+                                          loadings = pca$rotation, 
+                                          stdev = pca$var_pcs, 
+                                          key = "PC_", 
+                                          assay = "RNA")
+  # seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
   
   # DimPlot(seurDat, reduction = "pca")
   
-  d = DimHeatmap(seurDat, dims = 1:15, cells = NULL, balanced = TRUE, fast = FALSE, projected = TRUE, reduction = "pca")
+  d = DimHeatmap(seurDat, dims = 1:15, slot = 'data',
+                 balanced = TRUE, fast = TRUE, projected = FALSE, 
+                 reduction = "pca")
   d
 })
 
@@ -1922,7 +1928,7 @@ scranCluster <- function(pca,
 
 
 
-scran_Cluster <- reactive({
+scran_Cluster <- function(){
   if (DEBUG) {
     cat(file = stderr(), "scran_Cluster started.\n")
   }
@@ -1941,7 +1947,7 @@ scran_Cluster <- reactive({
   }
   
   # react to the following changes
-  input$updateClusteringParameters
+  # input$updateClusteringParameters
   scEx <- scEx()
   scEx_log <- scEx_log()
   pca <- pca()
@@ -1953,8 +1959,9 @@ scran_Cluster <- reactive({
   geneSelectionClustering <- isolate(input$geneSelectionClustering)
   minClusterSize <- isolate(input$minClusterSize)
   clusterMethod <- isolate(clusterMethodReact$clusterMethod)
+  tabsetCluster = isolate(input$tabsetCluster)
   
-  if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
+  if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize) | tabsetCluster != "scran_Cluster") {
     if (DEBUG) {
       cat(file = stderr(), "scran_Cluster:NULL\n")
     }
@@ -2007,8 +2014,51 @@ scran_Cluster <- reactive({
     retVal
   })
   return(retVal)
-})
+}
 
+# Seurat clustering ----
+seurat_Clustering <- function() {
+  if (DEBUG) {
+    cat(file = stderr(), "seurat_Clustering started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "seurat_Clustering")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "seurat_Clustering")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("seurat_Clustering", id = "seurat_Clustering", duration = NULL)
+  }
+  
+  scEx = scEx() # need to be run when updated
+  scEx_log = scEx_log()
+  pca = pca()
+  tabsetCluster = isolate(input$tabsetCluster)
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/seurat_Clustering.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
+  
+  if (tabsetCluster != "seurat_Clustering"){
+    return(NULL)
+  }
+  cellMeta <- colData(scEx)
+  rData <- rowData(scEx)
+  meta.data <- cellMeta[, "sampleNames", drop = FALSE]
+  # creates object @assays$RNA@data and @assays$RNA@counts
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx)[[1]],
+    meta.data = meta.data
+  )
+  # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  
+  
+}
 # dbCluster ----
 dbCluster <- reactive({
   if (DEBUG) {
@@ -2025,9 +2075,15 @@ dbCluster <- reactive({
     showNotification("dbCluster", id = "dbCluster", duration = NULL)
   }
   
-  input$updateClusteringParameters
+  clicked = input$updateClusteringParameters
+  scEx = scEx() # need to be run when updated
+  scEx_log = scEx_log()
+  pca = pca()
+  tabsetCluster = isolate(input$tabsetCluster)
+  
+  
   # kNr <- input$kNr
-  clustering <- scran_Cluster()
+  clustering <- do.call(tabsetCluster, args = list())
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls()))

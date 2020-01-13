@@ -179,11 +179,11 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # base calculations that are quite expensive to calculate
   # display name, reactive name to be executed
   # TODO do we still need this?
-  heavyCalculations <- list(
-    c("pca", "pca"),
-    c("scran_Cluster", "scran_Cluster"),
-    c("projections", "projections")
-  )
+  # heavyCalculations <- list(
+  #   c("pca", "pca"),
+  #   c("scran_Cluster", "scran_Cluster"),
+  #   c("projections", "projections")
+  # )
   
   # base projections
   # display name, reactive to calculate projections
@@ -226,12 +226,12 @@ scShinyServer <- shinyServer(function(input, output, session) {
   )
   for (fp in uiFiles) {
     if (DEBUG) base::cat(file = stderr(), paste("loading: ", fp, "\n"))
-    myHeavyCalculations <- NULL
+    # myHeavyCalculations <- NULL
     myProjections <- NULL
     myDiffExpFunctions <- NULL
     base::source(fp, local = TRUE)
     
-    heavyCalculations <- append2list(myHeavyCalculations, heavyCalculations)
+    # heavyCalculations <- append2list(myHeavyCalculations, heavyCalculations)
     projectionFunctions <- append2list(myProjections, projectionFunctions)
     diffExpFunctions <- append2list(myDiffExpFunctions, diffExpFunctions)
   }
@@ -263,11 +263,11 @@ scShinyServer <- shinyServer(function(input, output, session) {
   )
   for (fp in uiFiles) {
     if (DEBUG) cat(file = stderr(), paste("loading: ", fp, "\n"))
-    myHeavyCalculations <- NULL
+    # myHeavyCalculations <- NULL
     myProjections <- NULL
     myZippedReportFiles <- c()
     base::source(fp, local = TRUE)
-    heavyCalculations <- append2list(myHeavyCalculations, heavyCalculations)
+    # heavyCalculations <- append2list(myHeavyCalculations, heavyCalculations)
     projectionFunctions <- append2list(myProjections, projectionFunctions)
     zippedReportFiles <- c(zippedReportFiles, myZippedReportFiles)
   }
