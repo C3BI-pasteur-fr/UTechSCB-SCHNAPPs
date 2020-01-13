@@ -158,21 +158,24 @@ observe(label = "ob_clusteringParams", {
   if (DEBUG) cat(file = stderr(), "observe ob_clusteringParams\n")
   
   input$updateClusteringParameters
-  setRedGreenButtonCurrent(
-    vars = list(
-      c("seed", input$seed),
-      c("useRanks", input$useRanks),
-      c("clusterSource", clusterMethodReact$clusterSource),
-      c("geneSelectionClustering", input$geneSelectionClustering),
-      c("minClusterSize", input$minClusterSize),
-      c("clusterMethod", clusterMethodReact$clusterMethod)
+  whichClustering = isolate(input$tabsetCluster)
+  if ( whichClustering == "scran_Cluster"){
+    setRedGreenButtonCurrent(
+      vars = list(
+        c("seed", input$seed),
+        c("useRanks", input$useRanks),
+        c("clusterSource", clusterMethodReact$clusterSource),
+        c("geneSelectionClustering", input$geneSelectionClustering),
+        c("minClusterSize", input$minClusterSize),
+        c("clusterMethod", clusterMethodReact$clusterMethod)
+      )
     )
-  )
-  
-  updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
-    "seed", "useRanks", "minClusterSize", "clusterMethod",
-    "clusterSource", "geneSelectionClustering"
-  ))
+    
+    updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
+      "seed", "useRanks", "minClusterSize", "clusterMethod",
+      "clusterSource", "geneSelectionClustering"
+    ))
+  }
 })
 
 
@@ -651,8 +654,8 @@ observe(label = "ob_colorParams", {
 
 # Nclusters ----
 output$Nclusters <- renderText({
-  scran_Cluster <- scran_Cluster()
-  if (is.null(scran_Cluster)) {
+  dbCluster <- dbCluster()
+  if (is.null(dbCluster)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -660,7 +663,7 @@ output$Nclusters <- renderText({
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/Nclusters.RData")
-  retVal <- paste(levels(scran_Cluster$Cluster))
+  retVal <- paste(levels(dbCluster))
   exportTestValues(Nclusters = {
     retVal
   })
@@ -944,7 +947,7 @@ observe(label = "ob_pca",
           #   .schnappsEnv$calculated_gQC_tsneDim <- "NA"
           # }
           input$updatePCAParameters
- 
+          
           setRedGreenButtonCurrent(
             vars = list(
               c("pcaRank", input$pcaRank),

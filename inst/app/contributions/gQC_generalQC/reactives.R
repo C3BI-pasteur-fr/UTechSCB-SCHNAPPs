@@ -437,10 +437,10 @@ myProjections <- list(
 
 # myHeavyCalculations ----
 # declare function as heavy
-myHeavyCalculations <- list(
-  c("scaterReads", "scaterReads"),
-  c("tsne", "tsne")
-)
+# myHeavyCalculations <- list(
+#   c("scaterReads", "scaterReads"),
+#   c("tsne", "tsne")
+# )
 
 
 #' tsnePlot
