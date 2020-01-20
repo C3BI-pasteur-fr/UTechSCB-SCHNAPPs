@@ -755,6 +755,7 @@ valuesChanged <- function(parameters) {
     currVar <- var
     if (!exists(oldVar, envir = .schnappsEnv) | !exists(currVar, envir = .schnappsEnv)) {
       cat(file = stderr(), green("modified1\n"))
+      cat(file = stderr(), paste("var:", var, "old: ", exists(oldVar, envir = .schnappsEnv), " new:", exists(currVar, envir = .schnappsEnv)))
       modified <- TRUE
       next()
     }

@@ -317,7 +317,7 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   return(retVal)
 }
 
-#' sCA_dge
+# sCA_dge reactive ----
 #' manage calculation for differential expression analysis
 sCA_dge <- reactive({
   if (DEBUG) cat(file = stderr(), "sCA_dge started.\n")
@@ -359,7 +359,13 @@ sCA_dge <- reactive({
     save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
-
+  # require(archivist)
+  # library(tools)
+  # lazyLoad = local({load("~/SCHNAPPsDebug/sCA_dge.RData"); environment()})
+  # tools:::makeLazyLoadDB(lazyLoad, "Huge")
+  # lazyLoad("Huge")
+  # objNames <- ls()
+  # browser()
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions) == method) / 2)
   dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
   gCells <- sCA_getCells(projections, cellNs, db1, db2)

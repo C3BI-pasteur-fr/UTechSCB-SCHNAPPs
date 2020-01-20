@@ -155,7 +155,46 @@ scShinyServer <- shinyServer(function(input, output, session) {
         .schnappsEnv$historyFile = "history2.Rmd"
       }
       .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath,"/", basename(.schnappsEnv$historyFile))
-      line=paste0("---\ntitle: \"history\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n" )
+      line=paste0("---\ntitle: \"history\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)
+      suppressMessages(require(shiny))
+      suppressMessages(require(shinyTree))
+      suppressMessages(require(tibble))
+      suppressMessages(require(plotly))
+      suppressMessages(require(shinythemes))
+      suppressMessages(require(ggplot2))
+      suppressMessages(require(DT))
+      suppressMessages(require(pheatmap))
+      suppressMessages(require(threejs))
+      suppressMessages(require(RColorBrewer))
+      suppressMessages(require(mclust))
+      suppressMessages(require(reshape2))
+      suppressMessages(require(ggplot2))
+      suppressMessages(require(knitr))
+      suppressMessages(require(shinyWidgets))
+      suppressMessages(require(scater))
+      suppressMessages(require(kohonen))
+      suppressMessages(require(Rsomoclu))
+      suppressMessages(require(SingleCellExperiment))
+      suppressMessages(require(Matrix))
+      suppressMessages(require(colourpicker))
+      # suppressMessages(require(shinytest))
+      suppressMessages(require(scran))
+      suppressMessages(require(BiocSingular))
+
+      if (\"debugme\" %in% rownames(installed.packages())) {
+        suppressMessages(require(debugme))
+      }
+      if (\"gtools\" %in% rownames(installed.packages())) {
+        suppressMessages(require(gtools))
+      }
+      if (\"kableExtra\" %in% rownames(installed.packages())) {
+        suppressMessages(require(kableExtra))
+      }
+      if (\"reactlog\" %in% rownames(installed.packages())) {
+        suppressMessages(require(reactlog))
+      }
+      suppressMessages(require(Seurat))
+      \n```\n" )
       write(line,file=.schnappsEnv$historyFile,append=FALSE)
       
     } else {
