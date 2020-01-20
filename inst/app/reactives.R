@@ -62,9 +62,9 @@ output$dimPlotPCA <- renderPlot({
     }
     return(0)
   }
-  # if (.schnappsEnv$DEBUGSAVE) {
-  save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
-  # }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
+  }
   # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
   
   # return NuLL because it is not working correctly
@@ -201,6 +201,10 @@ inputDataFunc <- function(inFile) {
   if ("scEx" %in% fpLs) { # we prefer the scEx object ;)
     scExFound <- TRUE
     varName <- "scEx"
+    #when loading history files
+    if (is(scEx, "list")){
+      scEx = scEx[[1]]
+    }
   } else {
     scExFound <- FALSE
     for (varName in fpLs) {
@@ -209,6 +213,16 @@ inputDataFunc <- function(inFile) {
         scEx <- get(varName)
         scExFound <- TRUE
         break()
+      } else{
+        ## list as from history file
+        if(is(get(varName)[[1]], "SingleCellExperiment")) {
+          scEx <- get(varName)[[1]]
+          if (!"counts" == names(assays(scEx))[1]) {
+            assays(scEx)["counts"] = assays(scEx)[1]
+          }
+          scExFound <- TRUE
+          break()
+        }
       }
     }
   }
@@ -227,6 +241,8 @@ inputDataFunc <- function(inFile) {
   # In case we are loading precalculated normalizations.
   if ("logcounts" %in% names(assays(scEx))) {
     allScEx_log <- scEx
+    if(! "counts" %in% names(assays(scEx)))
+      assays(scEx)[["counts"]] = assays(scEx)[[1]]
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
@@ -2005,6 +2021,7 @@ scran_Cluster <- function(){
       c("clusterSource", isolate(clusterMethodReact$clusterSource)),
       c("geneSelectionClustering", isolate(input$geneSelectionClustering)),
       c("minClusterSize", isolate(input$minClusterSize)),
+      c("tabsetCluster", isolate(input$tabsetCluster)),
       c("clusterMethod", isolate(clusterMethodReact$clusterMethod))
     ),
     button = "updateClusteringParameters"
@@ -2036,13 +2053,16 @@ seurat_Clustering <- function() {
   scEx_log = scEx_log()
   pca = pca()
   tabsetCluster = isolate(input$tabsetCluster)
+  dims = isolate(input$seurClustDims)
+  k.param = isolate(input$seurClustk.param)
+  resolution = isolate(input$seurClustresolution)
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/seurat_Clustering.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
   
-  if (tabsetCluster != "seurat_Clustering"){
+  if (tabsetCluster != "seurat_Clustering" | is.null(pca)){
     return(NULL)
   }
   cellMeta <- colData(scEx)
@@ -2056,8 +2076,30 @@ seurat_Clustering <- function() {
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
   useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
   seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
+                                          loadings = pca$rotation, 
+                                          stdev = pca$var_pcs, 
+                                          key = "PC_", 
+                                          assay = "RNA")
   
   
+  seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
+  seurDat <- FindClusters(seurDat, resolution = resolution)
+  retVal = data.frame(Barcode = colnames(seurDat),
+                      Cluster = Idents(seurDat))
+  
+
+  setRedGreenButton(
+    vars = list(
+      c("seurClustDims", isolate(input$seurClustDims)),
+      c("seurClustk.param", isolate(input$seurClustk.param)),
+      c("seurClustresolution", isolate(input$seurClustresolution)),
+      c("tabsetCluster", isolate(input$tabsetCluster))
+    ),
+    button = "updateClusteringParameters"
+  )
+  
+  return(retVal)
 }
 # dbCluster ----
 dbCluster <- reactive({

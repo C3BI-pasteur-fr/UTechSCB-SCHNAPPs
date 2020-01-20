@@ -969,6 +969,43 @@ observe(label = "ob_pca",
         }
 )
 
+observe(label = "ob_clusterParams", {
+  if (DEBUG) cat(file = stderr(), "observe ob_clusterParams\n")
+  
+  input$updateClusteringParameters
+  tabsetCluster = input$tabsetCluster
+  
+  if (tabsetCluster == "seurat_Clustering") {
+    setRedGreenButtonCurrent(
+      vars = list(
+        c("tabsetCluster", input$tabsetCluster),
+        c("seurClustDims", input$seurClustDims),
+        c("seurClustk.param", input$seurClustk.param),
+        c("seurClustresolution", input$seurClustresolution)
+      )
+    )
+    updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
+      "seurClustDims", "seurClustk.param",
+      "seurClustresolution", "tabsetCluster"
+    ))
+  }
+  if (tabsetCluster == "scran_Cluster") {
+    setRedGreenButtonCurrent(
+      vars = list(
+        c("useRanks", input$useRanks),
+        c("clusterSource", clusterMethodReact$clusterSource),
+        c("geneSelectionClustering", input$geneSelectionClustering),
+        c("minClusterSize", input$minClusterSize),
+        c("clusterMethod", input$clusterMethod),
+        c("tabsetCluster", input$tabsetCluster)
+      )
+    )
+    updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
+      "useRanks", "clusterSource","geneSelectionClustering",
+       "minClusterSize", "clusterMethod", "tabsetCluster"
+    ))
+  }
+})
 
 
 if (DEBUG) {

@@ -382,7 +382,19 @@ generalParametersTab <- shinydashboard::tabItem(
       tabPanel("Seurat clustering",
         width = 12,
         value = "seurat_Clustering",
-        fluidRow()
+        fluidRow(
+          column(
+            width = 6,
+            numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = 15, width = "100%"),
+            numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = 15, width = "100%")
+          ),
+          column(
+            width = 6,
+            numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = 0.5, min = 0.1, width = "100%"),
+            # TOD implement more options
+          )
+        ),
+        
       ), # seurat clustering
       fluidRow(
         column(12, offset = 0, textOutput("Nclusters"))
