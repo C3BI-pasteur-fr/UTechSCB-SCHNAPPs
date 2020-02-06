@@ -268,14 +268,16 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       # %>% lapply(one_plot)
       p = plot_ly(alpha = 0.6)
       for (le in 1:length(p1)) {
+        if(nrow(p1[[le]])>0){
         
         p = add_histogram(p, x = p1[[le]][,dimX], name = levels(subsetData[,dimCol])[le])
         print(le)
+        }
       }
       p = p %>% layout(barmode = "stack")
       p
-      plot_ly(alpha = 0.6) %>% lapply(p1, one_plot) %>%
-        layout(barmode = "stack")
+      # plot_ly(alpha = 0.6) %>% lapply(p1, one_plot) %>%
+      #   layout(barmode = "stack")
       # plot_ly(alpha = 0.6) %>% add_histogram(x=~p1[[3]][,dimX]) %>% add_histogram(x=~p1[[2]][,dimX]) %>%
       #   layout(barmode = "stack")
       

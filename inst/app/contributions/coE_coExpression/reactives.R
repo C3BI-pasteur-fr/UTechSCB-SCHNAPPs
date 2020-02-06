@@ -590,14 +590,14 @@ coE_somFunction <- function(iData, nSom, geneName, projections, inputCells = "")
     return(NULL)
   }
   
-  if (.schnappsEnv$DEBUGSAVE) {
+  # if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls()))
-  }
+  # }
   # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
   
   cols2use <- which (colnames(iData) %in% inputCells)
   res2 <- Rsomoclu.train(
-    input_data = iData[, cols2use],
+    input_data = t(iData[, cols2use]),
     nSomX = nSom, nSomY = nSom,
     nEpoch = 10,
     radius0 = 0,
@@ -609,10 +609,24 @@ coE_somFunction <- function(iData, nSom, geneName, projections, inputCells = "")
     scaleN = 0.01,
     scaleCooling = "linear"
   )
-  
+  colnames(res2$codebook) <- colnames(iData)[cols2use]
   rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
   simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
                                                 res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
+  
+  # rownames(res3$globalBmus) <- make.unique(as.character(colnames(iData)), sep = "___")
+  # colnames(res3$codebook) <- make.unique(as.character(rownames(iData)), sep = "___")
+  # # heatmap for a specific gene-weight
+  # heatmap(matrix(res3$codebook[,geneName],nrow=20,byrow = T),Colv = NA, Rowv = NA)
+  # countMat = matrix(nrow = nSom, ncol = nSom)
+  # for (x in 0:(nSom-1)) {
+  #   for (y in 0:(nSom-1)){
+  #     countMat[x+1,y+1] <- median(iData[geneName, which(res3$globalBmus[, 1] == x &
+  #                                                      res3$globalBmus[, 2] == y)])
+  #   }
+  # }
+  # heatmap(countMat, Rowv = NA, Colv = NA)
+  
   return(simGenes)
 }
 
