@@ -141,6 +141,11 @@ commentModal <- function(failed = FALSE) {
 observeEvent(input$comment2History, {
   showModal(commentModal())
 })
+
+observeEvent(input$openBrowser, {
+  browser()
+}
+)
 # When OK button is pressed, attempt to load the data set. If successful,
 # remove the modal. If not show another modal, but this time with a failure
 # message.
@@ -559,14 +564,17 @@ readCSV <- function(inFile) {
 #' append annotation to singleCellExperiment object
 #' uses colData
 appendAnnotation <- function(scEx, annFile) {
+  if (DEBUG) {
+    cat(file = stderr(), "appendAnnotation\n")
+  }
   rDat <- rowData(scEx)
   cDat <- colData(scEx)
   
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
-    if (.schnappsEnv$DEBUGSAVE) {
+    # if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls()))
-    }
+    # }
     # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
       rownames(data) <- data[, 1]
@@ -617,7 +625,7 @@ appendAnnotation <- function(scEx, annFile) {
     }
     
     # colData
-    if (all(rownames(data) %in% rownames(cDat))) {
+    if (any(rownames(data) %in% rownames(cDat))) {
       # if any factor is already set we need to avoid having different levles
       if (any(colnames(cDat) %in% colnames(data))) {
         commonCols <- colnames(cDat) %in% colnames(data)
@@ -635,12 +643,17 @@ appendAnnotation <- function(scEx, annFile) {
           data[, cn] <- factor(data[, cn])
         }
       }
+      # only take cells that are also in the data set
+      data = data[rownames(data) %in% colnames(scEx),]
       cDat[rownames(data), colnames(data)] <- data
     }
   }
   cDat$sampleNames <- factor(cDat$sampleNames)
   colData(scEx) <- cDat
   rowData(scEx) <- rDat
+  if (DEBUG) {
+    cat(file = stderr(), "appendAnnotation done\n")
+  }
   return(scEx)
 }
 
@@ -2076,6 +2089,8 @@ seurat_Clustering <- function() {
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
   useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
   seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  dims = min(dims,ncol(pca$x)) 
+  
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
                                           loadings = pca$rotation, 
                                           stdev = pca$var_pcs, 
@@ -2088,7 +2103,7 @@ seurat_Clustering <- function() {
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
   
-
+  
   setRedGreenButton(
     vars = list(
       c("seurClustDims", isolate(input$seurClustDims)),
@@ -2752,6 +2767,7 @@ reacativeReport <- function() {
           "\`", var, "\`()"
         ))),
         error = function(e) {
+          browser()
           cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
           e
         },
