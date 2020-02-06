@@ -252,7 +252,38 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     #   # barchart
     #   # subsetData[, dimX] <- as.character(subsetData[, dimX])
     # } else {
-      # histogram
+    # histogram
+    
+    if (is(subsetData[,dimCol], "factor")) {
+      one_plot <- function(d) {
+        add_histogram(x = ~d[,dimX])  
+        # %>%
+        #   add_annotations(
+        #     ~unique(clarity), x = 0.5, y = 1, 
+        #     xref = "paper", yref = "paper", showarrow = FALSE
+        #   )
+      }
+      p1 <- subsetData %>% split(.[dimCol])
+      
+      # %>% lapply(one_plot)
+      p = plot_ly(alpha = 0.6)
+      for (le in 1:length(p1)) {
+        
+        p = add_histogram(p, x = p1[[le]][,dimX], name = levels(subsetData[,dimCol])[le])
+        print(le)
+      }
+      p = p %>% layout(barmode = "stack")
+      p
+      plot_ly(alpha = 0.6) %>% lapply(p1, one_plot) %>%
+        layout(barmode = "stack")
+      # plot_ly(alpha = 0.6) %>% add_histogram(x=~p1[[3]][,dimX]) %>% add_histogram(x=~p1[[2]][,dimX]) %>%
+      #   layout(barmode = "stack")
+      
+      # %>% p1 %>% layout(barmode = "overlay")
+    } else {
+      
+      
+      
       p <- plot_ly( x=~subsetData[, dimX], type = "histogram") %>%
         layout(
           xaxis = xAxis,
@@ -260,9 +291,10 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
           title = gtitle,
           dragmode = "select"
         )
-      return (p)
-      # %>%
-      #   layout(yaxis=list(type='linear'))
+    }
+    return (p)
+    # %>%
+    #   layout(yaxis=list(type='linear'))
     # }
     
   }
@@ -906,6 +938,8 @@ setRedGreenButtonCurrent <- function(vars = list()) {
 # }
 
 
+# add2history ----
+
 add2history <- function(type, comment = "", ...) {
   if (!exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
@@ -918,7 +952,7 @@ add2history <- function(type, comment = "", ...) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/add2history.RData')
+  # cp =load(file='~/SCHNAPPsDebug/add2history.RData')
   if (type == "text") {
     cat(file = stderr(), paste0("history text: \n"))
     assign(names(varnames[1]), arg[1])
@@ -943,13 +977,16 @@ add2history <- function(type, comment = "", ...) {
   }
 
   if (type == "renderPlotly") {
-    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    
+    tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = ".", fileext = ".png")
     assign(names(varnames[1]), arg[1])
-    save(file = tfile, list = c(names(varnames[1])))
-
+    # save(file = tfile, list = c(names(varnames[1])))
+    orca(plotData$plotData, file = tfile, format = "png")
+    withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
-      "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n"
+      # "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
+      # "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n",
+      "\n![](",basename(tfile),")\n\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
   }
