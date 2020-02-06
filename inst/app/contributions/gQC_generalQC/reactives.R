@@ -91,10 +91,13 @@ gQC_scaterReadsFunc <- function(scEx) {
   #
   # mt <- rownames(scEx)[grepl("^MT", rownames(scEx), ignore.case = TRUE)]
   
-  scEx <- scater::calculateQCMetrics(
+  cellMet <- scater::perCellQCMetrics(
     scEx
   )
-  filter_by_expr_features <- (scEx$total_features_by_counts > 200)
+  featureMet <- scater::perFeatureQCMetrics(
+    scEx
+  )
+  filter_by_expr_features <- (cellMet$detected > 200)
   scEx$use <- (
     # sufficient features (genes)
     filter_by_expr_features

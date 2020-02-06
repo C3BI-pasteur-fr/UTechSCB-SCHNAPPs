@@ -20,14 +20,18 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
     showNotification("sCA_getCells", id = "sCA_getCells", duration = NULL)
   }
 
-  dbCluster = projections$dbCluster
+  # save(file = "~/SCHNAPPsDebug/sCA_getCells.RData", list = c( ls()))
+  # cp =load("~/SCHNAPPsDebug/sCA_getCells.RData")
+  # dbCluster = projections$dbCluster
   subsetData <- projections[cl1,]
-  if (is(subsetData[,db1$mapping$x], "logical")) {
-    subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
-  }
-  if (is(subsetData[, db1$mapping$y], "logical")) {
-    subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
-  }
+  
+    if (is(subsetData[,db1$mapping$x], "logical")) {
+      subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
+    }
+    if (is(subsetData[, db1$mapping$y], "logical")) {
+      subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
+    }
+  
 
   # factors and brushedPoints don't work together.
   # so we change a factor into a numeric
@@ -41,7 +45,11 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
     db1$domain$discrete_limits <- NULL
   }
   db1$domain$discrete_limits <- NULL
-  db2$domain$discrete_limits <- NULL
+  cells.1 <- rownames(shiny::brushedPoints(df = subsetData, brush = db1))
+  
+  cells.2 = c()
+  if (!is.null(db2)) {
+    db2$domain$discrete_limits <- NULL
 
   # factors and brushedPoints don't work together.
   # so we change a factor into a numeric
@@ -53,9 +61,12 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
     subsetData[, db2$mapping$y] <- as.numeric(subsetData[, db2$mapping$y])
     db2$domain$discrete_limits <- NULL
   }
-
-  cells.1 <- rownames(shiny::brushedPoints(df = subsetData, brush = db1))
-  cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
+    cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
+  } else {
+    cells.2 <- rownames(subsetData)[!rownames(subsetData) %in% cells.1]
+  }
+  
+  # cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
   retVal <- list(c1 = cells.1, c2 = cells.2)
   # save(file = "~/SCHNAPPsDebug/sCA_getCells.RData", list = c( ls()))
   # cp = load("~/SCHNAPPsDebug/sCA_getCells.RData")
@@ -352,7 +363,7 @@ sCA_dge <- reactive({
   db2 <- isolate(input$db2)
   method <- isolate(input$sCA_dgeRadioButton)
 
-  if (is.null(scEx_log) | is.null(projections) || is.null(db1) || is.null(db2)) {
+  if (is.null(scEx_log) | is.null(projections)  || is.null(db1)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
