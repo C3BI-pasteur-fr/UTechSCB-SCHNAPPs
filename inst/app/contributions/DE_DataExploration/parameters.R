@@ -4,6 +4,7 @@ suppressMessages(require(Matrix))
 # choice for the radio buttion
 myNormalizationChoices <- list(
   scEx_log = "DE_logNormalization",
+  scaterNorm = "DE_scaterNormalization",
   gene_norm = "DE_logGeneNormalization",
   SeuratStandard = "DE_seuratStandard",
   SeuratSCtransform = "DE_seuratSCtransform",
@@ -14,6 +15,7 @@ myNormalizationChoices <- list(
 # will be displayed via renderUI
 myNormalizationParameters <- list(
   DE_logNormalization = h5("no Parameters implemented"),
+  DE_scaterNormalization = h5("no Parameters implemented"),
   DE_logGeneNormalization = textInput(inputId = "DE_geneIds_norm", label = "comma separated list of genes used for normalization", value = ""),
   DE_seuratStandard = tagList(
     numericInput("DE_seuratStandard_dims",
@@ -565,6 +567,86 @@ DE_logNormalizationButton <- reactiveVal(
   value = NULL,
   label = "pressed"
 )
+
+# DE_scaterNormalization ----
+DE_scaterNormalization <- reactive(label = "scaterNorm", {
+  if (DEBUG) cat(file = stderr(), "DE_scaterNormalization started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "DE_scaterNormalization")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "DE_scaterNormalization")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_scaterNormalization", id = "DE_scaterNormalization", duration = NULL)
+  }
+  
+  scEx <- scEx()
+  DE_logNormalizationButton()
+  
+  if (is.null(scEx)) {
+    if (DEBUG) {
+      cat(file = stderr(), "DE_scaterNormalization:NULL\n")
+    }
+    return(NULL)
+  }
+  # if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/DE_scaterNormalization.RData", list = c(ls()))
+  # }
+  # cp=load(file="~/SCHNAPPsDebug/DE_scaterNormalization.RData")
+  
+  # TODO ?? define scaling factor somewhere else???
+  sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
+  retVal <- DE_scaterNormalizationfunc(scEx, scalingFactor = sfactor)
+  
+  # turn normalization button green
+  addClass("updateNormalization", "green")
+  
+  .schnappsEnv$normalizationFactor <- sfactor
+  exportTestValues(DE_scaterNormalization = {
+    assays(retVal)[["logcounts"]]
+  })
+  return(retVal)
+  
+})
+
+DE_scaterNormalizationfunc <- function(scEx, scalingFactor = 10000) {
+  require(scater)
+  require(scran)
+  if (DEBUG) cat(file = stderr(), "DE_scaterNormalizationfunc started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "DE_scaterNormalizationfunc")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "DE_scaterNormalizationfunc")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_scaterNormalizationfunc", id = "DE_scaterNormalizationfunc", duration = NULL)
+  }
+  sampinfo = colData(scEx)$sampleNames
+  genes2use = rownames(scEx)
+  ta = table(sampinfo)
+  ta = ta[ta>0]
+  mtab = min(ta)
+  stp = round((mtab - 21) /10)
+  scaterReads <- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp), 
+                                          clusters = sampinfo, 
+                                          subset.row = genes2use)
+  # scaterReads <- scran::computeSumFactors(scEx, clusters = sampinfo)
+  dt = data.frame(x=librarySizeFactors(scaterReads), y=sizeFactors(scaterReads))
+  p = plot_ly(dt, x=~x,y=~y)  %>% add_markers()
+  p <- layout(p, xaxis = list(type = "log"),
+              yaxis = list(type = "log"))
+  
+  p
+  scaterReads <- normalize(scaterReads)
+  assays(scaterReads)['counts'] = NULL
+  return(scaterReads)
+}
+
+
 
 DE_logNormalization <- reactive(label = "rlogNorm", {
   if (DEBUG) cat(file = stderr(), "DE_logNormalization started.\n")
