@@ -1,0 +1,181 @@
+---
+title: "Custom Report from History"
+author: "Bernd Jagla"
+date: "1/20/2020"
+output: html_document
+---
+
+
+# history files
+
+intro to history file organization and it procedure.
+
+TODO: addin to remove files not needed anymore for a given active document (check load statements vs. files available and either list files or remove them, or move them.)
+
+TODO: optional integration of shiny elements / modules
+
+Basic information is already provided in the history. Here we just show how to create specific plots/tables.
+
+# not yet in implemented but should be
+
+
+```{r}
+sampNames <- levels(colData(scEx)$sampleNames)
+sampleCols=list()
+sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+```
+
+```{r}
+source("../../inst/app/contributions/sCA_subClusterAnalysis/reactives.R")
+```
+
+
+# individual plots
+
+## histogram raw counts
+
+```{r histogram raw counts}
+dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
+dat$sample <- colData(scEx)$sampleNames
+scols <- sampleCols$colPal
+retVal <- ggplot(data = dat, aes(counts, fill = sample)) +
+  geom_histogram(bins = 50) +
+  labs(title = "Histogram for raw counts", x = "count", y = "Frequency") +
+  scale_fill_manual(values = scols, aesthetics = "fill")
+retVal
+```
+
+
+## sample info
+
+```{r sampleInfo}
+samples = colData(scEx)$sampleNames
+counts <- table(samples)
+df <- as.data.frame(counts)
+ggplot(data = df,aes(x=samples, y=Freq, fill=samples)) + geom_bar(stat = "identity")  + 
+  scale_color_manual(values=scols) 
+```
+
+
+## Violin Plot
+
+```{r}
+source("../../inst/app/contributions/coE_coExpression//reactives.R")
+```
+
+
+```{r violin}
+  geneListStr <- c("PDCD1")
+  projectionVar <- "dbCluster"
+  minExpr <- 1
+  coE_showPermutations <- FALSE
+  # colPal = coE_geneGrp_vioFunc # TODO must be wrong
+  # sampCol <- sampleCols$colPal
+ccols <- allowedColors[1:length(levels(projections$dbCluster))]
+  upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
+  if (is.null(projections) | is.null(scEx_log)) {
+    if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot:NULL\n")
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
+
+  featureData <- rowData(scEx_log)
+  retVal <- coE_geneGrp_vioFunc(
+    genesin = geneListStr,
+    projections = projections,
+    scEx = scEx_log,
+    featureData = featureData,
+    minExpr = minExpr,
+    dbCluster = projectionVar,
+    coE_showPermutations = coE_showPermutations,
+    sampCol = scols,
+    ccols = ccols
+  )
+retVal
+```
+
+
+## SOM
+
+The som as implemented in SCHNAPPs will cluster the genes and output genes that cluster with a target gene. This makes sense when looking a given dbCluster and try to identify co-expressed genes. 
+Here, we go through all the clusters and print out those groups of genes
+
+```{r}
+suppressMessages(require(kohonen))
+suppressMessages(require(Rsomoclu))
+iData = as.matrix(assays(scEx_log)[[1]])
+geneName = "ENSG00000073861"
+nSom = 20
+featureData = rowData(scEx_log)
+for (dbCl in levels(projections$dbCluster)) {
+cols2use <- which(projections$dbCluster == dbCl)
+  res2 <- Rsomoclu.train(
+    input_data = iData[, cols2use],
+    nSomX = nSom, nSomY = nSom,
+    nEpoch = 10,
+    radius0 = 0,
+    radiusN = 0,
+    radiusCooling = "linear",
+    mapType = "planar",
+    gridType = "rectangular",
+    scale0 = 1,
+    scaleN = 0.01,
+    scaleCooling = "linear"
+  )
+  colnames(res2$codebook) <- colnames(iData)[cols2use]
+  rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
+  simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
+                                                res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
+  print(paste("dbCluster:", dbCl))
+  print(featureData[simGenes,"symbol"])
+}
+```
+
+## custom DGE
+
+
+```{r}
+myDiffExpFunctions <- list(
+  c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
+  c("t-test", "sCA_dge_ttest"),
+  c("DESeq2", "sCA_dge_deseq2"),
+  c("seurat:wilcox", "sCA_dge_s_wilcox"),
+  c("seurat:bimod", "sCA_dge_s_bimod"),
+  c("seurat:t-test", "sCA_dge_s_t"),
+  c("seurat:LR", "sCA_dge_s_LR"),
+  c("seurat:neg-binomial", "sCA_dge_s_negbinom"),
+  c("seurat:Poisson", "sCA_dge_s_poisson")
+)
+
+dgeFunc = myDiffExpFunctions[[1]][2]
+if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson")) {
+  scEx_log = scEx
+}
+
+# add projections
+# c1 = c("AAAGATGTCTACCTGC-1", "AAAGCAATCTGCGACG-1", "AACACGTTCGTACCGG-1", "AACCGCGAGCAGGCTA-1")
+projections$lung = projections$sampleNames %in% c("d3_lung", "d4_lung", "d8_lung", "d16_lung")
+
+clusterNr = 12
+c1 = rownames(projections[projections$dbCluster == clusterNr & projections$lung,])
+c2 = rownames(projections[projections$dbCluster == clusterNr & ! projections$lung,])
+
+top.genes <- do.call(dgeFunc, args = list(
+  scEx_log = scEx_log,
+  cells.1 = c1, cells.2 = c2
+))
+featureData <- rowData(scEx)
+
+top.genes$symbol <-
+  featureData[rownames(top.genes), "symbol"]
+if ("Description" %in% colnames(featureData)) {
+  top.genes$Description <- featureData[rownames(top.genes), "Description"]
+}
+rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "___")
+
+DT::datatable(top.genes)
+```
+
