@@ -98,6 +98,68 @@ retVal
 ```
 
 
+## panel plot
+
+
+```{r,fig.height=60, fig.width=12}
+  .schnappsEnv <- new.env(parent=emptyenv())
+
+source("~/Rstudio/Schnapps/inst/app/contributions/DE_DataExploration/reactives.R")
+# panelplotFunc ----
+# scEx_log singlecell Experiment object
+# projections as used in schnapps
+# genesin gene names to be plotted
+# dimx4, dimy4 dimensions to be plotted on
+# sameScale True/False
+# nCol number of columns for final plot
+# sampdes header for plot
+# cellNs cell names to be used
+
+
+retVal = panelPlotFunc(scEx_log, projections, genesin, "sampleNames", "UMI.count", sameScale = FALSE, nCol = 4, sampdesc = "all samples", cellNs = rownames(projections)) 
+
+retVal
+
+```
+
+## 2D plot (module)
+
+
+```{r}
+# g_id should be a valid rowname
+# geneNames needed for umicounts
+# geneNames2 needed for umicounts2
+# clId clId <- levels(projections$dbCluster) # might not be used anymore
+# grpN, grpNs
+  # if (length(grpN) > 0) {
+  #   if (length(grpNs[rownames(subsetData), grpN] == "TRUE") > 0 & sum(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE) > 0) {
+  #     grpNSub <- grpNs[rownames(subsetData), ]
+  #     selectedCells <- rownames(grpNSub[grpNSub[, grpN] == "TRUE", ])
+  #   }
+  # }
+# legend.position not used
+# logx, logy TRUE/FALSE
+# dimY can be "histogram"
+# dimX 
+# dimCol can be "cellDensity"
+
+source("~/Rstudio/Schnapps/inst/app/defaultValues.R")
+source("~/Rstudio/Schnapps/inst/app/serverFunctions.R")
+DEBUG = FALSE
+.schnappsEnv$DEBUGSAVE =  FALSE
+clId <- levels(projections$dbCluster)
+colnames(projections)
+p1 <- plot2Dprojection(scEx_log,
+      projections = projections, g_id = rowData(scEx_log)[1,"symbol"], featureData = rowData(scEx_log), geneNames = NULL,
+      geneNames2 = NULL, dimX = "UMI.count", dimY = "before.filter", clId, grpN = NULL, legend.position = NULL,
+      grpNs = "", logx = FALSE, logy = FALSE, divXBy = "before.filter", divYBy = "None", dimCol = "cellDensity", colors = NULL
+    )
+
+p1
+```
+
+
+
 ## SOM
 
 The som as implemented in SCHNAPPs will cluster the genes and output genes that cluster with a target gene. This makes sense when looking a given dbCluster and try to identify co-expressed genes. 
@@ -178,4 +240,98 @@ rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "___")
 
 DT::datatable(top.genes)
 ```
+
+
+### specific example of a custom child report
+
+requires specific sample names and projections (lung) data cannot be shared but this can be used as a template nonetheless
+
+```{R}
+#load scEx
+load(file = "~/Rstudio/Schnapps/history/hist_2020-Feb-19.13.03/scEx.360f308aaa23.RData")
+```
+
+```{R}
+#load scEx_log
+load(file = "~/Rstudio/Schnapps/history/hist_2020-Feb-19.13.03/scEx_log.360f5fa7f8ba.RData")
+```
+
+
+```{R}
+#load projections with umap
+load(file = "~/Rstudio/Schnapps/history/hist_2020-Feb-19.13.03/projections.360f2ba33a1b.RData")
+```
+
+
+```{r}
+
+scEx <- scEx$scEx
+featureData <- rowData(scEx)
+scEx_log <- scEx_log$scEx_log
+projections <- projections$projections
+projections$lung = FALSE
+projections$lung[grep("lung",projections$sampleNames)] = TRUE
+projections$lung = factor(projections$lung, levels = c(TRUE,FALSE))
+
+scExAll = scEx
+scEx_logAll = scEx_log
+projectionsAll = projections
+```
+
+
+
+```{r cell types}
+cellTypeMarkers = list(
+  t.cells = c("CD3G", "CD3D", "CD3E", "CD2"),
+  cd8 = c("CD8A", "GZMA"), # CD8+ T cells
+  treg = c("CD4", "FOXP3"), # CD4+- Treg
+  tbet = c("TBX21"), # t-bet
+  b.cells = c("CD19", "CD79A"), # B cells
+  nk.cells = c("KLRC1", "KLRC3"), # NK cells
+  pc = c("SLAMF7", "IGKC"), # plasma cells
+  macrophages = c("FCGR2A", "CSF1R"), # macrophages
+  dc = c("FLT3"), # Dendritic cells
+  plasmacytoid.dc = c("CLEC4C"), # plasmacytoid dendritic cells
+  fibroblasts = c("COL1A2"), # fibroblasts
+  myfibroblasts = c("MCAM", "MYLK"), # myfibroblasts
+  ca.fibroblasts = c("FAP", "PDPN"), # cancer-associated fibroblasts
+  malignant = c("EPCAM", "TP63"), # malignant cells
+  endothelial = c("PECAM1", "VWF"), # endothelial cells
+  melanocytes = c("PMEL", "MLANA"), # melanocytes
+  cd103 = c("ITGAE"),
+  cytotoxic = c("GZMB"), 
+  exhaution = c("PDCD1", "CTLA4", "LAG3", "HAVCR2","CD244", "CD160", "TIGIT" )
+)
+# which(featureData$symbol %in% "TIGIT")
+cellTypeCount = data.frame(row.names = rownames(projections))
+for (ct in names(cellTypeMarkers)) {
+  print(ct)
+  print(cellTypeMarkers[[ct]])
+  # print(all(cellTypeMarkers[[ct]] %in% featureData$symbol))
+  geneIdx = which(featureData$symbol %in% cellTypeMarkers[[ct]])
+  if (length(geneIdx) > 1) {
+    print(paste("sum: ", sum(colSums(assays(scEx)[[1]][geneIdx,]) > 0)))
+    cellTypeCount[ct] = colSums(assays(scEx)[[1]][geneIdx,]) > 0
+  } else {
+    print(paste("sum: ", sum(assays(scEx)[[1]][geneIdx,] > 0)))
+    cellTypeCount[ct] = assays(scEx)[[1]][geneIdx,] > 0
+  }
+}
+# cellTypeCount[cellTypeCount$cd8 & cellTypeCount$b.cells,]
+ctcTab = table(cellTypeCount)
+ctcTab = as.data.frame(ctcTab,stringsAsFactors =FALSE)[as.data.frame(ctcTab,stringsAsFactors =FALSE)$Freq>0,]
+ctcTab = cbind(Freq = ctcTab$Freq, SumTrue = rowSums(ctcTab[,-ncol(ctcTab)] == "TRUE"), ctcTab[,-ncol(ctcTab)])
+DT::datatable(ctcTab, )
+```
+
+
+```{r, eval=FALSE}
+  inputData <- scEx_logAll
+anovaName = "CD4+cleaned"
+
+```
+
+```{r child2, eval=FALSE , child='children/child.tartour.anova.Rmd'}
+```
+
 
