@@ -239,118 +239,8 @@ output$DE_panelPlot <- renderPlot({
   genesin <- strsplit(genesin, ",")
   genesin <- genesin[[1]]
 
-  featureData <- rowData(scEx_log)
-  # featureData$symbol = toupper(featureData$symbol)
-  genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
-  if (length(genesin) < 1) {
-    return(NULL)
-  }
-  par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
-  rbPal <- colorRampPalette(c("#f0f0f0", "red"))
-  ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
-  if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
-    ymax <- 0
-    for (i in 1:length(genesin)) {
-      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-      ymax <- max(ymax, max(Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])))
-    }
-    ylim <- c(0, ymax)
-    if (!sameScale) {
-      ylim <- NULL
-    }
-  }
-  plotList <- list()
-  plotIdx <- 0
-  # if (cl4 == "All") {
-  #   for (i in 1:length(genesin)) {
-  #     geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-  #     Col <- rbPal(10)[
-  #       as.numeric(
-  #         cut(
-  #           as.numeric(
-  #             assays(scEx_log)[[1]][
-  #               rownames(featureData[geneIdx, ]),
-  #               ]
-  #           ),
-  #           breaks = 10
-  #         )
-  #       )
-  #       ]
-  #     plotIdx = plotIdx +1
-  #
-  #     plotList[[plotIdx]] = ggplot(projections, aes_string(x=dimx4, y=dimy4))
-  #     if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
-  #       projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
-  #       plotList[[plotIdx]] = plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
-  #     } else{
-  #       plotList[[plotIdx]] = plotList[[plotIdx]] + geom_point(color = Col, show.legend = FALSE) + ggtitle(genesin[i])
-  #
-  #     }
-  #     if (!is.null(ylim)) {
-  #       plotList[[plotIdx]] = plotList[[plotIdx]]  + ylim(ylim)
-  #     }
-  #     # plot(projections[, dimx4], projections[, dimy4],
-  #     #      col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
-  #     # )
-  #     # title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
-  #     if (DEBUG) cat(file = stderr(), genesin[i])
-  #   }
-  # } else {
-  for (i in 1:length(genesin)) {
-    geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-    subsetTSNE <- projections[cellNs, ]
+  retVal <- panelPlotFunc(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs )
 
-    Col <- rbPal(10)[
-      as.numeric(
-        cut(
-          as.numeric(
-            assays(scEx_log)[[1]][
-              rownames(featureData[geneIdx, ]),
-            ]
-          ),
-          breaks = 10
-        )
-      )
-    ]
-
-    names(Col) <- rownames(projections)
-    plotCol <- Col[rownames(subsetTSNE)]
-    if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
-      projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
-      subsetTSNE <- projections[cellNs, ]
-    }
-
-    plotIdx <- plotIdx + 1
-
-    plotList[[plotIdx]] <- ggplot(subsetTSNE, aes_string(x = dimx4, y = dimy4))
-    if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
-      subsetTSNE[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, rownames(subsetTSNE), drop = FALSE])
-      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
-    } else {
-      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_point(color = plotCol, show.legend = FALSE) + ggtitle(genesin[i])
-    }
-    if (!is.null(ylim)) {
-      plotList[[plotIdx]] <- plotList[[plotIdx]] + ylim(ylim)
-    }
-    # plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
-    #      col = plotCol, pch = 16, frame.plot = TRUE,
-    #      ann = FALSE, ylim = ylim
-    # )
-    # title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
-    # if (DEBUG) cat(file = stderr(), ppgrp)
-  }
-  # }
-  require(ggpubr)
-  retVal <-
-    ggarrange(
-      plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),
-      label.x = "test", legend = "right",
-      common.legend = T
-    )
-  retVal <-
-    annotate_figure(retVal,
-      top = text_grob(sampdesc)
-    )
   setRedGreenButton(
     vars = list(
       c("DE_panelplotids", isolate(input$DE_panelplotids)),
@@ -683,13 +573,36 @@ observe(label = "ob DE_seuratStandardButton", {
   if (is.null(buttonPressed)) {
     buttonPressed <- 0
   }
-
+  
   # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
   if (radioButtonVal == "DE_seuratStandard" &
-    !.schnappsEnv$DE_seuratStandardButtonOldVal == buttonPressed) {
+      !.schnappsEnv$DE_seuratStandardButtonOldVal == buttonPressed) {
     cat(file = stderr(), green(paste("\n=====changing value\n")))
     DE_seuratStandardButton(buttonPressed)
     .schnappsEnv$DE_seuratStandardButtonOldVal <- buttonPressed
+  }
+})
+
+# obs.updateNormalization DE_seuratLogNormButton ----
+observe(label = "ob DE_seuratLogNormButton", {
+  buttonPressed <- input$updateNormalization
+  radioButtonVal <- isolate(input$normalizationRadioButton)
+  if (!exists("DE_seuratLogNormButtonOldVal", envir = .schnappsEnv)) {
+    .schnappsEnv$DE_seuratLogNormButtonOldVal <- 0
+  }
+  if (is.null(radioButtonVal)) {
+    radioButtonVal <- ""
+  }
+  if (is.null(buttonPressed)) {
+    buttonPressed <- 0
+  }
+  
+  # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
+  if (radioButtonVal == "DE_seuratLogNorm" &
+      !.schnappsEnv$DE_seuratLogNormButtonOldVal == buttonPressed) {
+    cat(file = stderr(), green(paste("\n=====changing value\n")))
+    DE_seuratLogNormButton(buttonPressed)
+    .schnappsEnv$DE_seuratLogNormButtonOldVal <- buttonPressed
   }
 })
 

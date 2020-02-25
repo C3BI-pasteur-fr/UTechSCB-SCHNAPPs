@@ -6,6 +6,7 @@ myNormalizationChoices <- list(
   scEx_log = "DE_logNormalization",
   scaterNorm = "DE_scaterNormalization",
   gene_norm = "DE_logGeneNormalization",
+  SeuratLogNorm = "DE_seuratLogNorm",
   SeuratStandard = "DE_seuratStandard",
   SeuratSCtransform = "DE_seuratSCtransform",
   SeuratRefBased = "DE_seuratRefBased"
@@ -16,6 +17,7 @@ myNormalizationChoices <- list(
 myNormalizationParameters <- list(
   DE_logNormalization = h5("no Parameters implemented"),
   DE_scaterNormalization = h5("no Parameters implemented"),
+  DE_seuratLogNorm = h5("no Parameters implemented"),
   DE_logGeneNormalization = textInput(inputId = "DE_geneIds_norm", label = "comma separated list of genes used for normalization", value = ""),
   DE_seuratStandard = tagList(
     numericInput("DE_seuratStandard_dims",
@@ -336,7 +338,7 @@ DE_seuratSCtransform <- reactive({
 })
 
 
-
+# DE_seuratStandardfunc ----
 DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.weight = 100) {
   require(Seurat)
   cellMeta <- colData(scEx)
@@ -448,6 +450,90 @@ DE_seuratStandard <- reactive({
   return(retVal)
 })
 
+# Seurat LogNorm ----
+
+DE_seuratLogNormButton  <- reactiveVal(
+  label = "DE_seuratLogNormButton",
+  value = ""
+  )
+
+
+DE_seuratLogNorm <- reactive({
+  if (DEBUG) cat(file = stderr(), "DE_seuratLogNorm started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "DE_seuratLogNorm")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "DE_seuratLogNorm")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_seuratLogNorm", id = "DE_seuratLogNorm", duration = NULL)
+  }
+  
+  scEx <- scEx()
+  runThis <- DE_seuratLogNormButton()
+  
+
+  if (is.null(scEx) | runThis == "") {
+    if (DEBUG) {
+      cat(file = stderr(), "DE_seuratStandard:NULL\n")
+    }
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/DE_seuratStandard.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/DE_seuratStandard.RData")
+  
+  
+  
+  # # TODO ?? define scaling factor somewhere else???
+  # sfactor = max(max(assays(scEx)[["counts"]]),1000)
+  retVal <- DE_seuratLogNormfunc(scEx = scEx)
+  
+  if (is.null(retVal)) {
+    showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
+  }
+  
+  addClass("updateNormalization", "green")
+  exportTestValues(DE_seuratLogNorm = {
+    assays(retVal)[["logcounts"]]
+  })
+  return(retVal)
+})
+
+DE_seuratLogNormfunc <- function(scEx) {
+  require(Seurat)
+  cellMeta <- colData(scEx)
+  # split in different samples
+  meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
+  # creates object @assays$RNA@data and @assays$RNA@counts
+  # integrated <- NULL
+  seurDat <- tryCatch(
+    {
+      seurDat <- CreateSeuratObject(
+        counts = assays(scEx)[[1]],
+        meta.data = meta.data
+      )
+    },
+    error = function(e) {
+      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\n", e, "\n\n"))
+      return(NULL)
+    }
+    )
+  
+  seurDat = NormalizeData(seurDat)
+  
+  A <- seurDat[["RNA"]]@data
+  scEx_bcnorm <- SingleCellExperiment(
+    assay = list(logcounts = as(A, "dgTMatrix")),
+    colData = colData(scEx)[colnames(A), , drop = FALSE],
+    rowData = rowData(scEx)[rownames(A), , drop = FALSE]
+  )
+  
+  return(scEx_bcnorm)
+}
 
 # observe input$DE_geneIds_norm ----
 

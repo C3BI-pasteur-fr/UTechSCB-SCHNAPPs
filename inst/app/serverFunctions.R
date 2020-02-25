@@ -108,6 +108,17 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
                              logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "Gene.count",
                              colors = NULL) {
+  # in case it is called not from within schnapps
+  if(!exists(".schnappsEnv")) {
+    .schnappsEnv <- new.env(parent=emptyenv())
+    .schnappsEnv$DEBUGSAVE = FALSE
+  } else {
+    if (is.null(.schnappsEnv$DEBUGSAVE)) {
+      .schnappsEnv$DEBUGSAVE = FALSE
+    }
+  }
+  
+  
   geneid <- geneName2Index(g_id, featureData)
 
   if (length(geneid) == 0) {
