@@ -119,17 +119,17 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   }
   
   
-  geneid <- geneName2Index(g_id, featureData)
+  # geneid <- geneName2Index(g_id, featureData)
 
-  if (length(geneid) == 0) {
-    return(NULL)
-  }
+  # if (length(geneid) == 0) {
+  #   return(NULL)
+  # }
   # if (length(geneid) == 1) {
   #   expression <- exprs(scEx_log)[geneid, ,drop=FALSE]
   # } else {
-  expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, rownames(projections), drop = FALSE])
+  # expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, rownames(projections), drop = FALSE])
   # }
-  validate(need(is.na(sum(expression)) != TRUE, ""))
+  # validate(need(is.na(sum(expression)) != TRUE, ""))
   # if (length(geneid) == 1) {
   #   expression <- exprs(scEx_log)[geneid, ]
   # } else {
@@ -159,8 +159,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     }
   }
 
-  projections <- cbind(projections, expression)
-  names(projections)[ncol(projections)] <- "exprs"
+  # projections <- cbind(projections, expression)
+  # names(projections)[ncol(projections)] <- "exprs"
 
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/clusterPlot.RData", 
@@ -328,7 +328,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       x = ~ get(dimX),
       y = ~ get(dimY),
       type = "scatter", mode = "markers",
-      text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+      # text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+      text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData)),
       color = ~ get(dimCol),
       colors = colors,
       showlegend = TRUE
@@ -368,10 +369,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
           color = rep("red", nrow(x1)),
           size = 5
         ),
-        text = ~ paste(
-          rownames(subsetData[selectedCells, ]),
-          "<br />", subsetData$exprs[selectedCells]
-        ),
+        # text = ~ paste(rownames(subsetData[selectedCells, ]), "<br />", subsetData$exprs[selectedCells]),
+        text = ~ paste(rownames(subsetData[selectedCells, ])),
         type = "scatter",
         mode = "markers",
         name = "selected",
