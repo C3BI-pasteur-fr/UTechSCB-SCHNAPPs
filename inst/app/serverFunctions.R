@@ -993,6 +993,7 @@ add2history <- function(type, comment = "", ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = ".", fileext = ".png")
     assign(names(varnames[1]), arg[1])
     # save(file = tfile, list = c(names(varnames[1])))
+    tryCatch({
     orca(plotData$plotData, file = tfile, format = "png")
     withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
     line <- paste0(
@@ -1001,6 +1002,7 @@ add2history <- function(type, comment = "", ...) {
       "\n![](",basename(tfile),")\n\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    })
   }
   
   if (type == "tronco") {
