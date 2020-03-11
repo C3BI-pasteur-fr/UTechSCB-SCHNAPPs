@@ -89,9 +89,9 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   # print debugging information on the console
   printTimeEnd(start.time, "inputData")
   # for automated shiny testing using shinytest
-  exportTestValues(coE_heatmapFunc = {
-    retVal
-  })
+  # exportTestValues(coE_heatmapFunc = {
+  #   retVal
+  # })
   
   # this is what is run in the module
   # do.call(TRONCO::pheatmap, retVal)
@@ -560,7 +560,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "violin plot",  
+  add2history(type = "renderPlot", input = input, comment = "violin plot",  
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
   
 })
@@ -590,14 +590,14 @@ coE_somFunction <- function(iData, nSom, geneName, projections, inputCells = "")
     return(NULL)
   }
   
-  # if (.schnappsEnv$DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_somFunction.RData", list = c(ls()))
-  # }
+  }
   # load(file="~/SCHNAPPsDebug/coE_somFunction.RData")
   
   cols2use <- which (colnames(iData) %in% inputCells)
   res2 <- Rsomoclu.train(
-    input_data = t(iData[, cols2use]),
+    input_data = iData[, cols2use],
     nSomX = nSom, nSomY = nSom,
     nEpoch = 10,
     radius0 = 0,
@@ -609,7 +609,7 @@ coE_somFunction <- function(iData, nSom, geneName, projections, inputCells = "")
     scaleN = 0.01,
     scaleCooling = "linear"
   )
-  colnames(res2$codebook) <- colnames(iData)[cols2use]
+  colnames(res2$codebook) <- rownames(iData)[cols2use]
   rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
   simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
                                                 res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]

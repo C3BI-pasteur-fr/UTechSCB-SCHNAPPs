@@ -101,7 +101,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "scater plot",  
+  add2history(type = "renderPlot", input = input, comment = "scater plot",  
               plotData = .schnappsEnv[["DE_scaterPNG"]])
   
 })
@@ -120,7 +120,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "Panel plot",  
+  add2history(type = "renderPlot", input = input, comment = "Panel plot",  
               plotData = .schnappsEnv[["DE_panelPlot"]])
   
 })
@@ -206,7 +206,7 @@ DE_scaterPNG <- reactive({
   n <- min(nrow(scaterReads), 50)
 
   rownames(scaterReads) <- rowData(scaterReads)$symbol
-  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "log10_total_counts", n = n)
+  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n)
   tryCatch(
     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
     error = function(e) {

@@ -620,7 +620,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlotly", comment = "volcano plot",  
+  add2history(type = "renderPlotly", input = input, comment = "volcano plot",  
               plotData = .schnappsEnv[["sCA_volcanoPlot"]])
   
 })
