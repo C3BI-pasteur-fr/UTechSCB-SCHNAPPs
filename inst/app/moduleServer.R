@@ -138,7 +138,7 @@ clusterServer <- function(input, output, session,
     }
 
     add2history(
-      type = "renderPlotly",
+      type = "renderPlotly",input = input, 
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
       comment = paste(myns)
     )
@@ -826,7 +826,8 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("pageLength"), 15, envir = .schnappsEnv)
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
-
+  assign(ns("currentStart"), 0, envir = .schnappsEnv)
+  
   observe({
     clicked <- input$save2HistTabUi
     myns <- session$ns("cellNameTable")
@@ -843,7 +844,7 @@ tableSelectionServer <- function(input, output, session,
     }
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     add2history(
-      type = "renderDT", comment = "Table",
+      type = "renderDT", input = input, comment = "Table",
       tableData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )
   })
@@ -890,7 +891,7 @@ tableSelectionServer <- function(input, output, session,
         list = c(ls())
       )
     }
-    # load(file=paste0("~/SCHNAPPsDebug/cellSelection", "ns", ".RData", collapse = "."))
+    # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
     # browser()
     # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
     # remove this here
@@ -903,7 +904,9 @@ tableSelectionServer <- function(input, output, session,
       retVal <- unique(retVal)
       # this removes everything other than row or col names
       # with just scEx we will cannot display the genes in the removed table
-      retVal <- retVal[retVal %in% c(inputData$symbol, colnames(scEx))]
+      # TODO need to check what we are comparing here. Just added "rowData(scEx)$symbol" because genes were not showing in some tables
+      # also check that removed genes / cells table are working
+      retVal <- retVal[retVal %in% c(rowData(scEx)$symbol,inputData$symbol, colnames(scEx))]
       retVal <- paste0(retVal, collapse = ", ")
     } else {
       retVal <- NULL
@@ -953,6 +956,7 @@ tableSelectionServer <- function(input, output, session,
     assign(ns("colState"), input$cellNameTable_state, envir = .schnappsEnv)
     assign(ns("pageLength"), input$cellNameTable_state$pageLength, envir = .schnappsEnv)
     assign(ns("colOrder"), input$cellNameTable_state$order, envir = .schnappsEnv)
+    assign(ns("currentStart"), input$cellNameTable_state$start, envir = .schnappsEnv)
     tmp <- input$cellNameTable_state$search
   })
 
@@ -1022,6 +1026,7 @@ tableSelectionServer <- function(input, output, session,
         }
       }
       # if (DEBUG) cat(file = stderr(), paste(colState$search,"\n"))
+      # browser()
       dtout <- DT::datatable(dataTables,
         rownames = F,
         filter = "top",
@@ -1034,6 +1039,7 @@ tableSelectionServer <- function(input, output, session,
           search = colState$search,
           searchCols = searchColList,
           stateSave = TRUE,
+          displayStart = get(ns("currentStart"), envir = .schnappsEnv),
           order = get(ns("colOrder"), envir = .schnappsEnv)
         )
       )
@@ -1098,7 +1104,7 @@ pHeatMapModule <- function(input, output, session,
     }
 
     add2history(
-      type = "tronco",
+      type = "tronco",input = input, 
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
       comment = paste(myns)
     )
@@ -1142,6 +1148,29 @@ pHeatMapModule <- function(input, output, session,
     #                   selected = colnames(proje)[2]
     # )
   })
+  
+  observe(label = "ob46a", {
+    if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "updateInput")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "updateInput")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("updateInput", id = "updateInput", duration = NULL)
+    }
+    heatmapData <- pheatmapList()
+    updateSliderInput(session, inputId = "heatmapMinMaxValue",
+                       min = signif(min(heatmapData$mat), digits = 4),
+                       max = signif(max(heatmapData$mat), digits = 4)
+    )
+    # updateNumericInput(session, inputId = "heatmapMaxValue",
+    #                    min = min(heatmapData$mat),
+    #                    max = max(heatmapData$mat)
+    # )
+  })
 
   # pHeatMapModule - pHeatMapPlot ----
   output$pHeatMapPlot <- renderImage({
@@ -1172,7 +1201,9 @@ pHeatMapModule <- function(input, output, session,
     pWidth <- input$heatmapWidth
     pHeight <- input$heatmapHeight
     colPal <- input$colPal
-
+    minMaxVal <- input$heatmapMinMaxValue
+    # maxVal <- input$heatmapMaxValue
+    
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
     if (.schnappsEnv$DEBUGSAVE) {
@@ -1181,134 +1212,29 @@ pHeatMapModule <- function(input, output, session,
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
     }
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
-
-    if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
-      return(list(
-        src = "empty.png",
-        contentType = "image/png",
-        width = 96,
-        height = 96,
-        alt = "pHeatMapPlot should be here"
-      ))
-    }
-    if (is.null(pWidth)) {
-      pWidth <- 800
-      pHeight <- 300
-    }
-    if (!is(heatmapData$mat, "matrix") & !is(heatmapData$mat, "Matrix")) {
-      cat(file = stderr(), "!!!!! output$pHeatMapModule:mat is not a matrix\n")
-      heatmapData$mat <- as.matrix(t(heatmapData$mat))
-    }
-    heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
-    if (is.null(scale)) {
-      heatmapData$scale <- "none"
-    } else {
-      heatmapData$scale <- scale
-      if (scale == "row") {
-        heatmapData$mat <- heatmapData$mat[-which(apply(heatmapData$mat, 1, sd) == 0), ]
-      }
-      if (scale == "column") {
-        heatmapData$mat <- heatmapData$mat[, -which(apply(heatmapData$mat, 2, sd) == 0)]
-      }
-    }
-
     outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
     outfile <- normalizePath(outfile, mustWork = FALSE)
-    heatmapData$filename <- outfile
-    # heatmapData$filename = NULL
-    # if (length(addColNames) > 0 & moreOptions) {
-    if (length(addColNames) > 0) {
-      heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+    
+    
+    
+    retVal = heatmapModuleFunction(
+      heatmapData = heatmapData,
+      addColNames = addColNames,
+      orderColNames = orderColNames, 
+      colTree = colTree,
+      scale = scale,
+      pWidth = pWidth, 
+      pHeight = pHeight,
+      colPal= colPal,
+      minMaxVal = minMaxVal,
+      proje = proje,
+      outfile = outfile
+    )
+      
+    if(retVal[["src"]] == "empty.png" ) {
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
     }
-    # if (length(addColNames) > 0 & moreOptions) {
-    if (length(addColNames) > 0) {
-      heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
-    }
-    # if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
-    if (sum(orderColNames %in% colnames(proje)) > 0) {
-      heatmapData$cluster_cols <- FALSE
-      colN <- rownames(psychTools::dfOrder(proje, orderColNames))
-      matN <- colnames(heatmapData$mat)
-      if (is.null(matN)) {
-        matN <- names(heatmapData$mat)
-      }
-      colN <- colN[colN %in% matN]
-      heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
-      # return()
-    }
-    # if (moreOptions) {
-    heatmapData$cluster_cols <- colTree
-    # }
-    # orgMat = heatmapData$mat
-
-    # heatmapData$mat = orgMat
-    # system.time(do.call(pheatmap, heatmapData))
-    # heatmapData$mat = as(orgMat, "dgTMatrix")
-    heatmapData$fontsize <- 14
-    # heatmapData$fontsize_row = 18
-    # heatmapData$filename=NULL
-    if (nrow(heatmapData$mat) > 1000) {
-      showNotification(
-        "more than 1000 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
-        id = "pHeatMapPlotWARNING",
-        type = "warning",
-        duration = 20
-      )
-      heatmapData$mat <- heatmapData$mat[1:1000, ]
-      heatmapData$gaps_row <- heatmapData$gaps_row[heatmapData$gaps_row < 1000]
-    }
-    if (nrow(heatmapData$mat) < 2) {
-      showNotification(
-        "Less than two rows to display",
-        id = "pHeatMapPlotWARNING",
-        type = "warning",
-        duration = 20
-      )
-      return(list(
-        src = "empty.png",
-        contentType = "image/png",
-        width = 96,
-        height = 96,
-        alt = "pHeatMapPlot should be here"
-      ))
-    }
-    heatmapData$width <- pWidth / 72
-    heatmapData$height <- pHeight / 72
-
-    if (colPal == "none") {
-      # use the supplied colors
-    } else {
-      heatmapData$color <- colorRampPalette(rev(brewer.pal(
-        n = 7, name =
-          colPal
-      )))(100)
-    }
-
-    do.call(TRONCO::pheatmap, heatmapData)
-
-    .schnappsEnv[[paste0("historyPlot-", myns)]] <- heatmapData
-    # library(seriation)
-    # hm <- hmap(x, method = "HC_ward", main = "HC_ward")
-
-    pixelratio <- session$clientData$pixelratio
-    if (is.null(pixelratio)) pixelratio <- 1
-    # width <- session$clientData$output_plot_width
-    # height <- session$clientData$output_plot_height
-    # if (is.null(width)) {
-    #   width <- 96 * 7
-    # } # 7x7 inch output
-    # if (is.null(height)) {
-    #   height <- 96 * 7
-    # }
-    outfilePH <- outfile
-    return(list(
-      src = outfilePH,
-      contentType = "image/png",
-      width = paste0(pWidth, "px"),
-      height = paste0(pHeight, "px"),
-      alt = "heatmap should be here"
-    ))
+   return(retVal)
   })
 
   # pHeatMapModule - additionalOptions ----

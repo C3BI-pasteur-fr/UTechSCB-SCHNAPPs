@@ -23,16 +23,16 @@ geneName2Index <- function(g_id, featureData) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("geneName2Index", id = "geneName2Index", duration = NULL)
   }
-
+  
   if (is.null(g_id)) {
     return(NULL)
   }
-
+  
   g_id <- toupper(g_id)
   g_id <- gsub(" ", "", g_id, fixed = TRUE)
   g_id <- strsplit(g_id, ",")
   g_id <- g_id[[1]]
-
+  
   notFound <- g_id[!g_id %in% toupper(featureData$symbol)]
   if (length(featureData$symbol) == length(notFound)) {
     # in case there is only one gene that is not available.
@@ -44,14 +44,14 @@ geneName2Index <- function(g_id, featureData) {
     }
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(paste("following genes were not found", notFound, collapse = " "),
-        id = "moduleNotFound", type = "warning",
-        duration = 20
+                       id = "moduleNotFound", type = "warning",
+                       duration = 20
       )
     }
   }
-
+  
   geneid <- unique(rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ]))
-
+  
   return(geneid)
 }
 
@@ -59,7 +59,7 @@ geneName2Index <- function(g_id, featureData) {
 updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NULL, scEx, projections) {
   featureData <- rowData(scEx)
   # if ((dimY == "UmiCountPerGenes") | (dimX == "UmiCountPerGenes")) {
-  geneNames <- geneName2Index(geneNames, featureData)
+  geneNames <- geneName2Index(g_id = geneNames, featureData = featureData)
   # if (length(geneNames) > 0) {
   if ((length(geneNames) > 0) && (length(geneNames[[1]]) > 0)) {
     if (length(geneNames) == 1) {
@@ -120,7 +120,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   
   
   # geneid <- geneName2Index(g_id, featureData)
-
+  
   # if (length(geneid) == 0) {
   #   return(NULL)
   # }
@@ -136,7 +136,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   #   expression <- Matrix::colSums(exprs(scEx_log)[geneid, ])
   # }
   # validate(need(is.na(sum(expression)) != TRUE, ""))
-
+  
   # geneid <- geneName2Index(geneNames, featureData)
   projections <- updateProjectionsWithUmiCount(
     dimX = dimX, dimY = dimY,
@@ -144,7 +144,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     geneNames2 = geneNames2,
     scEx = scEx_log, projections = projections
   )
-
+  
   # histogram as y and cellDensity as color is not allowed
   
   if (dimY == "histogram") {
@@ -158,14 +158,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       return(NULL)
     }
   }
-
+  
   # projections <- cbind(projections, expression)
   # names(projections)[ncol(projections)] <- "exprs"
-
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/clusterPlot.RData", 
          list = c(ls(), "legend.position")
-         )
+    )
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
   # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
@@ -199,7 +199,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
   }
-
+  
   suppressMessages(require(plotly))
   f <- list(
     family = "Courier New, monospace",
@@ -212,7 +212,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   if (divYBy != "None" & dimY != "histogram") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
   }
-
+  
   typeX <- typeY <- "linear"
   if (logx) {
     typeX <- "log"
@@ -280,9 +280,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       p = plot_ly(alpha = 0.6)
       for (le in 1:length(p1)) {
         if(nrow(p1[[le]])>0){
-        
-        p = add_histogram(p, x = p1[[le]][,dimX], name = levels(subsetData[,dimCol])[le])
-        print(le)
+          
+          p = add_histogram(p, x = p1[[le]][,dimX], name = levels(subsetData[,dimCol])[le])
+          print(le)
         }
       }
       p = p %>% layout(barmode = "stack")
@@ -319,7 +319,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
-
+  
   p1 <- plotly::plot_ly(
     data = subsetData, source = "subset",
     key = rownames(subsetData)
@@ -340,14 +340,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       title = gtitle,
       dragmode = "select"
     )
-
-
+  
+  
   if (is.factor(subsetData[, dimCol])) {
-
+    
   } else {
     p1 <- colorbar(p1, title = dimCol)
   }
-
+  
   selectedCells <- NULL
   if (length(grpN) > 0) {
     if (length(grpNs[rownames(subsetData), grpN] == "TRUE") > 0 & sum(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE) > 0) {
@@ -463,13 +463,13 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
   # moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
   colTree <- input[[paste0(moduleName, "-showColTree")]]
-
+  
   if (is.null(heatmapData) | is.null(projections) | is.null(heatmapData$mat)) {
     return(NULL)
   }
-
+  
   heatmapData$filename <- NULL
-
+  
   # if (length(addColNames) > 0 & moreOptions) {
   if (length(addColNames) > 0) {
     heatmapData$annotation_col <- projections[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
@@ -495,12 +495,12 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
 twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, legend.position = "none") {
   grpNs <- groupNames$namesDF
   grpN <- make.names(input$groupName, unique = TRUE)
-
+  
   dimY <- input[[paste0(moduleName, "-dimension_y")]]
   dimX <- input[[paste0(moduleName, "-dimension_x")]]
   dimCol <- input[[paste0(moduleName, "-dimension_col")]]
   clId <- input[[paste0(moduleName, "-clusters")]]
-
+  
   geneNames <- input[[paste0(moduleName, "-geneIds")]]
   geneNames2 <- input[[paste0(moduleName, "-geneIds2")]]
   logx <- input[[paste0(moduleName, "-logX")]]
@@ -509,13 +509,13 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   divYBy <- input[[paste0(moduleName, "-divideYBy")]]
   scols <- sampleCols$colPal
   ccols <- clusterCols$colPal
-
-
+  
+  
   if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
     return(NULL)
   }
-
+  
   featureData <- rowData(scEx_log)
   if (is.null(g_id) || nchar(g_id) == 0) {
     g_id <- featureData$symbol
@@ -524,8 +524,8 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (is.null(logy)) logy <- FALSE
   if (is.null(divXBy)) divXBy <- "None"
   if (is.null(divYBy)) divYBy <- "None"
-
-
+  
+  
   if (dimCol == "sampleNames") {
     myColors <- scols
   } else {
@@ -534,10 +534,10 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   if (dimCol == "dbCluster") {
     myColors <- ccols
   }
-
+  
   p1 <- plot2Dprojection(scEx_log, projections, g_id, featureData, geneNames,
-    geneNames2, dimX, dimY, clId, grpN, legend.position,
-    grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+                         geneNames2, dimX, dimY, clId, grpN, legend.position,
+                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
   )
   return(p1)
 }
@@ -556,7 +556,7 @@ checkShaCache <- function(moduleName = "traj_elpi_modules",
   retVal <- NULL
   message <- ""
   status <- "new"
-
+  
   shaStr <- ""
   idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
   infile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
@@ -621,24 +621,24 @@ getshaStr <- function(moduleParameters) {
     shaStr <- paste(
       shaStr,
       tryCatch(sha1(md, digits = 14),
-        warning = function(x) {
-          # print("warning")
-          # print(x)
-          # print(idx)
-          return(
-            sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
-          )
-        },
-        error = function(x) {
-          if (class(md) == "SingleCellExperiment") {
-            return(sha1(as.matrix(assays(md)[[1]])))
-          } else {
-            print(idx)
-            return(
-              sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
-            )
-          }
-        }
+               warning = function(x) {
+                 # print("warning")
+                 # print(x)
+                 # print(idx)
+                 return(
+                   sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+                 )
+               },
+               error = function(x) {
+                 if (class(md) == "SingleCellExperiment") {
+                   return(sha1(as.matrix(assays(md)[[1]])))
+                 } else {
+                   print(idx)
+                   return(
+                     sha1(capture.output(str(md, vec.len = 40, digits.d = 14, nchar.max = 1400000, list.len = 100)))
+                   )
+                 }
+               }
       )
     )
   }
@@ -688,51 +688,51 @@ if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages())))
     # here we create a PDF file for a given plot that is then combined later
     created <- FALSE
     switch(clP[1],
-      "plotly" = {
-        cat(file = stderr(), paste0("plotly\n"))
-        plot1 <- plot1 %>% layout(title = name)
-        if ("plotly" %in% class(plot1)) {
-          # requires orca bing installed (https://github.com/plotly/orca#installation)
-          withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
-        }
-        created <- TRUE
-      },
-      "character" = {
-        # in case this is a link to a file:
-        cat(file = stderr(), paste0("character\n"))
-        if (file.exists(plot1)) {
-          if (tools::file_ext(plot1) == "png") {
-            pdf(tmpF)
-            img <- png::readPNG(plot1)
-            plot(1:2, type = "n")
-            rasterImage(img, 1.2, 1.27, 1.8, 1.73, interpolate = FALSE)
-            dev.off()
-          }
-          created <- TRUE
-        }
-      },
-      "datatables" = {
-        # # // this takes too long
-        # cat(file = stderr(), paste0("datatables\n"))
-        # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
-        # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
-        #
-        # pdf(tmpF)
-        # if (nrow(img) > 20) {
-        #   maxrow = 20
-        # } else {
-        #   maxrow = nrow(plot1)
-        # }
-        # gridExtra::grid.table(img[maxrow],)
-        # dev.off()
-        # created = TRUE
-      }
+           "plotly" = {
+             cat(file = stderr(), paste0("plotly\n"))
+             plot1 <- plot1 %>% layout(title = name)
+             if ("plotly" %in% class(plot1)) {
+               # requires orca bing installed (https://github.com/plotly/orca#installation)
+               withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
+             }
+             created <- TRUE
+           },
+           "character" = {
+             # in case this is a link to a file:
+             cat(file = stderr(), paste0("character\n"))
+             if (file.exists(plot1)) {
+               if (tools::file_ext(plot1) == "png") {
+                 pdf(tmpF)
+                 img <- png::readPNG(plot1)
+                 plot(1:2, type = "n")
+                 rasterImage(img, 1.2, 1.27, 1.8, 1.73, interpolate = FALSE)
+                 dev.off()
+               }
+               created <- TRUE
+             }
+           },
+           "datatables" = {
+             # # // this takes too long
+             # cat(file = stderr(), paste0("datatables\n"))
+             # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
+             # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
+             #
+             # pdf(tmpF)
+             # if (nrow(img) > 20) {
+             #   maxrow = 20
+             # } else {
+             #   maxrow = nrow(plot1)
+             # }
+             # gridExtra::grid.table(img[maxrow],)
+             # dev.off()
+             # created = TRUE
+           }
     )
-
+    
     if (!created) {
       return(FALSE)
     }
-
+    
     if (file.exists(.schnappsEnv$historyFile)) {
       tmpF2 <- tempfile(fileext = ".pdf")
       file.copy(.schnappsEnv$historyFile, tmpF2)
@@ -759,25 +759,25 @@ if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages())))
 addColData <- function(allScEx_log, scEx) {
   cd1 <- colnames(colData(scEx))
   cd2 <- colnames(colData(allScEx_log))
-
+  
   for (cc in setdiff(cd1, cd2)) {
     lv <- NULL
     nCol <- NULL
     switch(class(colData(scEx)[, cc]),
-      "factor" = {
-        levels(colData(scEx)[, cc]) <- c(levels(colData(scEx)[, cc]), "NA")
-        lv <- levels(colData(scEx)[, cc])
-        nCol <- data.frame(factor(rep("NA", nrow(colData(allScEx_log))), levels = lv))
-        colnames(nCol) <- cc
-      },
-      "character" = {
-        nCol <- data.frame(cc = rep("NA", nrow(colData(allScEx_log))), stringsAsFactors = F)
-        colnames(nCol) <- cc
-      },
-      "numeric" = {
-        nCol <- data.frame(cc = rep(0, nrow(colData(allScEx_log))))
-        colnames(nCol) <- cc
-      }
+           "factor" = {
+             levels(colData(scEx)[, cc]) <- c(levels(colData(scEx)[, cc]), "NA")
+             lv <- levels(colData(scEx)[, cc])
+             nCol <- data.frame(factor(rep("NA", nrow(colData(allScEx_log))), levels = lv))
+             colnames(nCol) <- cc
+           },
+           "character" = {
+             nCol <- data.frame(cc = rep("NA", nrow(colData(allScEx_log))), stringsAsFactors = F)
+             colnames(nCol) <- cc
+           },
+           "numeric" = {
+             nCol <- data.frame(cc = rep(0, nrow(colData(allScEx_log))))
+             colnames(nCol) <- cc
+           }
     )
     colData(allScEx_log) <- cbind(colData(allScEx_log), nCol)
   }
@@ -843,7 +843,7 @@ updateButtonColor <- function(buttonName, parameters) {
   # load(file='~/SCHNAPPsDebug/updateButtonColor.RData')
   modified <- valuesChanged(parameters)
   if (!modified) {
-     removeClass(buttonName, "red")
+    removeClass(buttonName, "red")
     addClass(buttonName, "green")
   } else {
     removeClass(buttonName, "green")
@@ -861,7 +861,7 @@ setRedGreenButton <- function(vars = list(), button = "") {
     # if (is.null(v1[2])) {
     #   assign(paste0("calculated_", v1[1]), "NULL", envir = .schnappsEnv)
     # }else {
-      assign(paste0("calculated_", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
+    assign(paste0("calculated_", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
     # }
   }
   addClass(button, "green")
@@ -877,9 +877,92 @@ setRedGreenButtonCurrent <- function(vars = list()) {
     # if (is.null(v1[2])) {
     #   assign(paste0("", v1[1]), "NULL", envir = .schnappsEnv)
     # }else {
-      assign(paste0("", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
+    assign(paste0("", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
     # }
   }
+}
+
+
+
+
+
+reportFunction <- function(tmpPrjFile) {
+  return(NULL)
+}
+
+# getReactEnv ----
+
+getReactEnv <- function(DEBUG) {
+  report.env <- new.env()
+  # translate reactiveValues to lists
+  # this way they can be saved
+  rectVals <- c()
+  isolate({
+    for (var in c(names(globalenv()), names(parent.env(environment())))) {
+      if (DEBUG) cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
+      if (var == "reacativeReport") {
+        next()
+      }
+      if (class(get(var))[1] == "reactivevalues") {
+        if (DEBUG) cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
+        rectVals <- c(rectVals, var)
+        assign(var, reactiveValuesToList(get(var)), envir = report.env)
+      } else if (class(get(var))[1] == "reactiveExpr") {
+        if (DEBUG) {
+          cat(
+            file = stderr(),
+            paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
+          )
+        }
+        # if ( var == "coE_selctedCluster")
+        # browser()
+        rectVals <- c(rectVals, var)
+        tempVar <- tryCatch(eval(parse(text = paste0(
+          "\`", var, "\`()"
+        ))),
+        error = function(e) {
+          browser()
+          cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
+          e
+        },
+        warning = function(e) {
+          cat(file = stderr(), paste("warning with var", var, ":(", e, ")\n"))
+          e
+        }
+        )
+        assign(var, tempVar, envir = report.env)
+        # for modules we have to take care of return values
+        # this has to be done manually (for the moment)
+        # and is only required for clusterServer
+        if (class(report.env[[var]])[1] == "reactivevalues") {
+          if (all(c("selectedCells") %in% names(report.env[[var]]))) {
+            # cat(
+            #   file = stderr(),
+            #   paste(
+            #     "is reactivevalues2: ",
+            #     paste0(var, "-cluster"),
+            #     "\n"
+            #   )
+            # )
+            # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
+            #   browser()
+            # assign(paste0(var, "-cluster"),
+            # eval(report.env[[var]][["cluster"]]),
+            # envir = report.env
+            # )
+            tempVar <- report.env[[var]][["selectedCells"]]
+            assign(paste0(var, "-selectedCells"),
+                   eval(parse(text = "tempVar()")),
+                   envir = report.env
+            )
+          }
+        }
+      }
+    }
+    
+    assign("input", reactiveValuesToList(get("input")), envir = report.env)
+  })
+  return(report.env)
 }
 
 # updateButtonUI = function(input, name, variables){
@@ -952,12 +1035,12 @@ setRedGreenButtonCurrent <- function(vars = list()) {
 
 # add2history ----
 
-add2history <- function(type, comment = "", ...) {
+add2history <- function(type, comment = "", input = input, ...) {
   if (!exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
     return(NULL)
   }
-
+  
   varnames <- lapply(substitute(list(...))[-1], deparse)
   arg <- list(...)
   if(is.null(arg[[1]])) return(NULL)
@@ -979,7 +1062,7 @@ add2history <- function(type, comment = "", ...) {
     # browser()
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[1])
-    save(file = tfile, list = c(names(varnames[1])))
+    save(file = tfile, list = c(names(varnames[1]), "input"))
     # the load is commented out because it is not used at the moment and only takes time to load
     line <- paste0(
       "```{R}\n#load ", names(varnames[1]), "\n#load(file = \"", basename(tfile),
@@ -987,21 +1070,21 @@ add2history <- function(type, comment = "", ...) {
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
   }
-
+  
   if (type == "renderPlotly") {
     
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = ".", fileext = ".png")
     assign(names(varnames[1]), arg[1])
     # save(file = tfile, list = c(names(varnames[1])))
     tryCatch({
-    orca(plotData$plotData, file = tfile, format = "png")
-    withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
-    line <- paste0(
-      # "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
-      # "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n",
-      "\n![](",basename(tfile),")\n\n"
-    )
-    write(line, file = .schnappsEnv$historyFile, append = TRUE)
+      orca(plotData$plotData, file = tfile, format = "png")
+      withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
+      line <- paste0(
+        # "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
+        # "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n",
+        "\n![](",basename(tfile),")\n\n"
+      )
+      write(line, file = .schnappsEnv$historyFile, append = TRUE)
     })
   }
   
@@ -1009,7 +1092,8 @@ add2history <- function(type, comment = "", ...) {
     # browser()
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
-    save(file = tfile, list = c(names(varnames[1])))
+    # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
+    save(file = tfile, list = c(names(varnames[1]), "input"))
     
     line <- paste0(
       "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
@@ -1022,7 +1106,8 @@ add2history <- function(type, comment = "", ...) {
   if (type == "renderPlot") {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
-    save(file = tfile, list = c(names(varnames[1])))
+    # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
+    save(file = tfile, list = c(names(varnames[1]), "input"))
     
     line <- paste0(
       "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
@@ -1035,7 +1120,8 @@ add2history <- function(type, comment = "", ...) {
   if (type == "renderDT") {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
-    save(file = tfile, list = c(names(varnames[1])))
+    # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
+    save(file = tfile, list = c(names(varnames[1]), "input"))
     
     line <- paste0(
       "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
@@ -1060,5 +1146,184 @@ get_density <- function(x, y, ...) {
   iy <- findInterval(y, dens$y)
   ii <- cbind(ix, iy)
   return(dens$z[ii])
+}
+
+
+# ns <- session$ns
+# heatmapData <- pheatmapList()
+# addColNames <- input$ColNames
+# orderColNames <- input$orderNames
+# colTree <- input$showColTree
+# scale <- input$normRow
+# myns <- ns("pHeatMap")
+# save2History <- input$save2History
+# pWidth <- input$heatmapWidth
+# pHeight <- input$heatmapHeight
+# colPal <- input$colPal
+# minMaxVal <- input$heatmapMinMaxValue
+# # maxVal <- input$heatmapMaxValue
+# 
+# proje <- projections()
+
+
+
+heatmapModuleFunction <- function(
+  heatmapData = NULL,
+  addColNames = "sampleNames",
+  orderColNames = c(), 
+  colTree = FALSE,
+  scale = "none",
+  pWidth = 300, 
+  pHeight = 900,
+  colPal= "none",
+  minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat)),
+  proje = NULL,
+  outfile = NULL
+) {
+  
+  
+  
+  if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
+    
+    return(list(
+      src = "empty.png",
+      contentType = "image/png",
+      width = 96,
+      height = 96,
+      alt = "pHeatMapPlot should be here (null)"
+    ))
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
+  }
+  # load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
+  
+  if (is.null(pWidth)) {
+    pWidth <- 800
+    pHeight <- 300
+  }
+  if (!is(heatmapData$mat, "matrix") & !is(heatmapData$mat, "Matrix")) {
+    cat(file = stderr(), "!!!!! output$pHeatMapModule:mat is not a matrix\n")
+    heatmapData$mat <- as.matrix(t(heatmapData$mat))
+  }
+  if (is(heatmapData$mat, "sparseMatrix")) {
+    heatmapData$mat = as.matrix(heatmapData$mat)
+  }
+  heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
+  if (is.null(scale)) {
+    heatmapData$scale <- "none"
+  } else {
+    heatmapData$scale <- scale
+    if (scale == "row") {
+      rmRows = -which(apply(heatmapData$mat, 1, sd) == 0)
+      if(length(rmRows) > 1)
+        heatmapData$mat <- heatmapData$mat[rmRows, ]
+    }
+    if (scale == "column") {
+      rmCols = -which(apply(heatmapData$mat, 2, sd) == 0)
+      if (length(rmCols) > 1)
+        heatmapData$mat <- heatmapData$mat[, rmCols]
+    }
+  }
+  
+  heatmapData$filename <- outfile
+  # heatmapData$filename = NULL
+  # if (length(addColNames) > 0 & moreOptions) {
+  if (length(addColNames) > 0) {
+    heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+  }
+  # if (length(addColNames) > 0 & moreOptions) {
+  if (length(addColNames) > 0) {
+    heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
+  }
+  # if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
+  if (sum(orderColNames %in% colnames(proje)) > 0) {
+    heatmapData$cluster_cols <- FALSE
+    colN <- rownames(psychTools::dfOrder(proje, orderColNames))
+    matN <- colnames(heatmapData$mat)
+    if (is.null(matN)) {
+      matN <- names(heatmapData$mat)
+    }
+    colN <- colN[colN %in% matN]
+    heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
+    # return()
+  }
+  # if (moreOptions) {
+  heatmapData$cluster_cols <- colTree
+  # }
+  # orgMat = heatmapData$mat
+  
+  # heatmapData$mat = orgMat
+  # system.time(do.call(pheatmap, heatmapData))
+  # heatmapData$mat = as(orgMat, "dgTMatrix")
+  heatmapData$fontsize <- 14
+  # heatmapData$fontsize_row = 18
+  # heatmapData$filename=NULL
+  if (nrow(heatmapData$mat) > 1000) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "more than 1000 row in heatmap. This can be very slow to display. Only showing first 1000 rows",
+        id = "pHeatMapPlotWARNING",
+        type = "warning",
+        duration = 20
+      )
+    }
+    heatmapData$mat <- heatmapData$mat[1:1000, ]
+    heatmapData$gaps_row <- heatmapData$gaps_row[heatmapData$gaps_row < 1000]
+  }
+  if (nrow(heatmapData$mat) < 2) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "Less than two rows to display",
+        id = "pHeatMapPlotWARNING",
+        type = "warning",
+        duration = 20
+      )
+    }
+    return(list(
+      src = "empty.png",
+      contentType = "image/png",
+      width = 96,
+      height = 96,
+      alt = "pHeatMapPlot should be here (no rows)"
+    ))
+  }
+  heatmapData$width <- pWidth / 72
+  heatmapData$height <- pHeight / 72
+  
+  if (colPal == "none") {
+    # use the supplied colors
+  } else {
+    heatmapData$color <- colorRampPalette(rev(brewer.pal(
+      n = 7, name =
+        colPal
+    )))(100)
+  }
+  
+  heatmapData$mat[heatmapData$mat <= minMaxVal[1]] = minMaxVal[1]
+  heatmapData$mat[heatmapData$mat >= minMaxVal[2]] = minMaxVal[2]
+  
+  
+  do.call(TRONCO::pheatmap, heatmapData)
+  
+  
+  # pixelratio <- session$clientData$pixelratio
+  # if (is.null(pixelratio)) pixelratio <- 1
+  # width <- session$clientData$output_plot_width
+  # height <- session$clientData$output_plot_height
+  # if (is.null(width)) {
+  #   width <- 96 * 7
+  # } # 7x7 inch output
+  # if (is.null(height)) {
+  #   height <- 96 * 7
+  # }
+  outfilePH <- outfile
+  return(list(
+    src = outfilePH,
+    contentType = "image/png",
+    width = paste0(pWidth, "px"),
+    height = paste0(pHeight, "px"),
+    alt = "heatmap should be here"
+  ))
 }
 

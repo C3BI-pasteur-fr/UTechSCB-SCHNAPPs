@@ -131,7 +131,7 @@ clusterUI <- function(id) {
 tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
-    box(
+    jqui_resizable(box(
       width = 12,
       fluidRow(
         column(
@@ -164,14 +164,14 @@ tableSelectionUi <- function(id) {
           checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)
         ),
         br(),
-        column(
+        jqui_resizable(column(
           width = 12,
           DT::DTOutput(ns("cellNameTable")) %>% withSpinner(),
           style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
         )
-      )
+      ))
     )
-  )
+  ))
 }
 
 # pHeatMapUI --------------
@@ -221,6 +221,13 @@ pHeatMapUI <- function(id) {
               choices = c(),
               selected = "",
               multiple = TRUE
+            ),
+            sliderInput(
+              ns("heatmapMinMaxValue"),
+              label = "min/max value for heatmap",
+              min = -1,
+              max = 1,
+              value = c(-1,1)
             )
           ),
           column(
@@ -246,8 +253,17 @@ pHeatMapUI <- function(id) {
               selected = "none",
               multiple = FALSE
             )
+            # ,
+            # numericInput(
+            #   ns("heatmapMaxValue"),
+            #   label = "max value for heatmap",
+            #   min = -1,
+            #   max = 1,
+            #   value = 0
+            # )
           )
         ),
+        
         fluidRow(
           column(
             width = 12,

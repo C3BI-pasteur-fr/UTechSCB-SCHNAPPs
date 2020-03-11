@@ -152,7 +152,7 @@ observeEvent(input$openBrowser, {
 observeEvent(input$commentok, {
   cat(file = stderr(), paste0("commentok: \n"))
   comment <- input$Comment4history
-  add2history(type = "text", comment = "",  text2add = comment)
+  add2history(type = "text", comment = "",  input=input, text2add = comment)
   removeModal()
 })
 # inputDataFunc ----
@@ -1481,7 +1481,7 @@ scEx <- reactive({
     maxG = maxG
   )
   scEx = retVal
-  add2history(type = "save", comment = "scEx", scEx = retVal)
+  add2history(type = "save", input = input, comment = "scEx", scEx = retVal)
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
   })
@@ -1565,7 +1565,7 @@ scEx_log <- reactive({
   }
   .schnappsEnv$calculated_normalizationRadioButton <- normMethod
   
-  add2history(type = "save", comment = "scEx_log", scEx_log = scEx_log)
+  add2history(type = "save", input = input, comment = "scEx_log", scEx_log = scEx_log)
   
   exportTestValues(scEx_log = {
     assays(scEx_log)["logcounts"]
@@ -2339,9 +2339,9 @@ projections <- reactive({
   if (!"sampleNames" %in% colnames(projections)) {
     projections$sampleNames <- "1"
   }
-  add2history(type = "save", comment = "projections", projections = projections)
+  add2history(type = "save", input = input, comment = "projections", projections = projections)
   
-  add2history(type = "save", comment = "projections", projections = projections)
+  # add2history(type = "save", comment = "projections", projections = projections)
   
   exportTestValues(projections = {
     projections
@@ -2692,9 +2692,6 @@ getMemoryUsed <- reactive({
 # })
 
 
-reportFunction <- function(tmpPrjFile) {
-  return(NULL)
-}
 
 # reacativeReport ----
 reacativeReport <- function() {
@@ -2739,75 +2736,7 @@ reacativeReport <- function() {
       fileext = ".RData"
     )
   
-  report.env <- new.env()
-  # translate reactiveValues to lists
-  # this way they can be saved
-  rectVals <- c()
-  isolate({
-    for (var in c(names(globalenv()), names(parent.env(environment())))) {
-      if (DEBUG) cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
-      if (var == "reacativeReport") {
-        next()
-      }
-      if (class(get(var))[1] == "reactivevalues") {
-        if (DEBUG) cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
-        rectVals <- c(rectVals, var)
-        assign(var, reactiveValuesToList(get(var)), envir = report.env)
-      } else if (class(get(var))[1] == "reactiveExpr") {
-        if (DEBUG) {
-          cat(
-            file = stderr(),
-            paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
-          )
-        }
-        # if ( var == "coE_selctedCluster")
-        # browser()
-        rectVals <- c(rectVals, var)
-        tempVar <- tryCatch(eval(parse(text = paste0(
-          "\`", var, "\`()"
-        ))),
-        error = function(e) {
-          browser()
-          cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
-          e
-        },
-        warning = function(e) {
-          cat(file = stderr(), paste("warning with var", var, ":(", e, ")\n"))
-          e
-        }
-        )
-        assign(var, tempVar, envir = report.env)
-        # for modules we have to take care of return values
-        # this has to be done manually (for the moment)
-        # and is only required for clusterServer
-        if (class(report.env[[var]])[1] == "reactivevalues") {
-          if (all(c("selectedCells") %in% names(report.env[[var]]))) {
-            # cat(
-            #   file = stderr(),
-            #   paste(
-            #     "is reactivevalues2: ",
-            #     paste0(var, "-cluster"),
-            #     "\n"
-            #   )
-            # )
-            # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
-            #   browser()
-            # assign(paste0(var, "-cluster"),
-            # eval(report.env[[var]][["cluster"]]),
-            # envir = report.env
-            # )
-            tempVar <- report.env[[var]][["selectedCells"]]
-            assign(paste0(var, "-selectedCells"),
-                   eval(parse(text = "tempVar()")),
-                   envir = report.env
-            )
-          }
-        }
-      }
-    }
-    
-    assign("input", reactiveValuesToList(get("input")), envir = report.env)
-  })
+  report.env <- getReactEnv(DEBUG = DEBUG)
   pca <- pca()
   tsne <- tsne()
   
