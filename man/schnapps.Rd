@@ -4,10 +4,15 @@
 \alias{schnapps}
 \title{shiny server relevant functions}
 \usage{
-schnapps(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
+schnapps(
+  localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   defaultValueSingleGene = "CD52",
   defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
-  defaultValueRegExGene = "", DEBUG = FALSE, DEBUGSAVE = FALSE)
+  defaultValueRegExGene = "",
+  DEBUG = FALSE,
+  DEBUGSAVE = FALSE,
+  historyPath = NULL
+)
 }
 \arguments{
 \item{localContributionDir}{path to the directory(ies) that contain additional functionality}
@@ -21,6 +26,8 @@ schnapps(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
 \item{DEBUG}{TRUE/FALSE whether to show debugging information on the console}
 
 \item{DEBUGSAVE}{TRUE/FALSE where or not save internal data (very time consuming)}
+
+\item{historyPath}{location (directory) where history directories and data will be stored.}
 }
 \description{
 shiny server relevant functions
@@ -33,5 +40,4 @@ Shiny app for the analysis of single cell data
 data("scEx", package = "SCHNAPPs")
 save(file = "scEx.Rdata", list = "scEx")
 # use "scEx.Rdata" with load data functionality within the shiny app
-
 }
