@@ -1,0 +1,164 @@
+### summary stats on input data
+
+```{r}
+cat(file = stderr(), paste(anovaName, "\n"))
+```
+
+
+#### number of umis per sample
+
+```{r}
+table(projections$sampleNames)
+```
+
+#### number umis per organ (lung = TRUE)
+
+```{r}
+table(projections$lung)
+```
+
+
+### full table
+
+
+```{R}
+
+rData <- rowData(inputData)
+cellMeta <- colData(inputData)
+meta.data <- cellMeta[, "sampleNames", drop = FALSE]
+meta.data$organ <- "kidney"
+meta.data$organ[projections$lung] <- "lung"
+meta.data$organ <- as.factor(meta.data$organ)
+# DT::datatable(as.data.frame(meta.data))
+
+
+mat <- as.matrix(assays(inputData)[[1]])
+aov2Results <- data.frame()
+for (midx in 1:nrow(mat)) {
+  m1 <- data.frame(expr = mat[midx, ], organ = meta.data$organ, sample = meta.data$sampleNames)
+  res.aov2 <- aov(expr ~ organ + sample, data = m1)
+  res <- summary(res.aov2)
+  sumRes <- as.data.frame(res[[1]]["organ", ])
+  rownames(sumRes) <- rownames(mat)[midx]
+  sumRes$coef <- res.aov2$coefficients[["organlung"]]
+  aov2Results <- rbind(aov2Results, sumRes)
+}
+aov2Results <- cbind(rData[rownames(aov2Results), c("symbol", "Description")], aov2Results)
+aov2Results$ensg <- rownames(aov2Results)
+rownames(aov2Results) <- aov2Results$symbol
+DT::datatable(as.data.frame(aov2Results[!is.na(aov2Results$`F value`), ]))
+
+```
+
+
+### table genes of interest
+
+```{r}
+tmp = aov2Results[intGenes, ]
+intGenes[is.na(tmp$symbol)]
+tmp = tmp[!is.na(tmp$symbol),]
+# tmp[11:15,]
+intGTable <- as.data.frame(tmp)
+DT::datatable(intGTable)
+
+pValIntGenes[,anovaName] = intGTable[rownames(pValIntGenes), "Pr..F."]
+
+```
+
+
+
+### Panel plot samples/count (gene of interest)
+
+```{r,fig.height=60, fig.width=12}
+  .schnappsEnv <- new.env(parent=emptyenv())
+
+source("~/Rstudio/Schnapps/inst/app/contributions/DE_DataExploration/reactives.R")
+# panelplotFunc ----
+# scEx_log singlecell Experiment object
+# projections as used in schnapps
+# genesin gene names to be plotted
+# dimx4, dimy4 dimensions to be plotted on
+# sameScale True/False
+# nCol number of columns for final plot
+# sampdes header for plot
+# cellNs cell names to be used
+
+
+retVal = panelPlotFunc(inputData, projections, intGenes, "sampleNames", "UMI.count", FALSE, 4, "all samples", rownames(projections)) 
+
+retVal
+
+```
+
+### Panel plot lung/count (gene of interest)
+
+```{r,fig.height=60, fig.width=12}
+retVal = panelPlotFunc(inputData, projections, intGenes, "lung", "UMI.count", FALSE, 4, "lung/kidney", colnames(inputData)) 
+retVal
+```
+
+
+### Panel plot samples/count (best)
+
+Interesting genes defined as having a sum of squares >2 and a Pr(>F) < 0.05
+
+```{r}
+interestingRes = aov2Results[aov2Results$`Sum Sq`>2 & aov2Results$`Pr(>F)`<0.05,]
+DT::datatable(as.data.frame(interestingRes))
+```
+
+
+```{r}
+genesIn = rownames(interestingRes)[order(interestingRes$`Pr(>F)`,na.last = T,decreasing = F)[1:18]]
+tmp = t(apply(assays(inputData[interestingRes[genesIn,"ensg"],])[[1]],1,FUN = function(x) {table(projections[which(x>0),"lung"])}))
+rownames(tmp) = featureData[rownames(tmp), "symbol"]
+colnames(tmp) = c("lung", "kidney")
+DT::datatable(tmp, caption = "Table of genes which are 'significant' and how many cells expressing that gene  per organ")
+```
+
+```{r}
+tmp = t(apply(assays(inputData[interestingRes[genesIn,"ensg"],])[[1]],1,FUN = function(x) {table(projections[which(x>0),"sampleNames"])}))
+rownames(tmp) = featureData[rownames(tmp), "symbol"]
+# colnames(tmp) = c("lung", "kidney")
+DT::datatable(tmp, caption = "Table of genes which are 'significant' and how many cells expressing that gene  per sample")
+
+```
+
+
+
+```{r,fig.height=18, fig.width=12}
+
+
+retVal = panelPlotFunc(inputData, projections, genesIn, "sampleNames", "UMI.count", FALSE, 3, "best 9 genes all samples", rownames(projections)) 
+
+retVal
+
+```
+
+### Panel plot lung/count (best)
+
+```{r,fig.height=18, fig.width=12}
+retVal = panelPlotFunc(inputData, projections, genesIn, "lung", "UMI.count", FALSE, 3, "best 9 genes lung/kidney", colnames(inputData)) 
+retVal
+```
+
+### Panel plot UMAP1/2 (best)
+
+```{r,fig.height=18, fig.width=12}
+
+if ("UMAP1" %in% colnames(projections)) {
+  retVal = panelPlotFunc(inputData, projections, genesIn, "UMAP1", "UMAP2", FALSE, 3, "best genes ", colnames(inputData)) 
+} else {
+  retVal = panelPlotFunc(inputData, projections, genesIn, "tsne1", "tsne2", FALSE, 3, "best genes ", colnames(inputData)) 
+}
+retVal
+```
+
+### Panel plot PC1/2 (best)
+
+```{r,fig.height=18, fig.width=12}
+retVal = panelPlotFunc(inputData, projections, genesIn, "PC1", "PC2", FALSE, 3, "best  genes ", colnames(inputData)) 
+retVal
+```
+
+

@@ -89,9 +89,9 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   # print debugging information on the console
   printTimeEnd(start.time, "inputData")
   # for automated shiny testing using shinytest
-  exportTestValues(coE_heatmapFunc = {
-    retVal
-  })
+  # exportTestValues(coE_heatmapFunc = {
+  #   retVal
+  # })
   
   # this is what is run in the module
   # do.call(TRONCO::pheatmap, retVal)
@@ -560,7 +560,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "violin plot",  
+  add2history(type = "renderPlot", input = input, comment = "violin plot",  
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
   
 })
@@ -609,10 +609,24 @@ coE_somFunction <- function(iData, nSom, geneName, projections, inputCells = "")
     scaleN = 0.01,
     scaleCooling = "linear"
   )
-  
+  colnames(res2$codebook) <- rownames(iData)[cols2use]
   rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
   simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
                                                 res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
+  
+  # rownames(res3$globalBmus) <- make.unique(as.character(colnames(iData)), sep = "___")
+  # colnames(res3$codebook) <- make.unique(as.character(rownames(iData)), sep = "___")
+  # # heatmap for a specific gene-weight
+  # heatmap(matrix(res3$codebook[,geneName],nrow=20,byrow = T),Colv = NA, Rowv = NA)
+  # countMat = matrix(nrow = nSom, ncol = nSom)
+  # for (x in 0:(nSom-1)) {
+  #   for (y in 0:(nSom-1)){
+  #     countMat[x+1,y+1] <- median(iData[geneName, which(res3$globalBmus[, 1] == x &
+  #                                                      res3$globalBmus[, 2] == y)])
+  #   }
+  # }
+  # heatmap(countMat, Rowv = NA, Colv = NA)
+  
   return(simGenes)
 }
 

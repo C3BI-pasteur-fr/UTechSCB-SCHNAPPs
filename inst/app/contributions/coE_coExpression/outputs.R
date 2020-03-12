@@ -160,7 +160,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   return(retVal)
 })
 
-# # observer for coE_clusterValSOM ----
+# # observer for coE_clusterValSOM 
 # observeEvent(
 #   label = "ob15",
 #   eventExpr = input$coE_clusterSOM,
