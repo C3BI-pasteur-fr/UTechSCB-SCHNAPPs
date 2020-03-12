@@ -20,18 +20,24 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
     showNotification("sCA_getCells", id = "sCA_getCells", duration = NULL)
   }
 
-  dbCluster = projections$dbCluster
+  # save(file = "~/SCHNAPPsDebug/sCA_getCells.RData", list = c( ls()))
+  # cp =load("~/SCHNAPPsDebug/sCA_getCells.RData")
+  # dbCluster = projections$dbCluster
   subsetData <- projections[cl1,]
-  if (is(subsetData[,db1$mapping$x], "logical")) {
-    subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
-  }
-  if (is(subsetData[, db1$mapping$y], "logical")) {
-    subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
-  }
+  
+    if (is(subsetData[,db1$mapping$x], "logical")) {
+      subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
+    }
+    if (is(subsetData[, db1$mapping$y], "logical")) {
+      subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
+    }
+  
 
   # factors and brushedPoints don't work together.
   # so we change a factor into a numeric
   # TODO WHY is discrete_limits set/misused?????
+  # ggplot is not displaying levels for which there are no values
+  # thus, the numbering might be off 
   if (is(subsetData[, db1$mapping$x], "factor")) {
     subsetData[, db1$mapping$x] <- as.numeric(subsetData[, db1$mapping$x])
     db1$domain$discrete_limits <- NULL
@@ -41,7 +47,11 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
     db1$domain$discrete_limits <- NULL
   }
   db1$domain$discrete_limits <- NULL
-  db2$domain$discrete_limits <- NULL
+  cells.1 <- rownames(shiny::brushedPoints(df = subsetData, brush = db1))
+  
+  cells.2 = c()
+  if (!is.null(db2)) {
+    db2$domain$discrete_limits <- NULL
 
   # factors and brushedPoints don't work together.
   # so we change a factor into a numeric
@@ -53,9 +63,12 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
     subsetData[, db2$mapping$y] <- as.numeric(subsetData[, db2$mapping$y])
     db2$domain$discrete_limits <- NULL
   }
-
-  cells.1 <- rownames(shiny::brushedPoints(df = subsetData, brush = db1))
-  cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
+    cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
+  } else {
+    cells.2 <- rownames(subsetData)[!rownames(subsetData) %in% cells.1]
+  }
+  
+  # cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
   retVal <- list(c1 = cells.1, c2 = cells.2)
   # save(file = "~/SCHNAPPsDebug/sCA_getCells.RData", list = c( ls()))
   # cp = load("~/SCHNAPPsDebug/sCA_getCells.RData")
@@ -317,7 +330,7 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   return(retVal)
 }
 
-#' sCA_dge
+# sCA_dge reactive ----
 #' manage calculation for differential expression analysis
 sCA_dge <- reactive({
   if (DEBUG) cat(file = stderr(), "sCA_dge started.\n")
@@ -352,17 +365,23 @@ sCA_dge <- reactive({
   db2 <- isolate(input$db2)
   method <- isolate(input$sCA_dgeRadioButton)
 
-  if (is.null(scEx_log) | is.null(projections) || is.null(db1) || is.null(db2)) {
+  if (is.null(scEx_log) | is.null(projections)  || is.null(db1)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
-
+  # require(archivist)
+  # library(tools)
+  # lazyLoad = local({load("~/SCHNAPPsDebug/sCA_dge.RData"); environment()})
+  # tools:::makeLazyLoadDB(lazyLoad, "Huge")
+  # lazyLoad("Huge")
+  # objNames <- ls()
+  # browser()
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions) == method) / 2)
   dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
-  gCells <- sCA_getCells(projections, cellNs, db1, db2)
+  gCells <- sCA_getCells(projections, cl1 = cellNs, db1, db2)
   
   # in case we need counts and not normalized counts
   if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson")) {
@@ -573,7 +592,15 @@ subCluster2Dplot <- function() {
         axis.title.x = element_text(face = "bold", size = 16),
         axis.title.y = element_text(face = "bold", size = 16),
         legend.position = "none"
-      ) + ggtitle(sampdesc)
+      ) + ggtitle(sampdesc) 
+    if (is.factor(subsetData[,x1])) {
+      p1 <- p1 + scale_x_discrete(drop=FALSE) 
+    }
+    if (is.factor(subsetData[,y1])) {
+      p1 <- p1 + scale_y_discrete(drop=FALSE) 
+    }
+    
+    # + scale_y_discrete(drop=FALSE)
     p1
   })
 }
@@ -593,7 +620,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlotly", comment = "volcano plot",  
+  add2history(type = "renderPlotly", input = input, comment = "volcano plot",  
               plotData = .schnappsEnv[["sCA_volcanoPlot"]])
   
 })

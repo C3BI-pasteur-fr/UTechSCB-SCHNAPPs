@@ -62,13 +62,13 @@ output$dimPlotPCA <- renderPlot({
     }
     return(0)
   }
-  # if (.schnappsEnv$DEBUGSAVE) {
-  save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
-  # }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
+  }
   # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
   
   # return NuLL because it is not working correctly
-  return(NULL)
+  # return(NULL)
   
   scEx = scEx[rownames(pca$rotation),]
   scEx_log = scEx_log[rownames(pca$rotation),]
@@ -94,18 +94,24 @@ output$dimPlotPCA <- renderPlot({
   
   # recalculating because createDimReducObject is not working
   all.genes <- rownames(seurDat)
-  seurDat <- ScaleData(seurDat, features = all.genes)
-  seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
+  # seurDat <- ScaleData(seurDat, features = all.genes)
+  # seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
   
   colnames(pca$x) = str_replace(colnames(pca$x), "PC", "PC_")
-  
+  # pca.res = irlba(A=t(x=seurDat@assays$RNA@data), nv=50)
   # not working
-  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$rotation, loadings = pca$x[colnames(seurDat),], stdev = pca$var_pcs, key = "PC_", assay = "RNA")
-  seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
+                                          loadings = pca$rotation, 
+                                          stdev = pca$var_pcs, 
+                                          key = "PC_", 
+                                          assay = "RNA")
+  # seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
   
   # DimPlot(seurDat, reduction = "pca")
   
-  d = DimHeatmap(seurDat, dims = 1:15, cells = NULL, balanced = TRUE, fast = FALSE, projected = TRUE, reduction = "pca")
+  d = DimHeatmap(seurDat, dims = 1:15, slot = 'data',
+                 balanced = TRUE, fast = TRUE, projected = FALSE, 
+                 reduction = "pca")
   d
 })
 
@@ -135,13 +141,18 @@ commentModal <- function(failed = FALSE) {
 observeEvent(input$comment2History, {
   showModal(commentModal())
 })
+
+observeEvent(input$openBrowser, {
+  browser()
+}
+)
 # When OK button is pressed, attempt to load the data set. If successful,
 # remove the modal. If not show another modal, but this time with a failure
 # message.
 observeEvent(input$commentok, {
   cat(file = stderr(), paste0("commentok: \n"))
   comment <- input$Comment4history
-  add2history(type = "text", comment = "",  text2add = comment)
+  add2history(type = "text", comment = "",  input=input, text2add = comment)
   removeModal()
 })
 # inputDataFunc ----
@@ -195,6 +206,10 @@ inputDataFunc <- function(inFile) {
   if ("scEx" %in% fpLs) { # we prefer the scEx object ;)
     scExFound <- TRUE
     varName <- "scEx"
+    #when loading history files
+    if (is(scEx, "list")){
+      scEx = scEx[[1]]
+    }
   } else {
     scExFound <- FALSE
     for (varName in fpLs) {
@@ -203,6 +218,16 @@ inputDataFunc <- function(inFile) {
         scEx <- get(varName)
         scExFound <- TRUE
         break()
+      } else{
+        ## list as from history file
+        if(is(get(varName)[[1]], "SingleCellExperiment")) {
+          scEx <- get(varName)[[1]]
+          if (!"counts" == names(assays(scEx))[1]) {
+            assays(scEx)["counts"] = assays(scEx)[1]
+          }
+          scExFound <- TRUE
+          break()
+        }
       }
     }
   }
@@ -221,6 +246,8 @@ inputDataFunc <- function(inFile) {
   # In case we are loading precalculated normalizations.
   if ("logcounts" %in% names(assays(scEx))) {
     allScEx_log <- scEx
+    if(! "counts" %in% names(assays(scEx)))
+      assays(scEx)[["counts"]] = assays(scEx)[[1]]
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
@@ -537,14 +564,17 @@ readCSV <- function(inFile) {
 #' append annotation to singleCellExperiment object
 #' uses colData
 appendAnnotation <- function(scEx, annFile) {
+  if (DEBUG) {
+    cat(file = stderr(), "appendAnnotation\n")
+  }
   rDat <- rowData(scEx)
   cDat <- colData(scEx)
   
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
-    if (.schnappsEnv$DEBUGSAVE) {
+    # if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls()))
-    }
+    # }
     # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
       rownames(data) <- data[, 1]
@@ -595,7 +625,7 @@ appendAnnotation <- function(scEx, annFile) {
     }
     
     # colData
-    if (all(rownames(data) %in% rownames(cDat))) {
+    if (any(rownames(data) %in% rownames(cDat))) {
       # if any factor is already set we need to avoid having different levles
       if (any(colnames(cDat) %in% colnames(data))) {
         commonCols <- colnames(cDat) %in% colnames(data)
@@ -613,12 +643,17 @@ appendAnnotation <- function(scEx, annFile) {
           data[, cn] <- factor(data[, cn])
         }
       }
+      # only take cells that are also in the data set
+      data = data[rownames(data) %in% colnames(scEx),]
       cDat[rownames(data), colnames(data)] <- data
     }
   }
   cDat$sampleNames <- factor(cDat$sampleNames)
   colData(scEx) <- cDat
   rowData(scEx) <- rDat
+  if (DEBUG) {
+    cat(file = stderr(), "appendAnnotation done\n")
+  }
   return(scEx)
 }
 
@@ -1446,7 +1481,7 @@ scEx <- reactive({
     maxG = maxG
   )
   scEx = retVal
-  add2history(type = "save", comment = "scEx", scEx = retVal)
+  add2history(type = "save", input = input, comment = "scEx", scEx = retVal)
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
   })
@@ -1530,7 +1565,7 @@ scEx_log <- reactive({
   }
   .schnappsEnv$calculated_normalizationRadioButton <- normMethod
   
-  add2history(type = "save", comment = "scEx_log", scEx_log = scEx_log)
+  add2history(type = "save", input = input, comment = "scEx_log", scEx_log = scEx_log)
   
   exportTestValues(scEx_log = {
     assays(scEx_log)["logcounts"]
@@ -1922,7 +1957,7 @@ scranCluster <- function(pca,
 
 
 
-scran_Cluster <- reactive({
+scran_Cluster <- function(){
   if (DEBUG) {
     cat(file = stderr(), "scran_Cluster started.\n")
   }
@@ -1941,7 +1976,7 @@ scran_Cluster <- reactive({
   }
   
   # react to the following changes
-  input$updateClusteringParameters
+  # input$updateClusteringParameters
   scEx <- scEx()
   scEx_log <- scEx_log()
   pca <- pca()
@@ -1953,8 +1988,9 @@ scran_Cluster <- reactive({
   geneSelectionClustering <- isolate(input$geneSelectionClustering)
   minClusterSize <- isolate(input$minClusterSize)
   clusterMethod <- isolate(clusterMethodReact$clusterMethod)
+  tabsetCluster = isolate(input$tabsetCluster)
   
-  if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize)) {
+  if (is.null(pca) | is.null(scEx_log) | is.na(minClusterSize) | tabsetCluster != "scran_Cluster") {
     if (DEBUG) {
       cat(file = stderr(), "scran_Cluster:NULL\n")
     }
@@ -1998,6 +2034,7 @@ scran_Cluster <- reactive({
       c("clusterSource", isolate(clusterMethodReact$clusterSource)),
       c("geneSelectionClustering", isolate(input$geneSelectionClustering)),
       c("minClusterSize", isolate(input$minClusterSize)),
+      c("tabsetCluster", isolate(input$tabsetCluster)),
       c("clusterMethod", isolate(clusterMethodReact$clusterMethod))
     ),
     button = "updateClusteringParameters"
@@ -2007,8 +2044,78 @@ scran_Cluster <- reactive({
     retVal
   })
   return(retVal)
-})
+}
 
+# Seurat clustering ----
+seurat_Clustering <- function() {
+  if (DEBUG) {
+    cat(file = stderr(), "seurat_Clustering started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "seurat_Clustering")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "seurat_Clustering")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("seurat_Clustering", id = "seurat_Clustering", duration = NULL)
+  }
+  
+  scEx = scEx() # need to be run when updated
+  scEx_log = scEx_log()
+  pca = pca()
+  tabsetCluster = isolate(input$tabsetCluster)
+  dims = isolate(input$seurClustDims)
+  k.param = isolate(input$seurClustk.param)
+  resolution = isolate(input$seurClustresolution)
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/seurat_Clustering.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
+  
+  if (tabsetCluster != "seurat_Clustering" | is.null(pca)){
+    return(NULL)
+  }
+  cellMeta <- colData(scEx)
+  rData <- rowData(scEx)
+  meta.data <- cellMeta[, "sampleNames", drop = FALSE]
+  # creates object @assays$RNA@data and @assays$RNA@counts
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx)[[1]],
+    meta.data = meta.data
+  )
+  # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  dims = min(dims,ncol(pca$x)) 
+  
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
+                                          loadings = pca$rotation, 
+                                          stdev = pca$var_pcs, 
+                                          key = "PC_", 
+                                          assay = "RNA")
+  
+  
+  seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
+  seurDat <- FindClusters(seurDat, resolution = resolution)
+  retVal = data.frame(Barcode = colnames(seurDat),
+                      Cluster = Idents(seurDat))
+  
+  
+  setRedGreenButton(
+    vars = list(
+      c("seurClustDims", isolate(input$seurClustDims)),
+      c("seurClustk.param", isolate(input$seurClustk.param)),
+      c("seurClustresolution", isolate(input$seurClustresolution)),
+      c("tabsetCluster", isolate(input$tabsetCluster))
+    ),
+    button = "updateClusteringParameters"
+  )
+  
+  return(retVal)
+}
 # dbCluster ----
 dbCluster <- reactive({
   if (DEBUG) {
@@ -2025,9 +2132,15 @@ dbCluster <- reactive({
     showNotification("dbCluster", id = "dbCluster", duration = NULL)
   }
   
-  input$updateClusteringParameters
+  clicked = input$updateClusteringParameters
+  scEx = scEx() # need to be run when updated
+  scEx_log = scEx_log()
+  pca = pca()
+  tabsetCluster = isolate(input$tabsetCluster)
+  
+  
   # kNr <- input$kNr
-  clustering <- scran_Cluster()
+  clustering <- do.call(tabsetCluster, args = list())
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls()))
@@ -2226,9 +2339,9 @@ projections <- reactive({
   if (!"sampleNames" %in% colnames(projections)) {
     projections$sampleNames <- "1"
   }
-  add2history(type = "save", comment = "projections", projections = projections)
+  add2history(type = "save", input = input, comment = "projections", projections = projections)
   
-  add2history(type = "save", comment = "projections", projections = projections)
+  # add2history(type = "save", comment = "projections", projections = projections)
   
   exportTestValues(projections = {
     projections
@@ -2579,9 +2692,6 @@ getMemoryUsed <- reactive({
 # })
 
 
-reportFunction <- function(tmpPrjFile) {
-  return(NULL)
-}
 
 # reacativeReport ----
 reacativeReport <- function() {
@@ -2626,74 +2736,7 @@ reacativeReport <- function() {
       fileext = ".RData"
     )
   
-  report.env <- new.env()
-  # translate reactiveValues to lists
-  # this way they can be saved
-  rectVals <- c()
-  isolate({
-    for (var in c(names(globalenv()), names(parent.env(environment())))) {
-      if (DEBUG) cat(file = stderr(), paste("var: ", var, "---", class(get(var))[1], "\n"))
-      if (var == "reacativeReport") {
-        next()
-      }
-      if (class(get(var))[1] == "reactivevalues") {
-        if (DEBUG) cat(file = stderr(), paste("is reactiveValue: ", var, "\n"))
-        rectVals <- c(rectVals, var)
-        assign(var, reactiveValuesToList(get(var)), envir = report.env)
-      } else if (class(get(var))[1] == "reactiveExpr") {
-        if (DEBUG) {
-          cat(
-            file = stderr(),
-            paste("is reactiveExpr: ", var, "--", class(get(var))[1], "\n")
-          )
-        }
-        # if ( var == "coE_selctedCluster")
-        # browser()
-        rectVals <- c(rectVals, var)
-        tempVar <- tryCatch(eval(parse(text = paste0(
-          "\`", var, "\`()"
-        ))),
-        error = function(e) {
-          cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
-          e
-        },
-        warning = function(e) {
-          cat(file = stderr(), paste("warning with var", var, ":(", e, ")\n"))
-          e
-        }
-        )
-        assign(var, tempVar, envir = report.env)
-        # for modules we have to take care of return values
-        # this has to be done manually (for the moment)
-        # and is only required for clusterServer
-        if (class(report.env[[var]])[1] == "reactivevalues") {
-          if (all(c("selectedCells") %in% names(report.env[[var]]))) {
-            # cat(
-            #   file = stderr(),
-            #   paste(
-            #     "is reactivevalues2: ",
-            #     paste0(var, "-cluster"),
-            #     "\n"
-            #   )
-            # )
-            # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
-            #   browser()
-            # assign(paste0(var, "-cluster"),
-            # eval(report.env[[var]][["cluster"]]),
-            # envir = report.env
-            # )
-            tempVar <- report.env[[var]][["selectedCells"]]
-            assign(paste0(var, "-selectedCells"),
-                   eval(parse(text = "tempVar()")),
-                   envir = report.env
-            )
-          }
-        }
-      }
-    }
-    
-    assign("input", reactiveValuesToList(get("input")), envir = report.env)
-  })
+  report.env <- getReactEnv(DEBUG = DEBUG)
   pca <- pca()
   tsne <- tsne()
   

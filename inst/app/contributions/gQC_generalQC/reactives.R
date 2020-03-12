@@ -19,7 +19,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "UMI histogram",  
+  add2history(type = "renderPlot", input = input, comment = "UMI histogram",  
               plotData = .schnappsEnv[["gQC_plotUmiHist"]])
   
 })
@@ -40,7 +40,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "Sample histogram",  
+  add2history(type = "renderPlot", input = input, comment = "Sample histogram",  
               plotData = .schnappsEnv[["gQC_plotSampleHist"]])
   
 })
@@ -60,7 +60,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "PC variance",  
+  add2history(type = "renderPlot", input = input, comment = "PC variance",  
               plotData = .schnappsEnv[["gQC_variancePCA"]])
   
 })
@@ -91,10 +91,13 @@ gQC_scaterReadsFunc <- function(scEx) {
   #
   # mt <- rownames(scEx)[grepl("^MT", rownames(scEx), ignore.case = TRUE)]
   
-  scEx <- scater::calculateQCMetrics(
+  cellMet <- scater::perCellQCMetrics(
     scEx
   )
-  filter_by_expr_features <- (scEx$total_features_by_counts > 200)
+  featureMet <- scater::perFeatureQCMetrics(
+    scEx
+  )
+  filter_by_expr_features <- (cellMet$detected > 200)
   scEx$use <- (
     # sufficient features (genes)
     filter_by_expr_features
@@ -437,10 +440,10 @@ myProjections <- list(
 
 # myHeavyCalculations ----
 # declare function as heavy
-myHeavyCalculations <- list(
-  c("scaterReads", "scaterReads"),
-  c("tsne", "tsne")
-)
+# myHeavyCalculations <- list(
+#   c("scaterReads", "scaterReads"),
+#   c("tsne", "tsne")
+# )
 
 
 #' tsnePlot

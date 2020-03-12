@@ -101,7 +101,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "scater plot",  
+  add2history(type = "renderPlot", input = input, comment = "scater plot",  
               plotData = .schnappsEnv[["DE_scaterPNG"]])
   
 })
@@ -120,7 +120,7 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
-  add2history(type = "renderPlot", comment = "Panel plot",  
+  add2history(type = "renderPlot", input = input, comment = "Panel plot",  
               plotData = .schnappsEnv[["DE_panelPlot"]])
   
 })
@@ -206,7 +206,7 @@ DE_scaterPNG <- reactive({
   n <- min(nrow(scaterReads), 50)
 
   rownames(scaterReads) <- rowData(scaterReads)$symbol
-  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "log10_total_counts", n = n)
+  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n)
   tryCatch(
     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
     error = function(e) {
@@ -357,3 +357,135 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
 # DE_selectedCells <- reactiveValues(
 #   selectedCells <- ""
 # )
+
+
+# panelplotFunc ----
+# scEx_log singlecell Experiment object
+# projections as used in schnapps
+# genesin gene names to be plotted
+# dimx4, dimy4 dimensions to be plotted on
+# sameScale True/False
+# nCol number of columns for final plot
+# sampdes header for plot
+# cellNs cell names to be used
+
+
+panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs) {
+  
+  featureData <- rowData(scEx_log)
+  # featureData$symbol = toupper(featureData$symbol)
+  genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
+  if (length(genesin) < 1) {
+    return(NULL)
+  }
+  par(mfrow = c(ceiling(length(genesin) / 4), 4), mai = c(0., .3, .3, .3))
+  rbPal <- colorRampPalette(c("#f0f0f0", "red"))
+  ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
+  if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
+    ymax <- 0
+    for (i in 1:length(genesin)) {
+      geneIdx <- which(toupper(featureData$symbol) == genesin[i])
+      ymax <- max(ymax, max(Matrix::colSums(assays(scEx_log)[[1]][geneIdx, , drop = FALSE])))
+    }
+    ylim <- c(0, ymax)
+    if (!sameScale) {
+      ylim <- NULL
+    }
+  }
+  plotList <- list()
+  plotIdx <- 0
+  # if (cl4 == "All") {
+  #   for (i in 1:length(genesin)) {
+  #     geneIdx <- which(toupper(featureData$symbol) == genesin[i])
+  #     Col <- rbPal(10)[
+  #       as.numeric(
+  #         cut(
+  #           as.numeric(
+  #             assays(scEx_log)[[1]][
+  #               rownames(featureData[geneIdx, ]),
+  #               ]
+  #           ),
+  #           breaks = 10
+  #         )
+  #       )
+  #       ]
+  #     plotIdx = plotIdx +1
+  #
+  #     plotList[[plotIdx]] = ggplot(projections, aes_string(x=dimx4, y=dimy4))
+  #     if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
+  #       projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[["logcounts"]][geneIdx, , drop = FALSE])
+  #       plotList[[plotIdx]] = plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
+  #     } else{
+  #       plotList[[plotIdx]] = plotList[[plotIdx]] + geom_point(color = Col, show.legend = FALSE) + ggtitle(genesin[i])
+  #
+  #     }
+  #     if (!is.null(ylim)) {
+  #       plotList[[plotIdx]] = plotList[[plotIdx]]  + ylim(ylim)
+  #     }
+  #     # plot(projections[, dimx4], projections[, dimy4],
+  #     #      col = Col, pch = 16, frame.plot = TRUE, ann = FALSE, ylim = ylim
+  #     # )
+  #     # title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
+  #     if (DEBUG) cat(file = stderr(), genesin[i])
+  #   }
+  # } else {
+  for (i in 1:length(genesin)) {
+    geneIdx <- which(toupper(featureData$symbol) == genesin[i])
+    subsetTSNE <- projections[cellNs, ]
+    
+    Col <- rbPal(10)[
+      as.numeric(
+        cut(
+          as.numeric(
+            assays(scEx_log)[[1]][
+              rownames(featureData[geneIdx, ]),
+              ]
+          ),
+          breaks = 10
+        )
+      )
+      ]
+    
+    names(Col) <- rownames(projections)
+    plotCol <- Col[rownames(subsetTSNE)]
+    if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
+      projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, , drop = FALSE])
+      subsetTSNE <- projections[cellNs, ]
+    }
+    
+    plotIdx <- plotIdx + 1
+    
+    plotList[[plotIdx]] <- ggplot(subsetTSNE, aes_string(x = dimx4, y = dimy4))
+    if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
+      subsetTSNE[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, rownames(subsetTSNE), drop = FALSE])
+      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
+    } else {
+      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_point(color = plotCol, show.legend = FALSE) + ggtitle(genesin[i])
+    }
+    if (!is.null(ylim)) {
+      plotList[[plotIdx]] <- plotList[[plotIdx]] + ylim(ylim)
+    }
+    # plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
+    #      col = plotCol, pch = 16, frame.plot = TRUE,
+    #      ann = FALSE, ylim = ylim
+    # )
+    # title(genesin[i], line = -1.2, adj = 0.05, cex.main = 2)
+    # if (DEBUG) cat(file = stderr(), ppgrp)
+  }
+  # }
+  require(ggpubr)
+  retVal <-
+    ggarrange(
+      plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),
+      label.x = "test", legend = "right",
+      common.legend = T
+    )
+  retVal <-
+    annotate_figure(retVal,
+                    top = text_grob(sampdesc)
+    )
+  return(retVal)
+}
+
+
+

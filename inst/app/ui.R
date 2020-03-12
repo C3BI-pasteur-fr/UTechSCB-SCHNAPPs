@@ -159,6 +159,9 @@ scShinyUI <- shinyUI(
       if (exists("historyPath", envir = .schnappsEnv)){
         # checkboxInput("save2History", "save to history file", FALSE)
         actionButton("comment2History", "Add comment to history")
+      },
+      if (DEBUG) {
+        actionButton("openBrowser", "open Browser")
       }
       # ,
       # verbatimTextOutput("save2Historystring")

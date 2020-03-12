@@ -328,33 +328,32 @@ generalParametersTab <- shinydashboard::tabItem(
     ),
     checkbsTT(item = "tabsetPCA"),
   ),
-  #TODO not working so uncommenting
-  # fluidRow(
-  #   box(
-  #     title = "DimPlot for PCA", solidHeader = TRUE, width = 12,  status = 'primary', collapsible = TRUE, collapsed = TRUE,
-  #     # The id lets us use input$tabset1 on the server to find the current tab
-  #     id = "dimPlotPCA",
-  #     fluidRow(
-  #       column(12,
-  #              offset = 1,
-  #              actionButton("updateDimPlot", "generate plot", width = '80%', 
-  #                           style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
-  #       ),
-  #     ),
-  #     fluidRow(
-  #       column(width = 12,
-  #              jqui_resizable(plotOutput("dimPlotPCA"))
-  #       )
-  #     ),
-  #     checkbsTT(item = "dimPlotPCA"),
-  #   )
-  # ),
+  fluidRow(
+    box(
+      title = "DimPlot for PCA", solidHeader = TRUE, width = 12,  status = 'primary', collapsible = TRUE, collapsed = TRUE,
+      # The id lets us use input$tabset1 on the server to find the current tab
+      id = "dimPlotPCA",
+      fluidRow(
+        column(12,
+               offset = 1,
+               actionButton("updateDimPlot", "generate plot", width = '80%',
+                            style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+        ),
+      ),
+      fluidRow(
+        column(width = 12,
+               jqui_resizable(plotOutput("dimPlotPCA"))
+        )
+      ),
+      checkbsTT(item = "dimPlotPCA"),
+    )
+  ),
   fluidRow(
     tabBox(
       title = "Parameters for clustering", width = 12,
       id = "tabsetCluster",
       tabPanel("Scran clustering",
-               value = "scran_Cluster", # name of reactive to be used
+        value = "scran_Cluster", # name of reactive to be used
         width = 12,
         fluidRow(
           column(
@@ -380,9 +379,23 @@ generalParametersTab <- shinydashboard::tabItem(
         ),
         checkbsTT(item = "geneSelectionClustering"),
       ), # Scran clustering tab Panel
-      # tabPanel("Seurat clustering",
-      #          width = 12,
-      #          fluidRow()),
+      tabPanel("Seurat clustering",
+        width = 12,
+        value = "seurat_Clustering",
+        fluidRow(
+          column(
+            width = 6,
+            numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = 15, width = "100%"),
+            numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = 15, width = "100%")
+          ),
+          column(
+            width = 6,
+            numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = 0.5, min = 0.1, width = "100%"),
+            # TOD implement more options
+          )
+        ),
+        
+      ), # seurat clustering
       fluidRow(
         column(12, offset = 0, textOutput("Nclusters"))
       ),
