@@ -15,6 +15,7 @@
 #' @param defaultValueRegExGene regular Expression used for gene selection
 #' @param DEBUG TRUE/FALSE whether to show debugging information on the console
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
+#' @param historyPath location (directory) where history directories and data will be stored.
 #'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
@@ -36,8 +37,9 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                        defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
                        DEBUG = FALSE,
                        DEBUGSAVE = FALSE,
-                      historyPath = NULL,
-                     historyFile = NULL
+                      historyPath = NULL
+                     # ,
+                     # historyFile = NULL
 
                        ) {
   # on.exit({
@@ -58,7 +60,7 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   assign("DEBUG", DEBUG, envir = .schnappsEnv)
   assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
   assign("historyPath", historyPath, envir = .schnappsEnv)
-  assign("historyFile", historyFile, envir = .schnappsEnv)
+  # assign("historyFile", historyFile, envir = .schnappsEnv)
   
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL

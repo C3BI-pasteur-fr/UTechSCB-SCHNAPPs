@@ -617,96 +617,96 @@ flattenCorrMatrix <- function(cormat, pmat) {
 }
 
 
-# recHistory ----
-# record history in env
-# needs pdftk https://www.pdflabs.com/tools/pdftk-server/
-# only save to history file if variable historyFile in schnappsEnv is set
-if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages()))) {
-  recHistory <- function(...) {
-    return(NULL)
-  }
-} else {
-  require(pdftools)
-  recHistory <- function(name, plot1, envir = .schnappsEnv) {
-    if (!exists("historyFile", envir = envir)) {
-      return(NULL)
-    }
-    if (!exists("history", envir = .schnappsEnv)) {
-      .schnappsEnv$history <- list()
-    }
-    name <- paste(name, date())
-    tmpF <- tempfile(fileext = ".pdf")
-    cat(file = stderr(), paste0("history tmp File: ", tmpF, "\n"))
-    # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
-    # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
-    clP <- class(plot1)
-    cat(file = stderr(), paste0("class: ", clP[1], "\n"))
-    # here we create a PDF file for a given plot that is then combined later
-    created <- FALSE
-    switch(clP[1],
-      "plotly" = {
-        cat(file = stderr(), paste0("plotly\n"))
-        plot1 <- plot1 %>% layout(title = name)
-        if ("plotly" %in% class(plot1)) {
-          # requires orca bing installed (https://github.com/plotly/orca#installation)
-          withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
-        }
-        created <- TRUE
-      },
-      "character" = {
-        # in case this is a link to a file:
-        cat(file = stderr(), paste0("character\n"))
-        if (file.exists(plot1)) {
-          if (tools::file_ext(plot1) == "png") {
-            pdf(tmpF)
-            img <- png::readPNG(plot1)
-            plot(1:2, type = "n")
-            rasterImage(img, 1.2, 1.27, 1.8, 1.73, interpolate = FALSE)
-            dev.off()
-          }
-          created <- TRUE
-        }
-      },
-      "datatables" = {
-        # # // this takes too long
-        # cat(file = stderr(), paste0("datatables\n"))
-        # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
-        # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
-        #
-        # pdf(tmpF)
-        # if (nrow(img) > 20) {
-        #   maxrow = 20
-        # } else {
-        #   maxrow = nrow(plot1)
-        # }
-        # gridExtra::grid.table(img[maxrow],)
-        # dev.off()
-        # created = TRUE
-      }
-    )
-
-    if (!created) {
-      return(FALSE)
-    }
-
-    if (file.exists(.schnappsEnv$historyFile)) {
-      tmpF2 <- tempfile(fileext = ".pdf")
-      file.copy(.schnappsEnv$historyFile, tmpF2)
-      tryCatch(
-        pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile),
-        error = function(x) {
-          cat(file = stderr(), paste0("problem while combining PDF files:", x, "\n"))
-        }
-      )
-    } else {
-      file.copy(tmpF, .schnappsEnv$historyFile)
-    }
-    return(TRUE)
-    # pdf(file = tmpF,onefile = TRUE)
-    # ggsave(filename = tmpF, plot = plot1, device = pdf())
-    # dev.off()
-  }
-}
+# # recHistory ----
+# # record history in env
+# # needs pdftk https://www.pdflabs.com/tools/pdftk-server/
+# # only save to history file if variable historyFile in schnappsEnv is set
+# if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages()))) {
+#   recHistory <- function(...) {
+#     return(NULL)
+#   }
+# } else {
+#   require(pdftools)
+#   recHistory <- function(name, plot1, envir = .schnappsEnv) {
+#     if (!exists("historyFile", envir = envir)) {
+#       return(NULL)
+#     }
+#     if (!exists("history", envir = .schnappsEnv)) {
+#       .schnappsEnv$history <- list()
+#     }
+#     name <- paste(name, date())
+#     tmpF <- tempfile(fileext = ".pdf")
+#     cat(file = stderr(), paste0("history tmp File: ", tmpF, "\n"))
+#     # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
+#     # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
+#     clP <- class(plot1)
+#     cat(file = stderr(), paste0("class: ", clP[1], "\n"))
+#     # here we create a PDF file for a given plot that is then combined later
+#     created <- FALSE
+#     switch(clP[1],
+#       "plotly" = {
+#         cat(file = stderr(), paste0("plotly\n"))
+#         plot1 <- plot1 %>% layout(title = name)
+#         if ("plotly" %in% class(plot1)) {
+#           # requires orca bing installed (https://github.com/plotly/orca#installation)
+#           withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
+#         }
+#         created <- TRUE
+#       },
+#       "character" = {
+#         # in case this is a link to a file:
+#         cat(file = stderr(), paste0("character\n"))
+#         if (file.exists(plot1)) {
+#           if (tools::file_ext(plot1) == "png") {
+#             pdf(tmpF)
+#             img <- png::readPNG(plot1)
+#             plot(1:2, type = "n")
+#             rasterImage(img, 1.2, 1.27, 1.8, 1.73, interpolate = FALSE)
+#             dev.off()
+#           }
+#           created <- TRUE
+#         }
+#       },
+#       "datatables" = {
+#         # # // this takes too long
+#         # cat(file = stderr(), paste0("datatables\n"))
+#         # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
+#         # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
+#         #
+#         # pdf(tmpF)
+#         # if (nrow(img) > 20) {
+#         #   maxrow = 20
+#         # } else {
+#         #   maxrow = nrow(plot1)
+#         # }
+#         # gridExtra::grid.table(img[maxrow],)
+#         # dev.off()
+#         # created = TRUE
+#       }
+#     )
+# 
+#     if (!created) {
+#       return(FALSE)
+#     }
+# 
+#     if (file.exists(.schnappsEnv$historyFile)) {
+#       tmpF2 <- tempfile(fileext = ".pdf")
+#       file.copy(.schnappsEnv$historyFile, tmpF2)
+#       tryCatch(
+#         pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile),
+#         error = function(x) {
+#           cat(file = stderr(), paste0("problem while combining PDF files:", x, "\n"))
+#         }
+#       )
+#     } else {
+#       file.copy(tmpF, .schnappsEnv$historyFile)
+#     }
+#     return(TRUE)
+#     # pdf(file = tmpF,onefile = TRUE)
+#     # ggsave(filename = tmpF, plot = plot1, device = pdf())
+#     # dev.off()
+#   }
+# }
 
 #' addColData
 #' adds empty column to SingleCellExperiment object

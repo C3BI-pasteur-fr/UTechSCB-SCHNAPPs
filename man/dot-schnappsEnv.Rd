@@ -3,14 +3,16 @@
 \docType{data}
 \name{.schnappsEnv}
 \alias{.schnappsEnv}
-\title{.schnappsEnv 
+\title{.schnappsEnv
 Environment for package}
-\format{An object of class \code{environment} of length 0.}
+\format{
+An object of class \code{environment} of length 0.
+}
 \usage{
 .schnappsEnv
 }
 \description{
-.schnappsEnv 
+.schnappsEnv
 Environment for package
 }
 \keyword{datasets}
