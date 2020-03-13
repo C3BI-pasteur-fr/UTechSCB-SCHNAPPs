@@ -1078,7 +1078,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     assign(names(varnames[1]), arg[1])
     # save(file = tfile, list = c(names(varnames[1])))
     tryCatch({
-      orca(plotData$plotData, file = tfile, format = "png")
+      # orca(plotData$plotData, file = tfile, format = "png")
       withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
       line <- paste0(
         # "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
