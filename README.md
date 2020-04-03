@@ -21,7 +21,7 @@ BiocManager::install()
 BiocManager::install("BiocSingular")
 BiocManager::install(version='devel')
 BiocManager::install("SingleR")
-devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 ```
 
 ### history functionality
