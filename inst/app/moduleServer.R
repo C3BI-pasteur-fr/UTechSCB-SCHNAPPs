@@ -120,8 +120,8 @@ clusterServer <- function(input, output, session,
   })
 
   # observe save  2 history ----
-  observe({
-    clicked <- input$save2Hist
+  observeEvent(input$save2Hist, {
+    # clicked <- input$save2Hist
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- session$ns("-")
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
@@ -872,12 +872,12 @@ tableSelectionServer <- function(input, output, session,
     # input$refreshtable
 
     # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
-    inputData <- NULL
-    if (nsStr == "gsRMGenesMod--") {
-      inputData <- rowData(inputData()$scEx)
-    } else {
-      inputData <- dataTables
-    }
+    # inputData <- NULL
+    # if (nsStr == "gsRMGenesMod--") {
+    #   inputData <- rowData(inputData()$scEx)
+    # } else {
+    #   inputData <- dataTables
+    # }
 
     if (is.null(dataTables)) {
       return(NULL)
@@ -1087,20 +1087,20 @@ pHeatMapModule <- function(input, output, session,
   # observe save 2 history ----
   observe({
     clicked <- input$save2HistHM
-    if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
+    if (DEBUG) cat(file = stderr(), "observe input$save2HistHM \n")
     myns <- ns("pHeatMap")
     # browser()
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     start.time <- base::Sys.time()
-    if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
+    if (DEBUG) cat(file = stderr(), "cluster: save2HistHM\n")
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
-        removeNotification(id = "save2Hist")
+        removeNotification(id = "save2HistHM")
       }
     )
     # show in the app that this is running
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+      showNotification("save2HistHM", id = "save2HistHM", duration = NULL)
     }
 
     add2history(

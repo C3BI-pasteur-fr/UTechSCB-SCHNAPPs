@@ -7,7 +7,7 @@ suppressMessages(require(SingleCellExperiment))
 # save to history violoin observer ----
 observe({
   clicked  = input$save2Histumi
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2Histumi \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -28,7 +28,7 @@ observe({
 # save to history save2HistSample observer ----
 observe({
   clicked  = input$save2HistSample
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistSample \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -48,7 +48,7 @@ observe({
 # save to history save2HistSample observer ----
 observe({
   clicked  = input$save2Histvar
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2Histvar \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {

@@ -159,6 +159,8 @@ observe(label = "ob_clusteringParams", {
   
   input$updateClusteringParameters
   whichClustering = isolate(input$tabsetCluster)
+  req(whichClustering)
+  
   if ( whichClustering == "scran_Cluster"){
     setRedGreenButtonCurrent(
       vars = list(
@@ -974,6 +976,8 @@ observe(label = "ob_clusterParams", {
   
   input$updateClusteringParameters
   tabsetCluster = input$tabsetCluster
+  
+  if (is.null(tabsetCluster)) return(NULL)
   
   if (tabsetCluster == "seurat_Clustering") {
     setRedGreenButtonCurrent(

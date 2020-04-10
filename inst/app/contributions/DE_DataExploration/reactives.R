@@ -89,7 +89,7 @@ observeEvent(input$DE_clusterPP,{
 
 observe({
   clicked  = input$save2HistScater
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistScater \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
