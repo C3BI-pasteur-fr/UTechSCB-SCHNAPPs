@@ -41,15 +41,20 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # }
 # input, cell/gene selection tabs
 # source('tabs.R',  local = TRUE)
+
+scShinyUI <- function(request) {
+  
 source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
 source(paste0(packagePath, "/tabs.R"), local = TRUE)
 # general tabs
 allTabs <- list(
-  inputTab,
-  geneSelectionTab,
-  cellSelectionTab,
-  generalParametersTab,
-  renameTab
+  inputTab()
+  ,
+  geneSelectionTab()
+  ,
+  cellSelectionTab(),
+  generalParametersTab(),
+  renameTab()
 )
 # parameters tab, includes basic normalization
 source(paste0(packagePath, "/parameters.R"), local = TRUE)
@@ -62,7 +67,8 @@ allMenus <- list(
   ),
   shinydashboard::menuItem("Parameters",
     # id="parametersID",
-    tabName = "parameters", icon = icon("gopuram"), parameterItems
+    tabName = "parameters", icon = icon("gopuram"), 
+    parameterItems()
   ),
   shinydashboard::menuItem(" Cell selection",
     # id="cellSelectionID",
@@ -128,24 +134,46 @@ for (fp in parFiles) {
   for (li in tabList) {
     if (length(li) > 0) {
       # if(DEBUG)cat(file=stderr(), paste(li$children[[1]], "\n"))
-      allTabs[[length(allTabs) + 1]] <- li
+      # allTabs[[length(allTabs) + 1]] <- li
     }
   }
 }
 
+mulist <- list(inputTab(),
+               geneSelectionTab())
+getallTabs <- function() {
+  # tags$div(list(inputTab(),
+  #               geneSelectionTab()),
+  #          # inputTab(),
+  #          class = "tab-content"
+  # )  ,
+  tags$div(mulist
+    ,
+    # inputTab(),
+    class = "tab-content"
+  )  
+  tags$div(
+    allTabs,
+    # inputTab(),
+    class = "tab-content"
+  )  
+}
 # search for parameter contribution submenu items (menuSubItem)
 # parameterContributions = ""
 
+getallMenus <- function(){
+  allMenus
+}
 
-
-scShinyUI <- shinyUI(
+  
+  shinyUI(
   shinydashboard::dashboardPage(
     shinydashboard::dashboardHeader(title = "SCHNAPPs"),
     shinydashboard::dashboardSidebar(
       shinydashboard::sidebarMenu(
         id = "sideBarID",
-        allMenus
-      ),
+        getallMenus()
+      ,
       htmlOutput("summaryStatsSideBar"),
 
       downloadButton("report", "Generate report", class = "butt"),
@@ -156,13 +184,16 @@ scShinyUI <- shinyUI(
       downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
       verbatimTextOutput("DEBUGSAVEstring"),
+      if (is.environment(.schnappsEnv)) {
       if (exists("historyPath", envir = .schnappsEnv)){
         # checkboxInput("save2History", "save to history file", FALSE)
         actionButton("comment2History", "Add comment to history")
-      },
+      }},
       if (DEBUG) {
         actionButton("openBrowser", "open Browser")
-      }
+      },
+      bookmarkButton()
+      )
       # ,
       # verbatimTextOutput("save2Historystring")
       # ,verbatimTextOutput("currentTabInfo")
@@ -171,10 +202,14 @@ scShinyUI <- shinyUI(
       shinyjs::useShinyjs(debug = TRUE),
       inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
       inlineCSS(list(.green = "background-color: lightgreen")),
-      tags$div(
-        allTabs,
-        class = "tab-content"
-      )
+      getallTabs(),
+      # tags$div(list(inputTab(),
+      #               geneSelectionTab()),
+      #          # inputTab(),
+      #          class = "tab-content"
+      # )  ,
+      h4("Sum of all previous slider values:", textOutput("sum"))
     ) # dashboard body
   ) # main dashboard
 )
+}

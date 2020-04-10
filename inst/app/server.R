@@ -111,12 +111,18 @@ base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 # global variable with directory where to store files to be included in reports
 .schnappsEnv$reportTempDir <- base::tempdir()
 
-scShinyServer <- shinyServer(function(input, output, session) {
+scShinyServer <- function(input, output, session) {
+  if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   session$onSessionEnded(stopApp)
+  base::options(shiny.maxRequestSize = 2000 * 1024^2)
+  
+  # seed ----
   # TODO needs to be an option
   seed <- 2
   # localContributionDir <- .SCHNAPPs_locContributionDir
   base::set.seed(seed)
+  
+  # debug directory ----
   # check that directory is availabl, otherwise create it
   if (DEBUG) {
     if (!dir.exists("~/SCHNAPPsDebug")) {
@@ -125,6 +131,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     # TODO ??? clean directory??
   }
   
+  # in development mode, called not from package? ----
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
       packagePath <- "inst/app"
@@ -132,16 +139,18 @@ scShinyServer <- shinyServer(function(input, output, session) {
   } else {
     packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
   }
-  # files to be included in report
+  
+  
+  # files to be included in report ----
   # developers can add in outputs.R a variable called "myZippedReportFiles"
   zippedReportFiles <- c(
     "Readme.txt", "report.html", "sessionData.RData",
     "normalizedCounts.csv", "variables.used.txt"
   )
   
-  base::options(shiny.maxRequestSize = 2000 * 1024^2)
   
-  ### history setup
+  ### history setup ----
+  # TODO put in function
   if (exists("historyPath", envir = .schnappsEnv)) {
     if (!is.null(x = .schnappsEnv$historyPath)) {
       .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
@@ -203,6 +212,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     }
   
   
+  # gene list for gene selection tree ----
   # TODO check if file exists
   # TODO as parameter to load user specified information
   # TODO have this as an option to load other files
@@ -214,16 +224,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
     }
   }
   
-  if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
-  # base calculations that are quite expensive to calculate
-  # display name, reactive name to be executed
-  # TODO do we still need this?
-  # heavyCalculations <- list(
-  #   c("pca", "pca"),
-  #   c("scran_Cluster", "scran_Cluster"),
-  #   c("projections", "projections")
-  # )
-  
+
+  # initialize projection functions ----
   # base projections
   # display name, reactive to calculate projections
   projectionFunctions <- list(
@@ -234,11 +236,11 @@ scShinyServer <- shinyServer(function(input, output, session) {
   )
   .schnappsEnv$projectionFunctions <- projectionFunctions
   
-  # differential expression functions
+  # differential expression functions ----
   # used in subcluster analysis
   .schnappsEnv$diffExpFunctions <- list()
   diffExpFunctions <- list()
-  
+
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
   base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
@@ -246,7 +248,6 @@ scShinyServer <- shinyServer(function(input, output, session) {
   base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
   
   # bookmarking ----
-  # couldn't get bookmarking to work, esp. with the input file
   # setBookmarkExclude(c("bookmark1"))
   # observeEvent(input$bookmark1, {
   #   if (DEBUG) cat(file = stderr(), paste("bookmarking: \n"))
@@ -256,6 +257,37 @@ scShinyServer <- shinyServer(function(input, output, session) {
   #   if (DEBUG) cat(file = stderr(), paste("bookmarking: DONE\n"))
   # })
   # Need to exclude the buttons from themselves being bookmarked
+  # Save extra values in state$values when we bookmark
+  onBookmark(function(state) {
+    # TODO need to include here the color values and other reactive values
+    # browser()
+    if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
+    if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
+    if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
+    state$values$schnappsEnv <- .schnappsEnv
+  })
+  
+  # after bookmarking
+  onBookmarked(fun = function(url) {
+    # browser()
+    if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
+    if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
+    showBookmarkUrlModal(url)
+  }
+  )
+  setBookmarkExclude("bookmark1")
+  # Read values from state$values when we restore
+  onRestore(session = session, fun = function(state) {
+    # TODO need to include here the color values and other reactive values
+    if (DEBUG) base::cat(file = stderr(), paste("onRestore\n"))
+    .schnappsEnv <<-  state$values$schnappsEnv
+  })
+  # 
+  onRestored(session = session, fun = function(state) {
+    if (DEBUG) base::cat(file = stderr(), paste("onRestored\n"))
+    # browser()
+    .schnappsEnv <<-  state$values$schnappsEnv
+  })
   
   # load contribution reactives ----
   # parse all reactives.R files under contributions to include in application
@@ -311,7 +343,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
     zippedReportFiles <- c(zippedReportFiles, myZippedReportFiles)
   }
   .schnappsEnv$projectionFunctions <- projectionFunctions
-}) # END SERVER
+  
+} # END SERVER
 
 # shiny::showReactLog()
 

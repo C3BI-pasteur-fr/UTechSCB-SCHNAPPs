@@ -890,6 +890,7 @@ useCellsFunc <-
       save(file = "~/SCHNAPPsDebug/useCellsFunc.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/useCellsFunc.Rdata')
+    req(dataTables$scEx)
     goodCols <- rep(TRUE, dim(dataTables$scEx)[2])
     scEx <- assays(dataTables$scEx)[[1]]
     #### start: cells with genes expressed
@@ -1013,7 +1014,7 @@ useCells <- reactive({
   keepCells <- cellSelectionValues$cellKeep
   cellKeepOnly <- cellSelectionValues$cellKeepOnly
   # useGenes = isolate(useGenes())
-  if (!exists("dataTables") || is.null(dataTables)) {
+  if (!exists("dataTables") || is.null(dataTables) || ! "scEx" %in% names(dataTables)) {
     if (DEBUG) {
       cat(file = stderr(), "useCells:NULL\n")
     }
@@ -1286,8 +1287,7 @@ useGenes <- reactive({
   geneListSelection <- geneSelectionValues$geneListSelection
   
   if (!exists("dataTables") |
-      is.null(dataTables) |
-      length(dataTables$featuredata$symbol) == 0) {
+      is.null(dataTables) ) {
     if (DEBUG) {
       cat(file = stderr(), "useGenes: NULL\n")
     }

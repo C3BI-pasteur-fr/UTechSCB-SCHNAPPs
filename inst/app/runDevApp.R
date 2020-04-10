@@ -13,7 +13,7 @@ library(reactlog)
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = TRUE
-DEBUGSAVE = F
+DEBUGSAVE = T
 historyPath = "~/Rstudio/Schnapps/history"
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
@@ -36,7 +36,7 @@ packagePath <<- "inst/app"
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
-app <- shinyApp(ui = scShinyUI, server = scShinyServer)
+app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=TRUE)
 runApp(app)
 
