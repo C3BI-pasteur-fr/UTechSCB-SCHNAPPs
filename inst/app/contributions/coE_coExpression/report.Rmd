@@ -3,7 +3,6 @@ title: "coExpression"
 author: "Bernd Jagla"
 date: "3/23/2018"
 output: html_document
-  code_folding: hide
 ---
 
 # Co-expression
