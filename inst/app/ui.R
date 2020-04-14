@@ -208,7 +208,7 @@ getallMenus <- function(){
       #          # inputTab(),
       #          class = "tab-content"
       # )  ,
-      h4("Sum of all previous slider values:", textOutput("sum"))
+      # h4("Sum of all previous slider values:", textOutput("sum"))
     ) # dashboard body
   ) # main dashboard
 )
