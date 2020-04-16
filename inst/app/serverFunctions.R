@@ -694,6 +694,8 @@ flattenCorrMatrix <- function(cormat, pmat) {
 #         plot1 <- plot1 %>% layout(title = name)
 #         if ("plotly" %in% class(plot1)) {
 #           # requires orca bing installed (https://github.com/plotly/orca#installation)
+#           # https://github.com/plotly/orca/releases
+#           # https://github.com/plotly/orca
 #           withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
 #         }
 #         created <- TRUE
@@ -799,39 +801,39 @@ valuesChanged <- function(parameters) {
     oldVar <- paste0("calculated_", var)
     currVar <- var
     if (!exists(oldVar, envir = .schnappsEnv) | !exists(currVar, envir = .schnappsEnv)) {
-      cat(file = stderr(), green("modified1\n"))
-      cat(file = stderr(), paste("var:", var, "old: ", exists(oldVar, envir = .schnappsEnv), " new:", exists(currVar, envir = .schnappsEnv)))
+      # cat(file = stderr(), green("modified1\n"))
+      # cat(file = stderr(), paste("var:", var, "old: ", exists(oldVar, envir = .schnappsEnv), " new:", exists(currVar, envir = .schnappsEnv)))
       modified <- TRUE
       next()
     }
     if (is.null(get(oldVar, envir = .schnappsEnv)) | is.null(get(currVar, envir = .schnappsEnv))) {
       if (!(is.null(get(oldVar, envir = .schnappsEnv)) & is.null(get(currVar, envir = .schnappsEnv)))) {
-        cat(file = stderr(), "modified2\n")
+        # cat(file = stderr(), "modified2\n")
         modified <- TRUE
       }
     } else {
       if (is.na(get(oldVar, envir = .schnappsEnv)) | is.na(get(currVar, envir = .schnappsEnv))){
         if (!(is.na(get(oldVar, envir = .schnappsEnv)) & is.na(get(currVar, envir = .schnappsEnv)))){
           # browser()
-          cat(file = stderr(), "modified3a\n")
+          # cat(file = stderr(), "modified3a\n")
           modified <- TRUE
         }
       } else
         if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
           # browser()
-          cat(file = stderr(), "modified3\n")
-          cat(file = stderr(), oldVar)
-          cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
-          cat(file = stderr(), get(currVar, envir = .schnappsEnv))
+          # cat(file = stderr(), "modified3\n")
+          # cat(file = stderr(), oldVar)
+          # cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
+          # cat(file = stderr(), get(currVar, envir = .schnappsEnv))
           modified <- TRUE
         }
     }
   }
-  if (!modified) {
-    cat(file = stderr(), "\n\nnot modified\n\n\n")
-  } else {
-    cat(file = stderr(), "\n\nmodified4\n\n\n")
-  }
+  # if (!modified) {
+  #   cat(file = stderr(), "\n\nnot modified\n\n\n")
+  # } else {
+  #   cat(file = stderr(), "\n\nmodified4\n\n\n")
+  # }
   return(modified)
 }
 
@@ -1050,7 +1052,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   }
   # cp =load(file='~/SCHNAPPsDebug/add2history.RData')
   if (type == "text") {
-    cat(file = stderr(), paste0("history text: \n"))
+    # cat(file = stderr(), paste0("history text: \n"))
     assign(names(varnames[1]), arg[1])
     line <- paste0(
       "\n", get(names(varnames[1])), "\n"
