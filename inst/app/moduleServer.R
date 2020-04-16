@@ -2,7 +2,7 @@ if (DEBUG) {
   cat(file = stderr(), "\nloading Module server.\n")
 }
 
-source(paste0(packagePath, "/reactives.R"), local = TRUE)
+# source(paste0(packagePath, "/reactives.R"), local = TRUE)
 suppressMessages(library(psychTools))
 suppressMessages(library(magrittr))
 suppressMessages(library(dplyr))
