@@ -879,7 +879,7 @@ tableSelectionServer <- function(input, output, session,
       inputData <- dataTables
     }
 
-    if (is.null(dataTables)) {
+    if (is.null(inputData)) {
       return(NULL)
     }
     if (!is.null(getDefaultReactiveDomain())) {
