@@ -2,7 +2,6 @@ suppressMessages(require(shinyTree))
 
 # SUMMARY STATS ----------------------------------------------------------------
 source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
-source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
 DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # normalizationRadioButtonValue --------------------------------
