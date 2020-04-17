@@ -148,17 +148,26 @@ scShinyUI <- shinyUI(
       ),
       htmlOutput("summaryStatsSideBar"),
 
-      downloadButton("report", "Generate report", class = "butt"),
-      tags$head(tags$style(".butt{color: black !important;}")), #  font color
+      # downloadButton("report", "Generate report", class = "butt"),
+      tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
 
       # bookmarkButton(id = "bookmark1"),
+      br(),
       downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
+      br(),
       downloadButton("RDSsave", "Download RData", class = "butt"),
       if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
-      verbatimTextOutput("DEBUGSAVEstring"),
+      if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
+      if (exists("historyPath", envir = .schnappsEnv)){
+        br()
+      },
       if (exists("historyPath", envir = .schnappsEnv)){
         # checkboxInput("save2History", "save to history file", FALSE)
         actionButton("comment2History", "Add comment to history")
+        
+      },
+      if (DEBUG) {
+        br()
       },
       if (DEBUG) {
         actionButton("openBrowser", "open Browser")

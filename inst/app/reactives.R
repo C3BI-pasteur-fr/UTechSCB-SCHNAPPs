@@ -2,6 +2,7 @@ suppressMessages(require(tibble))
 suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
+source(paste0(packagePath, "/outputs.R"), local = TRUE)
 
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
@@ -150,7 +151,7 @@ observeEvent(input$openBrowser, {
 # remove the modal. If not show another modal, but this time with a failure
 # message.
 observeEvent(input$commentok, {
-  cat(file = stderr(), paste0("commentok: \n"))
+  # cat(file = stderr(), paste0("commentok: \n"))
   comment <- input$Comment4history
   add2history(type = "text", comment = "",  input=input, text2add = comment)
   removeModal()

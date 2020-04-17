@@ -12,7 +12,7 @@ library(reactlog)
   defaultValueMultiGenes = "CD52, S100A9, S100A4" # itgae, cd69, itga1" # CD52, S100A9, S100A4
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
-DEBUG = TRUE
+DEBUG = T
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
 
@@ -37,10 +37,10 @@ source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-options(shiny.reactlog=TRUE)
+# options(shiny.reactlog=TRUE)
 runApp(app)
 
-# schnapps(
+# schnapps(Ï
 # defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP",
 # defaultValueSingleGene = "MS4A1", DEBUG=TRUE
 # )
