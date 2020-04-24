@@ -260,18 +260,19 @@ scShinyServer <- function(input, output, session) {
   # Save extra values in state$values when we bookmark
   onBookmark(function(state) {
     # TODO need to include here the color values and other reactive values
+    # message
     # browser()
-    if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
-    if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
-    if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
+    # if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
+    # if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
+    # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
     state$values$schnappsEnv <- .schnappsEnv
   })
   
   # after bookmarking
   onBookmarked(fun = function(url) {
     # browser()
-    if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
-    if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
+    # if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
+    # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
     showBookmarkUrlModal(url)
   }
   )
