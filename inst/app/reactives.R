@@ -2596,7 +2596,7 @@ sampleInfo <- reactive({
 })
 
 
-# table of input cells with sample information
+# table of input cells with sample information ----
 # TODO: used in tableSeletionServer table; should be divided into function and reactive
 inputSample <- reactive({
   if (DEBUG) {
@@ -2631,7 +2631,9 @@ inputSample <- reactive({
   cellIds <- data.frame(
     cellName = colnames(dataTables$scEx),
     sample = sampInf,
-    ngenes = Matrix::colSums(assays(dataTables$scEx)[[1]])
+    # number of genes per cell
+    ngenes = Matrix::colSums(assays(dataTables$scEx)[[1]]>0),
+    nUMI = Matrix::colSums(assays(dataTables$scEx)[[1]])
   )
   
   if (DEBUG) {
