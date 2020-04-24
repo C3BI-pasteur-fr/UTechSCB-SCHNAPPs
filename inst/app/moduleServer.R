@@ -1012,7 +1012,8 @@ tableSelectionServer <- function(input, output, session,
       if (length(colState) == 0) {
         colState <- list(
           orderClasses = TRUE,
-          autoWidth = TRUE,
+          # setting to false, see https://stackoverflow.com/questions/46287971/column-headers-of-shiny-data-table-gets-shifted
+          autoWidth = FALSE,
           scrollX = TRUE,
           # search = list(search = searchStr),
           stateSave = TRUE,

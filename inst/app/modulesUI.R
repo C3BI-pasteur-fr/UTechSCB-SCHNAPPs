@@ -38,25 +38,25 @@ clusterUI <- function(id) {
       column(
         width = 4,
         selectInput(ns("dimension_x"),
-          label = "X",
-          choices = c("tsne1", "tsne2", "tsne3"),
-          selected = "tsne1"
+                    label = "X",
+                    choices = c("tsne1", "tsne2", "tsne3"),
+                    selected = "tsne1"
         )
       ),
       column(
         width = 4,
         selectInput(ns("dimension_y"),
-          label = "Y",
-          choices = c("tsne1", "tsne2", "tsne3"),
-          selected = "tsne2"
+                    label = "Y",
+                    choices = c("tsne1", "tsne2", "tsne3"),
+                    selected = "tsne2"
         )
       ),
       column(
         width = 4,
         selectInput(ns("dimension_col"),
-          label = "color",
-          choices = c("Gene.count"),
-          selected = "Gene.count"
+                    label = "color",
+                    choices = c("Gene.count"),
+                    selected = "Gene.count"
         )
       )
     ),
@@ -83,19 +83,19 @@ clusterUI <- function(id) {
           column(
             width = 3,
             selectInput(ns("divideXBy"),
-              label = "Divide X by",
-              # choices = c("None", "Gene.count", "UMI.count"),
-              choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2"),
-              selected = "None"
+                        label = "Divide X by",
+                        # choices = c("None", "Gene.count", "UMI.count"),
+                        choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2"),
+                        selected = "None"
             )
           ),
           column(
             width = 3,
             selectInput(ns("divideYBy"),
-              label = "Divide Y by",
-              # choices = c("None", "Gene.count", "UMI.count"),
-              choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2"),
-              selected = "None"
+                        label = "Divide Y by",
+                        # choices = c("None", "Gene.count", "UMI.count"),
+                        choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2"),
+                        selected = "None"
             )
           )
         ),
@@ -105,9 +105,9 @@ clusterUI <- function(id) {
             checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", TRUE),
             textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = "cellGroupName"),
             selectInput(ns("groupNames"),
-              label = "group names, !When modifying a group this list of cells is used as a reference!",
-              choices = c("plot"),
-              selected = "plot"
+                        label = "group names, !When modifying a group this list of cells is used as a reference!",
+                        choices = c("plot"),
+                        selected = "plot"
             ),
             verbatimTextOutput(ns("nCellsVisibleSelected")),
             actionButton(ns("changeGroups"), "change current selection"),
@@ -131,8 +131,9 @@ clusterUI <- function(id) {
 tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
-    jqui_resizable(box(
-      width = 12,
+   jqui_resizable
+    (box(
+      width = 12, height = 700,
       fluidRow(
         column(
           width = 12,
@@ -145,33 +146,34 @@ tableSelectionUi <- function(id) {
       ),
       fluidRow(
         column(
-          width = 3,
+          width = 6,
           downloadButton(ns("download_cellNameTable"), "Download table")
         ),
         column(
-          width = 3,
+          width = 6,
           actionButton(ns("save2HistTabUi"), "Save to history"),
         )
       ),
+      fluidRow(h4("Cells", offset = 1)),
       fluidRow(
-        h4("Cells", offset = 1),
         column(
-          width = 3,
+          width = 6,
           checkboxInput(ns("selectAll"), "Select all rows", FALSE)
         ),
         column(
-          width = 3,
+          width = 6,
           checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)
-        ),
-        br(),
-        jqui_resizable(column(
-          width = 12,
-          DT::DTOutput(ns("cellNameTable")) %>% withSpinner(),
-          style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
         )
-      ))
+      ),
+      br(),
+      fluidRow(column(
+        width = 12,
+        DT::DTOutput(ns("cellNameTable")) ,
+        style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
+      )
+      )
     )
-  ))
+    ))
 }
 
 # pHeatMapUI --------------
@@ -184,8 +186,8 @@ pHeatMapUI <- function(id) {
         column(
           width = 12,
           jqui_resizable(plotOutput(ns("pHeatMapPlot"),
-            # height = "auto",
-            brush = brushOpts(id = "crh1")
+                                    # height = "auto",
+                                    brush = brushOpts(id = "crh1")
           ), options = list(width = "99%"))
         )
       ),
@@ -203,9 +205,9 @@ pHeatMapUI <- function(id) {
           column(
             width = 6,
             selectInput(ns("normRow"),
-              label = "scale by row (for color)",
-              choices = c("row", "column", "none"),
-              selected = "none"
+                        label = "scale by row (for color)",
+                        choices = c("row", "column", "none"),
+                        selected = "none"
             ),
             selectInput(
               ns("ColNames"),
@@ -214,7 +216,7 @@ pHeatMapUI <- function(id) {
               selected = "sampleNames",
               multiple = TRUE
             ),
-
+            
             selectInput(
               ns("orderNames"),
               label = "order of columns",
@@ -272,7 +274,7 @@ pHeatMapUI <- function(id) {
             actionButton(ns("save2HistHM"), "save to history")
           )
         )
-
+        
         # checkboxInput(ns("showCells"), "show cell names", FALSE),
         #
         # verbatimTextOutput(ns('cellSelection'))
