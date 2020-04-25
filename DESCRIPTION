@@ -18,7 +18,7 @@ Imports:
     shiny,
     shinyjs,
     colourpicker,
-    DT, 
+    DT,
     knitr,
     manhattanly,
     mclust,
@@ -39,7 +39,8 @@ Imports:
     threejs,
     tidyverse,
     multtest,
-    TRONCO
+    TRONCO,
+    tibble
 Suggests:
     igraph,
     future,
