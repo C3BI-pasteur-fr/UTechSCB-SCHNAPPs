@@ -5,7 +5,5 @@ articles:
   Readme: Readme.html
   FAQs: pkdown/FAQs.html
   SCHNAPPs_usage: pkdown/SCHNAPPs_usage.html
-  child.tartour.anova: pkdown/children/child.tartour.anova.html
-  customReportFromHistory: pkdown/customReportFromHistory.html
-last_built: 2020-04-25T11:12Z
+last_built: 2020-04-27T15:19Z
 

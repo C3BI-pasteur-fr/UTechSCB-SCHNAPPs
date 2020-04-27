@@ -124,7 +124,7 @@ inputTab <- shinydashboard::tabItem(
 
   br(),
   box(
-    title = "gene counts", width = 12, solidHeader = TRUE, status = "primary",
+    title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
     footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
     fluidRow(column(
       6,
@@ -300,8 +300,9 @@ generalParametersTab <- shinydashboard::tabItem(
       fluidRow(
         column(6,
           offset = 0,
-          numericInput("pcaRank", "Number of components", 50, min = 2),
-          checkboxInput("pcaCenter", "center data", TRUE)
+          numericInput("pcaRank", "Number of components", 50, min = 2)
+          # ,
+          # checkboxInput("pcaCenter", "center data", TRUE)
         ),
         column(6,
           offset = 0,
@@ -341,12 +342,12 @@ generalParametersTab <- shinydashboard::tabItem(
         ),
       ),
       fluidRow(
-        column(width = 12,
-               jqui_resizable(plotOutput("dimPlotPCA"))
+       column(width = 12,
+              jqui_resizable(plotOutput("dimPlotPCA")
         )
-      ),
+      ))),
       checkbsTT(item = "dimPlotPCA"),
-    )
+    
   ),
   fluidRow(
     tabBox(
@@ -358,7 +359,7 @@ generalParametersTab <- shinydashboard::tabItem(
         fluidRow(
           column(
             width = 6,
-            selectInput("clusterSource", "use raw counts or normalized data?", choices = c("PCA", "counts", "logcounts"), selected = "PCA", width = "100%"),
+            selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = "logcounts", width = "100%"),
             selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")
           ),
           column(
@@ -411,20 +412,20 @@ generalParametersTab <- shinydashboard::tabItem(
   # fluidRow(div(h3("Parameters for clustering"), align = "left")),
 
   br(),
-  box(
-    title = "Comments", solidHeader = TRUE, width = 12, status = "primary",
-    collapsible = TRUE, collapsed = TRUE,
-    if ("shinyMCE" %in% rownames(installed.packages())) {
-      shinyMCE::tinyMCE(
-        "descriptionOfWork",
-        "Please describe your work. This will be included in the report."
-      )
-    } else {
-      textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
-    }
-  ),
-  checkbsTT(item = "descriptionOfWork"),
-  br(),
+  # box(
+  #   title = "Comments", solidHeader = TRUE, width = 12, status = "primary",
+  #   collapsible = TRUE, collapsed = TRUE,
+  #   if ("shinyMCE" %in% rownames(installed.packages())) {
+  #     shinyMCE::tinyMCE(
+  #       "descriptionOfWork",
+  #       "Please describe your work. This will be included in the report."
+  #     )
+  #   } else {
+  #     textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
+  #   }
+  # ),
+  # checkbsTT(item = "descriptionOfWork"),
+  # br(),
   box(
     title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
     collapsible = TRUE, collapsed = TRUE,
