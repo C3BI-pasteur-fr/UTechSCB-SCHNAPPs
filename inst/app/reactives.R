@@ -248,7 +248,7 @@ inputDataFunc <- function(inFile) {
   if ("logcounts" %in% names(assays(scEx))) {
     allScEx_log <- scEx
     if(! "counts" %in% names(assays(scEx)))
-      assays(scEx)[["counts"]] = assays(scEx)[[1]]
+      assays(scEx)[["counts"]] = assays(scEx)[["logcounts"]]
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
@@ -256,7 +256,7 @@ inputDataFunc <- function(inFile) {
   }
   # load(file='~/SCHNAPPsDebug/readInp1.RData')
   
-  # read multiple files
+  # read multiple files [2:1] => c(2,1) and not empty list
   if (length(inFile$datapath) > 1) {
     for (fpIdx in 2:length(inFile$datapath)) {
       # inFile$datapath[fpIdx] <- "~/Downloads/paper1.RData"
@@ -1575,14 +1575,14 @@ scEx_log <- reactive({
 })
 
 
-scEx_log_sha <- reactive({
-  scEx_log <- scEx_log()
-  require(digest)
-  if (is.null(scEx_log)) {
-    return(NULL)
-  }
-  return(sha1(as.matrix(assays(scEx_log)[[1]])))
-})
+# scEx_log_sha <- reactive({
+#   scEx_log <- scEx_log()
+#   require(digest)
+#   if (is.null(scEx_log)) {
+#     return(NULL)
+#   }
+#   return(sha1(as.matrix(assays(scEx_log)[[1]])))
+# })
 # scExLogMatrixDisplay ----
 # scExLog matrix with symbol as first column
 # TODO
@@ -1737,7 +1737,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, 
     }
     if (scale) {
       x <- x/sqrt(rv)
-      rv <- rep(1, nrow(x))
+      # rv <- rep(1, nrow(x))
     }
     x <- t(x)
     pca <- runPCA(x, rank=rank, get.rotation=TRUE)

@@ -1,8 +1,11 @@
 ---
 title: "SCHNAPPs - Single Cell sHiNy APP(s)"
 output: 
-  rmarkdown::html_vignette:
+  rmarkdown::html_document:
     toc: true
+    toc_depth : 5
+    number_sections: true
+    theme: united
 date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{SCHNAPPs_usage}
@@ -11,6 +14,10 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+
+# generate using 
+# pkgdown::build_site()
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -22,12 +29,12 @@ library(SCHNAPPs)
 ```
 
 
-## Overview
+# Overview
 
 Shiny app (referred to as "app" in this document) for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies or other. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well.
 
 
-## Installation
+# Installation
 
 ```
 if (!require("devtools"))
@@ -40,7 +47,7 @@ install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
 
-### history functionality
+## history functionality
 
 To take advantage of the history functionality orca needs to be installed:
 (https://github.com/plotly/orca#installation)
@@ -56,7 +63,7 @@ Notes:
 If the historyPath variable is set to a valid directory, all major events are stored in an Rmd file and associated RData files that all located in subdirectory of the historyPath. A time-stamp in the name of the subdirectory enables identifying and distinguishing different executions. It is recommended to rename these directories once the session is closed. Major events are: 1. loading of data, change of cells/genes and projections.
 In addition to these events that are automatically stored, the user can save individual tables and graphs using the appropiate buttons. During the execution of the app the Rmd file is only opened and appened to if an event is handled. Thus, using an editor that doesn't loc the file the Rmd can be modified at the same time the app is running. Just make sure you save the Rmd file each time a modification is done. A good editor is the RStudio editor.
 
-## Running schnapps
+# Running schnapps
 
 
 The application is started from the command line in R using schnapps().
@@ -100,13 +107,13 @@ Optional parameters:
     location (directory) where history directories and data will be stored.
 
 
-### Load data {#loadData}
+## Load data {#loadData}
 
 To load count data there are two formats that are accepted: 
 
 * singleCellExperiment object (preferred)
 * CSV file with genes per row and cells as columns.
-
+https://open.spotify.com/track/0POuQCMT4zyRzB2MjbzVaI
 In addition, cell or gene metadata can be loaded from a CSV file (optional)
 
 To save a singleCellExperiment object in an RData file use:
@@ -124,7 +131,7 @@ save(file = "scEx.Rdata", list = "scEx")
 
 This file can be loaded once the app is started.
 
-## Overview of functionality
+# Overview of functionality
 
 Below is the description of the individual tabs/views with the SCHNAPPs application.
 ^[ During the execution of a task, a message is displayed at the lower right corner. While the message is displayed other requests will wait. Though all mouse clicks and keyboard are normally retained (depending on the OS and computer characteristics), it is recommended to wait until the messages disappeared. Some internal SHINY processes that are not part of the actually SCHNAPPs application might also take considerable time. This can be checked using a monitoring tool (MAC: Activity Monitor).]
@@ -134,7 +141,7 @@ Below is the description of the individual tabs/views with the SCHNAPPs applicat
 knitr::include_graphics('images/overview.png')
 ```
 
-### Side panel
+# Side panel
 
 * Tabs: input, Parameters, Cell selection, Gene selection
 
@@ -144,9 +151,6 @@ knitr::include_graphics('images/overview.png')
 
     The name of the input files are listed, number of cells that are actively used (not necessarily the input data, but after applying the filters), number of genes with more than one UMI over all cells, median UMIs per cell, median number of genes with more than 1 UMI per cell, total number of UMIs (reads), memory used (just a very rough estimate at the beginning of the calculations), normalization method selected in parameters.
 
-* Generate report
-
-    An HTML report is created when clicking on this button. All visualizations are stored in that report with all parameters. Several other files are also stored. Everything is compiled in a ZIP file. Included are the list of differentially expressed genes, the projections as CSV, normalized counts as CSV, the table of Co-expressing genes (from Co-expression - selected), a readme.txt file, the report.html and the sessionData.RData, which includes the data for reanalysis in R as well as it can be again read into the application. Be aware that creating this report might take some time.
 
 * Download counts.csv
 
@@ -159,30 +163,55 @@ knitr::include_graphics('images/overview.png')
 * (Save for DEBUG)
 
     Only displayed when DEBUG is set to TRUE during start-up. Can be selected to save internal data for debugging purposes. This delays calculation. It also creates a directory in the home folder called SCHNAPPsDEBUG, where all saved files are stored.
+    
+* add to history
+
+    allows adding a comment to the history .Rmd file.
+    
+* bookmark
+
+    generates a bookmark that can be used to return to a state of the analysis.
 
 ```{r, out.width='90%', fig.align='center', fig.cap='While loading data', echo=FALSE}
+#TODO remove report button + add comment to history + bookmark
 knitr::include_graphics('images/loadingData.png')
 ```
 
-### Tabs
+# Tabs
 
-#### Input
+## Input
 
-* Upload annotation for cells and/or genes
+* Count data upload
+
+    Load RData file with singleCellExperiment object or a CSV file. Only the count matrix and the rowData/colData are used as the transformations and projections will be recalculated based on the actual cells used. An example for the RData file is scEx.RData. To create the data locally follow the instructs under ["Load data"](#loadData). The SingleCellExperiment object has to contain a sampleNames column in the ColData slot. RowData should contain columns called symbol, Description, and id. Multiple RData files can be loaded.
+
+PleaseNote ^[Since internally we call the singleCellExperiment object scEx, we first search for this name in the RData file. Otherwise the first SingleCellExperiment object is taken. For simplicity it is strongly recommended to have only one SingleCellExperiment in the RData file. <br/>
+If only the "logcounts" slot is availbale it is taken as the "counts" slot since we require the "counts" slot. This also allows loading only transformed data. <br/>
+When loading multiple RData files, it is strongly recommended not to use only logcount data as this hasn't been tested well enough.]
+
+* Annotations to add
+
+    Load annotation for cells and/or genes
 
     Examples for such files are given in :scExGenes.csv (gene annotations), scExCells.csv (cell annotations). Also the output from scorpius (see contributions) could be used here.
 
-* Upload RData or csv file
+* input options
 
-    The RData file has to contain a singleCellExperiment object called scEx. Only the count matrix and the rowData/colData are used as the transformations and projections will be recalculated based on the actual cells used. An example for the RData file is scEx.RData. To create the data locally follow the instructs under ["Load data"](#loadData).
-    
+  * sub sample
+
+    allows subsampling the input data to a random set of cells (the number can be chosen)
+      
+  * compute normalization
+
+    Here we can choose if the normalization and transformation should be perfromed using SCHNAPPs (calculate normalization here), should be takeing from the loaded RData file (the singleCellExperiment object contains the log_)
+
 * regular expression to count genes/cell
 
-    This is a regular expression that is calculate a projection called “before.filter”. These counts are based on the original input data. A common use case would be to include here ribosomal proteins and use this in a 2D plot together with UMI counts to visualize dying cells.
+    This is a regular expression that is used to calculate a projection called “before.filter”. These counts are based on the original input data. A common use case would be to include here ribosomal/mitochondrial proteins and use this in a 2D plot together with UMI counts to visualize dying cells.
 
-#### Parameters
+## Parameters
 
-##### Normalization
+### Normalization
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Parameters - Normalization', echo=FALSE}
 knitr::include_graphics('images/parametersNormalization.png')
@@ -196,11 +225,117 @@ knitr::include_graphics('images/parametersNormalization.png')
 
     Normalize by the total number of UMIs, log2(x+1) transform, scale with factor 1000
 
+* scaterNorm
+
+    uses scran::computeSumFactors followed by SingleCellExperiment::normalize
+    
+    Source ^[ scaterNorm: <br/>
+    ```ta = table(sampinfo)```<br/>
+  ```ta = ta[ta>0]```<br/>
+  ```mtab = min(ta)```<br/>
+  ```stp = round((mtab - 21) /10)```<br/>
+  ```scaterReads <- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp),clusters = sampinfo,subset.row = genes2use)```<br/>
+  ```scaterReads <- SingleCellExperiment::normalize(scaterReads)```]
+
 * gene_norm
 
     Divide each expression by the sum of the genes supplied per cell. If no genes supplied then it is the same as scEx-log
 
     Additional parameters for a normalization from a contribution will be shown here as well. Since the standard normalizations don’t have any, none is shown.
+    
+    Source ^[gene_norm:<br/>
+    ```nenner <- Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])```<br/>
+  ```nenner[nenner == 0] <- 1```<br/>
+  ```A@x <- A@x / (nenner[A@j + 1L])```<br/>
+  ```scEx_bcnorm <- SingleCellExperiment(assay = list(logcounts = as(A, "dgTMatrix")),colData = colData(scEx),rowData = rowData(scEx)```<br/>)
+  ```x <- uniqTsparse(assays(scEx_bcnorm)[[1]])```<br/>
+  ```slot(x, "x") <- log(1 + slot(x, "x"), base = 2) * scalingFactor```
+]
+
+* SeuratLogNorm
+
+    Uses Seurat::NormalizeData function
+    
+* SeuratStandard
+
+    Follows the standard Seurat protocol
+    
+    * Number of dimensions to use
+    
+    * number of features to use for anchor finding
+    
+    * number of neighbors (k)
+    ^[test:<br/>
+    `hello
+    foo
+    `]
+    * number of neighbors when weighting
+    
+    Source ^[ SeuratStandard:<br/>
+    ```seur.list <- SplitObject(seurDat, split.by = "sampleNames")```<br/>
+    ```  for (i in 1:length(seur.list)) {```<br/>
+    ```    seur.list[[i]] <- NormalizeData(seur.list[[i]])```<br/>
+    ```    seur.list[[i]] <- FindVariableFeatures(seur.list[[i]], selection.method = "vst", nfeatures = 2000)```<br/>
+    ```  }```<br/>
+    ```  anchors <- FindIntegrationAnchors(object.list = seur.list, dims = 1:dims, anchor.features = anchorsF, k.filter = kF)```<br/>
+    ```  integrated <- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight```<br/>
+    ```  DefaultAssay(integrated) <- "integrated"```<br/>
+    ```result <- ScaleData(integrated)```
+      ]
+    
+* SeuratSCtransform
+
+    * number of features to use for anchor finding
+    
+    * number of neighbors (k)
+    
+    * scaling factor
+    
+    * comma separated list of genes
+   
+    Source ^[ SeuratSCtransform:<br/>
+    ```seur.list <- SplitObject(seurDat, split.by = "sampleNames")```<br/>
+    ```  for (i in 1:length(seur.list)) {```<br/>
+    ```    seur.list[[i]] <- SCTransform(seur.list[[i]])```<br/>
+    ```  }```<br/>
+    ```  features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)```<br/>
+          ```  keep.features = keep.features[keep.features %in% rownames(scEx)]```<br/>
+      ```  features = unique(c(features, keep.features))```<br/>
+      ```  seur.list <- PrepSCTIntegration(object.list = seur.list, anchor.features = features)```<br/>
+      ```  anchors <- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT",anchor.features = features, k.filter = k.filter)```<br/>
+      ```  keep.features = keep.features[keep.features %in% rownames(scEx)]```<br/>
+      ```  anchors = unique(c(anchors, keep.features))```<br/>
+      ```  integrated <- IntegrateData(anchorset = anchors, normalization.method = "SCT")```<br/>
+     ```result <- integrated@assays$integrated@data * scalingFactor```
+      ]
+    
+* SeuratRefBased
+
+    TODO, SeuratSCtransform
+    
+    * number of features to use for anchor finding
+    
+    * number of neighbors (k)
+    
+    * scaling factor
+    
+    * comma separated list of genes
+    
+      make sure to give enough genes
+   
+   Source ^[ SeratRefBased <br/>
+   ```seur.list <- SplitObject(seurDat, split.by = "sampleNames")```<br/>
+```for (i in 1:length(seur.list)) {```<br/>
+```seur.list[[i]] <- SCTransform(seur.list[[i]])```<br/>
+```  }```<br/>
+```features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)```<br/>
+```#keep.features is the user supplied list of genes ```<br/>
+```keep.features = keep.features[keep.features %in% rownames(scEx)]```<br/>
+```features = unique(c(features, keep.features))```<br/>
+```seur.list <- PrepSCTIntegration(object.list = seur.list, anchor.features = features)```<br/>
+```reference_dataset <- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]```<br/>
+```anchors <- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT", anchor.features = features, k.filter = k.filter, reference = reference_dataset)```<br/>
+```integrated <- IntegrateData(anchorset = anchors, normalization.method = "SCT")```]
 
 * Cells table
 
@@ -208,54 +343,113 @@ knitr::include_graphics('images/parametersNormalization.png')
     The full table can also be downloaded as a CSV (comma seperated values) file.
 
 
-##### General Parameters
+### General Parameters
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Parameters - General', echo=FALSE}
+# TODO update with Seurat clustering
+# remove side panel
 knitr::include_graphics('images/parametersGeneral.png')
 ```
 
 Quickcluster from the scran package is used for clustering of cells.
 
-* Parameters for clustering
+* General Parameters
 
-    * use PCA or normalized data?
-
-        * PCA (default)
-        
-            Use the PCA components for the normalization
-        
-        * normData
-        
-            Use all data for normalization. This can take substantially more time and memory.
-
-    * minimum size of each cluster.
-
-        The minimum size of each cluster.
-
-    * clustering method to use
+    * Parameters for PCA
     
-        * Igraph (default)
-
-            A shared nearest neighbor graph is constructed using the buildSNNGraph function. This is used to define clusters based on highly connected communities in the graph, using the graph.fun function.
-
-        * Hclust
-
-            a distance matrix is constructed; hierarchical clustering is performed using Ward's criterion; and cutreeDynamic is used to define clusters of cells. This can take substantially more time and memory.
-
-    * Genes to be used for clustering
+        This is where the paramters for any PCA calculations are set. Normalized data is used to calculate the PCA (BiocSingular)
+        
+        * Number of components
+        
+            How many components should be calculated
+            
+        * Number of variable Genes to be used
+        
+            rowVars is used to calculate the variance, which is used to select this many genes.
+            
+        <!--- * center data
+        
+            not implemented at the moment
+            --->
+            
+        * scale data
+        
+            if set, the data is devided by the square root of the row-wise variance.
+            
+        * genes to be used for PCA
+        
+            if not empty, only the genes given here are used.
+            
+    * DimPlot for PCA
     
-        Only genes shown here will be used for normalization. The normalization factor will be applied to all genes. If left empty all genes (after filtering) will be used.
+        <!--- TODO 
+        - generate Plot button should change color
+        - save image to history
+        - resizeable corner is duplicated. If set anywhere else, it has no effect, i.e. the plot is not updated.
+        - make it a module to be used for UMAP and tSNE
+        - parameter for number of genes to plot
+        - change color palette
+        ---> 
 
+        Needs further development. Right now, it shows the output of the Seurat::DimPlot function. The plot is resizable but cannot be saved.
+
+
+    * Clustering Parameters
+    
+    The clustering method used is the one selected.
+
+    * Scran clustering
+        
+        Applies the quickCluster function to either the normalized data (logcounts) or raw counts (counts) with all the PCs from the previous PCA. As this can fail if the rank values are zero, if ranks are used this will automatically be set to false if an error occurs. A message is printed on the console in this event. If ranks are not used the might be duplicated cells (cells with exactly the same values but different names.)
+        
+
+        * clustering method to use
+    
+            * Igraph (default)
+
+                A shared nearest neighbor graph is constructed using the buildSNNGraph function. This is used to define clusters based on highly connected communities in the graph, using the graph.fun function.
+
+            * Hclust
+
+              a distance matrix is constructed; hierarchical clustering is performed using Ward's criterion; and cutreeDynamic is used to define clusters of cells. This can take substantially more time and memory.
+
+        * Genes to be used for clustering
+    
+            Only genes shown here will be used for normalization. The normalization factor will be applied to all genes. If left empty all genes (after filtering) will be used.
+
+    * Seurat clustering
+
+         uses Seurat::FindCluster 
+         
+         * Dimensions of PCA to use
+         
+            Dimensions of reduction to use as input
+         
+         * K (k-nearest neighbors)
+         
+            Defines k for the k-nearest neighbor algorithm
+             
+         * resolution parameter
+         
+            Value of the resolution parameter, use a value above (below) 1.0 if you want to obtain a larger (smaller) number of communities.
+
+         Source: ^[
+              ```seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)```<br/>
+              ```seurDat <- FindClusters(seurDat, resolution = resolution)```]
+
+<!--- Report related has been deprecated
 * Comments
 
     The work can be commented. These comments will show with the formatting in the report when "Generate report" is clicked.
+--->
+
 
 * Colors
     The colors for samples and cluster can be modified. The “Update colours” button needs to be clicked to apply the canges.
 
 
 
-##### TSNE plot
+### tSNE plot
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Parameters - tSNE', echo=FALSE}
 knitr::include_graphics('images/parametersTSNE.png')
@@ -263,7 +457,7 @@ knitr::include_graphics('images/parametersTSNE.png')
 
 Place to change the parameters for the tSNE calculations (Wrapper for the C++ implementation of Barnes-Hut t-Distributed Stochastic Neighbor Embedding. t-SNE is a method for constructing a low dimensional embedding of high-dimensional data, distances or similarities. Exact t-SNE can be computed by setting theta=0.0.) . Rtsne package is used. All PCA components available are used for the calculations. The number of PCs calculated is set under Parameters - General Parameters. 
 
-The 3D display is not limited to the tsne projections and thus can be used to
+The 3D display is not limited to the tsne projections and can be used in addition to the Co-expression -s Seleccted 2D plot. Special projections like histogram are not available.
 
 * Tsne dimensions
 
@@ -300,7 +494,7 @@ The 3D display is not limited to the tsne projections and thus can be used to
 
     Table of all projections
 
-##### Umap
+### Umap
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Parameters - UMAP', echo=FALSE}
 knitr::include_graphics('images/parametersUMAP.png')
@@ -356,46 +550,11 @@ Calculation of Umap projections. Since this can be quite time consuming there is
 
     The effective bandwidth of the kernel if we view the algorithm as similar to Laplacian Eigenmaps. Larger values induce more connectivity and a more global view of the data, smaller values concentrate more locally.
 
-####  General QC
-
-##### UMI histogram
-
-```{r, out.width='90%', fig.align='center', fig.cap='General QC - UMI histogram', echo=FALSE}
-knitr::include_graphics('images/generalUMI.png')
+```{r, child='GeneralQC.cRmd'}
 ```
 
-The number of UMIs per cell are displayed as a histogram. Different samples are colored differently. This allows identifying thresholds to be used in the cell selection panel.
 
-##### Sample histogram
-
-```{r, out.width='90%', fig.align='center', fig.cap='General QC - sample histogram', echo=FALSE}
-knitr::include_graphics('images/generalSample.png')
-```
-
-Histgram of cells per samples. This allows verifying that the number of cells per sample is comparable.
-
-##### PC variance
-
-```{r, out.width='90%', fig.align='center', fig.cap='General QC - PC variances', echo=FALSE}
-knitr::include_graphics('images/generalPC.png')
-```
-
-Variance of the first 10 principle components of the PCA are shown. This allows verifying the importance of the different PCs.
-
-##### Scater QC
-
-```{r, out.width='90%', fig.align='center', fig.cap='General QC - highest expressed genes before checking run', echo=FALSE}
-knitr::include_graphics('images/generalScater1.png')
-```
-
-```{r, out.width='90%', fig.align='center', fig.cap='General QC - highest expressed genes', echo=FALSE}
-knitr::include_graphics('images/generalScater2.png')
-```
-
-Plots the highest expressing genes based on the scater package. (scater::plotHighestExprs), colour_cells_by = "log10_total_counts" and a maximum of 50 genes is displayed.
-This can take quite some time to compute for larger (or even small) data sets.
-
-#### Cell selection
+## Cell selection
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Cell selection', echo=FALSE}
 knitr::include_graphics('images/CellSelection.png')
@@ -428,7 +587,7 @@ All selections are based on the original input data without filtering genes. In 
 
     All cells are shown, even those that have been removed. The result of the removal can be verified in the stats section of the side-panel.
 
-#### Gene selection
+## Gene selection
 
 ```{r, out.width='90%', fig.align='center', fig.cap='', echo=FALSE}
 knitr::include_graphics('images/geneSelection1.png')
@@ -461,9 +620,9 @@ knitr::include_graphics('images/geneSelection2.png')
 
     Shows the genes that were removed.
 
-#### Co-expression
+## Co-expression
 
-##### All clusters
+### All clusters
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - All clusters', echo=FALSE}
 knitr::include_graphics('images/coexpressionAll.png')
@@ -477,7 +636,7 @@ knitr::include_graphics('images/coexpressionAll.png')
 
     Uses the heatmap module see Modules Heatmap in this document
 
-##### Selected
+### Selected
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - Selected -- before selection', echo=FALSE}
 knitr::include_graphics('images/coexpressionSelected1.png')
@@ -510,7 +669,7 @@ knitr::include_graphics('images/coexpressionSelected3.png')
 
     Uses the Table module to display for the selected cells the genes that are expressed with a minimal UMI count (see above) in at least X % (see above) of the cells. This is yet another way to identify genes that are expressed over all the selected cells.
 
-##### Violin plot
+### Violin plot
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - Violin plot', echo=FALSE}
 knitr::include_graphics('images/coexpressionViolin1.png')
@@ -541,7 +700,7 @@ knitr::include_graphics('images/coexpressionViolin2.png')
 
     Cannot be interogated. This gives just an overview. The cells coresponding to the individual values have to be selected using one of the 2D plot (preferably the Co-expression-selected)
 
-##### SOM cluster
+### SOM cluster
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - SOM network too large', echo=FALSE}
 knitr::include_graphics('images/coexpressionSOM1.png')
@@ -565,9 +724,9 @@ A self organizing map is calculated of all the cells. The matrix of normalized c
 
     For better copy/paste operations the list of genes is displayed as a comma separated list.
 
-#### Data Exploration
+## Data Exploration
 
-##### Expression
+### Expression
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Data exploration - Expression', echo=FALSE}
 knitr::include_graphics('images/dataexplorationExpression.png')
@@ -591,7 +750,7 @@ As a convenience the following three plots are combined in one view. Most of the
 
     Whereas the violin plot under Co-expression-Violin shows the number of cells the express (or not) a given gene, here, the expression is estimated. The x-axis is fixed to clusters.
 
-##### Panel plot
+### Panel plot
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Data exploration - Panel plot', echo=FALSE}
 knitr::include_graphics('images/DataexplorationPanel.png')
@@ -617,9 +776,9 @@ knitr::include_graphics('images/DataexplorationPanel.png')
 
 * Plots
 
-#### Subcluster analysis
+## Subcluster analysis
 
-##### DGE analysis
+### DGE analysis
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Subcluster analysis - DGE analysis before selection', echo=FALSE}
 knitr::include_graphics('images/subclusteranalysis1.png')
@@ -666,9 +825,9 @@ Differential gene expression analysis of selected genes.
     Table with the differentially expressed genes.
     If a gene is higher expressed control samples (right plot) the average difference will be negative.
 
-### Reused GUI elements (Modules)
+# Reused GUI elements (Modules)
 
-#### Tables
+## Tables
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Modular tables', echo=FALSE}
 knitr::include_graphics('images/table1.png')
@@ -705,7 +864,7 @@ A modular table can be downloaded using the “Download Table” button.
 
     The table itself can be sorted (rows) by clicking on the column header. The sort order is indicated with a small triangle. Columns can also be filtered and a full text search is possible. The number of displayed rows can be changed as well.
 
-#### 2D plots
+## 2D plots
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Modular 2D plots', echo=FALSE}
 knitr::include_graphics('images/2Dplot1.png')
@@ -775,7 +934,7 @@ Comments on groups:
 
 Handling the groups is relatively complex because of the different possibilities especially with selection process within the plot. Once the group is activated (either after selecting a group in the group names dropdown or by clicking on “change current selection” the selected cells are colored red (instead of highlighted when selecting using the box/lasso select). This selection overwrites the selection in the plot. To deactivate this behaviour one has to uncheck the “show more options” check-box. Unfortunately the selection box/highlighting is removed in the plot though the selection is still used in the corresponding visualizations. This can be confusing.
 
-#### Heatmaps
+## Heatmaps
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Modular heatmaps', echo=FALSE}
 knitr::include_graphics('images/heatmap1.png')
@@ -811,5 +970,13 @@ The color of the samples and clusters can be changed under Parameters - general 
 
 
 
-## Create input data
+# Create input data
+
+
+```
+BiocManager::install("SingleR")
+
+```
+
+# Notes
 
