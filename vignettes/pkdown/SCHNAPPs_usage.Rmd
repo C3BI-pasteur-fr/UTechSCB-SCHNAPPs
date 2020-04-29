@@ -217,6 +217,9 @@ When loading multiple RData files, it is strongly recommended not to use only lo
 knitr::include_graphics('images/parametersNormalization.png')
 ```
 
+In SCHNAPPs there is only one normalization at a time. multiple normalization could be calculated but there is no way to compare them or switch between them.
+
+
 * rawNormalization:
 
     Umi counts, no transformation performed. Counts will still end up in the log-transformed slot
@@ -350,6 +353,8 @@ knitr::include_graphics('images/parametersNormalization.png')
 # remove side panel
 knitr::include_graphics('images/parametersGeneral.png')
 ```
+
+The clustering process populates the dbCluster projection. To compare different clustering methods a given dbCluster can be renamed
 
 Quickcluster from the scran package is used for clustering of cells.
 

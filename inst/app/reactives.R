@@ -1892,11 +1892,11 @@ scranCluster <- function(pca,
     )
   )
   switch(clusterSource,
-         "PCA" = {
-           reducedDims(scEx) <- SimpleList(PCA = pca$x)
-           params$assay.type <- "counts"
-           params$x <- scEx
-         },
+         # "PCA" = {
+         #   params$x <- scEx
+         #   reducedDims(scEx) <- SimpleList(PCA = pca$x)
+         #   params$assay.type <- "counts"
+         # },
          "logcounts" = {
            params$x <- scEx_log
            reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
@@ -2576,16 +2576,17 @@ sampleInfo <- reactive({
   }
   
   scEx <- scEx()
+
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls()))
+  }
+  # cp=load(file="~/SCHNAPPsDebug/sampleInfo.RData")
   if (!exists("scEx")) {
     if (DEBUG) {
       cat(file = stderr(), "sampleInfo: NULL\n")
     }
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls()))
-  }
-  # load(file="~/SCHNAPPsDebug/sampleInfo.RData")
   
   retVal <- sampleInfoFunc(scEx)
   
@@ -3038,12 +3039,13 @@ consolidateScEx <-
     commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
     commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
     scEx <- scEx[commGenes, commCells]
+    # what about UMAP??? others? => they are considered as projections not as reducedDims
     reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
     assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
-    colData(scEx)[["before.Filter"]] <- projections$before.filter[commCells]
-    colData(scEx)[["dbCluster"]] <- projections$dbCluster[commCells]
-    colData(scEx)[["UmiCountPerGenes"]] <- projections$UmiCountPerGenes[commCells]
-    colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2[commCells]
+    colData(scEx)[["before.Filter"]] <- projections[commCells, "before.filter"]
+    colData(scEx)[["dbCluster"]] <- projections[commCells, "dbCluster"]
+    colData(scEx)[["UmiCountPerGenes"]] <- projections[commCells, "UmiCountPerGenes"]
+    colData(scEx)[["UmiCountPerGenes2"]] <- projections[commCells, "UmiCountPerGenes2"]
     
     return(scEx)
   }
