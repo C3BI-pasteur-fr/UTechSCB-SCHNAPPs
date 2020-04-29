@@ -1199,7 +1199,7 @@ heatmapModuleFunction <- function(
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
+  # cp =load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
   
   if (is.null(pWidth)) {
     pWidth <- 800
@@ -1328,5 +1328,27 @@ heatmapModuleFunction <- function(
     height = paste0(pHeight, "px"),
     alt = "heatmap should be here"
   ))
+}
+
+# loadLiteData ----
+
+loadLiteData <- function(fileName = NULL) {
+  if (is.null(fileName)) return(NULL)
+  # fileName = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
+  cp = load(fileName)
+  
+  # The data has to be stored in scEx as it come from save from the main SCHNAPPs app
+  if (!all(c("scEx", "pca") %in% cp)) {
+    return(NULL)
+  }
+  
+  projections = colData(scEx)
+  dbCluster = projections$dbCluster
+  counts = scEx
+    assays(counts)[["logcounts"]] = NULL
+  logcounts = scEx
+    assays(logcounts)[["counts"]] = NULL
+  # pca = reducedDims(scEx)[["PCA"]] # now stored separately
+  return(list(scEx = counts, scEx_log = logcounts, pca = pca, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol))
 }
 
