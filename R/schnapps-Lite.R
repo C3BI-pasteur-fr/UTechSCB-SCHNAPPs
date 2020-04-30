@@ -8,7 +8,7 @@
 #'
 #' @details Shiny app for the analysis of single cell data
 #'
-#' @RdataFile data file with scEx, scEx_log, projections
+#' @param data RdataFile data file with scEx, scEx_log, projections
 #' @param localContributionDir path to the directory(ies) that contain additional functionality
 #' @param defaultValueSingleGene single gene name to used as a default value.
 #' @param defaultValueMultiGenes comma separated list of gene names to be used as a default value.
@@ -25,7 +25,7 @@
 #' @importFrom dplyr '%>%'
 #' @importFrom shiny shinyApp runApp
 #'
-#' @export schnapps
+#' @export schnappsLite
 #'
 #' @examples
 #' # create example data
@@ -90,14 +90,3 @@ schnappsLite <- function(data=RdataFile,
 #
 # schnapps(localContributionDir = "~/Rstudio/__shHubgit/bjContributions",  defaultValueSingleGene = "cd52", defaultValueMultiGenes = "S100A4, CD52, S100A9, S100A8,")
 
-
-#' Example data for schnapps app
-#'
-#' A dataset containing the prices and other attributes of almost 54,000
-#' diamonds. The variables are as follows:
-#'
-#' * `scEx`: singlecellExperiment object
-#'
-#' @format A data frame with 53940 rows and 10 variables
-#' @source <http://www.diamondse.info/>
-"scEx"
