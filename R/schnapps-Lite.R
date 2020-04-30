@@ -81,7 +81,7 @@ schnappsLite <- function(data=RdataFile,
   }
   
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-  runApp(app)
+  # runApp(app)
 }
 
 # library(SCHNAPPs)
