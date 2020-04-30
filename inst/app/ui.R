@@ -140,7 +140,7 @@ for (fp in parFiles) {
 
 scShinyUI <- shinyUI(
   shinydashboard::dashboardPage(
-    shinydashboard::dashboardHeader(title = "SCHNAPPs"),
+    shinydashboard::dashboardHeader(title = paste("SCHNAPPs" , packageVersion("SCHNAPPs"))),
     shinydashboard::dashboardSidebar(
       shinydashboard::sidebarMenu(
         id = "sideBarID",

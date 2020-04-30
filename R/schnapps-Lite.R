@@ -29,7 +29,8 @@
 #'
 #' @examples
 #' packPath = "schnappsPackage"
-#' schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
+#' # TODO fix:
+#' # schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
 schnappsLite <- function(data=RdataFile,
                          localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                      defaultValueSingleGene = "CD52",

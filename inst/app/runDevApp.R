@@ -42,7 +42,7 @@ source(paste0(packagePath,  "/server.R"))
 # assign(".SCHNAPPs_LiteData", "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData", envir = .schnappsEnv)
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-options(shiny.reactlog=TRUE)
+options(shiny.reactlog=FALSE)
 runApp(app)
 
 # schnapps(Ï
