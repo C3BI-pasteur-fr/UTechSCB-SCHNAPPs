@@ -254,7 +254,7 @@ inputDataFunc <- function(inFile) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/readInp1.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/readInp1.RData')
+  # cp = load(file='~/SCHNAPPsDebug/readInp1.RData')
   
   # read multiple files [2:1] => c(2,1) and not empty list
   if (length(inFile$datapath) > 1) {
@@ -291,7 +291,7 @@ inputDataFunc <- function(inFile) {
           genesUnion <- intersect(rownames(scEx), rownames(allScEx))
           
           allScEx <- addColData(allScEx, scEx)
-          scEx <- addColData(scEx, allScEx_log)
+          if (!is.null(allScEx_log)) scEx <- addColData(scEx, allScEx_log)
           # colData(allScEx_log)
           allScEx <- cbind(allScEx[genesUnion, ], scEx[genesUnion, ])
         }
@@ -3031,24 +3031,6 @@ reacativeReport <- function() {
   }
   return(outZipFile)
 }
-
-consolidateScEx <-
-  function(scEx, projections, scEx_log, pca, tsne) {
-    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls()))
-    # load(file = "~/SCHNAPPsDebug/consolidate.RData")
-    commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
-    commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
-    scEx <- scEx[commGenes, commCells]
-    # what about UMAP??? others? => they are considered as projections not as reducedDims
-    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
-    assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
-    colData(scEx)[["before.Filter"]] <- projections[commCells, "before.filter"]
-    colData(scEx)[["dbCluster"]] <- projections[commCells, "dbCluster"]
-    colData(scEx)[["UmiCountPerGenes"]] <- projections[commCells, "UmiCountPerGenes"]
-    colData(scEx)[["UmiCountPerGenes2"]] <- projections[commCells, "UmiCountPerGenes2"]
-    
-    return(scEx)
-  }
 
 
 if (DEBUG) {
