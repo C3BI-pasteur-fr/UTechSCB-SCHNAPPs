@@ -16,6 +16,8 @@ schnappsLite(
 )
 }
 \arguments{
+\item{data}{RdataFile data file with scEx, scEx_log, projections}
+
 \item{localContributionDir}{path to the directory(ies) that contain additional functionality}
 
 \item{defaultValueSingleGene}{single gene name to used as a default value.}
@@ -38,8 +40,6 @@ shiny server relevant functions
 Shiny app for the analysis of single cell data
 }
 \examples{
-# create example data
-data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")
-# use "scEx.Rdata" with load data functionality within the shiny app
+packPath = "schnappsPackage"
+schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
 }

@@ -28,10 +28,8 @@
 #' @export schnappsLite
 #'
 #' @examples
-#' # create example data
-#' data("scEx", package = "SCHNAPPs")
-#' save(file = "scEx.Rdata", list = "scEx")
-#' # use "scEx.Rdata" with load data functionality within the shiny app
+#' packPath = "schnappsPackage"
+#' schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
 schnappsLite <- function(data=RdataFile,
                          localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                      defaultValueSingleGene = "CD52",
@@ -90,3 +88,29 @@ schnappsLite <- function(data=RdataFile,
 #
 # schnapps(localContributionDir = "~/Rstudio/__shHubgit/bjContributions",  defaultValueSingleGene = "cd52", defaultValueMultiGenes = "S100A4, CD52, S100A9, S100A8,")
 
+
+
+#' Example data for schnapps app
+#'
+#' A dataset containing the prices and other attributes of almost 54,000
+#' diamonds. The variables are as follows:
+#'
+#' * `scExLite`: singlecellExperiment object
+#'
+#' @format A data frame with 53940 rows and 10 variables
+#' @source <http://www.diamondse.info/>
+"scExLite"
+
+#' * `ccol` : color definitions
+#' @format a vector with colours used for clusters
+"ccol"
+
+#' 
+#' * `scol` : color definitions for samples
+#' @format a vector of colour values for samples
+"scol"
+
+#' 
+#' * `pca` : pca results, Eigenvalues and vectors.
+#' @format List with "x", "var_pcs", "rotation"
+"pca"
