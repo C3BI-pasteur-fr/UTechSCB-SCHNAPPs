@@ -43,7 +43,7 @@ devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("BiocSingular")
-install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 ```
 
 
