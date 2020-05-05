@@ -41,5 +41,6 @@ Shiny app for the analysis of single cell data
 }
 \examples{
 packPath = "schnappsPackage"
-schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
+# TODO fix:
+# schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
 }
