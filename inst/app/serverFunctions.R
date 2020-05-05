@@ -1334,7 +1334,7 @@ heatmapModuleFunction <- function(
 
 consolidateScEx <-
   function(scEx, projections, scEx_log, pca, tsne) {
-    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls()))
+    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls(), "myProjections"))
     # load(file = "~/SCHNAPPsDebug/consolidate.RData")
     commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
     commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
@@ -1370,10 +1370,18 @@ loadLiteData <- function(fileName = NULL) {
   projections = colData(scEx)
   dbCluster = projections$dbCluster
   counts = scEx
-    assays(counts)[["logcounts"]] = NULL
+  assays(counts)[["logcounts"]] = NULL
   logcounts = scEx
-    assays(logcounts)[["counts"]] = NULL
+  assays(logcounts)[["counts"]] = NULL
   # pca = reducedDims(scEx)[["PCA"]] # now stored separately
-  return(list(scEx = counts, scEx_log = logcounts, pca = pca, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol))
+  returnList = list(scEx = counts, scEx_log = logcounts, pca = pca, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol)
+  for (va in cp[!cp %in% c("scEx", "pca", "ccol", "scol")]) {
+    # .schnappsEnv = global envirnment for schnapps
+    #  - projectionFunctions = list of 2 entries each: 1st: display name, 2nd reactive name (defined in a reactive.R)
+    
+      returnList[[va]] = get(va)
+    }
+  
+  return(returnList)
 }
 

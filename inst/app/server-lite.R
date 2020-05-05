@@ -162,6 +162,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     projectionFunctions <- append2list(myProjections, projectionFunctions)
     diffExpFunctions <- append2list(myDiffExpFunctions, diffExpFunctions)
   }
+  # .schnappsEnv$projectionFunctions 
   
   # update diffExpression radiobutton
   dgeChoices <- c()
@@ -203,10 +204,14 @@ scShinyServer <- shinyServer(function(input, output, session) {
     zippedReportFiles <- c(zippedReportFiles, myZippedReportFiles)
   }
   .schnappsEnv$projectionFunctions <- projectionFunctions
+  # browser()
   
-  
-  
-  
+  # overwrite reactives that should not be calculatated anymore
+  for (idx in 1:length(projectionFunctions)) {
+    if (!is.null(.schnappsEnv$.SCHNAPPs_LiteData[[ projectionFunctions[[idx]][2] ]])) {
+      assign(.schnappsEnv$projectionFunctions[[idx]][2],  as.function(alist(.schnappsEnv$.SCHNAPPs_LiteData[[projectionFunctions[[idx]][2]]])))
+    }
+  }
   
 }) # END SERVER
 

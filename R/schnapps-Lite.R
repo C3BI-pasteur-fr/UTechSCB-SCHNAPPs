@@ -73,16 +73,18 @@ schnappsLite <- function(data=RdataFile,
   source(paste0(packagePath, "/ui-lite.R"), local = TRUE)
   
   # load data
+  # data = "~/Downloads/rnEPDC.lite.RData"
   assign(".SCHNAPPs_LiteData", loadLiteData(file = data), envir = .schnappsEnv)
-  
   
   if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
     # error loading
     exit()
   }
-  
+
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
   # runApp(app)
+  
+  
 }
 
 # library(SCHNAPPs)

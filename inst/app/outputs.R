@@ -749,7 +749,17 @@ output$RDSsave <- downloadHandler(
     
     # we save the pca separately because I don't know how to store the rotation  otherwise.
     # mostly done to make the lite version work.
-    save(file = file, list = c("scEx" , "pca", "scol" , "ccol" ))
+    
+    saveList =  c("scEx" , "pca", "scol" , "ccol" )
+# browser()
+    # save projections that shouldn't be recalculated in lite version
+    for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
+      assign(.schnappsEnv$projectionFunctions[[idx]][2], eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
+      saveList = c(saveList, .schnappsEnv$projectionFunctions[[idx]][2])
+    }
+    
+    
+    save(file = file, list = saveList)
     
     # write.csv(as.matrix(exprs(scEx)), file)
   }
