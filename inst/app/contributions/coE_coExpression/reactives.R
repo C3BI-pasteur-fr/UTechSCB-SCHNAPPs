@@ -518,7 +518,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
     geom_violin(scale = "count") +
     scale_fill_manual(values = mycolPal, aesthetics = "fill") +
     stat_summary( # plot the centered dots
-      fun.y = median,
+      fun = median,
       geom = "point",
       size = 5,
       color = "black"
