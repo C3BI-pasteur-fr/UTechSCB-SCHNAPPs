@@ -120,7 +120,7 @@ clusterServer <- function(input, output, session,
   })
 
   # observe save  2 history ----
-  observe({
+  observe(label = "save2histMod2d", {
     clicked <- input$save2Hist
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- session$ns("-")
@@ -137,6 +137,8 @@ clusterServer <- function(input, output, session,
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
 
+    if (is.null(clicked)) return()
+    if (clicked < 1) return()
     add2history(
       type = "renderPlotly",input = input, 
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
@@ -828,7 +830,7 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   assign(ns("currentStart"), 0, envir = .schnappsEnv)
   
-  observe({
+  observe(label = "cellNameTable", {
     clicked <- input$save2HistTabUi
     myns <- session$ns("cellNameTable")
     if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi \n")
@@ -842,6 +844,8 @@ tableSelectionServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
+    if (is.null(clicked)) return()
+    if (clicked < 1) return()
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     add2history(
       type = "renderDT", input = input, comment = "Table",
@@ -1086,7 +1090,7 @@ pHeatMapModule <- function(input, output, session,
   outfilePH <- NULL
 
   # observe save 2 history ----
-  observe({
+  observe(label = "save2histHM", {
     clicked <- input$save2HistHM
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- ns("pHeatMap")
@@ -1104,6 +1108,8 @@ pHeatMapModule <- function(input, output, session,
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
 
+    if (is.null(clicked)) return()
+    if (clicked < 1) return()
     add2history(
       type = "tronco",input = input, 
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],

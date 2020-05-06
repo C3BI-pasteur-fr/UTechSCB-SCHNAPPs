@@ -183,10 +183,6 @@ scShinyServer <- shinyServer(function(input, output, session) {
   )
   .schnappsEnv$diffExpFunctions <- diffExpFunctions
   
-  # overwrite all reactives not needed or modified
-  base::source(paste0(packagePath, "/reactives-lite.R"), local = TRUE)
-  
-  
   # load contribution outputs ----
   # parse all outputs.R files under contributions to include in application
   uiFiles <- base::dir(
@@ -203,6 +199,11 @@ scShinyServer <- shinyServer(function(input, output, session) {
     projectionFunctions <- append2list(myProjections, projectionFunctions)
     zippedReportFiles <- c(zippedReportFiles, myZippedReportFiles)
   }
+  
+  # overwrite all reactives not needed or modified
+  base::source(paste0(packagePath, "/reactives-lite.R"), local = TRUE)
+
+  
   .schnappsEnv$projectionFunctions <- projectionFunctions
   # browser()
   
