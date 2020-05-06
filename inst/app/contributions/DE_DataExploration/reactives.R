@@ -329,7 +329,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
     scale_fill_manual(values = ccols, aesthetics = "fill") +
 
     stat_summary(
-      fun.y = median,
+      fun = median,
       geom = "point",
       size = 5,
       color = "black"
