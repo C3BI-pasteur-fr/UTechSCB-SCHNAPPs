@@ -88,6 +88,7 @@ schnappsLite <- function(data=RdataFile,
         .schnappsEnv$.SCHNAPPs_LiteData[[na]]$x = .schnappsEnv$.SCHNAPPs_LiteData[[na]]$x[cellIdx,]
         next()
       }
+      if (na %in%  c("sampleCol", "clusterCol")) next()
       if (na == "tsne") {
         .schnappsEnv$.SCHNAPPs_LiteData[[na]] = .schnappsEnv$.SCHNAPPs_LiteData[[na]][cellIdx,]
         next()
