@@ -15,6 +15,7 @@
 #' @param defaultValueRegExGene regular Expression used for gene selection
 #' @param DEBUG TRUE/FALSE whether to show debugging information on the console
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
+#' @param maxCells maximal number of cells to use. Used to limit memory usage for server
 #' @param historyPath location (directory) where history directories and data will be stored.
 #' historyPath should be used to generate Report
 #'
@@ -33,15 +34,16 @@
 #' # schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
 schnappsLite <- function(data=RdataFile,
                          localContributionDir = "~/Rstudio/shHubgit/Dummy/",
-                     defaultValueSingleGene = "CD52",
-                     defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
-                     defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
-                     DEBUG = FALSE,
-                     DEBUGSAVE = FALSE,
-                     historyPath = NULL
-                     # ,
-                     # historyFile = NULL
-                     
+                         defaultValueSingleGene = "CD52",
+                         defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
+                         defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
+                         DEBUG = FALSE,
+                         DEBUGSAVE = FALSE,
+                         historyPath = NULL,
+                         maxCells = 3000
+                         # ,
+                         # historyFile = NULL
+                         
 ) {
   # on.exit({
   #   rm(list = c(".SCHNAPPs_locContributionDir",
@@ -76,11 +78,42 @@ schnappsLite <- function(data=RdataFile,
   # data = "~/Downloads/rnEPDC.lite.RData"
   assign(".SCHNAPPs_LiteData", loadLiteData(file = data), envir = .schnappsEnv)
   
+  
+  nCells = length(colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx))
+  if (nCells > maxCells){
+    cellIdx = unique(sort(sample(nCells, maxCells)))
+    cells2keep = colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx)[cellIdx]
+    for (na in names(.schnappsEnv$.SCHNAPPs_LiteData)){
+      if (na == "pca") {
+        .schnappsEnv$.SCHNAPPs_LiteData[[na]]$x = .schnappsEnv$.SCHNAPPs_LiteData[[na]]$x[cellIdx,]
+        next()
+      }
+      if (na == "tsne") {
+        .schnappsEnv$.SCHNAPPs_LiteData[[na]] = .schnappsEnv$.SCHNAPPs_LiteData[[na]][cellIdx,]
+        next()
+      }
+      if ( all(cells2keep %in% colnames(.schnappsEnv$.SCHNAPPs_LiteData[[na]]))){
+        .schnappsEnv$.SCHNAPPs_LiteData[[na]] = .schnappsEnv$.SCHNAPPs_LiteData[[na]][,cells2keep]
+      } else {
+        if(all(cells2keep %in% rownames(.schnappsEnv$.SCHNAPPs_LiteData[[na]]))){
+          .schnappsEnv$.SCHNAPPs_LiteData[[na]] = .schnappsEnv$.SCHNAPPs_LiteData[[na]][cells2keep,]
+        } else {
+          if(is.null(rownames(.schnappsEnv$.SCHNAPPs_LiteData[[na]]))) {
+            .schnappsEnv$.SCHNAPPs_LiteData[[na]] = .schnappsEnv$.SCHNAPPs_LiteData[[na]][cellIdx]
+          }else{
+            cat(file = stderr(), paste("couldn't ", na, "\n"))
+          }
+        }
+      }
+    }
+    
+  }
+  
   if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
     # error loading
     exit()
   }
-
+  
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
   # runApp(app)
   
