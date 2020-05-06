@@ -546,7 +546,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
 }
 
 # save to history violoin observer ----
-observe({
+observe(label = "save2histVio", {
   clicked  = input$save2HistVio
   if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
   start.time <- base::Sys.time()
@@ -559,7 +559,8 @@ observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
-  
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
   add2history(type = "renderPlot", input = input, comment = "violin plot",  
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
   
