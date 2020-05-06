@@ -1088,6 +1088,8 @@ add2history <- function(type, comment = "", input = input, ...) {
         "\n![](",basename(tfile),")\n\n"
       )
       write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    }, error = function(w){
+      cat(file = stderr(),paste("problem with orca:",w,"\n"))
     })
   }
   
