@@ -265,7 +265,7 @@ output$DE_panelPlot <- renderPlot({
 
 
 # Scater QC ----
-output$DE_scaterQC <- renderImage({
+output$DE_scaterQC <- renderImage(deleteFile = T, {
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
