@@ -169,7 +169,7 @@ tableSelectionUi <- function(id) {
       fluidRow(column(
         width = 12,
         DT::DTOutput(ns("cellNameTable")) ,
-        style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
+        style = "overflow-y: scroll;overflow-x: scroll;"
       )
       )
     )
