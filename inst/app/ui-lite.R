@@ -52,7 +52,8 @@ source(paste0(packagePath, "/tabs.R"), local = TRUE)
 # we still want to be able to change the colors
 
 parameterItems <- list(
-  shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters")
+  shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters"),
+  shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
 )
 
 
@@ -88,8 +89,9 @@ generalParametersTab <- shinydashboard::tabItem(
 
 # general tabs
 allTabs <- list(
-  generalParametersTab,
-  renameTab
+  generalParametersTab
+  ,
+  modTab
 )
 # parameters tab, includes basic normalization
 source(paste0(packagePath, "/parameters.R"), local = TRUE)
@@ -99,11 +101,12 @@ allMenus <- list(
   shinydashboard::menuItem("Parameters",
                            # id="parametersID",
                            tabName = "parameters", icon = icon("gopuram"), parameterItems
-  ),
-  shinydashboard::menuItem("rename projections",
-                           # id="geneSelectionID",
-                           tabName = "renameProj", icon = icon("signature")
   )
+  # ,
+  # shinydashboard::menuItem("rename projections",
+  #                          # id="geneSelectionID",
+  #                          tabName = "modifyProj", icon = icon("signature")
+  # )
 )
 
 
