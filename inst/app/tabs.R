@@ -28,7 +28,7 @@ inputTab <- shinydashboard::tabItem(
     ),
     align = "center"
   )),
-
+  
   box(
     width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
     fluidRow(
@@ -87,48 +87,48 @@ inputTab <- shinydashboard::tabItem(
       )
     )
   ),
-
+  
   br(),
   box(
     title = "input options", solidHeader = TRUE, width = 12, status = "primary",
     fluidRow(
       column(
         6,
-
+        
         checkboxInput("sampleInput", label = "sub sample", value = TRUE),
-
+        
         numericInput("subsampleNum",
-          label = "max number of cells",
-          min = 500, max = 10000, step = 100, value = 1000
+                     label = "max number of cells",
+                     min = 500, max = 10000, step = 100, value = 1000
         )
       ),
-
+      
       checkbsTT("sampleInput"),
       column(
         6,
-
+        
         radioButtons("whichscLog",
-          label = "Compute normalizations?",
-          choices = c(
-            "disable log" = "disablescEx_log",
-            "use scEx from loaded data" = "useLog",
-            "calculate normalization here" = "calcLog"
-          ),
-          selected = "disablescEx_log"
+                     label = "Compute normalizations?",
+                     choices = c(
+                       "disable log" = "disablescEx_log",
+                       "use scEx from loaded data" = "useLog",
+                       "calculate normalization here" = "calcLog"
+                     ),
+                     selected = "disablescEx_log"
         )
         # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
       ),
       checkbsTT("disablescEx_log")
     )
   ),
-
+  
   br(),
   box(
     title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
     footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
     fluidRow(column(
       6,
-
+      
       textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
     )), checkbsTT("beforeFilterRegEx")
   )
@@ -164,7 +164,7 @@ geneSelectionTab <- shinydashboard::tabItem(
         numericInput("minGenesGS", "Min # of UMIs over all cells", 2, min = 2, max = 1000000)
       )
     ), checkbsTT("minGenesGS"),
-
+    
     fluidRow(
       column(
         width = 8, align = "center", offset = 2,
@@ -173,27 +173,35 @@ geneSelectionTab <- shinydashboard::tabItem(
     ), checkbsTT("genesKeep"),
   ),
   br(),
-  box(
-    title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
-    collapsible = FALSE, collapsed = TRUE,
-    fluidRow(
-      column(
-        12,
-        tableSelectionUi("gsSelectedGenesMod")
-      )
-    ), checkbsTT("gsSelectedGenesMod")
-  ),
-  br(),
-  box(
-    title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
-    collapsible = FALSE, collapsed = TRUE,
-    fluidRow(
-      column(
-        12,
-        tableSelectionUi("gsRMGenesMod")
-      ), checkbsTT("gsRMGenesMod")
+fluidRow(  
+  tabBox(
+    title = "Gene selection tables", width=12, id = "geneselectiontb",
+    tabPanel("Genes kept",height = "250px", width =12, value = "Genes kept",
+             # box(
+             #   title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
+             #   collapsible = FALSE, collapsed = TRUE,
+               fluidRow(
+                 column(
+                   12,
+                   tableSelectionUi("gsSelectedGenesMod")
+                 )
+               # ), checkbsTT("gsSelectedGenesMod")
+             )
+    ),
+    tabPanel("genes removed", height = "250px", value = "genes removed",
+             # box(
+             #   title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
+             #   collapsible = FALSE, collapsed = TRUE,
+               fluidRow(
+                 column(
+                   12,
+                   tableSelectionUi("gsRMGenesMod")
+                 ), checkbsTT("gsRMGenesMod")
+               )
+             # )
     )
   )
+)
 )
 
 
@@ -300,15 +308,15 @@ generalParametersTab <- shinydashboard::tabItem(
       id = "tabsetPCA",
       fluidRow(
         column(6,
-          offset = 0,
-          numericInput("pcaRank", "Number of components", 50, min = 2)
-          # ,
-          # checkboxInput("pcaCenter", "center data", TRUE)
+               offset = 0,
+               numericInput("pcaRank", "Number of components", 50, min = 2)
+               # ,
+               # checkboxInput("pcaCenter", "center data", TRUE)
         ),
         column(6,
-          offset = 0,
-          numericInput("pcaN", "Number of variable genes to be used", 500, min = 50),
-          checkboxInput("pcaScale", "scale data", TRUE)
+               offset = 0,
+               numericInput("pcaN", "Number of variable genes to be used", 500, min = 50),
+               checkboxInput("pcaScale", "scale data", TRUE)
         ),
       ),
       checkbsTT(item = "pcaRank"),
@@ -317,8 +325,8 @@ generalParametersTab <- shinydashboard::tabItem(
       checkbsTT("pcaScale"),
       fluidRow(
         column(12,
-          offset = 0,
-          textInput("genes4PCA", "Genes to be used for PCA", width = "100%")
+               offset = 0,
+               textInput("genes4PCA", "Genes to be used for PCA", width = "100%")
         ), checkbsTT("genes4PCA")
       ),
       fluidRow(
@@ -343,64 +351,64 @@ generalParametersTab <- shinydashboard::tabItem(
         ),
       ),
       fluidRow(
-       column(width = 12,
-              jqui_resizable(plotOutput("dimPlotPCA")
-        )
-      ))),
-      checkbsTT(item = "dimPlotPCA"),
+        column(width = 12,
+               jqui_resizable(plotOutput("dimPlotPCA")
+               )
+        ))),
+    checkbsTT(item = "dimPlotPCA"),
     
   ),
   fluidRow(
     tabBox(
       title = "Parameters for clustering", width = 12,
       id = "tabsetCluster",
-      tabPanel("Scran clustering",
-        value = "scran_Cluster", # name of reactive to be used
-        width = 12,
-        fluidRow(
-          column(
-            width = 6,
-            selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = "logcounts", width = "100%"),
-            selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")
-          ),
-          column(
-            width = 6,
-            numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2, width = "100%"),
-            selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%")
-          )
-        ),
-        checkbsTT(item = "clusterSource"),
-        checkbsTT(item = "minClusterSize"),
-        checkbsTT(item = "clusterMethod"),
-        checkbsTT(item = "useRanks"),
-        fluidRow(
-          column(
-            12,
-            textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%")
-          )
-        ),
-        checkbsTT(item = "geneSelectionClustering"),
-      ), # Scran clustering tab Panel
       tabPanel("Seurat clustering",
-        width = 12,
-        value = "seurat_Clustering",
-        fluidRow(
-          column(
-            width = 6,
-            numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = 15, width = "100%"),
-            numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = 15, width = "100%")
-          ),
-          column(
-            width = 6,
-            numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = 0.5, min = 0.1, width = "100%"),
-            # TOD implement more options
-          )
-        ),
-        
+               width = 12,
+               value = "seurat_Clustering",
+               fluidRow(
+                 column(
+                   width = 6,
+                   numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = 15, width = "100%"),
+                   numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = 15, width = "100%")
+                 ),
+                 column(
+                   width = 6,
+                   numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = 0.5, min = 0.1, width = "100%"),
+                   # TOD implement more options
+                 )
+               ),
+               
       ), # seurat clustering
       fluidRow(
         column(12, offset = 0, textOutput("Nclusters"))
       ),
+      tabPanel("Scran clustering",
+               value = "scran_Cluster", # name of reactive to be used
+               width = 12,
+               fluidRow(
+                 column(
+                   width = 6,
+                   selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = "logcounts", width = "100%"),
+                   selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = "igraph", width = "100%")
+                 ),
+                 column(
+                   width = 6,
+                   numericInput("minClusterSize", "minimum size of each cluster.", 2, min = 2, width = "100%"),
+                   selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = "TRUE", width = "100%")
+                 )
+               ),
+               checkbsTT(item = "clusterSource"),
+               checkbsTT(item = "minClusterSize"),
+               checkbsTT(item = "clusterMethod"),
+               checkbsTT(item = "useRanks"),
+               fluidRow(
+                 column(
+                   12,
+                   textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%")
+                 )
+               ),
+               checkbsTT(item = "geneSelectionClustering"),
+      ), # Scran clustering tab Panel
       # checkbsTT(item = ""),
       fluidRow(
         column(
@@ -411,7 +419,7 @@ generalParametersTab <- shinydashboard::tabItem(
     )
   ),
   # fluidRow(div(h3("Parameters for clustering"), align = "left")),
-
+  
   br(),
   # box(
   #   title = "Comments", solidHeader = TRUE, width = 12, status = "primary",
