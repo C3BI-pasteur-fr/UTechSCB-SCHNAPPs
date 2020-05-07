@@ -152,45 +152,80 @@ tabList <- list(
   # CoExpressionViolin ----
   expressionTab = shinydashboard::tabItem(
     "CoExpressionViolin",
-    box(
-      title = "Violin plot", solidHeader = TRUE, width = 12, status = "primary",
-      footer = "for each cell we count how many of the genes specified have an expression larger or equal than the minimum exprssion.\nThese counts are then divided up for any variable that can be used as a factor (has less than 20 levels).",
-      
-      fluidRow(
-        column(
-          width = 12,
-          checkboxInput("coE_showPermutations", "show Permutations", FALSE)
-        )
-      ),
-      fluidRow(
-        column(
-          width = 4,
-          textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
-        ),
-        column(
-          width = 4,
-          selectInput(
-            "coE_dimension_xVioiGrp",
-            label = "X",
-            choices = c("dbCluster", "sampleName", "tsne3"),
-            selected = "dbCluster"
-          )
-        ),
-        column(
-          width = 4,
-          numericInput("coEminExpr", "min expression of genes:",
-                       1,
-                       min = 1, max = 100000
-          )
-        )
-      ),
-      br(),
-      fluidRow(column(width = 12,
-                      # jqui_resizable(plotly::plotlyOutput("coE_geneGrp_vio_plot") )
-                      jqui_resizable(plotOutput("coE_geneGrp_vio_plot") )
-      )),
-      br(),
-      actionButton("save2HistVio", "save to history")
+    tabBox(title = "Violin plots", width = 12, id = "violinPlots",
+           tabPanel(
+             title = "permutated", value = "permViol",
+             footer = "for each cell we count how many of the genes specified have an expression larger or equal than the minimum exprssion.\nThese counts are then divided up for any variable that can be used as a factor (has less than 20 levels).",
+             
+             fluidRow(
+               column(
+                 width = 12,
+                 checkboxInput("coE_showPermutations", "show Permutations", FALSE)
+               )
+             ),
+             fluidRow(
+               column(
+                 width = 4,
+                 textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
+               ),
+               column(
+                 width = 4,
+                 selectInput(
+                   "coE_dimension_xVioiGrp",
+                   label = "X",
+                   choices = c("dbCluster", "sampleName", "tsne3"),
+                   selected = "dbCluster"
+                 )
+               ),
+               column(
+                 width = 4,
+                 numericInput("coEminExpr", "min expression of genes:",
+                              1,
+                              min = 1, max = 100000
+                 )
+               )
+             ),
+             br(),
+             fluidRow(column(width = 12,
+                             # jqui_resizable(plotly::plotlyOutput("coE_geneGrp_vio_plot") )
+                             jqui_resizable(plotOutput("coE_geneGrp_vio_plot") )
+             )),
+             br(),
+             actionButton("save2HistVio", "save to history")
+           ),
+           tabPanel(
+             title = "grouped", value = "grpViol",
+             fluidRow(
+               column(
+                 width = 4,
+                 textInput("coE_geneGrpVioIds2", "Comma seperated gene names", value = defaultValueMultiGenes)
+               ),
+               column(
+                 width = 4,
+                 selectizeInput(
+                   "coE_dimension_xVioiGrp2",
+                   label = "X",
+                   choices = c("dbCluster", "sampleName", "tsne3"),
+                   selected = "dbCluster", options = list(maxItems = 2)
+                 )
+               ),
+               column(
+                 width = 4,
+                 numericInput("coEminExpr2", "min expression of genes:",
+                              1,
+                              min = 1, max = 100000
+                 )
+               ),
+             ),
+             br(),
+             fluidRow(column(width = 12,
+                             jqui_resizable(plotly::plotlyOutput("coE_geneGrp_vio_plot2") )
+                             # jqui_resizable(plotOutput("coE_geneGrp_vio_plot") )
+             )),
+             br(),
+             actionButton("save2HistVio2", "save to history")
+           )
+           
     )
   ),
   # SOMcluster ----

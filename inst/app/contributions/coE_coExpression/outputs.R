@@ -131,7 +131,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
 
-  upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
+  # upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
   if (is.null(projections) | is.null(scEx_log)) {
     if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot:NULL\n")
     return(NULL)
@@ -159,6 +159,60 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   })
   return(retVal)
 })
+
+# EXPLORE GROUPEDB VIOLIN PLOT ------------------------------------------------------------------
+output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
+# output$coE_geneGrp_vio_plot2 <- renderPlot({
+  if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot2 started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_geneGrp_vio_plot2")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_geneGrp_vio_plot2")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_geneGrp_vio_plot2", id = "coE_geneGrp_vio_plot2", duration = NULL)
+  }
+  
+  projections <- projections()
+  scEx_log <- scEx_log()
+  geneListStr <- input$coE_geneGrpVioIds2
+  projectionVar <- input$coE_dimension_xVioiGrp2
+  minExpr <- input$coEminExpr2
+  # colPal = coE_geneGrp_vioFunc # TODO must be wrong
+  sampCol <- sampleCols$colPal
+  ccols <- clusterCols$colPal
+  
+  # upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
+  if (is.null(projections) | is.null(scEx_log)) {
+    if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot:NULL\n")
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
+  
+  featureData <- rowData(scEx_log)
+  retVal <- coE_geneGrp_vioFunc2(
+    genesin = geneListStr,
+    projections = projections,
+    scEx = scEx_log,
+    featureData = featureData,
+    minExpr = minExpr,
+    dbCluster = projectionVar,
+    sampCol = sampCol,
+    ccols = ccols
+  )
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
+  exportTestValues(coE_geneGrp_vio_plot = {
+    retVal
+  })
+  return(retVal)
+})
+
+
 
 # # observer for coE_clusterValSOM 
 # observeEvent(

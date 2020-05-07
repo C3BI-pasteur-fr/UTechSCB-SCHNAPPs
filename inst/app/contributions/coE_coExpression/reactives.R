@@ -126,8 +126,14 @@ coE_heatmapSelectedReactive <- reactive({
   ccols <- isolate(clusterCols$colPal)
   # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
   
-  if (is.null(scEx_log) ||
-      is.null(projections) || is.null(scCells) || length(scCells) == 0) {
+  if (is.null(scCells) || length(scCells) == 0) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("No cells selected", id = "coE_heatmapSelectedReactiveProbl", type = "error", duration = 10)
+    }
+  }
+  
+  if (is.null(scEx_log) ||is.null(scCells) || length(scCells) == 0 ||
+      is.null(projections)) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
     return(
       list(
@@ -201,6 +207,12 @@ coE_topExpGenesTable <- reactive({
   scCL <- isolate(levels(projections$dbCluster))
   scCells <- isolate(sc$selectedCells())
   # coEtgMinExprShow <- input$coEtgMinExprShow
+  
+  if (is.null(scCells) || length(scCells) == 0) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("No cells selected", id = "coE_topExpGenesTableProbl", type = "error", duration = 10)
+    }
+  }
   
   if (is.null(scEx_log) || is.null(scCells)) {
     if (DEBUG) if (is.null(scEx_log)) cat(file = stderr(), "coE_topExpGenesTable scEx_log null.\n")
@@ -294,9 +306,13 @@ coE_topExpCCTable <- reactive({
   scCells <- isolate(sc$selectedCells())
   # coE_topCCGenesShow <- input$coE_topCCGenesShow
   
-  if (is.null(scEx_log) || is.null(scCells)) {
-    return(NULL)
+  if (is.null(scCells) || length(scCells) == 0) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("No cells selected", id = "coE_topExpCCTableProbl", type = "error", duration = 10)
+      return(NULL)
+    }
   }
+  
   featureData <- rowData(scEx_log)
   genesin <- geneName2Index(genesin, featureData)
   if (is.null(genesin)) {
@@ -546,6 +562,183 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   # p1 <- ggplotly(p1)
   return(p1)
 }
+
+######## grouped plotly version
+
+#' coE_geneGrp_vioFunc
+#' generates a ggplot object with a violin plot
+#' optionally creates all permutations.
+coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExpr = 1,
+                                 dbCluster, sampCol, ccols) {
+  if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc2 started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_geneGrp_vioFunc2")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_geneGrp_vioFun2c")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_geneGrp_vioFunc", id = "coE_geneGrp_vioFunc2", duration = NULL)
+  }
+  
+  suppressMessages(require(gtools))
+  suppressMessages(require(stringr))
+  
+  genesin <- toupper(genesin)
+  genesin <- gsub(" ", "", genesin, fixed = TRUE)
+  genesin <- strsplit(genesin, ",")[[1]]
+  
+  map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc2.RData", list = c(ls()))
+  }
+  # cp =load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc2.RData")
+  
+  if (length(map) == 0) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "no genes found",
+        id = "heatmapWarning",
+        type = "warning",
+        duration = 20
+      )
+    }
+    return(NULL)
+  }
+  
+  expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minExpr)
+  ylabText <- "number genes from list"
+  
+  # coExpVal = number of cells with exprssion over minExpr
+  projections <- cbind(projections, coExpVal = expression * 1.0)
+  permsNames <- as.character(1:max(expression))
+  
+  #first coordinate
+  prj <- factor(projections[, dbCluster[1]])
+  mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
+    n = 6, name =
+      "RdYlBu"
+  ))(length(levels(prj)))
+  
+  if (dbCluster[1] == "sampleNames") {
+    mycolPal <- sampCol
+    names(mycolPal) = names(sampCol)
+  }
+  if (dbCluster[1] == "dbCluster") {
+    mycolPal <- ccols
+    names(mycolPal) = names(ccols)
+  }
+  
+  
+  
+  if (length(dbCluster) == 2 ) {
+    prj2 = factor(projections[, dbCluster[2]])
+    #second coordinate
+    prj2 <- factor(projections[, dbCluster[2]])
+    mycolPal2 <- colorRampPalette(RColorBrewer::brewer.pal(
+      n = 6, name =
+        "RdYlBu"
+    ))(length(levels(prj2)))
+    
+    if (dbCluster[2] == "sampleNames") {
+      mycolPal2 <- sampCol
+      names(mycolPal2) = names(sampCol)
+    }
+    if (dbCluster[2] == "dbCluster") {
+      mycolPal2 <- ccols
+      names(mycolPal2) = names(ccols)
+    }
+  } else {
+    if (length(dbCluster) == 1 ) {
+      prj2 = factor(rep(1,nrow(projections)))
+      mycolPal2 = list('1'="#2D96FA")
+    } else {
+      # should not happen
+    }
+  }
+  
+  p1 <- projections %>% plotly::plot_ly(type = 'violin')
+  for (lv in levels(prj2)) {
+    p1 <- p1 %>% plotly::add_trace(
+      x = prj[prj2 == lv],
+      y = projections$coExpVal[prj2 == lv],
+      legendgroup = lv,
+      scalegroup = lv,
+      name = lv,
+      box = list(
+        visible = T
+      ),
+      meanline = list(
+        visible = T
+      )
+      # , 
+      # color=mycolPal2[[lv]]
+    )
+    print(p1)
+  }
+  
+  p1 <- p1  %>%
+    plotly::layout(
+      xaxis = list(
+        title = paste(dbCluster, collapse = " + ")
+      ),
+      yaxis = list(
+        title = ylabText,
+        zeroline = F
+        # ,
+        # ticknames = permsNames
+      )
+      ,
+      violinmode = 'group'
+      # ,
+      # annotations = list(y = permsNames, yref = "y")
+    )
+  
+  # p1 <- p1 %>% 
+  
+  p1
+  
+  
+  
+  # p1 <-
+  #   ggplot(projections, aes_string(prj, "coExpVal",
+  #                                  fill = factor(projections[, dbCluster])
+  #   )) +
+  #   geom_violin(scale = "count") +
+  #   scale_fill_manual(values = mycolPal, aesthetics = "fill") +
+  #   stat_summary( # plot the centered dots
+  #     fun = median,
+  #     geom = "point",
+  #     size = 5,
+  #     color = "black"
+  #   ) +
+  #   stat_summary(fun.data = n_fun, geom = "text") +
+  #   theme_bw() +
+  #   theme(
+  #     axis.text.x = element_text(
+  #       angle = 60,
+  #       size = 12,
+  #       vjust = 0.5
+  #     ),
+  #     axis.text.y = element_text(size = 10),
+  #     strip.text.x = element_text(size = 16),
+  #     strip.text.y = element_text(size = 12),
+  #     axis.title.x = element_text(face = "bold", size = 16),
+  #     axis.title.y = element_text(face = "bold", size = 16),
+  #     legend.position = "right"
+  #   ) +
+  #   xlab(dbCluster) + ylab(ylabText) +
+  #   scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames))
+  # 
+  # # p1 <- ggplotly(p1)
+  return(p1)
+}
+
+
+
+
 
 # save to history violoin observer ----
 observe(label = "save2histVio", {
@@ -843,7 +1036,7 @@ observe(label = "ob16", {
   .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
 })
 
-coE_updateInputXviolinPlot <- reactive({
+coE_updateInputXviolinPlot <- observe({
   if (DEBUG) cat(file = stderr(), "coE_updateInputXviolinPlot started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -863,20 +1056,6 @@ coE_updateInputXviolinPlot <- reactive({
     return(NULL)
   }
   
-  # Can also set the label and select items
-  # updateSelectInput(
-  #   session,
-  #   "dimension_x3",
-  #   choices = colnames(tsneData),
-  #   selected = colnames(tsneData)[1]
-  # )
-  # updateSelectInput(
-  #   session,
-  #   "dimension_y3",
-  #   choices = colnames(tsneData),
-  #   selected = colnames(tsneData)[2]
-  # )
-  
   coln <- colnames(tsneData)
   choices <- c()
   for (cn in coln) {
@@ -890,6 +1069,12 @@ coE_updateInputXviolinPlot <- reactive({
   updateSelectInput(
     session,
     "coE_dimension_xVioiGrp",
+    choices = choices,
+    selected = .schnappsEnv$coE_vioGrp
+  )
+  updateSelectInput(
+    session,
+    "coE_dimension_xVioiGrp2",
     choices = choices,
     selected = .schnappsEnv$coE_vioGrp
   )
