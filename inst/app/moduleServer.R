@@ -257,6 +257,9 @@ clusterServer <- function(input, output, session,
         if (namedGroup %in% colnames(grpNs)) {
           return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ]))
         } else {
+          #TODO message about setting plot
+          showNotification("Make sure 'the'group names' is set correctly ", id = "selectedCellNamesProbl", duration = NULL)
+          if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames:some return null\n")
           return(NULL)
         }
       }
@@ -277,6 +280,8 @@ clusterServer <- function(input, output, session,
     exportTestValues(selectedCellNames = {
       cells.names
     })
+    if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: ",length(cells.names),"\n")
+    
     return(cells.names)
   })
 
@@ -351,6 +356,8 @@ clusterServer <- function(input, output, session,
       if (length(retVal) == 0) {
         return(NULL)
       }
+      if (DEBUG) cat(file = stderr(), paste("reactiveValues: selectedCells:", length(retVal), " done\n"))
+      
       return(retVal)
     })
   )

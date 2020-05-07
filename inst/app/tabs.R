@@ -283,7 +283,8 @@ parameterItems <- list(
   parameterContributions,
   shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters"),
   shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
-  shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
+  shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot"),
+  shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
 )
 
 
@@ -450,51 +451,6 @@ generalParametersTab <- shinydashboard::tabItem(
   checkbsTT(item = "clusterColorSelection")
 )
 
-# renameTab ----
-renameTab <- shinydashboard::tabItem(
-  tabName = "renameProj",
-  fluidRow(div(h3("rename projections"), align = "center")),
-  br(),
-  box(
-    title = "Rename projections", solidHeader = TRUE, width = 12, status = "primary",
-    fluidRow(
-      column(
-        width = 6,
-        selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")
-      ),
-      column(
-        width = 6,
-        fluidRow(
-          column(
-            width = 8,
-            textInput("newPrj", "new name of Projection", value = "")
-          ),
-          column(
-            width = 4,
-            actionButton("updatePrjsButton", "rename")
-          )
-        ),
-        fluidRow(
-          column(
-            width = 8,
-            selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")
-          ),
-          column(
-            width = 4,
-            actionButton("delPrjsButton", "delete")
-          ),
-          tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}"),
-          tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
-        )
-      )
-    ),
-    checkbsTT(item = "oldPrj"),
-    checkbsTT(item = "newPrj"),
-    checkbsTT(item = "updatePrjsButton"),
-    checkbsTT(item = "delPrj"),
-    checkbsTT(item = "delPrjsButton")
-  )
-)
 # # link to the content of the
 # parametersTab  = tabItem(tabName = "normalizations",
 #                             fluidRow(div(h3('Cell selection'), align = 'center')),

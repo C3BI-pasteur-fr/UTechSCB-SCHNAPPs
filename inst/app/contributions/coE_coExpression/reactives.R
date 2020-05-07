@@ -203,12 +203,14 @@ coE_topExpGenesTable <- reactive({
   # coEtgMinExprShow <- input$coEtgMinExprShow
   
   if (is.null(scEx_log) || is.null(scCells)) {
+    if (DEBUG) if (is.null(scEx_log)) cat(file = stderr(), "coE_topExpGenesTable scEx_log null.\n")
+    if (DEBUG) if (is.null(scCells)) cat(file = stderr(), "coE_topExpGenesTable scCells null.\n")
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
+  # cp = load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
   
   featureData <- rowData(scEx_log)
   # we only work on cells that have been selected
