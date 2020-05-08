@@ -340,5 +340,13 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
   DE_scaterPNG()
 })
 
+
+output$introRMD <- renderUI({
+  cat(file = stderr(), paste("wd:", getwd(), "\n"))
+  HTML(markdown::markdownToHTML(knit('intro.Rmd', quiet = TRUE), fragment.only = T))
+  # includeHTML("intro.html")
+})
+
+
 if (DEBUG) cat(file = stderr(), "end: reactives-lite\n")
 
