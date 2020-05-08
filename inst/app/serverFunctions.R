@@ -694,6 +694,8 @@ flattenCorrMatrix <- function(cormat, pmat) {
 #         plot1 <- plot1 %>% layout(title = name)
 #         if ("plotly" %in% class(plot1)) {
 #           # requires orca bing installed (https://github.com/plotly/orca#installation)
+#           # https://github.com/plotly/orca/releases
+#           # https://github.com/plotly/orca
 #           withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
 #         }
 #         created <- TRUE
@@ -799,39 +801,39 @@ valuesChanged <- function(parameters) {
     oldVar <- paste0("calculated_", var)
     currVar <- var
     if (!exists(oldVar, envir = .schnappsEnv) | !exists(currVar, envir = .schnappsEnv)) {
-      cat(file = stderr(), green("modified1\n"))
-      cat(file = stderr(), paste("var:", var, "old: ", exists(oldVar, envir = .schnappsEnv), " new:", exists(currVar, envir = .schnappsEnv)))
+      # cat(file = stderr(), green("modified1\n"))
+      # cat(file = stderr(), paste("var:", var, "old: ", exists(oldVar, envir = .schnappsEnv), " new:", exists(currVar, envir = .schnappsEnv)))
       modified <- TRUE
       next()
     }
     if (is.null(get(oldVar, envir = .schnappsEnv)) | is.null(get(currVar, envir = .schnappsEnv))) {
       if (!(is.null(get(oldVar, envir = .schnappsEnv)) & is.null(get(currVar, envir = .schnappsEnv)))) {
-        cat(file = stderr(), "modified2\n")
+        # cat(file = stderr(), "modified2\n")
         modified <- TRUE
       }
     } else {
       if (is.na(get(oldVar, envir = .schnappsEnv)) | is.na(get(currVar, envir = .schnappsEnv))){
         if (!(is.na(get(oldVar, envir = .schnappsEnv)) & is.na(get(currVar, envir = .schnappsEnv)))){
           # browser()
-          cat(file = stderr(), "modified3a\n")
+          # cat(file = stderr(), "modified3a\n")
           modified <- TRUE
         }
       } else
         if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
           # browser()
-          cat(file = stderr(), "modified3\n")
-          cat(file = stderr(), oldVar)
-          cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
-          cat(file = stderr(), get(currVar, envir = .schnappsEnv))
+          # cat(file = stderr(), "modified3\n")
+          # cat(file = stderr(), oldVar)
+          # cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
+          # cat(file = stderr(), get(currVar, envir = .schnappsEnv))
           modified <- TRUE
         }
     }
   }
-  if (!modified) {
-    cat(file = stderr(), "\n\nnot modified\n\n\n")
-  } else {
-    cat(file = stderr(), "\n\nmodified4\n\n\n")
-  }
+  # if (!modified) {
+  #   cat(file = stderr(), "\n\nnot modified\n\n\n")
+  # } else {
+  #   cat(file = stderr(), "\n\nmodified4\n\n\n")
+  # }
   return(modified)
 }
 
@@ -1050,7 +1052,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   }
   # cp =load(file='~/SCHNAPPsDebug/add2history.RData')
   if (type == "text") {
-    cat(file = stderr(), paste0("history text: \n"))
+    # cat(file = stderr(), paste0("history text: \n"))
     assign(names(varnames[1]), arg[1])
     line <- paste0(
       "\n", get(names(varnames[1])), "\n"
@@ -1086,6 +1088,8 @@ add2history <- function(type, comment = "", input = input, ...) {
         "\n![](",basename(tfile),")\n\n"
       )
       write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    }, error = function(w){
+      cat(file = stderr(),paste("problem with orca:",w,"\n"))
     })
   }
   
@@ -1197,7 +1201,7 @@ heatmapModuleFunction <- function(
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
+  # cp =load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
   
   if (is.null(pWidth)) {
     pWidth <- 800
@@ -1326,5 +1330,60 @@ heatmapModuleFunction <- function(
     height = paste0(pHeight, "px"),
     alt = "heatmap should be here"
   ))
+}
+
+# consolidateScEx ----
+
+consolidateScEx <-
+  function(scEx, projections, scEx_log, pca, tsne) {
+    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls(), "myProjections"))
+    # load(file = "~/SCHNAPPsDebug/consolidate.RData")
+    commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
+    commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
+    scEx <- scEx[commGenes, commCells]
+    # what about UMAP??? others? => they are considered as projections not as reducedDims
+    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
+    assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
+    
+    for (name in colnames(projections)) {
+      colData(scEx)[[name]] <- projections[commCells, name]
+    }
+    # colData(scEx)[["before.Filter"]] <- projections[commCells, "before.filter"]
+    # colData(scEx)[["dbCluster"]] <- projections[commCells, "dbCluster"]
+    # colData(scEx)[["UmiCountPerGenes"]] <- projections[commCells, "UmiCountPerGenes"]
+    # colData(scEx)[["UmiCountPerGenes2"]] <- projections[commCells, "UmiCountPerGenes2"]
+    
+    return(scEx)
+  }
+
+
+# loadLiteData ----
+
+loadLiteData <- function(fileName = NULL) {
+  if (is.null(fileName)) return(NULL)
+  # fileName = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
+  cp = load(fileName)
+  
+  # The data has to be stored in scEx as it come from save from the main SCHNAPPs app
+  if (!all(c("scEx", "pca") %in% cp)) {
+    return(NULL)
+  }
+  
+  projections = colData(scEx)
+  dbCluster = projections$dbCluster
+  counts = scEx
+  assays(counts)[["logcounts"]] = NULL
+  logcounts = scEx
+  assays(logcounts)[["counts"]] = NULL
+  # pca = reducedDims(scEx)[["PCA"]] # now stored separately
+  returnList = list(scEx = counts, scEx_log = logcounts, pca = pca, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol)
+  for (va in cp[!cp %in% c("scEx", "pca", "ccol", "scol")]) {
+    # .schnappsEnv = global envirnment for schnapps
+    #  - projectionFunctions = list of 2 entries each: 1st: display name, 2nd reactive name (defined in a reactive.R)
+    
+      returnList[[va]] = get(va)
+    }
+  
+  return(returnList)
 }
 

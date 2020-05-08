@@ -2,7 +2,6 @@ suppressMessages(require(shinyTree))
 
 # SUMMARY STATS ----------------------------------------------------------------
 source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
-source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
 DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # normalizationRadioButtonValue --------------------------------
@@ -34,25 +33,25 @@ for (fp in parFiles) {
     for (li in 1:length(myNormalizationParameters)) {
       lVal <- myNormalizationParameters[[li]]
       if (length(lVal) > 0) {
-        if (DEBUG) {
-          cat(
-            file = stderr(),
-            paste(
-              "normalization Choice: ",
-              names(myNormalizationParameters)[li],
-              " ",
-              lVal,
-              "\n"
-            )
-          )
-          cat(file = stderr(), paste(
-            "class: ",
-            class(myNormalizationParameters[[li]]),
-            " ",
-            lVal,
-            "\n"
-          ))
-        }
+        # if (DEBUG) {
+        #   cat(
+        #     file = stderr(),
+        #     paste(
+        #       "normalization Choice: ",
+        #       names(myNormalizationParameters)[li],
+        #       " ",
+        #       lVal,
+        #       "\n"
+        #     )
+        #   )
+        #   cat(file = stderr(), paste(
+        #     "class: ",
+        #     class(myNormalizationParameters[[li]]),
+        #     " ",
+        #     lVal,
+        #     "\n"
+        #   ))
+        # }
         oldNames <- names(normaliztionParameters)
         normaliztionParameters[[length(normaliztionParameters) + 1]] <-
           lVal
@@ -154,8 +153,14 @@ observe(label = "ob_cellSelection",
         })
 
 # observe: clustering Button ----
-observe(label = "ob_clusteringParams", {
+ob_clusteringParams <- observe(label = "ob_clusteringParams", {
   if (DEBUG) cat(file = stderr(), "observe ob_clusteringParams\n")
+  
+  # this happens when the lite version is used
+  if (is.null(input$tabsetCluster)){
+    ob_clusteringParams$destroy()
+    return(NULL)
+  }
   
   input$updateClusteringParameters
   whichClustering = isolate(input$tabsetCluster)
@@ -624,10 +629,9 @@ observeEvent(
 )
 
 # observe: color selection----
-observe(label = "ob_colorParams", {
+observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
-  input$updateColors
   scExx <- scEx()
   projections <- projections()
   if (is.null(scExx) || is.null(projections)) {
@@ -722,11 +726,18 @@ output$RDSsave <- downloadHandler(
       removeNotification(id = "RDSsave")
     }
     
+    # TODO Warning if scEx_log is not set
+    
+    # umaps???
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
+    # TODO should be taken from projections
     tsne <- tsne()
+    ccol = clusterCols$colPal
+    scol = sampleCols$colPal
+    
     
     if (is.null(scEx)) {
       return(NULL)
@@ -738,7 +749,19 @@ output$RDSsave <- downloadHandler(
     
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
     
-    save(file = file, list = c("scEx"))
+    # we save the pca separately because I don't know how to store the rotation  otherwise.
+    # mostly done to make the lite version work.
+    
+    saveList =  c("scEx" , "pca", "scol" , "ccol" )
+# browser()
+    # save projections that shouldn't be recalculated in lite version
+    for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
+      assign(.schnappsEnv$projectionFunctions[[idx]][2], eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
+      saveList = c(saveList, .schnappsEnv$projectionFunctions[[idx]][2])
+    }
+    
+    
+    save(file = file, list = saveList)
     
     # write.csv(as.matrix(exprs(scEx)), file)
   }
@@ -859,87 +882,7 @@ observeEvent(
   }
 )
 
-# rename projections
-observe(label = "ob27", {
-  projections <- projections()
-  
-  updateSelectInput(session, "oldPrj",
-                    choices = c(colnames(projections))
-  )
-  updateSelectInput(session, "delPrj",
-                    choices = c(colnames(projectionsTable$newProjections))
-  )
-})
 
-observe(label = "ob28", {
-  input$newPrj
-  updateTextInput(session, "newPrj", value = make.names(input$newPrj, unique = TRUE))
-})
-
-observeEvent(
-  label = "ob29",
-  eventExpr = input$delPrjsButton,
-  handlerExpr = {
-    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
-    newPrjs <- projectionsTable$newProjections
-    delPrj <- input$delPrj
-    if (is.null(projections)) {
-      return(NULL)
-    }
-    if (!delPrj %in% colnames(newPrjs)) {
-      return(NULL)
-    }
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/delPrjsButton.RData",
-        list = c("normaliztionParameters", ls())
-      )
-    }
-    # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
-    
-    projectionsTable$newProjections <- newPrjs[, -which(colnames(newPrjs) == delPrj), drop = FALSE]
-  }
-)
-
-
-observeEvent(
-  label = "ob30",
-  eventExpr = input$updatePrjsButton,
-  handlerExpr = {
-    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
-    oldPrj <- input$oldPrj
-    newPrj <- input$newPrj
-    projections <- projections()
-    newPrjs <- projectionsTable$newProjections
-    
-    if (is.null(projections)) {
-      return(NULL)
-    }
-    
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
-        list = c("normaliztionParameters", ls())
-      )
-    }
-    # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
-    if (newPrj %in% colnames(projections)) {
-      showNotification(
-        "New column name already used",
-        type = "error",
-        duration = NULL
-      )
-      return(NULL)
-    }
-    if (ncol(newPrjs) == 0) {
-      newPrjs <- projections[, oldPrj, drop = FALSE]
-    } else {
-      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
-    }
-    colnames(newPrjs)[ncol(newPrjs)] <- newPrj
-    projectionsTable$newProjections <- newPrjs
-  }
-)
 
 observe(label = "ob_pca",
         {
@@ -971,14 +914,18 @@ observe(label = "ob_pca",
         }
 )
 
-observe(label = "ob_clusterParams", {
+ob_clusterParams <- observe(label = "ob_clusterParams", {
   if (DEBUG) cat(file = stderr(), "observe ob_clusterParams\n")
-  
+
   input$updateClusteringParameters
   tabsetCluster = input$tabsetCluster
   
-  if (is.null(tabsetCluster)) return(NULL)
-  
+  # this happens when the lite version is used
+  if (is.null(tabsetCluster)){
+    ob_clusterParams$destroy()
+    return(NULL)
+  }
+
   if (tabsetCluster == "seurat_Clustering") {
     setRedGreenButtonCurrent(
       vars = list(

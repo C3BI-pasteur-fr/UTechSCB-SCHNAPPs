@@ -1,0 +1,39 @@
+
+##  General QC
+
+### UMI histogram
+
+```{r, out.width='90%', fig.align='center', fig.cap='General QC - UMI histogram', echo=FALSE}
+knitr::include_graphics('images/generalUMI.png')
+```
+
+The number of UMIs per cell are displayed as a histogram. Different samples are colored differently. This allows identifying thresholds to be used in the cell selection panel.
+
+### Sample histogram
+
+```{r, out.width='90%', fig.align='center', fig.cap='General QC - sample histogram', echo=FALSE}
+knitr::include_graphics('images/generalSample.png')
+```
+
+Histgram of cells per samples. This allows verifying that the number of cells per sample is comparable.
+
+### PC variance
+
+```{r, out.width='90%', fig.align='center', fig.cap='General QC - PC variances', echo=FALSE}
+knitr::include_graphics('images/generalPC.png')
+```
+
+Variance of the first 10 principle components of the PCA are shown. This allows verifying the importance of the different PCs.
+
+### Scater QC
+
+```{r, out.width='90%', fig.align='center', fig.cap='General QC - highest expressed genes before checking run', echo=FALSE}
+knitr::include_graphics('images/generalScater1.png')
+```
+
+```{r, out.width='90%', fig.align='center', fig.cap='General QC - highest expressed genes', echo=FALSE}
+knitr::include_graphics('images/generalScater2.png')
+```
+
+Plots the highest expressing genes based on the scater package. (scater::plotHighestExprs), colour_cells_by = "log10_total_counts" and a maximum of 50 genes is displayed.
+This can take quite some time to compute for larger (or even small) data sets.
