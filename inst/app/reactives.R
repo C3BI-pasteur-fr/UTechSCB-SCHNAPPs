@@ -2,6 +2,7 @@ suppressMessages(require(tibble))
 suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
+source(paste0(packagePath, "/outputs.R"), local = TRUE)
 
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
@@ -150,7 +151,7 @@ observeEvent(input$openBrowser, {
 # remove the modal. If not show another modal, but this time with a failure
 # message.
 observeEvent(input$commentok, {
-  cat(file = stderr(), paste0("commentok: \n"))
+  # cat(file = stderr(), paste0("commentok: \n"))
   comment <- input$Comment4history
   add2history(type = "text", comment = "",  input=input, text2add = comment)
   removeModal()
@@ -247,15 +248,15 @@ inputDataFunc <- function(inFile) {
   if ("logcounts" %in% names(assays(scEx))) {
     allScEx_log <- scEx
     if(! "counts" %in% names(assays(scEx)))
-      assays(scEx)[["counts"]] = assays(scEx)[[1]]
+      assays(scEx)[["counts"]] = assays(scEx)[["logcounts"]]
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/readInp1.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/readInp1.RData')
+  # cp = load(file='~/SCHNAPPsDebug/readInp1.RData')
   
-  # read multiple files
+  # read multiple files [2:1] => c(2,1) and not empty list
   if (length(inFile$datapath) > 1) {
     for (fpIdx in 2:length(inFile$datapath)) {
       # inFile$datapath[fpIdx] <- "~/Downloads/paper1.RData"
@@ -290,7 +291,7 @@ inputDataFunc <- function(inFile) {
           genesUnion <- intersect(rownames(scEx), rownames(allScEx))
           
           allScEx <- addColData(allScEx, scEx)
-          scEx <- addColData(scEx, allScEx_log)
+          if (!is.null(allScEx_log)) scEx <- addColData(scEx, allScEx_log)
           # colData(allScEx_log)
           allScEx <- cbind(allScEx[genesUnion, ], scEx[genesUnion, ])
         }
@@ -1574,14 +1575,14 @@ scEx_log <- reactive({
 })
 
 
-scEx_log_sha <- reactive({
-  scEx_log <- scEx_log()
-  require(digest)
-  if (is.null(scEx_log)) {
-    return(NULL)
-  }
-  return(sha1(as.matrix(assays(scEx_log)[[1]])))
-})
+# scEx_log_sha <- reactive({
+#   scEx_log <- scEx_log()
+#   require(digest)
+#   if (is.null(scEx_log)) {
+#     return(NULL)
+#   }
+#   return(sha1(as.matrix(assays(scEx_log)[[1]])))
+# })
 # scExLogMatrixDisplay ----
 # scExLog matrix with symbol as first column
 # TODO
@@ -1736,7 +1737,7 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, 
     }
     if (scale) {
       x <- x/sqrt(rv)
-      rv <- rep(1, nrow(x))
+      # rv <- rep(1, nrow(x))
     }
     x <- t(x)
     pca <- runPCA(x, rank=rank, get.rotation=TRUE)
@@ -1891,11 +1892,11 @@ scranCluster <- function(pca,
     )
   )
   switch(clusterSource,
-         "PCA" = {
-           reducedDims(scEx) <- SimpleList(PCA = pca$x)
-           params$assay.type <- "counts"
-           params$x <- scEx
-         },
+         # "PCA" = {
+         #   params$x <- scEx
+         #   reducedDims(scEx) <- SimpleList(PCA = pca$x)
+         #   params$assay.type <- "counts"
+         # },
          "logcounts" = {
            params$x <- scEx_log
            reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
@@ -2575,16 +2576,17 @@ sampleInfo <- reactive({
   }
   
   scEx <- scEx()
+
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls()))
+  }
+  # cp=load(file="~/SCHNAPPsDebug/sampleInfo.RData")
   if (!exists("scEx")) {
     if (DEBUG) {
       cat(file = stderr(), "sampleInfo: NULL\n")
     }
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleInfo.RData", list = c(ls()))
-  }
-  # load(file="~/SCHNAPPsDebug/sampleInfo.RData")
   
   retVal <- sampleInfoFunc(scEx)
   
@@ -2595,7 +2597,7 @@ sampleInfo <- reactive({
 })
 
 
-# table of input cells with sample information
+# table of input cells with sample information ----
 # TODO: used in tableSeletionServer table; should be divided into function and reactive
 inputSample <- reactive({
   if (DEBUG) {
@@ -2630,7 +2632,9 @@ inputSample <- reactive({
   cellIds <- data.frame(
     cellName = colnames(dataTables$scEx),
     sample = sampInf,
-    ngenes = Matrix::colSums(assays(dataTables$scEx)[[1]])
+    # number of genes per cell
+    ngenes = Matrix::colSums(assays(dataTables$scEx)[[1]]>0),
+    nUMI = Matrix::colSums(assays(dataTables$scEx)[[1]])
   )
   
   if (DEBUG) {
@@ -3027,23 +3031,6 @@ reacativeReport <- function() {
   }
   return(outZipFile)
 }
-
-consolidateScEx <-
-  function(scEx, projections, scEx_log, pca, tsne) {
-    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls()))
-    # load(file = "~/SCHNAPPsDebug/consolidate.RData")
-    commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
-    commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
-    scEx <- scEx[commGenes, commCells]
-    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
-    assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
-    colData(scEx)[["before.Filter"]] <- projections$before.filter[commCells]
-    colData(scEx)[["dbCluster"]] <- projections$dbCluster[commCells]
-    colData(scEx)[["UmiCountPerGenes"]] <- projections$UmiCountPerGenes[commCells]
-    colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2[commCells]
-    
-    return(scEx)
-  }
 
 
 if (DEBUG) {
