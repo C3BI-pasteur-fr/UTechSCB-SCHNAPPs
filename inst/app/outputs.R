@@ -759,7 +759,7 @@ output$RDSsave <- downloadHandler(
     # mostly done to make the lite version work.
     
     saveList =  c("scEx" , "pca", "scol" , "ccol" )
-# browser()
+    # browser()
     # save projections that shouldn't be recalculated in lite version
     for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
       assign(.schnappsEnv$projectionFunctions[[idx]][2], eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
@@ -772,6 +772,90 @@ output$RDSsave <- downloadHandler(
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
+
+# download Rmd ----
+output$RmdSave <- downloadHandler(
+  filename = "report.zip",
+  content = function(outZipFile) {
+    if (DEBUG) {
+      cat(file = stderr(), "RmdSave started.\n")
+    }
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "RmdSave")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "RmdSave")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("RmdSave", id = "RmdSave", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "RmdSave")
+    }
+    
+    if (is.null(.schnappsEnv$historyPath) ) {
+      return(NULL)
+    }
+    # if (is.null(scEx)) {
+    #   return(NULL)
+    # }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/RmdSave.RData", list = c(ls(), ".schnappsEnv"))
+    }
+    # cp = load(file='~/SCHNAPPsDebug/RmdSave.RData')
+    
+    tempReport = .schnappsEnv$historyFile
+    outReport = paste0(.schnappsEnv$historyPath, .Platform$file.sep,"report.html")
+    # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
+    # file.copy("contributions/gQC_generalQC//report.Rmd",
+    #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
+    tryCatch(
+      callr::r(
+        function(inputFP, output_file, params, envir) {
+          rmarkdown::render(
+            input = inputFP,
+            output_file = output_file,
+            params = params,
+            envir = envir
+          )
+        },
+        args = list(
+          inputFP = tempReport,
+          output_file = outReport,
+          # params = params,
+          envir = new.env()
+        ),
+        stderr = stderr(),
+        stdout = stderr()
+      ),
+      error = function(e) {
+        cat(file = stderr(), paste("==== An error occurred during the creation of the report\n", e, "\n"))
+      }
+    )
+    # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
+    #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
+    # rmarkdown::render(input = tempReport, output_file = "report.html",
+    #                   params = params, envir = new.env())
+    
+    # outZipFile <- paste0(tempdir(), .Platform$file.sep, "report.zip")
+    
+    # tDir <- paste0(.schnappsEnv$reportTempDir, .Platform$file.sep)
+    # zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
+    zip(outZipFile, paste0(path.expand(.schnappsEnv$historyPath), .Platform$file.sep), flags = "-9jr")
+    if (DEBUG) {
+      end.time <- Sys.time()
+      cat(
+        file = stderr(),
+        "===Report:done",
+        difftime(end.time, start.time, units = "min"),
+        "\n"
+      )
+    }
+    return(outZipFile)
+  }
+)
+
 
 # Report creation ------------------------------------------------------------------
 output$report <- downloadHandler(
@@ -922,7 +1006,7 @@ observe(label = "ob_pca",
 
 ob_clusterParams <- observe(label = "ob_clusterParams", {
   if (DEBUG) cat(file = stderr(), "observe ob_clusterParams\n")
-
+  
   input$updateClusteringParameters
   tabsetCluster = input$tabsetCluster
   
@@ -931,7 +1015,7 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
     ob_clusterParams$destroy()
     return(NULL)
   }
-
+  
   if (tabsetCluster == "seurat_Clustering") {
     setRedGreenButtonCurrent(
       vars = list(
@@ -959,7 +1043,7 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
     )
     updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
       "useRanks", "clusterSource","geneSelectionClustering",
-       "minClusterSize", "clusterMethod", "tabsetCluster"
+      "minClusterSize", "clusterMethod", "tabsetCluster"
     ))
   }
 })

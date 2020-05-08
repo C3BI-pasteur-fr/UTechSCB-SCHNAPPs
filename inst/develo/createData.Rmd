@@ -111,7 +111,7 @@ getFeatureDataSummary <- function(ver = 0, dataset = "mmusculus_gene_ensembl", g
 read10X <- function(run, sampleName = 1) {
   # run = dirname(pipestance_paths[1])
   if (!grepl("\\/$", run)) {
-    run <- paste(run, "/", sep = "")
+    run <- paste(run, .Platform$file.sep, sep = "")
   }
   barcode.loc <- paste0(run, "barcodes.tsv")
   gene.loc <- paste0(run, "features.tsv")

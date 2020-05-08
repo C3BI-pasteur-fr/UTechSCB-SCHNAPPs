@@ -3009,7 +3009,7 @@ reacativeReport <- function() {
   # rmarkdown::render(input = tempReport, output_file = "report.html",
   #                   params = params, envir = new.env())
   
-  tDir <- paste0(.schnappsEnv$reportTempDir, "/")
+  tDir <- paste0(.schnappsEnv$reportTempDir, .Platform$file.sep)
   base::file.copy(tmpPrjFile, paste0(.schnappsEnv$reportTempDir, "/sessionData.RData"))
   write.csv(as.matrix(assays(scEx_log)[[1]]),
             file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")

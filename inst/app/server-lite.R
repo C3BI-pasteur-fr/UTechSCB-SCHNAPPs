@@ -50,7 +50,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
       if (is.null(.schnappsEnv$historyFile)) {
         .schnappsEnv$historyFile = "history2.Rmd"
       }
-      .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath,"/", basename(.schnappsEnv$historyFile))
+      .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
       line=paste0("---\ntitle: \"history\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)
       suppressMessages(require(shiny))
       suppressMessages(require(shinyTree))
