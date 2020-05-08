@@ -3,14 +3,24 @@
 \docType{data}
 \name{ccol}
 \alias{ccol}
-\title{* `ccol` : color definitions}
+\title{Example data for schnapps app}
 \format{
+A data frame with 53940 rows and 10 variables
+
 a vector with colours used for clusters
+}
+\source{
+<http://www.diamondse.info/>
+* `ccol` : color definitions
 }
 \usage{
 ccol
 }
 \description{
-* `ccol` : color definitions
+A dataset containing the prices and other attributes of almost 54,000
+diamonds. The variables are as follows:
+}
+\details{
+* `scExLite`: singlecellExperiment object
 }
 \keyword{datasets}

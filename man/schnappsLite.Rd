@@ -5,14 +5,15 @@
 \title{shiny server relevant functions}
 \usage{
 schnappsLite(
-  data = RdataFile,
+  data = "RdataFile",
   localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   defaultValueSingleGene = "CD52",
   defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
   defaultValueRegExGene = "",
   DEBUG = FALSE,
   DEBUGSAVE = FALSE,
-  historyPath = NULL
+  historyPath = NULL,
+  maxCells = 3000
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ schnappsLite(
 
 \item{historyPath}{location (directory) where history directories and data will be stored.
 historyPath should be used to generate Report}
+
+\item{maxCells}{maximal number of cells to use. Used to limit memory usage for server}
 }
 \description{
 shiny server relevant functions

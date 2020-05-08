@@ -930,7 +930,7 @@ tableSelectionServer <- function(input, output, session,
     return(retVal)
   })
 
-  proxy <- DT::dataTableProxy("cellNameTable")
+  proxy <- DT::dataTableProxy(ns("cellNameTable"))
 
   observeEvent(input$selectAll, {
     if (DEBUG) cat(file = stderr(), "observe input$selectAll\n")
@@ -991,6 +991,8 @@ tableSelectionServer <- function(input, output, session,
     nsStr <- ns("-")
     reorderCells <- input$reorderCells
     selectedRows <- input$cellNameTable_rows_selected
+    showAllCells <- input$showAllCells
+    
     # searchStr <-
     if (is.null(dataTables)) {
       .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
@@ -1018,6 +1020,7 @@ tableSelectionServer <- function(input, output, session,
         cols2disp <- numericCols
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
+      if(showAllCells) cols2disp = colnames(dataTables)
       dataTables <- as.data.frame(dataTables[, cols2disp])
       colState <- get(ns("colState"), envir = .schnappsEnv)
       if (length(colState) == 0) {

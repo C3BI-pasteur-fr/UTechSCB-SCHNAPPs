@@ -26,13 +26,13 @@
 #' @importFrom dplyr '%>%'
 #' @importFrom shiny shinyApp runApp
 #'
-#' @export schnappsLite
+#' @export 
 #'
 #' @examples
 #' packPath = "schnappsPackage"
 #' # TODO fix:
 #' # schnappsLite(data = paste0(packPath, "/data/scExLite.RData"))
-schnappsLite <- function(data=RdataFile,
+schnappsLite <- function(data="RdataFile",
                          localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                          defaultValueSingleGene = "CD52",
                          defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
@@ -75,7 +75,7 @@ schnappsLite <- function(data=RdataFile,
   source(paste0(packagePath, "/ui-lite.R"), local = TRUE)
   
   # load data
-  # data = "~/Downloads/rnEPDC.lite.RData"
+  
   assign(".SCHNAPPs_LiteData", loadLiteData(file = data), envir = .schnappsEnv)
   
   
@@ -112,7 +112,7 @@ schnappsLite <- function(data=RdataFile,
   
   if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
     # error loading
-    exit()
+    return(NULL)
   }
   
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
@@ -136,7 +136,7 @@ schnappsLite <- function(data=RdataFile,
 #'
 #' @format A data frame with 53940 rows and 10 variables
 #' @source <http://www.diamondse.info/>
-"scExLite"
+# "scExLite"
 
 #' * `ccol` : color definitions
 #' @format a vector with colours used for clusters
@@ -151,3 +151,40 @@ schnappsLite <- function(data=RdataFile,
 #' * `pca` : pca results, Eigenvalues and vectors.
 #' @format List with "x", "var_pcs", "rotation"
 "pca"
+
+
+#' 
+#' * `geneCount` : number of genes per cell.
+#' @format List with "x", "var_pcs", "rotation"
+"geneCount"       
+
+
+#' 
+#' * `pca` : pca results, Eigenvalues and vectors.
+#' @format List with "x", "var_pcs", "rotation"
+"umiCount"        
+
+
+#' 
+#' * `beforeFilterPrj` : number of reads that got filtered out
+#' @format List with "x", "var_pcs", "rotation"
+"beforeFilterPrj" 
+
+#' 
+#' * `tsne` : tsne projection.
+#' @format List with "x", "var_pcs", "rotation"
+"tsne"            
+
+
+
+#' 
+#' * `dbCluster` : used clustering
+#' @format List with "x", "var_pcs", "rotation"
+"dbCluster"       
+
+
+
+#' 
+#' * `umapReact` : umap projections
+#' @format List with "x", "var_pcs", "rotation"
+"umapReact" 

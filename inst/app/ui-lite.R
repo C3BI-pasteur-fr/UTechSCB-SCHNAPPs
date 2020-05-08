@@ -90,8 +90,8 @@ generalParametersTab <- shinydashboard::tabItem(
 # general tabs
 allTabs <- list(
   generalParametersTab
-  ,
-  modTab
+  # ,
+  # modTab
 )
 # parameters tab, includes basic normalization
 source(paste0(packagePath, "/parameters.R"), local = TRUE)

@@ -157,12 +157,16 @@ tableSelectionUi <- function(id) {
       fluidRow(h4("Cells", offset = 1)),
       fluidRow(
         column(
-          width = 6,
+          width = 4,
           checkboxInput(ns("selectAll"), "Select all rows", FALSE)
         ),
         column(
-          width = 6,
+          width = 4,
           checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)
+        ),
+        column(
+          width = 4,
+          checkboxInput(ns("showAllCells"), "show all columns", FALSE)
         )
       ),
       br(),
