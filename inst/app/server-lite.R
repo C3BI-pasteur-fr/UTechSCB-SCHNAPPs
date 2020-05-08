@@ -1,6 +1,14 @@
 
 scShinyServer <- shinyServer(function(input, output, session) {
-  session$onSessionEnded(stopApp)
+  session$onSessionEnded(function () {
+    if (!is.null(x = .schnappsEnv$historyPath)) {
+      cat(file = stderr(), paste("removing: ", .schnappsEnv$historyPath ))
+      if (dir.exists(.schnappsEnv$historyPath)){
+        unlink(.schnappsEnv$historyPath, recursive = T)
+      }
+    }
+    stopApp()
+  })
   # TODO needs to be an option
   seed <- 2
   # localContributionDir <- .SCHNAPPs_locContributionDir
@@ -202,10 +210,9 @@ scShinyServer <- shinyServer(function(input, output, session) {
   
   # overwrite all reactives not needed or modified
   base::source(paste0(packagePath, "/reactives-lite.R"), local = TRUE)
-
+  
   
   .schnappsEnv$projectionFunctions <- projectionFunctions
-  # browser()
   
   # overwrite reactives that should not be calculatated anymore
   for (idx in 1:length(projectionFunctions)) {
