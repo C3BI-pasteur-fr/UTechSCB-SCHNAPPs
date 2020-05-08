@@ -347,9 +347,9 @@ output$DE_downloadPanel <- downloadHandler(
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls()))
+      save(file = "~/SCHNAPPsDebug/DE_downloadPanel.RData", list = c(ls()))
     }
-    # load(file='~/SCHNAPPsDebug/RDSsave.RData')
+    # load(file='~/SCHNAPPsDebug/DE_downloadPanel.RData')
 
     reducedDims(scEx) <- SimpleList(PCA = pca$x, TSNE = tsne)
     assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]]
@@ -359,7 +359,7 @@ output$DE_downloadPanel <- downloadHandler(
     colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2
 
     save(file = file, list = c("scEx"))
-    if (DEBUG) cat(file = stderr(), paste("RDSsave:done \n"))
+    if (DEBUG) cat(file = stderr(), paste("DE_downloadPanel:done \n"))
 
     # write.csv(as.matrix(exprs(scEx)), file)
   }

@@ -575,11 +575,11 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExp
   on.exit({
     printTimeEnd(start.time, "coE_geneGrp_vioFunc2")
     if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "coE_geneGrp_vioFun2c")
+      removeNotification(id = "coE_geneGrp_vioFunc2")
     }
   })
   if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("coE_geneGrp_vioFunc", id = "coE_geneGrp_vioFunc2", duration = NULL)
+    showNotification("coE_geneGrp_vioFunc2", id = "coE_geneGrp_vioFunc2", duration = NULL)
   }
   
   suppressMessages(require(gtools))
@@ -676,7 +676,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExp
       # , 
       # color=mycolPal2[[lv]]
     )
-    print(p1)
+    # print(p1)
   }
   
   p1 <- p1  %>%

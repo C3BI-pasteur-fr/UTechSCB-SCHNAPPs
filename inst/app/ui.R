@@ -182,6 +182,8 @@ scShinyUI <- function(request) {
           downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
           br(),
           downloadButton("RDSsave", "Download RData", class = "butt"),
+          br(),
+          downloadButton("RmdSave", "Download History", class = "butt"),
           if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
           verbatimTextOutput("DEBUGSAVEstring"),
           if (is.environment(.schnappsEnv)) {
