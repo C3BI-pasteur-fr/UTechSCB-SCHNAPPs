@@ -14,6 +14,119 @@ menuList <- list(
   )
 )
 
+
+
+# modTab ----
+modTab <- shinydashboard::tabItem(
+  tabName = "modifyProj",
+  fluidRow(div(h3("work with projections"), align = "center")),
+  br(),
+  tabBox(title = "modify projections", width = 12, id = "modProj",
+         tabPanel(
+           title = "Rename projections", solidHeader = TRUE, width = 12, value = "renameProj",
+           fluidRow(
+             column(
+               width = 6,
+               selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")
+             ),
+             column(
+               width = 6,
+               fluidRow(
+                 column(
+                   width = 8,
+                   textInput("newPrj", "new name of Projection", value = "")
+                 ),
+                 column(
+                   width = 4,
+                   actionButton("updatePrjsButton", "rename")
+                 )
+               ),
+               fluidRow(
+                 column(
+                   width = 8,
+                   selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")
+                 ),
+                 column(
+                   width = 4,
+                   actionButton("delPrjsButton", "delete")
+                 ),
+                 tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}"),
+                 tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
+               )
+             )
+           ),
+           checkbsTT(item = "oldPrj"),
+           checkbsTT(item = "newPrj"),
+           checkbsTT(item = "updatePrjsButton"),
+           checkbsTT(item = "delPrj"),
+           checkbsTT(item = "delPrjsButton")
+         ),
+         tabPanel(
+           title = "combine projections", solidHeader = TRUE, width = 12, value = "gQC_combProj",
+           tags$p("Two factors can be combined by pasting the values per row and re-leveling"),
+           br(),
+           fluidRow(
+             column(
+               width = 6,
+               selectInput("gQC_combPrj1", "1 st Projection", choices = c("notyet"), selected = "notyet")
+             ),
+             column(
+               width = 6,
+               
+               selectInput("gQC_combPrj2", "2nd Projections", choices = c("notyet"), selected = "notyet")
+             )),
+           fluidRow(
+             column(width = 6, 
+                    textInput("gQC_newCombPrj", "name of new Projection", value = "")),
+             column(
+               width = 6,
+               actionButton("gQC_updateCombPrjsButton", "apply")
+             )
+           ),
+           fluidRow(column(
+             width = 12,
+             tableSelectionUi("gQC_projCombTableMod")
+           )
+           )
+         ),
+         tabPanel(
+           title = "rename levels", width = 12, value = "gQC_renameLev",
+           tags$p("rename the levels of a factor"),
+           br(),
+           
+           fluidRow(
+             column(
+               width = 6,
+               selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
+             ),
+             column(width = 6, 
+                     textInput("gQC_newRnPrj", "name of new Projection", value = ""))
+           ),
+           
+           fluidRow(
+             column(
+               width = 12,
+               tags$p(tags$b("original values")),
+               textOutput("gQC_orgLevels", ),
+               br()
+             )
+           ),
+           fluidRow(
+             column(
+               width = 12,
+               textAreaInput("gQC_renameLev", "new levels")
+             )
+           ),
+           fluidRow(
+             column(
+               width = 6,
+               actionButton("gQC_renameLevButton", "apply")
+             )
+           )
+         )
+  )
+)
+
 tabList <- list(
   shinydashboard::tabItem(
     "gQC_umiHist",
@@ -245,5 +358,7 @@ tabList <- list(
         clusterUI("gQC_umap_main")
       ))
     )
-  )
+  ),
+  modTab
+  
 )

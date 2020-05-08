@@ -1,0 +1,64 @@
+base:	Part of R 3.6.3
+BiocSingular:	GPL-3
+callr:	MIT + file LICENSE
+colourpicker:	MIT + file LICENSE
+crayon:	MIT + file LICENSE
+debugme:	MIT + file LICENSE
+DESeq2:	LGPL (>= 3)
+digest:	GPL (>= 2)
+dplyr:	MIT + file LICENSE
+DT:	GPL-3 | file LICENSE
+edgeR:	GPL (>=2)
+future:	LGPL (>= 2.1)
+ggplot2:	GPL-2 | file LICENSE
+ggpubr:	GPL-2
+gtools:	GPL-2
+Hmisc:	GPL (>= 2)
+htmltools:	GPL (>= 2)
+irlba:	GPL-3
+kableExtra:	MIT + file LICENSE
+knitr:	GPL
+kohonen:	GPL (>= 2)
+magrittr:	MIT + file LICENSE
+manhattanly:	MIT + file LICENSE
+MASS:	GPL-2 | GPL-3
+Matrix:	GPL (>= 2) | file LICENCE
+mclust:	GPL (>= 2)
+parallel:	Part of R 3.6.3
+pheatmap:	GPL-2
+plotly:	MIT + file LICENSE
+png:	GPL-2 | GPL-3
+pryr:	GPL-2
+psychTools:	GPL (>= 2)
+RColorBrewer:	Apache License 2.0
+reactlog:	GPL-3
+reshape2:	MIT + file LICENSE
+rmarkdown:	GPL-3
+Rsomoclu:	GPL-3
+Rtsne:	file LICENSE
+scater:	GPL-3
+scran:	GPL-3
+Seurat:	GPL-3 | file LICENSE
+shiny:	GPL-3 | file LICENSE
+shinyBS:	GPL-3
+shinycssloaders:	GPL-3
+shinydashboard:	GPL (>= 2) | file LICENSE
+shinyjqui:	MIT + file LICENSE
+shinyjs:	AGPL-3
+shinyMCE:	MIT
+shinythemes:	GPL-3 | file LICENSE
+shinyTree:	MIT + file LICENSE
+shinyWidgets:	GPL-3 | file LICENSE
+SingleCellExperiment:	GPL-3
+SingleR:	GPL-3 + file LICENSE
+stats:	Part of R 3.6.3
+stringr:	GPL-2 | file LICENSE
+SummarizedExperiment:	Artistic-2.0
+threejs:	MIT + file LICENSE
+tibble:	MIT + file LICENSE
+tidyverse:	GPL-3 | file LICENSE
+tools:	Part of R 3.6.3
+TRONCO:	GPL-3
+utils:	Part of R 3.6.3
+uwot:	GPL-3
+withr:	GPL (>= 2)

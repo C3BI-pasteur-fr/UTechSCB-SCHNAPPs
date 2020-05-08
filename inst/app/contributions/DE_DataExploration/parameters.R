@@ -523,7 +523,7 @@ DE_seuratLogNormfunc <- function(scEx) {
     }
     )
   
-  seurDat = NormalizeData(seurDat)
+  seurDat = Seurat::NormalizeData(seurDat)
   
   A <- seurDat[["RNA"]]@data
   scEx_bcnorm <- SingleCellExperiment(
@@ -721,13 +721,13 @@ DE_scaterNormalizationfunc <- function(scEx, scalingFactor = 10000) {
                                           clusters = sampinfo, 
                                           subset.row = genes2use)
   # scaterReads <- scran::computeSumFactors(scEx, clusters = sampinfo)
-  dt = data.frame(x=librarySizeFactors(scaterReads), y=sizeFactors(scaterReads))
-  p = plot_ly(dt, x=~x,y=~y)  %>% add_markers()
-  p <- layout(p, xaxis = list(type = "log"),
-              yaxis = list(type = "log"))
-  
-  p
-  scaterReads <- normalize(scaterReads)
+  # dt = data.frame(x=librarySizeFactors(scaterReads), y=sizeFactors(scaterReads))
+  # p = plot_ly(dt, x=~x,y=~y)  %>% add_markers()
+  # p <- layout(p, xaxis = list(type = "log"),
+  #             yaxis = list(type = "log"))
+  # 
+  # p
+  scaterReads <- SingleCellExperiment::normalize(scaterReads)
   assays(scaterReads)['counts'] = NULL
   return(scaterReads)
 }

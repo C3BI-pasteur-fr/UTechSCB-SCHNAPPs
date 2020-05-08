@@ -43,173 +43,175 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # source('tabs.R',  local = TRUE)
 
 scShinyUI <- function(request) {
-  
-source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
-source(paste0(packagePath, "/tabs.R"), local = TRUE)
-# general tabs
-allTabs <- list(
-  inputTab()
-  ,
-  geneSelectionTab()
-  ,
-  cellSelectionTab(),
-  generalParametersTab(),
-  renameTab()
-)
-# parameters tab, includes basic normalization
-source(paste0(packagePath, "/parameters.R"), local = TRUE)
-
-# Basic menu Items
-allMenus <- list(
-  shinydashboard::menuItem("input",
-    # id="inputID",
-    tabName = "input", icon = icon("folder")
-  ),
-  shinydashboard::menuItem("Parameters",
-    # id="parametersID",
-    tabName = "parameters", icon = icon("gopuram"), 
-    parameterItems()
-  ),
-  shinydashboard::menuItem(" Cell selection",
-    # id="cellSelectionID",
-    tabName = "cellSelection", icon = icon("ello")
-  ),
-  shinydashboard::menuItem("Gene selection",
-    # id="geneSelectionID",
-    tabName = "geneSelection", icon = icon("atom")
-  ),
-  shinydashboard::menuItem("rename projections",
-    # id="geneSelectionID",
-    tabName = "renameProj", icon = icon("signature")
+  source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
+  source(paste0(packagePath, "/tabs.R"), local = TRUE)
+  # general tabs
+  allTabs <- list(
+    inputTab(),
+    geneSelectionTab(),
+    cellSelectionTab(),
+    generalParametersTab(),
+    renameTab()
   )
-)
+  # parameters tab, includes basic normalization
+  source(paste0(packagePath, "/parameters.R"), local = TRUE)
+
+  # Basic menu Items
+  allMenus <- list(
+    shinydashboard::menuItem("input",
+      # id="inputID",
+      tabName = "input", icon = icon("folder")
+    ),
+    shinydashboard::menuItem("Parameters",
+      # id="parametersID",
+      tabName = "parameters", icon = icon("gopuram"),
+      parameterItems()
+    ),
+    shinydashboard::menuItem(" Cell selection",
+      # id="cellSelectionID",
+      tabName = "cellSelection", icon = icon("ello")
+    ),
+    shinydashboard::menuItem("Gene selection",
+      # id="geneSelectionID",
+      tabName = "geneSelection", icon = icon("atom")
+    )
+    # ,
+    # shinydashboard::menuItem("rename projections",
+    #   # id="geneSelectionID",
+    #   tabName = "modifyProj", icon = icon("signature")
+    # )
+  )
 
 
-# parse all ui.R files under contributions to include in application
-uiFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
-for (fp in uiFiles) {
-  menuList <- list()
-  tabList <- list()
-  source(fp, local = TRUE)
+  # parse all ui.R files under contributions to include in application
+  uiFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
+  for (fp in uiFiles) {
+    menuList <- list()
+    tabList <- list()
+    source(fp, local = TRUE)
 
-  for (li in menuList) {
-    if (length(li) > 0) {
-      # if(DEBUG)cat(file=stderr(), paste("menuList:", length(allMenus)," ", li$children, "\n"))
-      allMenus[[length(allMenus) + 1 ]] <- li
+    for (li in menuList) {
+      if (length(li) > 0) {
+        # if(DEBUG)cat(file=stderr(), paste("menuList:", length(allMenus)," ", li$children, "\n"))
+        allMenus[[length(allMenus) + 1]] <- li
+      }
+    }
+    for (li in tabList) {
+      if (length(li) > 0) {
+        # if(DEBUG)cat(file=stderr(), paste(li$children[[1]], "\n"))
+        allTabs[[length(allTabs) + 1]] <- li
+      }
     }
   }
-  for (li in tabList) {
-    if (length(li) > 0) {
-      # if(DEBUG)cat(file=stderr(), paste(li$children[[1]], "\n"))
-      allTabs[[length(allTabs) + 1]] <- li
+
+
+  mListNames <- c()
+  for (menuListItem in 1:length(allMenus)) {
+    mListNames[menuListItem] <- allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
+  }
+  sollOrder <- c(
+    "input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
+    "Data Exploration", "Subcluster analysis"
+  )
+  sollOrderIdx <- c()
+  for (sIdx in 1:length(sollOrder)) {
+    sollOrderIdx[sIdx] <- which(sollOrder[sIdx] == mListNames)
+  }
+  sollOrderIdx <- c(sollOrderIdx, which(!1:length(allMenus) %in% sollOrderIdx))
+
+  allMenus <- allMenus[sollOrderIdx]
+
+  # todo
+  # parse all parameters.R files under contributions to include in application
+  # allTabs holds all tabs regardsless of their location in the GUI
+  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  for (fp in parFiles) {
+    tabList <- list()
+    source(fp, local = TRUE)
+
+    for (li in tabList) {
+      if (length(li) > 0) {
+        # if(DEBUG)cat(file=stderr(), paste(li$children[[1]], "\n"))
+        # allTabs[[length(allTabs) + 1]] <- li
+      }
     }
   }
-}
 
-
-mListNames <- c()
-for (menuListItem in 1:length(allMenus)) {
-  mListNames[menuListItem] <- allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
-}
-sollOrder <- c(
-  "input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
-  "Data Exploration", "Subcluster analysis"
-)
-sollOrderIdx <- c()
-for (sIdx in 1:length(sollOrder)) {
-  sollOrderIdx[sIdx] <- which(sollOrder[sIdx] == mListNames)
-}
-sollOrderIdx <- c(sollOrderIdx, which(!1:length(allMenus) %in% sollOrderIdx))
-
-allMenus <- allMenus[sollOrderIdx]
-
-# todo
-# parse all parameters.R files under contributions to include in application
-# allTabs holds all tabs regardsless of their location in the GUI
-parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
-for (fp in parFiles) {
-  tabList <- list()
-  source(fp, local = TRUE)
-
-  for (li in tabList) {
-    if (length(li) > 0) {
-      # if(DEBUG)cat(file=stderr(), paste(li$children[[1]], "\n"))
-      # allTabs[[length(allTabs) + 1]] <- li
-    }
+  mulist <- list(
+    inputTab(),
+    geneSelectionTab()
+  )
+  getallTabs <- function() {
+    # tags$div(list(inputTab(),
+    #               geneSelectionTab()),
+    #          # inputTab(),
+    #          class = "tab-content"
+    # )  ,
+    tags$div(mulist,
+      # inputTab(),
+      class = "tab-content"
+    )
+    tags$div(
+      allTabs,
+      # inputTab(),
+      class = "tab-content"
+    )
   }
-}
+  # search for parameter contribution submenu items (menuSubItem)
+  # parameterContributions = ""
 
-mulist <- list(inputTab(),
-               geneSelectionTab())
-getallTabs <- function() {
-  # tags$div(list(inputTab(),
-  #               geneSelectionTab()),
-  #          # inputTab(),
-  #          class = "tab-content"
-  # )  ,
-  tags$div(mulist
-    ,
-    # inputTab(),
-    class = "tab-content"
-  )  
-  tags$div(
-    allTabs,
-    # inputTab(),
-    class = "tab-content"
-  )  
-}
-# search for parameter contribution submenu items (menuSubItem)
-# parameterContributions = ""
+  getallMenus <- function() {
+    allMenus
+  }
 
-getallMenus <- function(){
-  allMenus
-}
 
-  
   shinyUI(
-  shinydashboard::dashboardPage(
-    shinydashboard::dashboardHeader(title = "SCHNAPPs"),
-    shinydashboard::dashboardSidebar(
-      shinydashboard::sidebarMenu(
-        id = "sideBarID",
-        getallMenus()
-      ,
-      htmlOutput("summaryStatsSideBar"),
+    shinydashboard::dashboardPage(
+      shinydashboard::dashboardHeader(title = paste("SCHNAPPs", packageVersion("SCHNAPPs"))),
+      shinydashboard::dashboardSidebar(
+        shinydashboard::sidebarMenu(
+          id = "sideBarID",
+          getallMenus(),
+          htmlOutput("summaryStatsSideBar"),
 
-      downloadButton("report", "Generate report", class = "butt"),
-      tags$head(tags$style(".butt{color: black !important;}")), #  font color
+          # downloadButton("report", "Generate report", class = "butt"),
+          tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
 
-      # bookmarkButton(id = "bookmark1"),
-      downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
-      downloadButton("RDSsave", "Download RData", class = "butt"),
-      if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
-      verbatimTextOutput("DEBUGSAVEstring"),
-      if (is.environment(.schnappsEnv)) {
-      if (exists("historyPath", envir = .schnappsEnv)){
-        # checkboxInput("save2History", "save to history file", FALSE)
-        actionButton("comment2History", "Add comment to history")
-      }},
-      if (DEBUG) {
-        actionButton("openBrowser", "open Browser")
-      },
-      bookmarkButton()
-      )
-      # ,
-      # verbatimTextOutput("save2Historystring")
-      # ,verbatimTextOutput("currentTabInfo")
-    ), # dashboard side bar
-    shinydashboard::dashboardBody(
-      shinyjs::useShinyjs(debug = TRUE),
-      inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
-      inlineCSS(list(.green = "background-color: lightgreen")),
-      getallTabs(),
-      # tags$div(list(inputTab(),
-      #               geneSelectionTab()),
-      #          # inputTab(),
-      #          class = "tab-content"
-      # )  ,
-      # h4("Sum of all previous slider values:", textOutput("sum"))
-    ) # dashboard body
-  ) # main dashboard
-)
+          # bookmarkButton(id = "bookmark1"),
+          br(),
+          downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
+          br(),
+          downloadButton("RDSsave", "Download RData", class = "butt"),
+          if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
+          verbatimTextOutput("DEBUGSAVEstring"),
+          if (is.environment(.schnappsEnv)) {
+            if (exists("historyPath", envir = .schnappsEnv)) {
+              # checkboxInput("save2History", "save to history file", FALSE)
+              actionButton("comment2History", "Add comment to history")
+            }
+          },
+          if (DEBUG) {
+            actionButton("openBrowser", "open Browser")
+          },
+          bookmarkButton()
+        )
+        # ,
+        # verbatimTextOutput("save2Historystring")
+        # ,verbatimTextOutput("currentTabInfo")
+      ), # dashboard side bar
+      shinydashboard::dashboardBody(
+        shinyjs::useShinyjs(debug = TRUE),
+        inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
+        inlineCSS(list(.green = "background-color: lightgreen")),
+        getallTabs(),
+        # tags$div(list(inputTab(),
+        #               geneSelectionTab()),
+        #          # inputTab(),
+        #          class = "tab-content"
+        # )  ,
+        # h4("Sum of all previous slider values:", textOutput("sum"))
+      ) # dashboard body
+    ) # main dashboard
+  )
 }
+
