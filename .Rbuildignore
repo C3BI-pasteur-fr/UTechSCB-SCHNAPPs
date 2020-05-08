@@ -15,3 +15,5 @@
 ^CONTRIBUTING.md$
 ^.github
 ^shiny_bookmarks$
+^intro*
+^figure$
