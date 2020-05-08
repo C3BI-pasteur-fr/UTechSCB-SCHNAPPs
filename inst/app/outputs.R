@@ -782,7 +782,6 @@ output$RmdSave <- downloadHandler(
     }
     start.time <- base::Sys.time()
     on.exit({
-      printTimeEnd(start.time, "RmdSave")
       if (!is.null(getDefaultReactiveDomain())) {
         removeNotification(id = "RmdSave")
       }
@@ -1015,8 +1014,9 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
     ob_clusterParams$destroy()
     return(NULL)
   }
+
   
-  if (tabsetCluster == "seurat_Clustering") {
+    if (tabsetCluster == "seurat_Clustering") {
     setRedGreenButtonCurrent(
       vars = list(
         c("tabsetCluster", input$tabsetCluster),
