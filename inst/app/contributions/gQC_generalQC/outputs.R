@@ -42,9 +42,9 @@ gQC_update3DInput <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_update3DInput", id = "gQC_update3DInput", duration = NULL)
   }
-
+  
   projections <- projections()
-
+  
   # Can use character(0) to remove all choices
   if (is.null(projections)) {
     return(NULL)
@@ -53,21 +53,21 @@ gQC_update3DInput <- reactive({
   choices <- colnames(projections)
   # Can also set the label and select items
   updateSelectInput(session, "gQC_dim3D_x",
-    choices = choices,
-    selected = .schnappsEnv$gQC_X1
+                    choices = choices,
+                    selected = .schnappsEnv$gQC_X1
   )
-
+  
   updateSelectInput(session, "gQC_dim3D_y",
-    choices = choices,
-    selected = .schnappsEnv$gQC_X2
+                    choices = choices,
+                    selected = .schnappsEnv$gQC_X2
   )
   updateSelectInput(session, "gQC_dim3D_z",
-    choices = choices,
-    selected = .schnappsEnv$gQC_X3
+                    choices = choices,
+                    selected = .schnappsEnv$gQC_X3
   )
   updateSelectInput(session, "gQC_col3D",
-    choices = colnames(projections),
-    selected = .schnappsEnv$gQC_col
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$gQC_col
   )
 })
 
@@ -80,24 +80,24 @@ observe(label = "ob_UMAPParams", {
   
   input$activateUMAP
   setRedGreenButtonCurrent(
-      vars = list(
-        c("gQC_um_randSeed", input$gQC_um_randSeed),
-        c("gQC_um_n_neighbors", input$gQC_um_n_neighbors),
-        c("gQC_um_n_components", input$gQC_um_n_components),
-        c("gQC_um_n_epochs", input$gQC_um_n_epochs),
-        # c("um_alpha", input$um_alpha),
-        c("gQC_um_init", input$gQC_um_init),
-        c("gQC_um_min_dist", input$gQC_um_min_dist),
-        c("gQC_um_set_op_mix_ratio", input$gQC_um_set_op_mix_ratio),
-        c("gQC_um_local_connectivity", input$gQC_um_local_connectivity),
-        c("gQC_um_bandwidth", input$gQC_um_bandwidth),
-        c("um_gamma", input$um_gamma),
-        c("gQC_um_negative_sample_rate", input$gQC_um_negative_sample_rate),
-        c("gQC_um_metric", input$gQC_um_metric),
-        c("gQC_um_spread", input$gQC_um_spread)
-      )
+    vars = list(
+      c("gQC_um_randSeed", input$gQC_um_randSeed),
+      c("gQC_um_n_neighbors", input$gQC_um_n_neighbors),
+      c("gQC_um_n_components", input$gQC_um_n_components),
+      c("gQC_um_n_epochs", input$gQC_um_n_epochs),
+      # c("um_alpha", input$um_alpha),
+      c("gQC_um_init", input$gQC_um_init),
+      c("gQC_um_min_dist", input$gQC_um_min_dist),
+      c("gQC_um_set_op_mix_ratio", input$gQC_um_set_op_mix_ratio),
+      c("gQC_um_local_connectivity", input$gQC_um_local_connectivity),
+      c("gQC_um_bandwidth", input$gQC_um_bandwidth),
+      c("um_gamma", input$um_gamma),
+      c("gQC_um_negative_sample_rate", input$gQC_um_negative_sample_rate),
+      c("gQC_um_metric", input$gQC_um_metric),
+      c("gQC_um_spread", input$gQC_um_spread)
     )
-    
+  )
+  
   updateButtonColor(buttonName = "activateUMAP", parameters = c(
     "gQC_um_randSeed", "gQC_um_n_neighbors", "gQC_um_n_components", "gQC_um_n_epochs", 
     "gQC_um_init", "gQC_um_min_dist", "gQC_um_set_op_mix_ratio", 
@@ -116,7 +116,7 @@ observe(label = "ob_tsneParams", {
     .schnappsEnv$calculated_gQC_tsneDim <- "NA"
   }
   input$updatetsneParameters
-
+  
   setRedGreenButtonCurrent(
     vars = list(
       c("gQC_tsneDim", input$gQC_tsneDim),
@@ -144,7 +144,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_tsne_main", id = "gQC_tsne_main", duration = NULL)
   }
-
+  
   upI <- gQC_update3DInput()
   projections <- projections()
   dimX <- input$gQC_dim3D_x
@@ -153,7 +153,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   dimCol <- input$gQC_col3D
   scols <- sampleCols$colPal
   ccols <- clusterCols$colPal
-
+  
   if (is.null(projections)) {
     if (DEBUG) cat(file = stderr(), "output$gQC_tsne_main:NULL\n")
     return(NULL)
@@ -162,9 +162,9 @@ output$gQC_tsne_main <- plotly::renderPlotly({
     save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
-
+  
   retVal <- tsnePlot(projections, dimX, dimY, dimZ, dimCol, scols, ccols)
-
+  
   exportTestValues(tsnePlot = {
     str(retVal)
   })
@@ -185,6 +185,13 @@ callModule(
   projectionTable
 )
 
+# gQC_projectionCombTableMod ----
+callModule(
+  tableSelectionServer,
+  "gQC_projCombTableMod",
+  projectionTable
+)
+
 # gQC_plotUmiHist ----
 output$gQC_plotUmiHist <- renderPlot({
   if (DEBUG) cat(file = stderr(), "gQC_plotUmiHist started.\n")
@@ -198,10 +205,10 @@ output$gQC_plotUmiHist <- renderPlot({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_plotUmiHist", id = "gQC_plotUmiHist", duration = NULL)
   }
-
+  
   scEx <- scEx()
   scols <- sampleCols$colPal
-
+  
   if (is.null(scEx)) {
     return(NULL)
   }
@@ -209,7 +216,7 @@ output$gQC_plotUmiHist <- renderPlot({
     save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData")
-
+  
   dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
   dat$sample <- colData(scEx)$sampleNames
   retVal <- ggplot(data = dat, aes(counts, fill = sample)) +
@@ -233,10 +240,10 @@ output$gQC_plotSampleHist <- renderPlot({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_plotSampleHist", id = "gQC_plotSampleHist", duration = NULL)
   }
-
+  
   sampleInf <- sampleInfo()
   scols <- sampleCols$colPal
-
+  
   if (is.null(sampleInf)) {
     return(NULL)
   }
@@ -272,8 +279,8 @@ output$gQC_variancePCA <- renderPlot({
   # load(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData")
   
   # h2("Variances of PCs")
-
- 
+  
+  
   
   df <- data.frame(var = pca$var_pcs, pc = 1:length(pca$var_pcs))
   retVal <- ggplot(data = df,aes(x=pc, y=var)) + geom_bar(stat = "identity")  
@@ -281,3 +288,261 @@ output$gQC_variancePCA <- renderPlot({
   return(retVal)
   # barplot(pca$var_pcs, main = "Variance captured by first PCs")
 })
+
+# rename projections observers ----
+
+observeEvent(
+  label = "ob30",
+  eventExpr = input$updatePrjsButton,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
+    oldPrj <- input$oldPrj
+    newPrj <- input$newPrj
+    projections <- projections()
+    newPrjs <- projectionsTable$newProjections
+    
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
+        list = c("normaliztionParameters", ls())
+      )
+    }
+    # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
+    if (newPrj %in% colnames(projections)) {
+      showNotification(
+        "New column name already used",
+        type = "error",
+        duration = NULL
+      )
+      return(NULL)
+    }
+    if (ncol(newPrjs) == 0) {
+      newPrjs <- projections[, oldPrj, drop = FALSE]
+    } else {
+      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
+    }
+    colnames(newPrjs)[ncol(newPrjs)] <- newPrj
+    projectionsTable$newProjections <- newPrjs
+  }
+)
+
+# rename projections
+observe(label = "ob27", {
+  projections <- projections()
+  
+  updateSelectInput(session, "oldPrj",
+                    choices = c(colnames(projections))
+  )
+  updateSelectInput(session, "delPrj",
+                    choices = c(colnames(projectionsTable$newProjections))
+  )
+})
+
+observe(label = "ob28", {
+  input$newPrj
+  updateTextInput(session, "newPrj", value = make.names(input$newPrj, unique = TRUE))
+})
+
+observeEvent(
+  label = "ob29",
+  eventExpr = input$delPrjsButton,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
+    newPrjs <- projectionsTable$newProjections
+    delPrj <- input$delPrj
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (!delPrj %in% colnames(newPrjs)) {
+      return(NULL)
+    }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = "~/SCHNAPPsDebug/delPrjsButton.RData",
+        list = c("normaliztionParameters", ls())
+      )
+    }
+    # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
+    
+    projectionsTable$newProjections <- newPrjs[, -which(colnames(newPrjs) == delPrj), drop = FALSE]
+  }
+)
+
+# combine projections observers ----
+
+observeEvent(
+  label = "gQC_updateCombPrjsButton",
+  eventExpr = input$gQC_updateCombPrjsButton,
+  handlerExpr = {
+    if (DEBUG) cat(file = stderr(), "gQC_updateCombPrjsButton\n")
+    prj1 <- input$gQC_combPrj1
+    prj2 <- input$gQC_combPrj2
+    newPrj <- make.names(input$gQC_newCombPrj)
+    projections <- projections()
+    newPrjs <- projectionsTable$newProjections
+    
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (!all(c(prj1, prj2) %in% colnames(projections))) {
+      return(NULL)
+    }
+    
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = "~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData",
+        list = c("normaliztionParameters", ls())
+      )
+    }
+    # cp=  load(file="~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData")
+    if (newPrj %in% colnames(projections)) {
+      showNotification(
+        "New column name already used",
+        type = "error",
+        duration = NULL
+      )
+      return(NULL)
+    }
+    combProjections = paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor()
+    if (length(levels(combProjections)) > 100) {
+      out = showModal(verifyLevelModal(NLevel = length(levels(combProjections))))
+      # browser()
+    }
+    if (ncol(newPrjs) == 0) {
+      newPrjs <- data.frame(newPrj = combProjections)
+      rownames(newPrjs) = rownames(projections)
+    } else {
+      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], combProjections)
+    }
+    colnames(newPrjs)[ncol(newPrjs)] <- newPrj
+    projectionsTable$newProjections  <- newPrjs
+  }
+)
+
+output$gQC_orgLevels = renderText({
+  rnProj = input$gQC_rnProj
+  projections = projections()
+  shiny::req(rnProj)
+  shiny::req(projections)
+  if (! rnProj %in% colnames(projections)) return(NULL)
+  # browser()
+  paste(levels(projections[,rnProj]), collapse = ", ")
+})
+
+# rename projection levels ----
+
+
+verifyLevelModal <- function(NLevel, failed = FALSE) {
+  modalDialog(
+    span(paste(
+      "There are ", NLevel, "new levels, are you sure you want to do this?\n")
+    )
+    ,
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("commentok", "OK")
+    )
+  )
+}
+
+
+observeEvent(eventExpr = input$gQC_renameLevButton,
+             label = "rnBtn",
+             handlerExpr = {
+               newLables = input$gQC_renameLev
+               rnProj = input$gQC_rnProj
+               newProjName = make.names(input$gQC_newRnPrj)
+               projections = projections()
+               newPrjs <- projectionsTable$newProjections
+               if (is.null(projections)) {
+                 return(NULL)
+               }
+               
+               if (.schnappsEnv$DEBUGSAVE) {
+                 save(
+                   file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
+                   list = c("normaliztionParameters", ls())
+                 )
+               }
+               # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
+               
+               if(is.null(
+                 tryCatch({
+                   newLbVec = str_split(newLables, ",")[[1]]
+                   if (ncol(newPrjs) == 0) {
+                     newPrjs <- projections[,rnProj, drop = FALSE]
+                   } else {
+                     newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,rnProj])
+                   }
+                   newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
+                   levels(newPrjs[,ncol(newPrjs)]) = newLbVec
+                 }, error=function(w){
+                   cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
+                   showNotification("problem with names", id = "renameProbl", duration = NULL)
+                   return(NULL)
+                 }))) return(NULL)
+               newProjName = make.unique(c(colnames(projections),newProjName))[length(c(colnames(projections),newProjName))]
+               updateTextInput(session, "gQC_newRnPrj", value = newProjName)
+               colnames(newPrjs)[ncol(newPrjs)] <- newProjName
+               projectionsTable$newProjections  <- newPrjs
+               
+             })
+
+observeEvent(eventExpr = input$gQC_rnProj,
+             label = "gqc1",
+             handlerExpr = {
+               rnProj = input$gQC_rnProj
+               projections = projections()
+               shiny::req(rnProj)
+               shiny::req(projections)
+               if (! rnProj %in% colnames(projections)) return(NULL)
+               # browser()
+               updateTextAreaInput(session, inputId = "gQC_renameLev", value = paste(levels(projections[,rnProj]), collapse = ", "))
+             })
+
+
+# rename projections
+.schnappsEnv$gQC_combPrj1 <- "tsne1"
+.schnappsEnv$gQC_combPrj2 <- "tsne1"
+.schnappsEnv$gQC_rnProj <- "tsne1"
+
+observe(label = "ob27b", {
+  projections <- projections()
+  
+  
+  # only factorials?
+  updateSelectInput(session, "gQC_combPrj1",
+                    choices = c(colnames(projections),
+                                selected = .schnappsEnv$gQC_combPrj1)
+  )
+  updateSelectInput(session, "gQC_combPrj2",
+                    choices = c(colnames(projections),
+                                selected = .schnappsEnv$gQC_combPrj2)
+  )
+  updateSelectInput(session, "gQC_rnProj",
+                    choices = c(colnames(projections),
+                                selected = .schnappsEnv$gQC_rnProj)
+  )
+  
+})
+observe(label = "ob27c", {
+  if (DEBUG) cat(file = stderr(), "observe: gQC_combPrj1\n")
+  .schnappsEnv$gQC_combPrj1 <- input$gQC_combPrj1
+})
+observe(label = "ob27d", {
+  if (DEBUG) cat(file = stderr(), "observe: gQC_combPrj2\n")
+  .schnappsEnv$gQC_combPrj2 <- input$gQC_combPrj2
+})
+observe(label = "ob27e", {
+  if (DEBUG) cat(file = stderr(), "observe: gQC_rnProj\n")
+  .schnappsEnv$gQC_rnProj <- input$gQC_rnProj
+})
+
+
+# rename levels
+
+output$gQC_renameLev <- renderText({"text"})

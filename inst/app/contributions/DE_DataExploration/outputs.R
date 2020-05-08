@@ -1,4 +1,4 @@
-source(paste0(packagePath, "/reactives.R"), local = TRUE)
+# source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
 # since DE_scaterPNG is not used frequently it is not included in the heavyCalculations
 # list
@@ -265,7 +265,7 @@ output$DE_panelPlot <- renderPlot({
 
 
 # Scater QC ----
-output$DE_scaterQC <- renderImage({
+output$DE_scaterQC <- renderImage(deleteFile = T, {
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -340,6 +340,7 @@ output$DE_downloadPanel <- downloadHandler(
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
+    # TODO should be taken from projections.
     tsne <- tsne()
 
     if (is.null(scEx)) {
