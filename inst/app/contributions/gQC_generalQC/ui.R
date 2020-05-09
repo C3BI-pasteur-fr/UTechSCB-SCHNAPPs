@@ -27,7 +27,7 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")
+               selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = defaultValue("oldPrj", "NO"))
              ),
              column(
                width = 6,

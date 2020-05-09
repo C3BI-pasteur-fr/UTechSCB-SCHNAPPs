@@ -197,7 +197,8 @@ scShinyUI <- function(request) {
   
   shinyUI(
     shinydashboard::dashboardPage(
-      shinydashboard::dashboardHeader(title = paste("SCHNAPPs" , packageVersion("SCHNAPPs"))),
+      dheader(),
+      # shinydashboard::dashboardHeader(title = paste("SCHNAPPs" , packageVersion("SCHNAPPs"))),
       shinydashboard::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sideBarID",
