@@ -101,7 +101,7 @@ tabList <- list(
                                          column(
                                            width = 3,
                                            numericInput("coEtgMinExpr", "min UMI count per gene:",
-                                                        1,
+                                                        defaultValue("coEtgMinExpr", 1),
                                                         min = 0, max = 100000
                                            )
                                          ), column(
