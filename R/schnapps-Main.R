@@ -16,6 +16,7 @@
 #' @param DEBUG TRUE/FALSE whether to show debugging information on the console
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
 #' @param historyPath location (directory) where history directories and data will be stored.
+#' @param defaultValues list of default values to use for inputs
 #'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
@@ -32,16 +33,17 @@
 #' save(file = "scEx.Rdata", list = "scEx")
 #' # use "scEx.Rdata" with load data functionality within the shiny app
 schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
-                       defaultValueSingleGene = "CD52",
-                       defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
-                       defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
-                       DEBUG = FALSE,
-                       DEBUGSAVE = FALSE,
-                      historyPath = NULL
+                     defaultValueSingleGene = "CD52",
+                     defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
+                     defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
+                     DEBUG = FALSE,
+                     DEBUGSAVE = FALSE,
+                     historyPath = NULL,
+                     defaultValues = list()
                      # ,
                      # historyFile = NULL
 
-                       ) {
+) {
   # on.exit({
   #   rm(list = c(".SCHNAPPs_locContributionDir",
   #        ".SCHNAPPs_defaultValueSingleGene",
@@ -60,8 +62,9 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   assign("DEBUG", DEBUG, envir = .schnappsEnv)
   assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
   assign("historyPath", historyPath, envir = .schnappsEnv)
+  assign("defaultValues", defaultValues, envir = .schnappsEnv)
   # assign("historyFile", historyFile, envir = .schnappsEnv)
-  
+
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL
   scShinyServer <- NULL
@@ -87,4 +90,3 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
 #' @format A data frame with 53940 rows and 10 variables
 #' @source <http://www.diamondse.info/>
 "scEx"
-

@@ -22,6 +22,13 @@ assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
 # assign("historyFile", historyFile, envir = .schnappsEnv)
 
+
+defaultValues = list()
+defaultValues[["coEtgMinExpr"]] = 100
+
+assign("defaultValues", defaultValues, envir = .schnappsEnv)
+
+
 # will be set during sourcing, but we need to define them, otherwise there will be a warning
 scShinyUI <- NULL
 scShinyServer <- NULL

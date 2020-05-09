@@ -14,128 +14,131 @@ source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 
 
-
 # inputTab ----
-inputTab <- function(){
+inputTab <- function() {
   shinydashboard::tabItem(
-  tabName = "input",
-  box(
-    width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
-    fluidRow(
-    div(h3("SCHNAPPs Input"), align = "center")
-  ),
-  br(),
-  fluidRow(div(
-    h4(
-      "Single Cell sHiNy APP(s)"
-    ),
-    align = "center"
-  )),
+    tabName = "input",
     box(
       width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
       fluidRow(
-        column(
-          width = 12,
-          div(
-            p(
-              "Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies or other. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well."
-            ),
-            align = "left"
-          )
-        )
-      )
-    ),
-    br(),
-    box(
-      title = "Input files", status = "primary", solidHeader = TRUE, width = 12,
-      footer = div(
-        "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
-        br(),
-        "Multiple files can be selected when using RData files with SingleCellExpression objects.",
-        br(),
-        "RData files are R data files generated using base::save()."
+        div(h3("SCHNAPPs Input"), align = "center")
       ),
-      fluidRow(
-        column(
-          6,
-          offset = 3,
-          fileInput(
-            "file1",
-            "Count data upload",
-            accept = c(
-              ".Rds", ".RData", ".Rdata", ".txt", ".csv"
-            ),
-            multiple = TRUE,
-          ), checkbsTT("file1")
+      br(),
+      fluidRow(div(
+        h4(
+          "Single Cell sHiNy APP(s)"
         ),
-        box(
-          title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
-          footer = "(Not required): Choose .CSV file with annotation to upload. This can be projections or gene based features.",
-          collapsible = TRUE, collapsed = TRUE,
-          fluidRow(
-            column(
-              6,
-              offset = 3,
-              fileInput(
-                "annoFile",
-                "Annotations to add",
-                accept = c(
-                  ".txt", ".csv", ".mtx"
-                ),
-                multiple = TRUE
-              ), checkbsTT("annoFile")
+        align = "center"
+      )),
+      box(
+        width = 12, solidHeader = FALSE, collapsible = FALSE, collapsed = FALSE,
+        fluidRow(
+          column(
+            width = 12,
+            div(
+              p(
+                "Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies or other. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well."
+              ),
+              align = "left"
             )
           )
         )
       )
-    )
-  ),
-  
-  br(),
-  box(
-    title = "input options", solidHeader = TRUE, width = 12, status = "primary",
-    fluidRow(
-      column(
-        6,
-        
-        checkboxInput("sampleInput", label = "sub sample", value = TRUE),
-        
-        numericInput("subsampleNum",
-                     label = "max number of cells",
-                     min = 500, max = 10000, step = 100, value = 1000
-        )
       ),
-      
-      checkbsTT("sampleInput"),
-      column(
-        6,
-        
-        radioButtons("whichscLog",
-                     label = "Compute normalizations?",
-                     choices = c(
-                       "disable log" = "disablescEx_log",
-                       "use scEx from loaded data" = "useLog",
-                       "calculate normalization here" = "calcLog"
-                     ),
-                     selected = "disablescEx_log"
+      br(),
+      boxWhelp(
+        title = "Input files",
+        helpID = "inputHelp",
+        status = "primary", solidHeader = TRUE, width = 12,
+        footer = div(
+          "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
+          br(),
+          "Multiple files can be selected when using RData files with SingleCellExpression objects.",
+          br(),
+          "RData files are R data files generated using base::save()."
+        ),
+
+        fluidRow(
+          column(
+            6,
+            offset = 3,
+            fileInput(
+              "file1",
+              "Count data upload",
+              accept = c(
+                ".Rds", ".RData", ".Rdata", ".txt", ".csv"
+              ),
+              multiple = TRUE,
+            ) %>% setId(id="fileInput"), checkbsTT("fileInput")
+          ),
+          boxWhelp(
+            title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
+            helpID = "inputHelpAdd",
+            footer = "(Not required): Choose .CSV file with annotation to upload. This can be projections or gene based features.",
+            collapsible = TRUE, collapsed = TRUE,
+            fluidRow(
+              column(
+                6,
+                offset = 3,
+                fileInput(
+                  "annoFile",
+                  "Annotations to add",
+                  accept = c(
+                    ".txt", ".csv", ".mtx"
+                  ),
+                  multiple = TRUE
+                ) %>% setId(id="fileInputAnnotation"), checkbsTT("annoFile")
+              )
+            )
+            
         )
-        # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
-      ),
-      checkbsTT("disablescEx_log")
+      )
+    ),
+
+    br(),
+    box(
+      title = "input options", solidHeader = TRUE, width = 12, status = "primary",
+      fluidRow(
+        column(
+          6,
+
+          checkboxInput("sampleInput", label = "sub sample", value = TRUE),
+
+          numericInput("subsampleNum",
+            label = "max number of cells",
+            min = 500, max = 10000, step = 100, value = 1000
+          )
+        ),
+
+        checkbsTT("sampleInput"),
+        column(
+          6,
+
+          radioButtons("whichscLog",
+            label = "Compute normalizations?",
+            choices = c(
+              "disable log" = "disablescEx_log",
+              "use scEx from loaded data" = "useLog",
+              "calculate normalization here" = "calcLog"
+            ),
+            selected = "disablescEx_log"
+          )
+          # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
+        ),
+        checkbsTT("disablescEx_log")
+      )
+    ),
+
+    br(),
+    box(
+      title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
+      footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
+      fluidRow(column(
+        6,
+
+        textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
+      )), checkbsTT("beforeFilterRegEx")
     )
-  ),
-  
-  br(),
-  box(
-    title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
-    footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
-    fluidRow(column(
-      6,
-      
-      textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
-    )), checkbsTT("beforeFilterRegEx")
-    
-  )
   )
 }
 
@@ -213,7 +216,7 @@ geneSelectionTab <- function() {
 }
 
 # cellSelectionTab ----
-cellSelectionTab <- function(){
+cellSelectionTab <- function() {
   shinydashboard::tabItem(
     tabName = "cellSelection",
     fluidRow(div(h3("Cell selection"), align = "center")),
@@ -276,7 +279,7 @@ cellSelectionTab <- function(){
 
 # parse all parameters.R files under contributions to include in application
 # allTabs holds all tabs regardsless of their location in the GUI
-getparameterContributions <- function(){
+getparameterContributions <- function() {
   parameterContributions <- list()
   # localContributionDir <- .SCHNAPPs_locContributionDir
   parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
@@ -297,7 +300,7 @@ getparameterContributions <- function(){
 
 # submenu items for the paramters main tab
 
-parameterItems <- function(){
+parameterItems <- function() {
   list(
     shinydashboard::menuSubItem("Normalization", tabName = "normalizations"),
     getparameterContributions(),
@@ -482,7 +485,7 @@ generalParametersTab <- function() {
 }
 
 # renameTab ----
-renameTab <- function(){
+renameTab <- function() {
   shinydashboard::tabItem(
     tabName = "renameProj",
     fluidRow(div(h3("rename projections"), align = "center")),
@@ -525,14 +528,13 @@ renameTab <- function(){
       checkbsTT(item = "updatePrjsButton"),
       checkbsTT(item = "delPrj"),
       checkbsTT(item = "delPrjsButton")
-    
-  ),
+    ),
 
-    
-  checkbsTT(item = "updateColors"),
-  checkbsTT(item = "sampleColorSelection"),
-  checkbsTT(item = "clusterColorSelection")
-)
+
+    checkbsTT(item = "updateColors"),
+    checkbsTT(item = "sampleColorSelection"),
+    checkbsTT(item = "clusterColorSelection")
+  )
 }
 
 # # link to the content of the

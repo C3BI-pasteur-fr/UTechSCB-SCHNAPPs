@@ -1,5 +1,5 @@
 suppressMessages(require(shinyTree))
-
+require(rintrojs)
 # SUMMARY STATS ----------------------------------------------------------------
 source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
 
@@ -1048,6 +1048,26 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
   }
 })
 
+# about modal ----
+observeEvent(input$AboutApp,{
+  showModal(modalDialog(
+    title = "About SCHNAPPs",
+    tags$a(tags$b("Here comes the about text")),
+    easyClose = TRUE,
+    footer = NULL
+  ))
+})
+
+inputHelpIJS<- read.delim(system.file("extdata", "inputHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+# inputHelpIJS<- read.delim("inst/extdata/inputHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
+
+observeEvent(input$inputHelp, {
+  cat(file = stderr(), paste("inputHelp started\n"))
+  cat(file = stderr(), apply(inputHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
+  introjs(session,
+          options = list(steps = inputHelpIJS)
+  )
+})
 
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))
