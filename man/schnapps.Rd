@@ -11,7 +11,8 @@ schnapps(
   defaultValueRegExGene = "",
   DEBUG = FALSE,
   DEBUGSAVE = FALSE,
-  historyPath = NULL
+  historyPath = NULL,
+  defaultValues = list()
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ schnapps(
 \item{DEBUGSAVE}{TRUE/FALSE where or not save internal data (very time consuming)}
 
 \item{historyPath}{location (directory) where history directories and data will be stored.}
+
+\item{defaultValues}{list of default values to use for inputs}
 }
 \description{
 shiny server relevant functions

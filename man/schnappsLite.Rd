@@ -13,7 +13,8 @@ schnappsLite(
   DEBUG = FALSE,
   DEBUGSAVE = FALSE,
   historyPath = NULL,
-  maxCells = 3000
+  maxCells = 3000,
+  defaultValues = list()
 )
 }
 \arguments{
@@ -31,10 +32,12 @@ schnappsLite(
 
 \item{DEBUGSAVE}{TRUE/FALSE where or not save internal data (very time consuming)}
 
-\item{historyPath}{location (directory) where history directories and data will be stored.
-historyPath should be used to generate Report}
+\item{historyPath}{location (directory) where history directories and data will be stored.}
 
 \item{maxCells}{maximal number of cells to use. Used to limit memory usage for server}
+
+\item{defaultValues}{list of default values to use for inputs
+historyPath should be used to generate Report}
 }
 \description{
 shiny server relevant functions

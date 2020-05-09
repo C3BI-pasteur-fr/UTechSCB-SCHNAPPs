@@ -31,6 +31,15 @@ assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
 ls(.schnappsEnv)
 
+
+defaultValues = list()
+defaultValues[["coEtgMinExpr"]] = 100
+
+assign("defaultValues", defaultValues, envir = .schnappsEnv)
+
+
+
+
 devscShinyApp = TRUE
 packagePath <<- "inst/app"
 source(paste0(packagePath,  "/ui.R"))

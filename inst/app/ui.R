@@ -55,25 +55,25 @@ scShinyUI <- function(request) {
   )
   # parameters tab, includes basic normalization
   source(paste0(packagePath, "/parameters.R"), local = TRUE)
-
+  
   # Basic menu Items
   allMenus <- list(
     shinydashboard::menuItem("input",
-      # id="inputID",
-      tabName = "input", icon = icon("folder")
+                             # id="inputID",
+                             tabName = "input", icon = icon("folder")
     ),
     shinydashboard::menuItem("Parameters",
-      # id="parametersID",
-      tabName = "parameters", icon = icon("gopuram"),
-      parameterItems()
+                             # id="parametersID",
+                             tabName = "parameters", icon = icon("gopuram"),
+                             parameterItems()
     ),
     shinydashboard::menuItem(" Cell selection",
-      # id="cellSelectionID",
-      tabName = "cellSelection", icon = icon("ello")
+                             # id="cellSelectionID",
+                             tabName = "cellSelection", icon = icon("ello")
     ),
     shinydashboard::menuItem("Gene selection",
-      # id="geneSelectionID",
-      tabName = "geneSelection", icon = icon("atom")
+                             # id="geneSelectionID",
+                             tabName = "geneSelection", icon = icon("atom")
     )
     # ,
     # shinydashboard::menuItem("rename projections",
@@ -81,15 +81,15 @@ scShinyUI <- function(request) {
     #   tabName = "modifyProj", icon = icon("signature")
     # )
   )
-
-
+  
+  
   # parse all ui.R files under contributions to include in application
   uiFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
   for (fp in uiFiles) {
     menuList <- list()
     tabList <- list()
     source(fp, local = TRUE)
-
+    
     for (li in menuList) {
       if (length(li) > 0) {
         # if(DEBUG)cat(file=stderr(), paste("menuList:", length(allMenus)," ", li$children, "\n"))
@@ -103,8 +103,8 @@ scShinyUI <- function(request) {
       }
     }
   }
-
-
+  
+  
   mListNames <- c()
   for (menuListItem in 1:length(allMenus)) {
     mListNames[menuListItem] <- allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
@@ -118,9 +118,9 @@ scShinyUI <- function(request) {
     sollOrderIdx[sIdx] <- which(sollOrder[sIdx] == mListNames)
   }
   sollOrderIdx <- c(sollOrderIdx, which(!1:length(allMenus) %in% sollOrderIdx))
-
+  
   allMenus <- allMenus[sollOrderIdx]
-
+  
   # todo
   # parse all parameters.R files under contributions to include in application
   # allTabs holds all tabs regardsless of their location in the GUI
@@ -128,7 +128,7 @@ scShinyUI <- function(request) {
   for (fp in parFiles) {
     tabList <- list()
     source(fp, local = TRUE)
-
+    
     for (li in tabList) {
       if (length(li) > 0) {
         # if(DEBUG)cat(file=stderr(), paste(li$children[[1]], "\n"))
@@ -136,7 +136,7 @@ scShinyUI <- function(request) {
       }
     }
   }
-
+  
   mulist <- list(
     inputTab(),
     geneSelectionTab()
@@ -148,8 +148,8 @@ scShinyUI <- function(request) {
     #          class = "tab-content"
     # )  ,
     tags$div(mulist,
-      # inputTab(),
-      class = "tab-content"
+             # inputTab(),
+             class = "tab-content"
     )
     tags$div(
       allTabs,
@@ -159,24 +159,24 @@ scShinyUI <- function(request) {
   }
   # search for parameter contribution submenu items (menuSubItem)
   # parameterContributions = ""
-
+  
   getallMenus <- function() {
     allMenus
   }
-
-
+  
+  
   shinyUI(
     shinydashboard::dashboardPage(
-      shinydashboard::dashboardHeader(title = paste("SCHNAPPs", packageVersion("SCHNAPPs"))),
+      dheader(),
       shinydashboard::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sideBarID",
           getallMenus(),
           htmlOutput("summaryStatsSideBar"),
-
+          
           # downloadButton("report", "Generate report", class = "butt"),
           tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
-
+          
           # bookmarkButton(id = "bookmark1"),
           br(),
           downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
@@ -203,9 +203,12 @@ scShinyUI <- function(request) {
       ), # dashboard side bar
       shinydashboard::dashboardBody(
         shinyjs::useShinyjs(debug = TRUE),
+        rintrojs::introjsUI(),
         inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
         inlineCSS(list(.green = "background-color: lightgreen")),
         getallTabs(),
+        tags$head(tags$style(HTML("div.box-header {display: block;}"))),
+        tags$head(tags$style(HTML("h3.box-title {display: block;}")))
         # tags$div(list(inputTab(),
         #               geneSelectionTab()),
         #          # inputTab(),

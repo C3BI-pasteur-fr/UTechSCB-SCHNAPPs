@@ -17,6 +17,7 @@
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
 #' @param maxCells maximal number of cells to use. Used to limit memory usage for server
 #' @param historyPath location (directory) where history directories and data will be stored.
+#' @param defaultValues list of default values to use for inputs
 #' historyPath should be used to generate Report
 #'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
@@ -40,7 +41,8 @@ schnappsLite <- function(data="RdataFile",
                          DEBUG = FALSE,
                          DEBUGSAVE = FALSE,
                          historyPath = NULL,
-                         maxCells = 3000
+                         maxCells = 3000,
+                         defaultValues = list()
                          # ,
                          # historyFile = NULL
                          
@@ -63,6 +65,7 @@ schnappsLite <- function(data="RdataFile",
   assign("DEBUG", DEBUG, envir = .schnappsEnv)
   assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
   assign("historyPath", historyPath, envir = .schnappsEnv)
+  assign("defaultValues", defaultValues, envir = .schnappsEnv)
   # assign("historyFile", historyFile, envir = .schnappsEnv)
   
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
