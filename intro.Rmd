@@ -22,6 +22,3 @@ Circ Res. 2020 Mar 16. CIRCRESAHA.119.316251 [https://www.ahajournals.org/doi/10
 
 `r shiny::includeHTML(system.file("extdata", "generalSCHNAPPs.html",package = "SCHNAPPs"))`
 
-<!-----
-`r shiny::includeHTML("inst/extdata/generalSCHNAPPs.html")`
------>
