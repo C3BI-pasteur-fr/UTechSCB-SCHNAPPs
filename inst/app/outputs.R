@@ -1058,8 +1058,8 @@ observeEvent(input$AboutApp,{
   ))
 })
 
-inputHelpIJS<- read.delim(system.file("extdata", "inputHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
-# inputHelpIJS<- read.delim("inst/extdata/inputHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
+# inputHelpIJS<- read.delim(system.file("extdata", "inputHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+inputHelpIJS<- read.delim("inst/extdata/inputHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
 
 observeEvent(input$inputHelp, {
   cat(file = stderr(), paste("inputHelp started\n"))
