@@ -40,6 +40,7 @@ DE_updateInputPPt <- reactive({
     showNotification("DE_updateInputPPt", id = "DE_updateInputPPt", duration = NULL)
   }
   tsneData <- projections()
+  projFactors <- projFactors()
   
   # Can use character(0) to remove all choices
   if (is.null(tsneData)) {
@@ -48,20 +49,20 @@ DE_updateInputPPt <- reactive({
   # save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls()))
   # load(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata")
   
-  coln <- colnames(tsneData)
-  choices <- c()
-  for (cn in coln) {
-    if (length(levels(as.factor(tsneData[, cn]))) < 50) {
-      choices <- c(choices, cn)
-    }
-  }
-  if (length(choices) == 0) {
-    choices <- c("no valid columns")
-  }
+  # coln <- colnames(tsneData)
+  # choices <- c()
+  # for (cn in coln) {
+  #   if (length(levels(as.factor(tsneData[, cn]))) < 50) {
+  #     choices <- c(choices, cn)
+  #   }
+  # }
+  # if (length(choices) == 0) {
+  #   choices <- c("no valid columns")
+  # }
   updateSelectInput(
     session,
     "DE_clusterPP",
-    choices = choices,
+    choices = projFactors,
     selected = .schnappsEnv$DE_PPGrp
   )
 })

@@ -1050,32 +1050,32 @@ coE_updateInputXviolinPlot <- observe({
   }
   
   tsneData <- projections()
-  
+  projFactors <- projFactors()
   # Can use character(0) to remove all choices
   if (is.null(tsneData)) {
     return(NULL)
   }
   
-  coln <- colnames(tsneData)
-  choices <- c()
-  for (cn in coln) {
-    if (length(levels(as.factor(tsneData[, cn]))) < 50) {
-      choices <- c(choices, cn)
-    }
-  }
-  if (length(choices) == 0) {
-    choices <- c("no valid columns")
-  }
+  # coln <- colnames(tsneData)
+  # choices <- c()
+  # for (cn in coln) {
+  #   if (length(levels(as.factor(tsneData[, cn]))) < 50) {
+  #     choices <- c(choices, cn)
+  #   }
+  # }
+  # if (length(choices) == 0) {
+  #   choices <- c("no valid columns")
+  # }
   updateSelectInput(
     session,
     "coE_dimension_xVioiGrp",
-    choices = choices,
+    choices = projFactors,
     selected = .schnappsEnv$coE_vioGrp
   )
   updateSelectInput(
     session,
     "coE_dimension_xVioiGrp2",
-    choices = choices,
+    choices = projFactors,
     selected = .schnappsEnv$coE_vioGrp
   )
 })

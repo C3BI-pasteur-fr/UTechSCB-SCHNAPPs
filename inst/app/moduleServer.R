@@ -57,7 +57,7 @@ clusterServer <- function(input, output, session,
   #   mod_cl1 <<- input$clusters
   # })
 
-  observe({
+  observe(label = "dimension_x", {
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
     .schnappsEnv$dim1 <- input$dimension_x
   })
@@ -1376,13 +1376,13 @@ cellSelectionModule <- function(input, output, session) {
   # and observe/save if changed
 
   assign(ns("Mod_PPGrp"), "1", envir = .schnappsEnv)
-  observe({
+  observe(label = "Mod_PPGrp", {
     if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp\n"))
     assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
   })
 
   assign(ns("Mod_clusterPP"), "dbCluster", envir = .schnappsEnv)
-  observe({
+  observe(label = "Mod_clusterPP", {
     if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP\n"))
     assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
   })
@@ -1390,7 +1390,7 @@ cellSelectionModule <- function(input, output, session) {
 
 
   # Mod_updateInputPPt if projections changed ====
-  observe({
+  observe(label = "Mod_clusterPP", {
     if (DEBUG) cat(file = stderr(), "Mod_updateInputPPt started.\n")
     start.time <- base::Sys.time()
     on.exit({
@@ -1403,7 +1403,7 @@ cellSelectionModule <- function(input, output, session) {
       showNotification("Mod_updateInputPPt", id = "Mod_updateInputPPt", duration = NULL)
     }
     projections <- projections()
-
+    projFactors <- projFactors()
     # Can use character(0) to remove all choices
     if (is.null(projections)) {
       return(NULL)
@@ -1411,20 +1411,19 @@ cellSelectionModule <- function(input, output, session) {
     # save(file = "~/SCHNAPPsDebug/Mod_updateInputPPt", list = c(ls(), ls(envir = globalenv())))
     # load(file = "~/SCHNAPPsDebug/Mod_updateInputPPt")
 
-    coln <- colnames(projections)
-    choices <- c()
-    for (cn in coln) {
-      if (length(levels(as.factor(projections[, cn]))) < 50) {
-        choices <- c(choices, cn)
-      }
-    }
-    if (length(choices) == 0) {
-      choices <- c("no valid columns")
-    }
+    # coln <- colnames(projections)
+    # choices <- c()
+    # for (cn in coln) {
+    #   if (length(levels(as.factor(projections[, cn]))) < 50) {
+    #     choices <- c(choices, cn)
+    #   }
+    # }
+    # 
+
     updateSelectInput(
       session,
       "Mod_clusterPP",
-      choices = choices,
+      choices = projFactors,
       selected = get(ns("Mod_clusterPP"), envir = .schnappsEnv)
     )
   })

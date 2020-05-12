@@ -2350,6 +2350,45 @@ projections <- reactive({
   return(projections)
 })
 
+# projFactors ----
+# which projections are factors?
+projFactors <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "projFactors started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "projFactors")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "projFactors")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("projFactors", id = "projFactors", duration = NULL)
+  }
+
+  projections <- projections()
+  if (is.null(projections)) {
+    choices <- c("no valid columns")
+    return(choices)
+  }
+  coln <- colnames(projections)
+  choices <- c()
+  for (cn in coln) {
+    if (length(levels(as.factor(projections[, cn]))) < 50) {
+      choices <- c(choices, cn)
+    }
+  }
+  if (is.null(projFactors)) {
+    choices <- c("no valid columns")
+  }
+  if (length(projFactors) == 0) {
+    choices <- c("no valid columns")
+  }
+  return(choices)
+})
+
+
 # initializeGroupNames ----
 # TODO shouldn't this be an observer??? or just a function???
 initializeGroupNames <- reactive({
