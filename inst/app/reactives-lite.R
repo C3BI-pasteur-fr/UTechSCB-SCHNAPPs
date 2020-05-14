@@ -6,28 +6,34 @@
 #   
 # }
 
+# inputData ----
 inputData <- reactive({NULL})
 
+# scEx_log ----
 scEx_log <- reactive({
   cat(file = stderr(), green("lite: scEx_log\n"))
   get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$scEx_log
 })
 
+# scEx ----
 scEx <- reactive({
   cat(file = stderr(), green("lite: scEx\n"))
   get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$scEx
 })
 
+# pca ----
 pca <- reactive({
   cat(file = stderr(), green("lite: pca\n"))
   get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$pca
 })
 
+# dbCluster ----
 dbCluster <- reactive({
   cat(file = stderr(), green("lite: dbCluster\n"))
   get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$projections$dbCluster
 })
 
+# projections ----
 projections <- reactive({
   if (DEBUG) {
     cat(file = stderr(), green("projections started.\n"))
@@ -177,17 +183,17 @@ projections <- reactive({
   # TODO figure out how to limit this.
   # add2history(type = "save", input = input, comment = "projections", projections = projections)
   
-
+  
   exportTestValues(projections = {
     projections
   })
   return(projections)
 })
 
-# colors for samples
+# colors for samples ----
 sampleCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$sampleCol)
 
-# colors for clusters
+# colors for clusters ----
 clusterCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$clusterCol)
 
 # DE_scaterPNG ----
@@ -340,12 +346,22 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
   DE_scaterPNG()
 })
 
-
+# introRMD ----
 output$introRMD <- renderUI({
   cat(file = stderr(), paste("wd:", getwd(), "\n"))
   HTML(markdown::markdownToHTML(knit('intro.Rmd', quiet = TRUE), fragment.only = T))
   # includeHTML("intro.html")
 })
+
+# groupNames ----
+# store cell groups that are defined on the fly using the modular 2D plot
+groupNames <- reactiveValues(
+  namesDF = if(!is.null(.schnappsEnv$.SCHNAPPs_LiteData[["namesDF"]])) {
+    .schnappsEnv$.SCHNAPPs_LiteData[["namesDF"]]
+  } else {
+    data.frame()
+  }
+)
 
 
 if (DEBUG) cat(file = stderr(), "end: reactives-lite\n")
