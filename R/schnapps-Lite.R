@@ -1,6 +1,6 @@
 #' .schnappsEnv
 #' Environment for package
-.schnappsEnv <- new.env(parent = emptyenv())
+.schnappsEnv <<- new.env(parent = emptyenv())
 
 
 
