@@ -25,7 +25,7 @@ assign("historyPath", historyPath, envir = .schnappsEnv)
 
 defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
-
+defaultValues[["coE_selected-groupNames"]] = "all"
 assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
 
@@ -37,9 +37,9 @@ scShinyServer <- NULL
 devscShinyApp = TRUE
 packagePath <<- "inst/app"
 source(paste0(packagePath, "/server.R"), local = TRUE)
-source(paste0(packagePath, "/ui.R"), local = TRUE)
+source(paste0(packagePath, "/ui.R"), local = T)
 source(paste0(packagePath, "/server-lite.R"), local = TRUE)
-source(paste0(packagePath, "/ui-lite.R"), local = TRUE)
+source(paste0(packagePath, "/ui-lite.R"), local = T)
 
 # load data
 maxCells = 3000
@@ -85,6 +85,7 @@ if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
 }
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
+options(shiny.reactlog=TRUE)
 runApp(app)
 
 
