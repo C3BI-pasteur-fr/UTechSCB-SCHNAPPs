@@ -50,7 +50,7 @@ tabList <- list(
               fluidRow(
                 column(
                   width = 12,
-                  textInput("DE_gene_id", "Enter gene", value = defaultValueSingleGene),
+                  textInput("DE_gene_id", "Enter gene", value = defaultValue("DE_gene_id", defaultValueSingleGene)),
                   jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
                 )
               ),
@@ -117,30 +117,30 @@ tabList <- list(
               width = 6,
               selectInput("DE_dim_x",
                           label = "X",
-                          choices = c("tsne1", "tsne2", "tsne3"),
-                          selected = "tsne1"
+                          choices = c(defaultValue("DE_dim_x", "tsne1"), "tsne2", "tsne3"),
+                          selected = defaultValue("DE_dim_x", "tsne1")
               )
             ),
             column(
               width = 6,
               selectInput("DE_dim_y",
                           label = "Y",
-                          choices = c("tsne1", "tsne2", "tsne3"),
-                          selected = "tsne2"
+                          choices = c("tsne1", defaultValue("DE_dim_y", "tsne2"), "tsne3"),
+                          selected = defaultValue("DE_dim_y", "tsne2")
               )
             )
           ),
           fluidRow(
             column(
               width = 4,
-              checkboxInput("DE_panelplotSameScale", "same scale", value = TRUE)
+              checkboxInput("DE_panelplotSameScale", "same scale", value = defaultValue("DE_panelplotSameScale", TRUE))
             ),
             column(
               width = 8,
               selectInput("DE_nCol",
                           label = "number of columns for plot",
                           choices = c(1:10),
-                          selected = 4
+                          selected = defaultValue("DE_nCol", 4)
               )
             ), align = 'right'
           )
@@ -148,7 +148,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          textInput("DE_panelplotids", "Comma seperated gene names", value = defaultValueMultiGenes)
+          textInput("DE_panelplotids", "Comma seperated gene names", value = defaultValue("DE_panelplotids", defaultValueMultiGenes))
         ),
       ),
       fluidRow(column(
