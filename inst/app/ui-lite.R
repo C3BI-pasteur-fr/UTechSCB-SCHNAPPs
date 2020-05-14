@@ -65,8 +65,9 @@ generalParametersTab <- function(){
 }
 
 
-base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
+base::source(paste0(packagePath, "/serverFunctions.R"))
 
+base::source("global.RData")
 
 
 scShinyUI <- function(request) {
