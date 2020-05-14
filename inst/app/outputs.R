@@ -1069,8 +1069,8 @@ observeEvent(input$inputHelp, {
   )
 })
 
-# twoDselectedAddOptHelpIJS <- read.delim(system.file("extdata", "twoDselectedAddOptHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
-twoDselectedAddOptHelpIJS <- read.delim("inst/extdata/twoDselectedAddOptHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
+twoDselectedAddOptHelpIJS <- read.delim(system.file("extdata", "twoDselectedAddOptHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+# twoDselectedAddOptHelpIJS <- read.delim("inst/extdata/twoDselectedAddOptHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
 observeEvent(input$twoDselectedAddOpt, {
   cat(file = stderr(), paste("twoDselectedAddOpt started\n"))
   # cat(file = stderr(), apply(twoDselectedAddOptHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
