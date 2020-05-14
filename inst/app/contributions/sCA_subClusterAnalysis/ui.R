@@ -48,16 +48,16 @@ tabList <- list(
                             selectInput(
                               "sCA_subscluster_x1",
                               label = "X",
-                              choices = c("tsne1", "tsne2", "tsne3"),
-                              selected = "tsne1"
+                              choices = c(defaultValue("sCA_subscluster_x1", "tsne1"), "tsne2", "tsne3"),
+                              selected = defaultValue("sCA_subscluster_x1", "tsne1")
                             )
                      ),
                      column(width = 6,
                             selectInput(
                               "sCA_subscluster_y1",
                               label = "Y",
-                              choices = c("tsne1", "tsne2", "tsne3"),
-                              selected = "tsne2"
+                              choices = c("tsne1", defaultValue("sCA_subscluster_y1", "tsne2"), "tsne3"),
+                              selected = defaultValue("sCA_subscluster_y1", "tsne2")
                             )
                      )
                    )
@@ -68,8 +68,8 @@ tabList <- list(
                    selectizeInput(
                      inputId = "sCA_dgeRadioButton",
                      label = "Method to use",
-                     choices = "dgeChoices",
-                     selected = "DE_logNormalization",
+                     choices = defaultValue("sCA_dgeRadioButton", "DE_logNormalization"),
+                     selected = defaultValue("sCA_dgeRadioButton", "DE_logNormalization"),
                      width = "100%"
                    )
                  )
@@ -120,14 +120,14 @@ tabList <- list(
           column(
             width = 6,
             numericInput(
-              inputId = "sCA_volc_effectLimit", label = "x-axis threshold", value = 1, min = 0.0, max = 10000,
+              inputId = "sCA_volc_effectLimit", label = "x-axis threshold", value = defaultValue("sCA_volc_effectLimit", 1), min = 0.0, max = 10000,
               step = 0.1
             )
           ),
           column(
             width = 6,
             numericInput(
-              inputId = "sCA_volc_pval", label = "y-axis threshold", value = 5, min = 0.0, max = 110000,
+              inputId = "sCA_volc_pval", label = "y-axis threshold", value = defaultValue("sCA_volc_pval", 5), min = 0.0, max = 110000,
               step = 0.1
             )
           )

@@ -27,7 +27,7 @@
 #' @importFrom dplyr '%>%'
 #' @importFrom shiny shinyApp runApp
 #'
-#' @export 
+#' @export schnappsLite
 #'
 #' @examples
 #' packPath = "schnappsPackage"
