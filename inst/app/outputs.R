@@ -1,5 +1,5 @@
 suppressMessages(require(shinyTree))
-
+require(rintrojs)
 # SUMMARY STATS ----------------------------------------------------------------
 source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
 
@@ -33,25 +33,25 @@ for (fp in parFiles) {
     for (li in 1:length(myNormalizationParameters)) {
       lVal <- myNormalizationParameters[[li]]
       if (length(lVal) > 0) {
-        if (DEBUG) {
-          cat(
-            file = stderr(),
-            paste(
-              "normalization Choice: ",
-              names(myNormalizationParameters)[li],
-              " ",
-              lVal,
-              "\n"
-            )
-          )
-          cat(file = stderr(), paste(
-            "class: ",
-            class(myNormalizationParameters[[li]]),
-            " ",
-            lVal,
-            "\n"
-          ))
-        }
+        # if (DEBUG) {
+        #   cat(
+        #     file = stderr(),
+        #     paste(
+        #       "normalization Choice: ",
+        #       names(myNormalizationParameters)[li],
+        #       " ",
+        #       lVal,
+        #       "\n"
+        #     )
+        #   )
+        #   cat(file = stderr(), paste(
+        #     "class: ",
+        #     class(myNormalizationParameters[[li]]),
+        #     " ",
+        #     lVal,
+        #     "\n"
+        #   ))
+        # }
         oldNames <- names(normaliztionParameters)
         normaliztionParameters[[length(normaliztionParameters) + 1]] <-
           lVal
@@ -153,11 +153,19 @@ observe(label = "ob_cellSelection",
         })
 
 # observe: clustering Button ----
-observe(label = "ob_clusteringParams", {
+ob_clusteringParams <- observe(label = "ob_clusteringParams", {
   if (DEBUG) cat(file = stderr(), "observe ob_clusteringParams\n")
+  
+  # this happens when the lite version is used
+  if (is.null(input$tabsetCluster)){
+    ob_clusteringParams$destroy()
+    return(NULL)
+  }
   
   input$updateClusteringParameters
   whichClustering = isolate(input$tabsetCluster)
+  req(whichClustering)
+  
   if ( whichClustering == "scran_Cluster"){
     setRedGreenButtonCurrent(
       vars = list(
@@ -263,6 +271,9 @@ output$summaryStatsSideBar <- renderUI({
   line7 <-
     paste("Normalization selected:", normalizationRadioButton)
   htmlOut <- paste0(
+    "<br/>",
+    "<br/>",
+    "<br/>",
     "Summary statistics of this dataset:",
     "<br/>",
     "<br/>",
@@ -284,7 +295,10 @@ output$summaryStatsSideBar <- renderUI({
     "<br/>",
     line6,
     "<br/>",
-    line7
+    line7,
+    "<br/>",
+    "<br/>"
+    
   )
   exportTestValues(summaryStatsSideBar = {
     htmlOut
@@ -621,10 +635,9 @@ observeEvent(
 )
 
 # observe: color selection----
-observe(label = "ob_colorParams", {
+observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
-  input$updateColors
   scExx <- scEx()
   projections <- projections()
   if (is.null(scExx) || is.null(projections)) {
@@ -719,11 +732,18 @@ output$RDSsave <- downloadHandler(
       removeNotification(id = "RDSsave")
     }
     
+    # TODO Warning if scEx_log is not set
+    
+    # umaps???
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
+    # TODO should be taken from projections
     tsne <- tsne()
+    ccol = clusterCols$colPal
+    scol = sampleCols$colPal
+    namesDF = groupNames$namesDF
     
     if (is.null(scEx)) {
       return(NULL)
@@ -735,11 +755,106 @@ output$RDSsave <- downloadHandler(
     
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
     
-    save(file = file, list = c("scEx"))
+    # we save the pca separately because I don't know how to store the rotation  otherwise.
+    # mostly done to make the lite version work.
+    
+    saveList =  c("scEx" , "pca", "scol" , "ccol" , "namesDF")
+    # browser()
+    # save projections that shouldn't be recalculated in lite version
+    for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
+      assign(.schnappsEnv$projectionFunctions[[idx]][2], eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
+      saveList = c(saveList, .schnappsEnv$projectionFunctions[[idx]][2])
+    }
+    
+    
+    save(file = file, list = saveList)
     
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
+
+# download Rmd ----
+output$RmdSave <- downloadHandler(
+  filename = "report.zip",
+  content = function(outZipFile) {
+    if (DEBUG) {
+      cat(file = stderr(), "RmdSave started.\n")
+    }
+    start.time <- base::Sys.time()
+    on.exit({
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "RmdSave")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("RmdSave", id = "RmdSave", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "RmdSave")
+    }
+    
+    if (is.null(.schnappsEnv$historyPath) ) {
+      return(NULL)
+    }
+    # if (is.null(scEx)) {
+    #   return(NULL)
+    # }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/RmdSave.RData", list = c(ls(), ".schnappsEnv"))
+    }
+    # cp = load(file='~/SCHNAPPsDebug/RmdSave.RData')
+    
+    tempReport = .schnappsEnv$historyFile
+    outReport = paste0(.schnappsEnv$historyPath, .Platform$file.sep,"report.html")
+    # tempReport = "~/SCHNAPPsDebug/tmpReport.Rmd"
+    # file.copy("contributions/gQC_generalQC//report.Rmd",
+    #           '/var/folders/tf/jwlc7r3d48z7pkq0w38_v7t40000gp/T//RtmpTx4l4G/file1a6e471a698.Rmd', overwrite = TRUE)
+    tryCatch(
+      callr::r(
+        function(inputFP, output_file, params, envir) {
+          rmarkdown::render(
+            input = inputFP,
+            output_file = output_file,
+            params = params,
+            envir = envir
+          )
+        },
+        args = list(
+          inputFP = tempReport,
+          output_file = outReport,
+          # params = params,
+          envir = new.env()
+        ),
+        stderr = stderr(),
+        stdout = stderr()
+      ),
+      error = function(e) {
+        cat(file = stderr(), paste("==== An error occurred during the creation of the report\n", e, "\n"))
+      }
+    )
+    # file.copy(from = "contributions/sCA_subClusterAnalysis/report.Rmd",
+    #           to = "/var/folders/_h/vtcnd09n2jdby90zkb6wyd740000gp/T//Rtmph1SRTE/file69aa37a47206.Rmd", overwrite = TRUE)
+    # rmarkdown::render(input = tempReport, output_file = "report.html",
+    #                   params = params, envir = new.env())
+    
+    # outZipFile <- paste0(tempdir(), .Platform$file.sep, "report.zip")
+    
+    # tDir <- paste0(.schnappsEnv$reportTempDir, .Platform$file.sep)
+    # zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
+    zip(outZipFile, paste0(path.expand(.schnappsEnv$historyPath), .Platform$file.sep), flags = "-9jr")
+    if (DEBUG) {
+      end.time <- Sys.time()
+      cat(
+        file = stderr(),
+        "===Report:done",
+        difftime(end.time, start.time, units = "min"),
+        "\n"
+      )
+    }
+    return(outZipFile)
+  }
+)
+
 
 # Report creation ------------------------------------------------------------------
 output$report <- downloadHandler(
@@ -856,87 +971,7 @@ observeEvent(
   }
 )
 
-# rename projections
-observe(label = "ob27", {
-  projections <- projections()
-  
-  updateSelectInput(session, "oldPrj",
-                    choices = c(colnames(projections))
-  )
-  updateSelectInput(session, "delPrj",
-                    choices = c(colnames(projectionsTable$newProjections))
-  )
-})
 
-observe(label = "ob28", {
-  input$newPrj
-  updateTextInput(session, "newPrj", value = make.names(input$newPrj, unique = TRUE))
-})
-
-observeEvent(
-  label = "ob29",
-  eventExpr = input$delPrjsButton,
-  handlerExpr = {
-    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
-    newPrjs <- projectionsTable$newProjections
-    delPrj <- input$delPrj
-    if (is.null(projections)) {
-      return(NULL)
-    }
-    if (!delPrj %in% colnames(newPrjs)) {
-      return(NULL)
-    }
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/delPrjsButton.RData",
-        list = c("normaliztionParameters", ls())
-      )
-    }
-    # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
-    
-    projectionsTable$newProjections <- newPrjs[, -which(colnames(newPrjs) == delPrj), drop = FALSE]
-  }
-)
-
-
-observeEvent(
-  label = "ob30",
-  eventExpr = input$updatePrjsButton,
-  handlerExpr = {
-    if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
-    oldPrj <- input$oldPrj
-    newPrj <- input$newPrj
-    projections <- projections()
-    newPrjs <- projectionsTable$newProjections
-    
-    if (is.null(projections)) {
-      return(NULL)
-    }
-    
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
-        list = c("normaliztionParameters", ls())
-      )
-    }
-    # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
-    if (newPrj %in% colnames(projections)) {
-      showNotification(
-        "New column name already used",
-        type = "error",
-        duration = NULL
-      )
-      return(NULL)
-    }
-    if (ncol(newPrjs) == 0) {
-      newPrjs <- projections[, oldPrj, drop = FALSE]
-    } else {
-      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
-    }
-    colnames(newPrjs)[ncol(newPrjs)] <- newPrj
-    projectionsTable$newProjections <- newPrjs
-  }
-)
 
 observe(label = "ob_pca",
         {
@@ -968,13 +1003,20 @@ observe(label = "ob_pca",
         }
 )
 
-observe(label = "ob_clusterParams", {
+ob_clusterParams <- observe(label = "ob_clusterParams", {
   if (DEBUG) cat(file = stderr(), "observe ob_clusterParams\n")
   
   input$updateClusteringParameters
   tabsetCluster = input$tabsetCluster
   
-  if (tabsetCluster == "seurat_Clustering") {
+  # this happens when the lite version is used
+  if (is.null(tabsetCluster)){
+    ob_clusterParams$destroy()
+    return(NULL)
+  }
+
+  
+    if (tabsetCluster == "seurat_Clustering") {
     setRedGreenButtonCurrent(
       vars = list(
         c("tabsetCluster", input$tabsetCluster),
@@ -1001,11 +1043,48 @@ observe(label = "ob_clusterParams", {
     )
     updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
       "useRanks", "clusterSource","geneSelectionClustering",
-       "minClusterSize", "clusterMethod", "tabsetCluster"
+      "minClusterSize", "clusterMethod", "tabsetCluster"
     ))
   }
 })
 
+# about modal ----
+observeEvent(input$AboutApp,{
+  showModal(modalDialog(
+    title = "About SCHNAPPs",
+    tags$a(tags$b("Here comes the about text")),
+    easyClose = TRUE,
+    footer = NULL
+  ))
+})
+
+inputHelpIJS <- read.delim(system.file("extdata", "inputHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+# inputHelpIJS<- read.delim("inst/extdata/inputHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
+
+observeEvent(input$inputHelp, {
+  cat(file = stderr(), paste("inputHelp started\n"))
+  cat(file = stderr(), apply(inputHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
+  introjs(session,
+          options = list(steps = inputHelpIJS)
+  )
+})
+
+# twoDselectedAddOptHelpIJS <- read.delim(system.file("extdata", "twoDselectedAddOptHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+twoDselectedAddOptHelpIJS <- read.delim("inst/extdata/twoDselectedAddOptHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
+observeEvent(input$twoDselectedAddOpt, {
+  cat(file = stderr(), paste("twoDselectedAddOpt started\n"))
+  # cat(file = stderr(), apply(twoDselectedAddOptHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
+  introjs(session,
+          options = list(steps = twoDselectedAddOptHelpIJS,
+                         "showBullets" = "false",
+                         "showProgress" = "true",
+                         "showStepNumbers" = "false",
+                         "nextLabel" = "Next",
+                         "prevLabel" = "Prev",
+                         "skipLabel" = "Skip",
+                         "highlightClass" = 'berndTest')
+  )
+})
 
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))

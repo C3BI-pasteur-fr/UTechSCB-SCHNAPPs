@@ -6,13 +6,13 @@ library(reactlog)
   .schnappsEnv <- new.env(parent=emptyenv())
 # }
 
-  localContributionDir = "~/Rstudio/scShinyHub-github/bjContributions/"
+  localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
   # localContributionDir = ""
   defaultValueSingleGene = "itgae" # CD52
   defaultValueMultiGenes = "CD52, S100A9, S100A4" # itgae, cd69, itga1" # CD52, S100A9, S100A4
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
-DEBUG = F
+DEBUG = T
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
 
@@ -31,13 +31,22 @@ assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
 ls(.schnappsEnv)
 
+
+defaultValues = list()
+defaultValues[["coEtgMinExpr"]] = 100
+
+assign("defaultValues", defaultValues, envir = .schnappsEnv)
+
+
+
+
 devscShinyApp = TRUE
 packagePath <<- "inst/app"
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
-app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-# options(shiny.reactlog=TRUE)
+app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+options(shiny.reactlog=TRUE)
 runApp(app)
 
 # schnapps(Ï

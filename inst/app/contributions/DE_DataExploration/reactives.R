@@ -16,12 +16,12 @@ deProjTable <- reactive({
 })
 
 .schnappsEnv$coE_PPGrp <- "sampleNames"
-observe({
+observe(label = "DE_PPGrp", {
   if (DEBUG) cat(file = stderr(), paste0("observe: DE_PPGrp\n"))
   .schnappsEnv$DE_PPGrp <- input$DE_PPGrp
 })
 .schnappsEnv$coE_PPSelection <- "1"
-observe({
+observe(label = "DE_clusterPP", {
   if (DEBUG) cat(file = stderr(), paste0("observe: DE_clusterPP\n"))
   .schnappsEnv$DE_clusterPP <- input$DE_clusterPP
 })
@@ -40,6 +40,7 @@ DE_updateInputPPt <- reactive({
     showNotification("DE_updateInputPPt", id = "DE_updateInputPPt", duration = NULL)
   }
   tsneData <- projections()
+  projFactors <- projFactors()
   
   # Can use character(0) to remove all choices
   if (is.null(tsneData)) {
@@ -48,25 +49,25 @@ DE_updateInputPPt <- reactive({
   # save(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata", list = c(ls()))
   # load(file = "~/SCHNAPPsDebug/DE_updateInputPPt.Rdata")
   
-  coln <- colnames(tsneData)
-  choices <- c()
-  for (cn in coln) {
-    if (length(levels(as.factor(tsneData[, cn]))) < 50) {
-      choices <- c(choices, cn)
-    }
-  }
-  if (length(choices) == 0) {
-    choices <- c("no valid columns")
-  }
+  # coln <- colnames(tsneData)
+  # choices <- c()
+  # for (cn in coln) {
+  #   if (length(levels(as.factor(tsneData[, cn]))) < 50) {
+  #     choices <- c(choices, cn)
+  #   }
+  # }
+  # if (length(choices) == 0) {
+  #   choices <- c("no valid columns")
+  # }
   updateSelectInput(
     session,
     "DE_clusterPP",
-    choices = choices,
+    choices = projFactors,
     selected = .schnappsEnv$DE_PPGrp
   )
 })
 
-observeEvent(input$DE_clusterPP,{
+observeEvent(label = "DE_clusterPP", input$DE_clusterPP,{
   projections <- projections()
   if (DEBUG) cat(file = stderr(), "observeEvent: input$DE_clusterPP\n")
   # Can use character(0) to remove all choices
@@ -87,9 +88,9 @@ observeEvent(input$DE_clusterPP,{
 
 
 
-observe({
+observe(label = "save2HistScater", {
   clicked  = input$save2HistScater
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistScater \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -100,13 +101,14 @@ observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
-  
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
   add2history(type = "renderPlot", input = input, comment = "scater plot",  
               plotData = .schnappsEnv[["DE_scaterPNG"]])
   
 })
 
-observe({
+observe(label = "save2HistPanel", {
   clicked  = input$save2HistPanel
   if (DEBUG) cat(file = stderr(), "observe input$save2HistPanel \n")
   start.time <- base::Sys.time()
@@ -119,7 +121,8 @@ observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
-  
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
   add2history(type = "renderPlot", input = input, comment = "Panel plot",  
               plotData = .schnappsEnv[["DE_panelPlot"]])
   
@@ -327,7 +330,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
     scale_fill_manual(values = ccols, aesthetics = "fill") +
 
     stat_summary(
-      fun.y = median,
+      fun = median,
       geom = "point",
       size = 5,
       color = "black"

@@ -5,9 +5,9 @@ suppressMessages(require(SingleCellExperiment))
 # here we define reactive values/variables
 
 # save to history violoin observer ----
-observe({
+observe(label = "save2histumi", {
   clicked  = input$save2Histumi
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2histumi \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -18,6 +18,8 @@ observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
   
   add2history(type = "renderPlot", input = input, comment = "UMI histogram",  
               plotData = .schnappsEnv[["gQC_plotUmiHist"]])
@@ -28,7 +30,7 @@ observe({
 # save to history save2HistSample observer ----
 observe({
   clicked  = input$save2HistSample
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistSample \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -40,15 +42,17 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
   add2history(type = "renderPlot", input = input, comment = "Sample histogram",  
               plotData = .schnappsEnv[["gQC_plotSampleHist"]])
   
 })
 
 # save to history save2HistSample observer ----
-observe({
-  clicked  = input$save2Histvar
-  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
+observe(label = "save2histvar", {
+  clicked  = input$save2Histvar  
+  if (DEBUG) cat(file = stderr(), "observe input$save2histvar \n")
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -60,6 +64,8 @@ observe({
     showNotification("save2Hist", id = "save2Hist", duration = NULL)
   }
   
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
   add2history(type = "renderPlot", input = input, comment = "PC variance",  
               plotData = .schnappsEnv[["gQC_variancePCA"]])
   

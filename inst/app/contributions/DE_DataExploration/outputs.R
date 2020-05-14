@@ -1,4 +1,4 @@
-source(paste0(packagePath, "/reactives.R"), local = TRUE)
+# source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
 # since DE_scaterPNG is not used frequently it is not included in the heavyCalculations
 # list
@@ -265,7 +265,7 @@ output$DE_panelPlot <- renderPlot({
 
 
 # Scater QC ----
-output$DE_scaterQC <- renderImage({
+output$DE_scaterQC <- renderImage(deleteFile = T, {
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -340,15 +340,16 @@ output$DE_downloadPanel <- downloadHandler(
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pca()
+    # TODO should be taken from projections.
     tsne <- tsne()
 
     if (is.null(scEx)) {
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls()))
+      save(file = "~/SCHNAPPsDebug/DE_downloadPanel.RData", list = c(ls()))
     }
-    # load(file='~/SCHNAPPsDebug/RDSsave.RData')
+    # load(file='~/SCHNAPPsDebug/DE_downloadPanel.RData')
 
     reducedDims(scEx) <- SimpleList(PCA = pca$x, TSNE = tsne)
     assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]]
@@ -358,7 +359,7 @@ output$DE_downloadPanel <- downloadHandler(
     colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2
 
     save(file = file, list = c("scEx"))
-    if (DEBUG) cat(file = stderr(), paste("RDSsave:done \n"))
+    if (DEBUG) cat(file = stderr(), paste("DE_downloadPanel:done \n"))
 
     # write.csv(as.matrix(exprs(scEx)), file)
   }

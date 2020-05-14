@@ -53,7 +53,8 @@ if ("shinyBS" %in% rownames(installed.packages())) {
   .schnappsEnv$sbTT_tabsetPCA <- bsPopover("tabsetPCA", title = "PCA", "performs principle component analysis using BiocSingular::runPCA", placement = "left")
 
   checkbsTT <- function(item) {
-    if (exists(".schnappsEnv")) {
+    if (exists(".schnappsEnv")) 
+      if (is.environment(.schnappsEnv)) {
       if (exists(paste0("sbTT_", item), envir = .schnappsEnv)) {
         .schnappsEnv[[paste0("sbTT_", item)]]
       }
