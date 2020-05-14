@@ -21,6 +21,7 @@ suppressMessages(require(pheatmap))
 suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinyjs))
+base::source(paste0(packagePath, "/serverFunctions.R"))
 
 
 
