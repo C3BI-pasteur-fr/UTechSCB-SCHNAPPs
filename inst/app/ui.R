@@ -55,6 +55,7 @@ scShinyUI <- function(request) {
   )
   # parameters tab, includes basic normalization
   source(paste0(packagePath, "/parameters.R"), local = TRUE)
+  base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
   
   # Basic menu Items
   allMenus <- list(

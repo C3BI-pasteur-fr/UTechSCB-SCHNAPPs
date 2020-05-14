@@ -28,7 +28,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          textInput("coE_heatmap_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
+          textInput("coE_heatmap_geneids", "Comma seperated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
         )
       ),
       fluidRow(
@@ -60,7 +60,7 @@ tabList <- list(
                       column( width = 12,
                               fluidRow(column(
                                 width = 12,
-                                textInput("coE_heatmapselected_geneids", "Comma seperated gene names", value = defaultValueMultiGenes)
+                                textInput("coE_heatmapselected_geneids", "Comma seperated gene names", value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
                               )),
                               br(),
                               # fluidRow(checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
@@ -108,7 +108,7 @@ tabList <- list(
                                          ), column(
                                            width = 3,
                                            numericInput("coEtgPerc", "min percentage of cells expressing a genes:",
-                                                        60,
+                                                        defaultValue("coEtgPerc", 60),
                                                         min = 1, max = 100
                                            )
                                          )
@@ -161,27 +161,27 @@ tabList <- list(
              fluidRow(
                column(
                  width = 12,
-                 checkboxInput("coE_showPermutations", "show Permutations", FALSE)
+                 checkboxInput("coE_showPermutations", "show Permutations", value = defaultValue("coE_showPermutations",FALSE))
                )
              ),
              fluidRow(
                column(
                  width = 4,
-                 textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValueMultiGenes)
+                 textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValue("coE_geneGrpVioIds", defaultValueMultiGenes))
                ),
                column(
                  width = 4,
                  selectInput(
                    "coE_dimension_xVioiGrp",
                    label = "X",
-                   choices = c("dbCluster", "sampleName", "tsne3"),
-                   selected = "dbCluster"
+                   choices = c(defaultValue("coE_dimension_xVioiGrp", "dbCluster"), "sampleName", "tsne3"),
+                   selected = defaultValue("coE_dimension_xVioiGrp", "dbCluster")
                  )
                ),
                column(
                  width = 4,
                  numericInput("coEminExpr", "min expression of genes:",
-                              1,
+                              value = defaultValue("coEminExpr", 1),
                               min = 1, max = 100000
                  )
                )
@@ -199,21 +199,21 @@ tabList <- list(
              fluidRow(
                column(
                  width = 4,
-                 textInput("coE_geneGrpVioIds2", "Comma seperated gene names", value = defaultValueMultiGenes)
+                 textInput("coE_geneGrpVioIds2", "Comma seperated gene names", value = defaultValue("coE_geneGrpVioIds2", defaultValueMultiGenes))
                ),
                column(
                  width = 4,
                  selectizeInput(
                    "coE_dimension_xVioiGrp2",
                    label = "X",
-                   choices = c("dbCluster", "sampleName", "tsne3"),
-                   selected = "dbCluster", options = list(maxItems = 2)
+                   choices = c(defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), "sampleName", "tsne3"),
+                   selected = defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), options = list(maxItems = 2)
                  )
                ),
                column(
                  width = 4,
                  numericInput("coEminExpr2", "min expression of genes:",
-                              1,
+                              defaultValue("coEminExpr2", 1),
                               min = 1, max = 100000
                  )
                ),
@@ -234,9 +234,9 @@ tabList <- list(
             title = "alluvial plot", solidHeader = TRUE, width = 12, status = 'primary', 
             fluidRow(
               column(width = 6, 
-                     selectInput("alluiv1", "1st axsis", choices = c("notyet"), selected = "notyet")),
+                     selectInput("alluiv1", "1st axsis", choices = defaultValue("alluiv1", "notyet"), selected = defaultValue("alluiv1", "notyet"))),
               column(width = 6, 
-                     selectInput("alluiv2", "2nd axsis", choices = c("notyet"), selected = "notyet"))
+                     selectInput("alluiv2", "2nd axsis", choices = defaultValue("alluiv2", "notyet"), selected = defaultValue("alluiv2", "notyet")))
             ),
             fluidRow(
               column(width = 12, 
