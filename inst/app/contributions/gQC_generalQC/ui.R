@@ -27,14 +27,14 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = defaultValue("oldPrj", "NO"))
+               selectInput("oldPrj", "projections to copy + rename", choices = defaultValue("oldPrj", "notyet"), selected = defaultValue("oldPrj", "notyet"))
              ),
              column(
                width = 6,
                fluidRow(
                  column(
                    width = 8,
-                   textInput("newPrj", "new name of Projection", value = "")
+                   textInput("newPrj", "new name of Projection", value = defaultValue("newPrj", ""))
                  ),
                  column(
                    width = 4,
@@ -44,7 +44,7 @@ modTab <- shinydashboard::tabItem(
                fluidRow(
                  column(
                    width = 8,
-                   selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")
+                   selectInput("delPrj", "projections to delete", choices = defaultValue("delPrj", "notyet"), selected = defaultValue("delPrj", "notyet"))
                  ),
                  column(
                    width = 4,
@@ -179,7 +179,7 @@ tabList <- list(
         ),
         column(
           width = 6,
-          numericInput("gQC_tsnePerplexity", "Perplexity", 30, min = 1, max = 100)
+          numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 30), min = 1, max = 100)
         )
       ),
       box(
@@ -187,11 +187,11 @@ tabList <- list(
         collapsible = TRUE, collapsed = TRUE,
         column(
           width = 6,
-          numericInput("gQC_tsneTheta", "Theta", 0.5, min = 0.0, max = 1, step = 0.1)
+          numericInput("gQC_tsneTheta", "Theta", defaultValue("gQC_tsneTheta", 0.5), min = 0.0, max = 1, step = 0.1)
         ),
         column(
           width = 6,
-          numericInput("gQC_tsneSeed", "Seed", 1, min = 1, max = 10000)
+          numericInput("gQC_tsneSeed", "Seed", defaultValue("gQC_tsneSeed", 1), min = 1, max = 10000)
         )
       ),
       fluidRow(
@@ -212,32 +212,32 @@ tabList <- list(
           width = 3,
           selectInput("gQC_dim3D_x",
                       label = "X",
-                      choices = c("tsne1", "tsne2", "tsne3"),
-                      selected = "tsne1"
+                      choices = c(defaultValue("gQC_dim3D_x", "tsne1"), "tsne2", "tsne3"),
+                      selected = defaultValue("gQC_dim3D_x", "tsne1")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_dim3D_y",
                       label = "Y",
-                      choices = c("tsne1", "tsne2", "tsne3"),
-                      selected = "tsne2"
+                      choices = c("tsne1", defaultValue("gQC_dim3D_y", "tsne2"), "tsne3"),
+                      selected = defaultValue("gQC_dim3D_y", "tsne2")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_dim3D_z",
                       label = "Z",
-                      choices = c("tsne1", "tsne2", "tsne3"),
-                      selected = "tsne3"
+                      choices = c("tsne1", "tsne2", defaultValue("gQC_dim3D_z", "tsne3")),
+                      selected = defaultValue("gQC_dim3D_z", "tsne3")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_col3D",
                       label = "colored by",
-                      choices = c("sampleNames"),
-                      selected = "sampleNames"
+                      choices = defaultValue("gQC_col3D", "sampleNames"),
+                      selected = defaultValue("gQC_col3D", "sampleNames")
           )
         )
       ),
@@ -270,30 +270,30 @@ tabList <- list(
       fluidRow(
         column(
           width = 3,
-          selectInput("gQC_um_n_neighbors",
+            selectInput("gQC_um_n_neighbors",
                       label = "N Neighbors",
-                      choices = c(2:100), selected = "15"
+                      choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "15")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_n_components",
                       label = "N components",
-                      choices = c(2:20), selected = "2"
+                      choices = c(2:20), selected = defaultValue("gQC_um_n_components", "2")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_spread",
                       label = "spread",
-                      choices = c(1:10), selected = "1"
+                      choices = c(1:10), selected = defaultValue("gQC_um_spread", "1")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_local_connectivity",
                       label = "local connectivity",
-                      choices = 1:20, selected = "1"
+                      choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "1")
           )
         )
       ),
@@ -305,11 +305,11 @@ tabList <- list(
             width = 3,
             selectInput("gQC_um_randSeed",
                         label = "random seed",
-                        choices = c(1:100), selected = "1"
+                        choices = c(1:100), selected = defaultValue("gQC_um_randSeed", "1")
             ),
             selectInput("gQC_um_init",
                         label = "init",
-                        choices = c("spectral", "random"), selected = "spectral"
+                        choices = c("spectral", "random"), selected = defaultValue("gQC_um_init", "spectral")
             )
           ),
           column(
@@ -317,11 +317,11 @@ tabList <- list(
             selectInput(
               "gQC_um_negative_sample_rate",
               label = "negative sample rate",
-              choices = c(1:50), selected = "5"
+              choices = c(1:50), selected = defaultValue("gQC_um_negative_sample_rate", "5")
             ),
             selectInput("gQC_um_min_dist",
                         label = "min dist",
-                        choices = seq(0.05, 0.5, 0.01), selected = "0.01"
+                        choices = seq(0.05, 0.5, 0.01), selected = defaultValue("gQC_um_min_dist", "0.01")
             )
           ),
           column(
@@ -329,23 +329,23 @@ tabList <- list(
             selectInput("gQC_um_metric",
                         label = "metric",
                         choices = c("euclidean", "manhattan", "cosine", "hamming"),
-                        selected = "euclidean"
+                        selected = defaultValue("gQC_um_metric", "euclidean")
             ),
             selectInput("gQC_um_set_op_mix_ratio",
                         label = "set op mix ratio",
-                        choices = seq(0, 1, 0.1), selected = "1"
+                        choices = seq(0, 1, 0.1), selected = defaultValue("gQC_um_set_op_mix_ratio", "1")
             )
           ),
           column(
             width = 3,
             selectInput("gQC_um_n_epochs",
                         label = "epochs",
-                        choices = c(1:1000), selected = "200"
+                        choices = c(1:1000), selected = defaultValue("gQC_um_n_epochs", "200")
             ),
             selectInput(
               "gQC_um_bandwidth",
               label = "bandwidth",
-              choices = c(1:20), selected = "1"
+              choices = c(1:20), selected = defaultValue("gQC_um_bandwidth", "1")
             )
           ),
         )
