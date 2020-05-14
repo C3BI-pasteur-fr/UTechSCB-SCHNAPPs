@@ -83,7 +83,7 @@ scShinyUI <- function(request) {
   DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
   DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
   
-  base::source(paste0(packagePath, "/serverFunctions.R"))
+  base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
   
   # source(paste0(packagePath,  "/ui.R"))
   
