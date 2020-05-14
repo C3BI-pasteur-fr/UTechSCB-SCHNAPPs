@@ -743,7 +743,7 @@ output$RDSsave <- downloadHandler(
     tsne <- tsne()
     ccol = clusterCols$colPal
     scol = sampleCols$colPal
-    
+    namesDF = groupNames$namesDF
     
     if (is.null(scEx)) {
       return(NULL)
@@ -758,7 +758,7 @@ output$RDSsave <- downloadHandler(
     # we save the pca separately because I don't know how to store the rotation  otherwise.
     # mostly done to make the lite version work.
     
-    saveList =  c("scEx" , "pca", "scol" , "ccol" )
+    saveList =  c("scEx" , "pca", "scol" , "ccol" , "namesDF")
     # browser()
     # save projections that shouldn't be recalculated in lite version
     for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
@@ -1058,7 +1058,7 @@ observeEvent(input$AboutApp,{
   ))
 })
 
-inputHelpIJS<- read.delim(system.file("extdata", "inputHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+inputHelpIJS <- read.delim(system.file("extdata", "inputHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
 # inputHelpIJS<- read.delim("inst/extdata/inputHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
 
 observeEvent(input$inputHelp, {
@@ -1066,6 +1066,23 @@ observeEvent(input$inputHelp, {
   cat(file = stderr(), apply(inputHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
   introjs(session,
           options = list(steps = inputHelpIJS)
+  )
+})
+
+# twoDselectedAddOptHelpIJS <- read.delim(system.file("extdata", "twoDselectedAddOptHelpIJS.txt",package = "SCHNAPPs"), sep=";", stringsAsFactors = FALSE)
+twoDselectedAddOptHelpIJS <- read.delim("inst/extdata/twoDselectedAddOptHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
+observeEvent(input$twoDselectedAddOpt, {
+  cat(file = stderr(), paste("twoDselectedAddOpt started\n"))
+  cat(file = stderr(), apply(twoDselectedAddOptHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
+  introjs(session,
+          options = list(steps = twoDselectedAddOptHelpIJS,
+                         "showBullets" = "false",
+                         "showProgress" = "true",
+                         "showStepNumbers" = "false",
+                         "nextLabel" = "Next",
+                         "prevLabel" = "Prev",
+                         "skipLabel" = "Skip",
+                         "highlightClass" = 'berndTest')
   )
 })
 

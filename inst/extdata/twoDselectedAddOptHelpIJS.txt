@@ -1,0 +1,2 @@
+element;intro
+#groupTutorial;Here you can define/name groups of cells. Clicking the button creates/modifies a group of cells that is named by the field (). For easier selection, one can select a previously defined group by selecting it with the drop-down menu. The selected group of cells is being used by the other panels in this view. Only if "plot" is selected the cells selected directly in the plot are used.

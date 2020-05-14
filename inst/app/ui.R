@@ -176,6 +176,7 @@ scShinyUI <- function(request) {
           
           # downloadButton("report", "Generate report", class = "butt"),
           tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
+          tags$head(tags$style(HTML("berndTest{background-color:rgba(255,34,22,0.1);}"))), # supposed to change the transparency of introjs area that is highlighted.
           
           # bookmarkButton(id = "bookmark1"),
           br(),

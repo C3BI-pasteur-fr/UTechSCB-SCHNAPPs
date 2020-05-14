@@ -68,8 +68,9 @@ clusterUI <- function(id) {
           jqui_resizable(plotly::plotlyOutput(ns("clusterPlot")))
         )
       ),
-      box(
+      boxWhelp(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
+        helpID = "twoDselectedAddOpt",
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
           column(
@@ -103,14 +104,14 @@ clusterUI <- function(id) {
           column(
             width = 12,
             checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", TRUE),
-            textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = "cellGroupName"),
+            list(textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = ""),
             selectInput(ns("groupNames"),
                         label = "group names, !When modifying a group this list of cells is used as a reference!",
-                        choices = c("plot"),
-                        selected = "plot"
+                        choices = c("plot", "all", "none"),
+                        selected = defaultValue(ns("groupNames"), "plot")
             ),
             verbatimTextOutput(ns("nCellsVisibleSelected")),
-            actionButton(ns("changeGroups"), "change current selection"),
+            actionButton(ns("changeGroups"), "change current selection")) %>% setId("groupTutorial"),
             checkboxInput(ns("showCells"), "show cell names", FALSE),
             verbatimTextOutput(ns("cellSelection")),
             actionButton(ns("save2Hist"), "save to history"),
