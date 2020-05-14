@@ -1,6 +1,6 @@
 #' .schnappsEnv
 #' Environment for package
-.schnappsEnv <<- new.env(parent = emptyenv())
+.schnappsEnv <- new.env(parent = emptyenv())
 
 
 
@@ -117,7 +117,7 @@ schnappsLite <- function(data="RdataFile",
     # error loading
     return(NULL)
   }
-  
+  save(file = "global.RData", list = c(".schnappsEnv"))
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
   # runApp(app)
   
