@@ -1,3 +1,12 @@
+if (!exists(".schnappsEnv")) {
+  .schnappsEnv <- new.env(parent = emptyenv())
+  .schnappsEnv$DEBUG = TRUE
+}
+
+if (.schnappsEnv$DEBUG) {
+  cat(file = stderr(), "started severFunctions.R\n")
+}
+
 suppressMessages(library(magrittr))
 suppressMessages(require(digest))
 suppressMessages(require(psychTools))
@@ -1390,7 +1399,7 @@ loadLiteData <- function(fileName = NULL) {
 
 
 defaultValue <- function(param = "coEtgMinExpr", val ) {
-  cat(file = stderr(), paste( "defaultValue : ",param, " val: ", val, "\n"))
+  cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
   # browser()
   if (!exists(".schnappsEnv")) return (val)
   if (exists(envir = .schnappsEnv, x = "defaultValues")) {
@@ -1494,3 +1503,6 @@ boxWhelp <- function (..., title = NULL, footer = NULL, status = NULL, solidHead
 setId = function(inp, id) {return(tags$div(id=id, inp))}
 
 
+if (.schnappsEnv$DEBUG) {
+  cat(file = stderr(), "end severFunctions.R\n")
+}
