@@ -7,7 +7,7 @@ source(paste0(packagePath, "/outputs.R"), local = TRUE)
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
 
-# store cell groups that are defined on the fly using the modular 2D plot
+# store groups of cells that are defined on the fly using the modular 2D plot
 groupNames <- reactiveValues(namesDF = data.frame())
 
 # colors for samples
@@ -2411,6 +2411,7 @@ initializeGroupNames <- reactive({
   
   scEx <- scEx()
   if (is.null(scEx)) {
+    cat(file = stderr(), "     scEx NULL.\n")
     return(NULL)
   }
   isolate({
@@ -2421,7 +2422,7 @@ initializeGroupNames <- reactive({
     # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
     # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
     # this will invalidate all previous selections.
-    if (is_empty(data.frame()) | !all(colnames(scEx) %in% rownames(grpNs))) {
+    if (is_empty(grpNs) | !all(colnames(scEx) %in% rownames(grpNs))) {
       df <-
         data.frame(
           all = rep(TRUE, dim(scEx)[2]),

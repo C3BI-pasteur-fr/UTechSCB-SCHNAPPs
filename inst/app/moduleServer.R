@@ -102,7 +102,8 @@ clusterServer <- function(input, output, session,
   })
 
   # clusterServer - observe input$groupNames ----
-  # if we manually select a group from the list we update the name group field
+  # if we manually select a group from the list we update the groupName field
+  # as this is the value that is actually being used for other calculations (except "plot" is selected)
   observe(label = "ob40", {
     if (DEBUG) cat(file = stderr(), "observe input$groupNames \n")
     if (!is.null(input$groupNames)) {
@@ -111,7 +112,8 @@ clusterServer <- function(input, output, session,
       } else {
         isolate({
           updateTextInput(
-            session = session, inputId = "groupName",
+            session = session, 
+            inputId = "groupName",
             value = input$groupNames
           )
         })
@@ -554,7 +556,11 @@ clusterServer <- function(input, output, session,
     }
 
     ns <- session$ns
-    input$changeGroups # action button
+    clicked <- input$changeGroups # action button
+    if (clicked < 1) {
+      if (DEBUG) cat(file = stderr(), "     input$changeGroups not clicked\n")
+      return(NULL)
+    }
     addToSelection <- .schnappsEnv$addToGroupValue
 
     # we isolate here because we only want to change if the button is clicked.
@@ -572,6 +578,7 @@ clusterServer <- function(input, output, session,
       grpNs <- groupNames$namesDF
       cells.names <- selectedCellNames()
       visibleCells <- visibleCellNames()
+      # 
       if (nrow(grpNs) == 0) {
         initializeGroupNames()
       }
@@ -603,7 +610,7 @@ clusterServer <- function(input, output, session,
     grpNs[cells.names, grpN] <- TRUE
     grpNs[, grpN] <- as.factor(grpNs[, grpN])
     # Set  reactive value
-    # cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
+    # cat(file = stderr(), paste("DEBUG: ",colnames(grpNs)," \n"))
     groupNames$namesDF <- grpNs
     updateSelectInput(session, "groupNames",
       choices = c("plot", colnames(grpNs)),

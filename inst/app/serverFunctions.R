@@ -1488,6 +1488,7 @@ boxWhelp <- function (..., title = NULL, footer = NULL, status = NULL, solidHead
 }
 
 # setId ----
+# gives an area an ID to be referenced by introjs
 # to be able to use %>%
 setId = function(inp, id) {return(tags$div(id=id, inp))}
 

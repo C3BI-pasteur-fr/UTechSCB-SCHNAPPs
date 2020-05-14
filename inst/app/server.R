@@ -16,7 +16,7 @@ suppressMessages(require(knitr))
 suppressMessages(require(shinyWidgets))
 suppressMessages(require(scater))
 suppressMessages(require(kohonen))
-suppressMessages(require(Rsomoclu))
+# suppressMessages(require(Rsomoclu))
 suppressMessages(require(SingleCellExperiment))
 suppressMessages(require(Matrix))
 suppressMessages(require(colourpicker))
@@ -182,7 +182,7 @@ scShinyServer <- function(input, output, session) {
       suppressMessages(require(shinyWidgets))
       suppressMessages(require(scater))
       suppressMessages(require(kohonen))
-      suppressMessages(require(Rsomoclu))
+      # suppressMessages(require(Rsomoclu))
       suppressMessages(require(SingleCellExperiment))
       suppressMessages(require(Matrix))
       suppressMessages(require(colourpicker))
@@ -321,7 +321,7 @@ scShinyServer <- function(input, output, session) {
       }
     }
   }
-  updateRadioButtons(
+  updateSelectizeInput(
     session = session, inputId = "sCA_dgeRadioButton",
     choices = dgeChoices
   )

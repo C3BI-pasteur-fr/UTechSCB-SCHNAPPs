@@ -41,7 +41,7 @@ generalParametersTab <- function(){
     br(),
     box(
       title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = F, collapsed = F,
       fluidRow(column(
         width = 12, offset = 1,
         actionButton("updateColors", "apply changes", width = "80%")
@@ -92,7 +92,7 @@ scShinyUI <- function(request) {
   # input, cell/gene selection tabs
   # source('tabs.R',  local = TRUE)
   source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
-  source(paste0(packagePath, "/tabs.R"), local = TRUE)
+  # source(paste0(packagePath, "/tabs.R"), local = TRUE)
   
   # remove up to here ------------------
   
@@ -208,6 +208,7 @@ scShinyUI <- function(request) {
         
         # downloadButton("report", "Generate report", class = "butt"),
         tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
+        tags$head(tags$style(HTML("berndTest {background-color : rgb(255,34,22,0.1);}"))),
         
         # bookmarkButton(id = "bookmark1"),
         br(),
@@ -238,6 +239,7 @@ scShinyUI <- function(request) {
       ), # dashboard side bar
       shinydashboard::dashboardBody(
         shinyjs::useShinyjs(debug = TRUE),
+        rintrojs::introjsUI(),
         inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
         inlineCSS(list(.green = "background-color: lightgreen")),
         tags$div(

@@ -11,7 +11,8 @@ menuList <- list(
                            shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
                            shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
                            shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
-                           shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
+                           shinydashboard::menuSubItem("alluvialTab", tabName = "alluvialTab")
+                           # shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )
 
@@ -228,57 +229,21 @@ tabList <- list(
            
     )
   ),
-  # SOMcluster ----
-  tabList = shinydashboard::tabItem(
-    "SOMcluster",
-    box(
-      title = "Self organizing map (SOM)", solidHeader = TRUE, width = 12, status = "primary",
-      footer = "Here, we calculate a SOM on all genes using the information from all cells. Then we ask, which other genes are in the same cluster as the gene of intereset.",
-      fluidRow(
-        column(
-          width = 12, offset = 1,
-          actionButton("updateSOMParameters", "apply changes", width = "80%")
-        )
-      ),
-      br(),
-      fluidRow(
-        cellSelectionUI("coE_SOM_dataInput"),
-        box(
-          fluidRow(
-            column(width = 3,
-                   numericInput("coE_dimSOM", "number of nodes per dimension",
-                                20,
-                                min = 2, max = 100
-                   )
-            ), 
-            column(width = 3,
-                   textInput("coE_geneSOM", "Gene of interest", value = defaultValueSingleGene)
+  tabItem("alluvialTab",
+          box(
+            title = "alluvial plot", solidHeader = TRUE, width = 12, status = 'primary', 
+            fluidRow(
+              column(width = 6, 
+                     selectInput("alluiv1", "1st axsis", choices = c("notyet"), selected = "notyet")),
+              column(width = 6, 
+                     selectInput("alluiv2", "2nd axsis", choices = c("notyet"), selected = "notyet"))
+            ),
+            fluidRow(
+              column(width = 12, 
+                     plotOutput("alluvial_plot") # %>% withSpinner()
+              )
             )
           )
-        ),
-        
-        # column(width = 3,
-        #        selectInput(inputId = "coE_clusterSOM", label = "Clusters/Factor to use", 
-        #                    choices = c("dbCluster", "sampleName"),
-        #                    selected = "dbCluster")
-        # ),
-        # column(width = 3,
-        #        selectInput(inputId = "coE_clusterValSOM", label = "Values to use",
-        #                    choices = c("1","2"), selected = "1", multiple = TRUE)
-        # )
-      ),
-      br(),
-      fluidRow(
-        column(
-          width = 12,
-          pHeatMapUI("coE_heatmapSOM")
-        )
-      ),
-      br(),
-      fluidRow(column(
-        width = 12,
-        verbatimTextOutput("coE_somGenes")
-      ))
-    )
+          
   )
 )
