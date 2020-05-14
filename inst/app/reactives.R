@@ -2416,6 +2416,7 @@ initializeGroupNames <- reactive({
   }
   isolate({
     grpNs <- groupNames$namesDF
+    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls()))
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls()))
     }
