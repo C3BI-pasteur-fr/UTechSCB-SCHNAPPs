@@ -57,7 +57,7 @@ clusterServer <- function(input, output, session,
   #   mod_cl1 <<- input$clusters
   # })
 
-  observe({
+  observe(label = "dimension_x", {
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
     .schnappsEnv$dim1 <- input$dimension_x
   })
@@ -102,7 +102,8 @@ clusterServer <- function(input, output, session,
   })
 
   # clusterServer - observe input$groupNames ----
-  # if we manually select a group from the list we update the name group field
+  # if we manually select a group from the list we update the groupName field
+  # as this is the value that is actually being used for other calculations (except "plot" is selected)
   observe(label = "ob40", {
     if (DEBUG) cat(file = stderr(), "observe input$groupNames \n")
     if (!is.null(input$groupNames)) {
@@ -111,7 +112,8 @@ clusterServer <- function(input, output, session,
       } else {
         isolate({
           updateTextInput(
-            session = session, inputId = "groupName",
+            session = session, 
+            inputId = "groupName",
             value = input$groupNames
           )
         })
@@ -120,7 +122,7 @@ clusterServer <- function(input, output, session,
   })
 
   # observe save  2 history ----
-  observe({
+  observe(label = "save2histMod2d", {
     clicked <- input$save2Hist
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- session$ns("-")
@@ -137,8 +139,14 @@ clusterServer <- function(input, output, session,
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
 
+    if (is.null(clicked)) {
+      return()
+    }
+    if (clicked < 1) {
+      return()
+    }
     add2history(
-      type = "renderPlotly",input = input, 
+      type = "renderPlotly", input = input,
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
       comment = paste(myns)
     )
@@ -255,6 +263,9 @@ clusterServer <- function(input, output, session,
         if (namedGroup %in% colnames(grpNs)) {
           return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ]))
         } else {
+          # TODO message about setting plot
+          showNotification("Make sure 'the'group names' is set correctly ", id = "selectedCellNamesProbl", duration = NULL)
+          if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames:some return null\n")
           return(NULL)
         }
       }
@@ -275,6 +286,8 @@ clusterServer <- function(input, output, session,
     exportTestValues(selectedCellNames = {
       cells.names
     })
+    if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: ", length(cells.names), "\n")
+
     return(cells.names)
   })
 
@@ -349,6 +362,8 @@ clusterServer <- function(input, output, session,
       if (length(retVal) == 0) {
         return(NULL)
       }
+      if (DEBUG) cat(file = stderr(), paste("reactiveValues: selectedCells:", length(retVal), " done\n"))
+
       return(retVal)
     })
   )
@@ -541,7 +556,11 @@ clusterServer <- function(input, output, session,
     }
 
     ns <- session$ns
-    input$changeGroups # action button
+    clicked <- input$changeGroups # action button
+    if (clicked < 1) {
+      if (DEBUG) cat(file = stderr(), "     input$changeGroups not clicked\n")
+      return(NULL)
+    }
     addToSelection <- .schnappsEnv$addToGroupValue
 
     # we isolate here because we only want to change if the button is clicked.
@@ -559,6 +578,7 @@ clusterServer <- function(input, output, session,
       grpNs <- groupNames$namesDF
       cells.names <- selectedCellNames()
       visibleCells <- visibleCellNames()
+      # 
       if (nrow(grpNs) == 0) {
         initializeGroupNames()
       }
@@ -590,7 +610,7 @@ clusterServer <- function(input, output, session,
     grpNs[cells.names, grpN] <- TRUE
     grpNs[, grpN] <- as.factor(grpNs[, grpN])
     # Set  reactive value
-    # cat(file = stderr(), paste("DEBUG: ",cells.names," \n"))
+    # cat(file = stderr(), paste("DEBUG: ",colnames(grpNs)," \n"))
     groupNames$namesDF <- grpNs
     updateSelectInput(session, "groupNames",
       choices = c("plot", colnames(grpNs)),
@@ -827,8 +847,8 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("colOrder"), list(), envir = .schnappsEnv)
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   assign(ns("currentStart"), 0, envir = .schnappsEnv)
-  
-  observe({
+
+  observe(label = "cellNameTable", {
     clicked <- input$save2HistTabUi
     myns <- session$ns("cellNameTable")
     if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi \n")
@@ -841,6 +861,12 @@ tableSelectionServer <- function(input, output, session,
     # show in the app that this is running
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
+    }
+    if (is.null(clicked)) {
+      return()
+    }
+    if (clicked < 1) {
+      return()
     }
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     add2history(
@@ -872,12 +898,12 @@ tableSelectionServer <- function(input, output, session,
     # input$refreshtable
 
     # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
-    inputData <- NULL
-    if (nsStr == "gsRMGenesMod--") {
-      inputData <- rowData(inputData()$scEx)
-    } else {
-      inputData <- dataTables
-    }
+    # inputData <- NULL
+    # if (nsStr == "gsRMGenesMod--") {
+    #   inputData <- rowData(inputData()$scEx)
+    # } else {
+    #   inputData <- dataTables
+    # }
 
     if (is.null(inputData)) {
       return(NULL)
@@ -906,7 +932,7 @@ tableSelectionServer <- function(input, output, session,
       # with just scEx we will cannot display the genes in the removed table
       # TODO need to check what we are comparing here. Just added "rowData(scEx)$symbol" because genes were not showing in some tables
       # also check that removed genes / cells table are working
-      retVal <- retVal[retVal %in% c(rowData(scEx)$symbol,inputData$symbol, colnames(scEx))]
+      retVal <- retVal[retVal %in% c(rowData(scEx)$symbol, inputData$symbol, colnames(scEx))]
       retVal <- paste0(retVal, collapse = ", ")
     } else {
       retVal <- NULL
@@ -919,7 +945,7 @@ tableSelectionServer <- function(input, output, session,
     return(retVal)
   })
 
-  proxy <- DT::dataTableProxy("cellNameTable")
+  proxy <- DT::dataTableProxy(ns("cellNameTable"))
 
   observeEvent(input$selectAll, {
     if (DEBUG) cat(file = stderr(), "observe input$selectAll\n")
@@ -980,6 +1006,8 @@ tableSelectionServer <- function(input, output, session,
     nsStr <- ns("-")
     reorderCells <- input$reorderCells
     selectedRows <- input$cellNameTable_rows_selected
+    showAllCells <- input$showAllCells
+
     # searchStr <-
     if (is.null(dataTables)) {
       .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
@@ -1007,6 +1035,7 @@ tableSelectionServer <- function(input, output, session,
         cols2disp <- numericCols
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
+      if (showAllCells) cols2disp <- colnames(dataTables)
       dataTables <- as.data.frame(dataTables[, cols2disp])
       colState <- get(ns("colState"), envir = .schnappsEnv)
       if (length(colState) == 0) {
@@ -1086,26 +1115,32 @@ pHeatMapModule <- function(input, output, session,
   outfilePH <- NULL
 
   # observe save 2 history ----
-  observe({
+  observe(label = "save2histHM", {
     clicked <- input$save2HistHM
-    if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
+    if (DEBUG) cat(file = stderr(), "observe input$save2HistHM \n")
     myns <- ns("pHeatMap")
     # browser()
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     start.time <- base::Sys.time()
-    if (DEBUG) cat(file = stderr(), "cluster: save2Hist\n")
+    if (DEBUG) cat(file = stderr(), "cluster: save2HistHM\n")
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
-        removeNotification(id = "save2Hist")
+        removeNotification(id = "save2HistHM")
       }
     )
     # show in the app that this is running
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("save2Hist", id = "save2Hist", duration = NULL)
+      showNotification("save2HistHM", id = "save2HistHM", duration = NULL)
     }
 
+    if (is.null(clicked)) {
+      return()
+    }
+    if (clicked < 1) {
+      return()
+    }
     add2history(
-      type = "tronco",input = input, 
+      type = "tronco", input = input,
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
       comment = paste(myns)
     )
@@ -1149,7 +1184,7 @@ pHeatMapModule <- function(input, output, session,
     #                   selected = colnames(proje)[2]
     # )
   })
-  
+
   observe(label = "ob46a", {
     if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
     start.time <- base::Sys.time()
@@ -1163,9 +1198,10 @@ pHeatMapModule <- function(input, output, session,
       showNotification("updateInput", id = "updateInput", duration = NULL)
     }
     heatmapData <- pheatmapList()
-    updateSliderInput(session, inputId = "heatmapMinMaxValue",
-                       min = signif(min(heatmapData$mat), digits = 4),
-                       max = signif(max(heatmapData$mat), digits = 4)
+    updateSliderInput(session,
+      inputId = "heatmapMinMaxValue",
+      min = signif(min(heatmapData$mat), digits = 4),
+      max = signif(max(heatmapData$mat), digits = 4)
     )
     # updateNumericInput(session, inputId = "heatmapMaxValue",
     #                    min = min(heatmapData$mat),
@@ -1204,7 +1240,7 @@ pHeatMapModule <- function(input, output, session,
     colPal <- input$colPal
     minMaxVal <- input$heatmapMinMaxValue
     # maxVal <- input$heatmapMaxValue
-    
+
     proje <- projections()
     if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
     if (.schnappsEnv$DEBUGSAVE) {
@@ -1215,27 +1251,27 @@ pHeatMapModule <- function(input, output, session,
     # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
     outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
     outfile <- normalizePath(outfile, mustWork = FALSE)
-    
-    
-    
-    retVal = heatmapModuleFunction(
+
+
+
+    retVal <- heatmapModuleFunction(
       heatmapData = heatmapData,
       addColNames = addColNames,
-      orderColNames = orderColNames, 
+      orderColNames = orderColNames,
       colTree = colTree,
       scale = scale,
-      pWidth = pWidth, 
+      pWidth = pWidth,
       pHeight = pHeight,
-      colPal= colPal,
+      colPal = colPal,
       minMaxVal = minMaxVal,
       proje = proje,
       outfile = outfile
     )
-      
-    if(retVal[["src"]] == "empty.png" ) {
-    .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
+
+    if (retVal[["src"]] == "empty.png") {
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
     }
-   return(retVal)
+    return(retVal)
   })
 
   # pHeatMapModule - additionalOptions ----
@@ -1347,13 +1383,13 @@ cellSelectionModule <- function(input, output, session) {
   # and observe/save if changed
 
   assign(ns("Mod_PPGrp"), "1", envir = .schnappsEnv)
-  observe({
+  observe(label = "Mod_PPGrp", {
     if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp\n"))
     assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
   })
 
   assign(ns("Mod_clusterPP"), "dbCluster", envir = .schnappsEnv)
-  observe({
+  observe(label = "Mod_clusterPP", {
     if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP\n"))
     assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
   })
@@ -1361,7 +1397,7 @@ cellSelectionModule <- function(input, output, session) {
 
 
   # Mod_updateInputPPt if projections changed ====
-  observe({
+  observe(label = "Mod_clusterPP", {
     if (DEBUG) cat(file = stderr(), "Mod_updateInputPPt started.\n")
     start.time <- base::Sys.time()
     on.exit({
@@ -1374,7 +1410,7 @@ cellSelectionModule <- function(input, output, session) {
       showNotification("Mod_updateInputPPt", id = "Mod_updateInputPPt", duration = NULL)
     }
     projections <- projections()
-
+    projFactors <- projFactors()
     # Can use character(0) to remove all choices
     if (is.null(projections)) {
       return(NULL)
@@ -1382,20 +1418,19 @@ cellSelectionModule <- function(input, output, session) {
     # save(file = "~/SCHNAPPsDebug/Mod_updateInputPPt", list = c(ls(), ls(envir = globalenv())))
     # load(file = "~/SCHNAPPsDebug/Mod_updateInputPPt")
 
-    coln <- colnames(projections)
-    choices <- c()
-    for (cn in coln) {
-      if (length(levels(as.factor(projections[, cn]))) < 50) {
-        choices <- c(choices, cn)
-      }
-    }
-    if (length(choices) == 0) {
-      choices <- c("no valid columns")
-    }
+    # coln <- colnames(projections)
+    # choices <- c()
+    # for (cn in coln) {
+    #   if (length(levels(as.factor(projections[, cn]))) < 50) {
+    #     choices <- c(choices, cn)
+    #   }
+    # }
+    # 
+
     updateSelectInput(
       session,
       "Mod_clusterPP",
-      choices = choices,
+      choices = projFactors,
       selected = get(ns("Mod_clusterPP"), envir = .schnappsEnv)
     )
   })

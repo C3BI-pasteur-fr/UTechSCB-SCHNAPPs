@@ -1,6 +1,7 @@
 suppressMessages(library(magrittr))
 require(digest)
 require(psychTools)
+require(tidyr)
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
@@ -1088,6 +1089,8 @@ add2history <- function(type, comment = "", input = input, ...) {
         "\n![](",basename(tfile),")\n\n"
       )
       write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    }, error = function(w){
+      cat(file = stderr(),paste("problem with orca:",w,"\n"))
     })
   }
   
@@ -1199,7 +1202,7 @@ heatmapModuleFunction <- function(
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
+  # cp =load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
   
   if (is.null(pWidth)) {
     pWidth <- 800
@@ -1329,4 +1332,164 @@ heatmapModuleFunction <- function(
     alt = "heatmap should be here"
   ))
 }
+
+# consolidateScEx ----
+
+consolidateScEx <-
+  function(scEx, projections, scEx_log, pca, tsne) {
+    # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls(), "myProjections"))
+    # load(file = "~/SCHNAPPsDebug/consolidate.RData")
+    commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
+    commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
+    scEx <- scEx[commGenes, commCells]
+    # what about UMAP??? others? => they are considered as projections not as reducedDims
+    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
+    assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
+    
+    for (name in colnames(projections)) {
+      colData(scEx)[[name]] <- projections[commCells, name]
+    }
+    # colData(scEx)[["before.Filter"]] <- projections[commCells, "before.filter"]
+    # colData(scEx)[["dbCluster"]] <- projections[commCells, "dbCluster"]
+    # colData(scEx)[["UmiCountPerGenes"]] <- projections[commCells, "UmiCountPerGenes"]
+    # colData(scEx)[["UmiCountPerGenes2"]] <- projections[commCells, "UmiCountPerGenes2"]
+    
+    return(scEx)
+  }
+
+
+# loadLiteData ----
+
+loadLiteData <- function(fileName = NULL) {
+  if (is.null(fileName)) return(NULL)
+  # fileName = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
+  cp = load(fileName)
+  
+  # The data has to be stored in scEx as it come from save from the main SCHNAPPs app
+  if (!all(c("scEx", "pca") %in% cp)) {
+    return(NULL)
+  }
+  
+  projections = colData(scEx)
+  dbCluster = projections$dbCluster
+  counts = scEx
+  assays(counts)[["logcounts"]] = NULL
+  logcounts = scEx
+  assays(logcounts)[["counts"]] = NULL
+  # pca = reducedDims(scEx)[["PCA"]] # now stored separately
+  returnList = list(scEx = counts, scEx_log = logcounts, pca = pca, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol)
+  for (va in cp[!cp %in% c("scEx", "pca", "ccol", "scol")]) {
+    # .schnappsEnv = global envirnment for schnapps
+    #  - projectionFunctions = list of 2 entries each: 1st: display name, 2nd reactive name (defined in a reactive.R)
+    
+    returnList[[va]] = get(va)
+  }
+  
+  return(returnList)
+}
+
+
+defaultValue <- function(param = "coEtgMinExpr", val ) {
+  cat(file = stderr(), paste( "defaultValue : ",param, " val: ", val, "\n"))
+  # browser()
+  if (exists(envir = .schnappsEnv, x = "defaultValues")) {
+    if ( param %in% names(.schnappsEnv$defaultValues)) {
+      cat(file = stderr(), paste( "value: ", .schnappsEnv$defaultValues[[param]], "\n"))
+      return(.schnappsEnv$defaultValues[[param]])
+    }
+  } 
+  return(val)
+}
+
+# dheader ----
+# it is used in ui.R and ui-lite.R and is still being developped
+dheader <- function() {
+  shinydashboard::dashboardHeader(
+    title = paste("SCHNAPPs", packageVersion("SCHNAPPs")),
+    shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-question"),badgeStatus = NULL,
+                                 headerText = "Help",
+                                 notificationItem(text =  actionButton("menuTour", label = "short Tour", icon = icon("fas fa-directions")),
+                                                  icon = icon("")
+                                 ),
+                                 notificationItem(text =  "online documentation",
+                                                  href="https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/", 
+                                                  icon("fas fa-book-medical")
+                                 )
+    ), 
+    shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-info"),badgeStatus = NULL,
+                                 headerText = "About",
+                                 notificationItem(text =  actionButton("AboutApp", label = "about SCHNAPPs"),
+                                                  icon = icon("")
+                                 )
+    )
+  )
+}
+
+# boxWhelp ----
+# box with help
+# modified box function that places a question mark with a botton at the far right
+
+boxWhelp <- function (..., title = NULL, footer = NULL, status = NULL, solidHeader = FALSE, 
+                  background = NULL, width = 6, height = NULL, collapsible = FALSE, 
+                  collapsed = FALSE, helpID = NULL) 
+{
+  boxClass <- "box"
+  if (solidHeader || !is.null(background)) {
+    boxClass <- paste(boxClass, "box-solid")
+  }
+  if (!is.null(status)) {
+    # validateStatus(status)
+    boxClass <- paste0(boxClass, " box-", status)
+  }
+  if (collapsible && collapsed) {
+    boxClass <- paste(boxClass, "collapsed-box")
+  }
+  if (!is.null(background)) {
+    # validateColor(background)
+    boxClass <- paste0(boxClass, " bg-", background)
+  }
+  style <- NULL
+  if (!is.null(height)) {
+    style <- paste0("height: ", validateCssUnit(height))
+  }
+  titleTag <- NULL
+  if (!is.null(title)) {
+    titleTag <- h3(class = "box-title", title)
+  }
+  helpTag <- NULL
+  if (!is.null(helpID)) {
+    helpTag <- actionButton(inputId = helpID, label = "", icon = icon("fas fa-question")
+    )
+  }
+  collapseTag <- NULL
+  if (collapsible) {
+    buttonStatus <- status 
+    if (is.null(buttonStatus)) buttonStatus = "default"
+    collapseIcon <- if (collapsed) 
+      "plus"
+    else "minus"
+    collapseTag <- div(class = "box-tools pull-right", helpTag, tags$button(class = paste0("btn btn-box-tool"), 
+                                                                   `data-widget` = "collapse", shiny::icon(collapseIcon)))
+  } else {
+    if (!is.null(helpTag))
+    collapseTag <- div(class = "box-tools pull-right", 
+                      helpTag
+                      )
+  }
+  
+  headerTag <- NULL
+  if (!is.null(titleTag) || !is.null(collapseTag)) {
+    headerTag <- div(class = "box-header", titleTag, collapseTag)
+  }
+  div(class = if (!is.null(width)) 
+    paste0("col-sm-", width), div(class = boxClass, style = if (!is.null(style)) 
+      style, headerTag, div(class = "box-body", ...), if (!is.null(footer)) 
+        div(class = "box-footer", footer)))
+}
+
+# setId ----
+# gives an area an ID to be referenced by introjs
+# to be able to use %>%
+setId = function(inp, id) {return(tags$div(id=id, inp))}
+
 

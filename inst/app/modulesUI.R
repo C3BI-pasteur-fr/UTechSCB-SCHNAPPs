@@ -68,8 +68,9 @@ clusterUI <- function(id) {
           jqui_resizable(plotly::plotlyOutput(ns("clusterPlot")))
         )
       ),
-      box(
+      boxWhelp(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
+        helpID = "twoDselectedAddOpt",
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
           column(
@@ -103,14 +104,14 @@ clusterUI <- function(id) {
           column(
             width = 12,
             checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", TRUE),
-            textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = "cellGroupName"),
+            list(textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = ""),
             selectInput(ns("groupNames"),
                         label = "group names, !When modifying a group this list of cells is used as a reference!",
-                        choices = c("plot"),
-                        selected = "plot"
+                        choices = c("plot", "all", "none"),
+                        selected = defaultValue(ns("groupNames"), "plot")
             ),
             verbatimTextOutput(ns("nCellsVisibleSelected")),
-            actionButton(ns("changeGroups"), "change current selection"),
+            actionButton(ns("changeGroups"), "change current selection")) %>% setId("groupTutorial"),
             checkboxInput(ns("showCells"), "show cell names", FALSE),
             verbatimTextOutput(ns("cellSelection")),
             actionButton(ns("save2Hist"), "save to history"),
@@ -157,19 +158,23 @@ tableSelectionUi <- function(id) {
       fluidRow(h4("Cells", offset = 1)),
       fluidRow(
         column(
-          width = 6,
+          width = 4,
           checkboxInput(ns("selectAll"), "Select all rows", FALSE)
         ),
         column(
-          width = 6,
+          width = 4,
           checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)
+        ),
+        column(
+          width = 4,
+          checkboxInput(ns("showAllCells"), "show all columns", FALSE)
         )
       ),
       br(),
       fluidRow(column(
         width = 12,
         DT::DTOutput(ns("cellNameTable")) ,
-        style = "height:500px; overflow-y: scroll;overflow-x: scroll;"
+        style = "overflow-y: scroll;overflow-x: scroll;"
       )
       )
     )
