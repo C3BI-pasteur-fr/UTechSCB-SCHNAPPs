@@ -1,7 +1,7 @@
 suppressMessages(library(magrittr))
-require(digest)
-require(psychTools)
-require(tidyr)
+suppressMessages(require(digest))
+suppressMessages(require(psychTools))
+suppressMessages(require(tidyr))
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
@@ -1431,8 +1431,8 @@ dheader <- function() {
 # modified box function that places a question mark with a botton at the far right
 
 boxWhelp <- function (..., title = NULL, footer = NULL, status = NULL, solidHeader = FALSE, 
-                  background = NULL, width = 6, height = NULL, collapsible = FALSE, 
-                  collapsed = FALSE, helpID = NULL) 
+                      background = NULL, width = 6, height = NULL, collapsible = FALSE, 
+                      collapsed = FALSE, helpID = NULL) 
 {
   boxClass <- "box"
   if (solidHeader || !is.null(background)) {
@@ -1470,12 +1470,12 @@ boxWhelp <- function (..., title = NULL, footer = NULL, status = NULL, solidHead
       "plus"
     else "minus"
     collapseTag <- div(class = "box-tools pull-right", helpTag, tags$button(class = paste0("btn btn-box-tool"), 
-                                                                   `data-widget` = "collapse", shiny::icon(collapseIcon)))
+                                                                            `data-widget` = "collapse", shiny::icon(collapseIcon)))
   } else {
     if (!is.null(helpTag))
-    collapseTag <- div(class = "box-tools pull-right", 
-                      helpTag
-                      )
+      collapseTag <- div(class = "box-tools pull-right", 
+                         helpTag
+      )
   }
   
   headerTag <- NULL

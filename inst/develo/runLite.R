@@ -9,7 +9,7 @@ DEBUG = T
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
 
-
+.schnappsEnv 
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -66,6 +66,7 @@ scShinyServer <- NULL
 
 devscShinyApp = TRUE
 packagePath <<- "inst/app"
+
 source(paste0(packagePath, "/server.R"), local = TRUE)
 source(paste0(packagePath, "/ui.R"), local = T)
 source(paste0(packagePath, "/server-lite.R"), local = TRUE)
