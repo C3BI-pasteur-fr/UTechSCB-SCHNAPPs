@@ -46,9 +46,9 @@ clusterServer <- function(input, output, session,
 
   # dim1 <- defaultValues[1]
   # dim2 <- defaultValues[2]
-  dim1 <- "PC1"
-  dim2 <- "PC2"
-  dimCol <- "Gene.count"
+  # dim1 <- "PC1"
+  # dim2 <- "PC2"
+  # dimCol <- "Gene.count"
   divXBy <- "None"
   divYBy <- "None"
   # mod_cl1 <- ""
@@ -59,15 +59,15 @@ clusterServer <- function(input, output, session,
 
   observe(label = "dimension_x", {
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
-    .schnappsEnv$dim1 <- input$dimension_x
+    .schnappsEnv[[ns('dimension_x')]] <- input$dimension_x
   })
   observe(label = "ob32", {
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_y\n"))
-    .schnappsEnv$dim2 <- input$dimension_y
+    .schnappsEnv[[ns('dimension_y')]]<- input$dimension_y
   })
   observe(label = "ob33", {
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_col\n"))
-    .schnappsEnv$dimCol <- input$dimension_col
+    .schnappsEnv[[ns('dimension_col')]] <- input$dimension_col
   })
   observe(label = "ob34", {
     if (DEBUG) cat(file = stderr(), paste0("observe: divideXBy\n"))
@@ -171,15 +171,15 @@ clusterServer <- function(input, output, session,
     # )
     updateSelectInput(session, "dimension_x",
       choices = c(colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
-      selected = .schnappsEnv$dim1
+      selected = .schnappsEnv[[ns('dimension_x')]]
     )
     updateSelectInput(session, "dimension_y",
       choices = c(colnames(projections), "histogram", "UmiCountPerGenes", "UmiCountPerGenes2"),
-      selected = .schnappsEnv$dim2
+      selected = .schnappsEnv[[ns('dimension_y')]]
     )
     updateSelectInput(session, "dimension_col",
       choices = c(colnames(projections), "cellDensity", "UmiCountPerGenes", "UmiCountPerGenes2"),
-      selected = .schnappsEnv$dimCol
+      selected = .schnappsEnv[[ns('dimension_col')]]
     )
 
     updateSelectInput(session, "divideXBy",

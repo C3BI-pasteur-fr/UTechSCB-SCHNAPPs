@@ -206,8 +206,10 @@ tabList <- list(
                  selectizeInput(
                    "coE_dimension_xVioiGrp2",
                    label = "X",
+                   multiple = TRUE,
                    choices = c(defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), "sampleName", "tsne3"),
-                   selected = defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), options = list(maxItems = 2)
+                   selected = defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), 
+                   options = list(maxItems = 2)
                  )
                ),
                column(

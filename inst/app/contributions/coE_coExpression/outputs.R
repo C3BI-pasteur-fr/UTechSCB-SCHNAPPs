@@ -172,13 +172,17 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
   
   # upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
   if (is.null(projections) | is.null(scEx_log)) {
-    if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot:NULL\n")
+    if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot2:NULL\n")
+    return(NULL)
+  }
+  if (!projectionVar %in% colnames(projections)) {
+    if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot2: projectionVar not known: NULL\n")
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
+  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData")
   
   featureData <- rowData(scEx_log)
   retVal <- coE_geneGrp_vioFunc2(
@@ -269,10 +273,11 @@ output$alluvial_plot <- renderPlot({
   return(gg)
 })
 
-# rename projections
+# observe alluiv ----
 observe({
   projections <- projections()
   
+  req(projections)
   # save(file = "~/SCHNAPPsDebug/alluvial_plot2.RData", list = c(ls(), ls(envir = globalenv())))
   # load(file="~/SCHNAPPsDebug/alluvial_plot2.RData")
   facs = which(lapply(projections, class) == "factor")
@@ -285,10 +290,12 @@ observe({
   }
   
   updateSelectInput(session, "alluiv1",
-                    choices = c(colnames(projections)[facs])
+                    choices = c(colnames(projections)[facs]),
+                    selected = .schnappsEnv$alluiv1
   )
   updateSelectInput(session, "alluiv2",
-                    choices = c(colnames(projections)[facs])
+                    choices = c(colnames(projections)[facs]),
+                    selected = .schnappsEnv$alluiv2
   )
 })
 
