@@ -766,11 +766,26 @@ observe(label = "save2histVio", {
 #' coE_updateInputXviolinPlot
 #' Update x/y axis selection possibilities for violin plot
 #' could probably be an observer, but it works like this as well...
-.schnappsEnv$coE_vioGrp <- "sampleNames"
+# .schnappsEnv$coE_vioGrp <- "sampleNames"
 observe(label = "ob16", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
   .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
 })
+
+observe(label = "ob16a", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  .schnappsEnv$coE_vioGrp2 <- input$coE_dimension_xVioiGrp2
+})
+observe(label = "ob16b", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  .schnappsEnv$alluiv1 <- input$alluiv1
+})
+observe(label = "ob16c", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  .schnappsEnv$alluiv2 <- input$alluiv2
+})
+
+
 
 coE_updateInputXviolinPlot <- observe({
   if (DEBUG) cat(file = stderr(), "coE_updateInputXviolinPlot started.\n")
@@ -791,17 +806,6 @@ coE_updateInputXviolinPlot <- observe({
   if (is.null(tsneData)) {
     return(NULL)
   }
-  
-  # coln <- colnames(tsneData)
-  # choices <- c()
-  # for (cn in coln) {
-  #   if (length(levels(as.factor(tsneData[, cn]))) < 50) {
-  #     choices <- c(choices, cn)
-  #   }
-  # }
-  # if (length(choices) == 0) {
-  #   choices <- c("no valid columns")
-  # }
   updateSelectInput(
     session,
     "coE_dimension_xVioiGrp",
@@ -812,7 +816,7 @@ coE_updateInputXviolinPlot <- observe({
     session,
     "coE_dimension_xVioiGrp2",
     choices = projFactors,
-    selected = .schnappsEnv$coE_vioGrp
+    selected = .schnappsEnv$coE_vioGrp2
   )
 })
 
