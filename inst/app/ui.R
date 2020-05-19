@@ -50,8 +50,9 @@ scShinyUI <- function(request) {
     inputTab(),
     geneSelectionTab(),
     cellSelectionTab(),
-    generalParametersTab(),
-    renameTab()
+    generalParametersTab()
+    # ,
+    # renameTab()
   )
   # parameters tab, includes basic normalization
   source(paste0(packagePath, "/parameters.R"), local = TRUE)

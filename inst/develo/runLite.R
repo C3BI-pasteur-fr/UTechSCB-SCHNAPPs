@@ -8,6 +8,7 @@ defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
+AllowClustering = F
 
 .schnappsEnv 
 

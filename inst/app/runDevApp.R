@@ -6,7 +6,7 @@ library(reactlog)
   .schnappsEnv <- new.env(parent=emptyenv())
 # }
 
-  localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
+  localContributionDir = "~/Rstudio/SCHNAPPsContributions-dont/"
   # localContributionDir = ""
   defaultValueSingleGene = "itgae" # CD52
   defaultValueMultiGenes = "CD52, S100A9, S100A4" # itgae, cd69, itga1" # CD52, S100A9, S100A4
