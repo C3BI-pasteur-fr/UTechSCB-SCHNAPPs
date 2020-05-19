@@ -18,7 +18,7 @@
 #' @param maxCells maximal number of cells to use. Used to limit memory usage for server
 #' @param historyPath location (directory) where history directories and data will be stored.
 #' @param defaultValues list of default values to use for inputs
-#' historyPath should be used to generate Report
+#' @param AllowClustering whether to include functionality to cluster cells.
 #'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
@@ -42,7 +42,8 @@ schnappsLite <- function(data="RdataFile",
                          DEBUGSAVE = FALSE,
                          historyPath = NULL,
                          maxCells = 3000,
-                         defaultValues = list()
+                         defaultValues = list(),
+                         AllowClustering = FALSE
                          # ,
                          # historyFile = NULL
                          

@@ -330,17 +330,11 @@ observeEvent(
   }
 )
 
-# rename projections
-observe(label = "ob27", {
-  projections <- projections()
-  
-  updateSelectInput(session, "oldPrj",
-                    choices = c(colnames(projections))
-  )
-  updateSelectInput(session, "delPrj",
-                    choices = c(colnames(projectionsTable$newProjections))
-  )
-})
+# # rename projections
+# observe(label = "ob27", {
+#   projections <- projections()
+#   
+# })
 
 observe(label = "ob28", {
   input$newPrj
@@ -527,6 +521,14 @@ observe(label = "ob27b", {
                     choices = c(colnames(projections),
                                 selected = .schnappsEnv$gQC_rnProj)
   )
+  updateSelectInput(session, "oldPrj",
+                    choices = c(colnames(projections),
+                                selected = .schnappsEnv$oldPrj)
+  )
+  updateSelectInput(session, "delPrj",
+                    choices = c(colnames(projectionsTable$newProjections),
+                                selected = .schnappsEnv$delPrj)
+  )
   
 })
 observe(label = "ob27c", {
@@ -540,6 +542,14 @@ observe(label = "ob27d", {
 observe(label = "ob27e", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_rnProj\n")
   .schnappsEnv$gQC_rnProj <- input$gQC_rnProj
+})
+observe(label = "ob27f", {
+  if (DEBUG) cat(file = stderr(), "observe: oldPrj\n")
+  .schnappsEnv$oldPrj <- input$oldPrj
+})
+observe(label = "ob27g", {
+  if (DEBUG) cat(file = stderr(), "observe: delPrj\n")
+  .schnappsEnv$delPrj <- input$delPrj
 })
 
 

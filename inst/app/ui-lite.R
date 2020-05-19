@@ -22,7 +22,7 @@ suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinyjs))
 
-
+source(paste0(packagePath, "/tabs.R"), local = TRUE)
 
 introTab <- function(){
   shinydashboard::tabItem(
@@ -33,8 +33,13 @@ introTab <- function(){
   )
 }
 
+if (!exists('AllowClustering')) {
+  AllowClustering = FALSE
+  if (DEBUG) cat(file = stderr(), "ui-lite: AllowClustering not defined\n")
+}
 
-generalParametersTab <- function(){
+if (!AllowClustering)
+generalParametersTab <<- function(){
   shinydashboard::tabItem(
     "generalParameters",
     fluidRow(div(h2("General parameters"), align = "center")),
