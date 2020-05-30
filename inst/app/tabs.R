@@ -46,9 +46,13 @@ inputTab <- function() {
       )
       ),
       br(),
-      boxWhelp(
+      boxPlus(
         title = "Input files",
-        helpID = "inputHelp",
+        # helpID = ,
+        dropdown_icon = NULL,
+        closable = FALSE,
+        enable_dropdown = T,
+        dropdown_menu = actionButton(inputId = "inputHelp", label = "", icon = icon("fas fa-question")),
         status = "primary", solidHeader = TRUE, width = 12,
         footer = div(
           "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
@@ -72,9 +76,13 @@ inputTab <- function() {
               multiple = TRUE,
             ) %>% setId(id="fileInput"), checkbsTT("fileInput")
           ),
-          boxWhelp(
+          boxPlus(
             title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
-            helpID = "inputHelpAdd",
+            # helpID = "inputHelpAdd",
+            closable = FALSE,
+            dropdown_icon = NULL,
+            enable_dropdown = T,
+            dropdown_menu = actionButton(inputId = "inputHelpAdd", label = "", icon = icon("fas fa-question")),
             footer = "(Not required): Choose .CSV file with annotation to upload. This can be projections or gene based features.",
             collapsible = TRUE, collapsed = TRUE,
             fluidRow(
