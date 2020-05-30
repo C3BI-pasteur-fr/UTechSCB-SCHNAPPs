@@ -1,5 +1,5 @@
 element;intro
-#Welcome;Welcome to <code>ideal</code> - the Interactive Differential Expression Analysis tool that also enables reproducible analyses! Click on the <code>'Next'</code> button to proceed with the first interactive tour.
+#Welcome;Input data, can be CSV file or RData with singleCellExperiment object.
 #GeneralTour;If you click out of the intro-highlighted area, you are about to interrupt the tour. Don't worry, you can resume it anytime by re-clicking on the tour button.
 #fileInput;If you click out of the intro-highlighted area, you are about to interrupt the tour. Don't worry, you can resume it anytime by re-clicking on the tour button.
 #fileInputAnnotation; Annotations can be loaded here.

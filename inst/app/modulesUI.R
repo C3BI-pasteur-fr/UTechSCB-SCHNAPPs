@@ -68,9 +68,13 @@ clusterUI <- function(id) {
           jqui_resizable(plotly::plotlyOutput(ns("clusterPlot")))
         )
       ),
-      boxWhelp(
+      boxPlus(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
-        helpID = "twoDselectedAddOpt",
+        # helpID = "twoDselectedAddOpt",
+        dropdown_icon = NULL,
+        closable = FALSE,
+        enable_dropdown = T,
+        dropdown_menu = actionButton(inputId = "twoDselectedAddOpt", label = "", icon = icon("fas fa-question")),
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
           column(
