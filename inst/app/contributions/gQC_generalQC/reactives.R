@@ -151,7 +151,7 @@ scaterReads <- reactive({
 # gQC_sampleHistFunc ----
 #' gQC_sampleHistFunc
 #' create a histogram from samples
-gQC_sampleHistFunc <- function(samples, scols) {
+gQC_sampleHistFunc <- function(sampleInf, scols) {
   if (DEBUG) cat(file = stderr(), "gQC_sampleHistFunc started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -164,10 +164,14 @@ gQC_sampleHistFunc <- function(samples, scols) {
     showNotification("gQC_sampleHistFunc", id = "gQC_sampleHistFunc", duration = NULL)
   }
   
-  counts <- table(samples)
-  df <- as.data.frame(counts)
-  ggplot(data = df,aes(x=samples, y=Freq, fill=samples)) + geom_bar(stat = "identity")  + 
-    scale_color_manual(values=scols) 
+  
+  plotly::plot_ly(x=sampleInf, 
+                  type="histogram", 
+                  marker = list(color = scols))
+  # counts <- table(sampleInf)
+  # df <- as.data.frame(counts)
+  # ggplot(data = df,aes(x=sampleInf, y=Freq, fill=sampleInf)) + geom_bar(stat = "identity")  + 
+  #   scale_color_manual(values=scols) 
   # barplot(counts,
   #         main = "histogram of number of cell per sample",
   #         xlab = "Samples",

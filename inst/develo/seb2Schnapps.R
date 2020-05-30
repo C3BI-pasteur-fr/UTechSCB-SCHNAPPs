@@ -49,3 +49,7 @@ rowData(scEx)$id = rownames(rowData(scEx))
 rowData(scEx)$Description = rownames(rowData(scEx))
 save(file = "FBJ_SC01_BufferC_so.scEx.RData", list = c("scEx"))
 
+# Run schnapps with both files and save RData file.
+# should probably be done for all files individually as well, but hey let's wait for this request.
+
+

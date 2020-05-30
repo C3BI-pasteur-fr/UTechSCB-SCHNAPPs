@@ -131,10 +131,11 @@ tabList <- list(
   shinydashboard::tabItem(
     "gQC_umiHist",
     tags$h3("Histogram of UMI counts"),
+    numericInput("gQC_binSize", "number of bins", 20, min=10),
     fluidRow(column(
       10,
       offset = 1,
-      plotOutput("gQC_plotUmiHist") %>% withSpinner()
+      jqui_resizable(plotly::plotlyOutput("gQC_plotUmiHist"))
     )),
     br(),
     actionButton("save2Histumi", "save to history")
@@ -147,7 +148,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 1,
-      plotOutput("gQC_plotSampleHist") %>% withSpinner()
+      jqui_resizable(plotly::plotlyOutput("gQC_plotSampleHist"))
     )),
     br(),
     actionButton("save2HistSample", "save to history")

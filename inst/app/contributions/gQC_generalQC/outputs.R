@@ -193,7 +193,7 @@ callModule(
 )
 
 # gQC_plotUmiHist ----
-output$gQC_plotUmiHist <- renderPlot({
+output$gQC_plotUmiHist <- plotly::renderPlotly({
   if (DEBUG) cat(file = stderr(), "gQC_plotUmiHist started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -208,6 +208,7 @@ output$gQC_plotUmiHist <- renderPlot({
   
   scEx <- scEx()
   scols <- sampleCols$colPal
+  binSize <- input$gQC_binSize
   
   if (is.null(scEx)) {
     return(NULL)
@@ -215,20 +216,45 @@ output$gQC_plotUmiHist <- renderPlot({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData")
+  # cp = load(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData")
   
   dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
   dat$sample <- colData(scEx)$sampleNames
-  retVal <- ggplot(data = dat, aes(counts, fill = sample)) +
-    geom_histogram(bins = 50) +
-    labs(title = "Histogram for raw counts", x = "count", y = "Frequency") +
-    scale_fill_manual(values = scols, aesthetics = "fill")
   
-  .schnappsEnv[["gQC_plotUmiHist"]] <- retVal
-  return(retVal)
+  
+  fig <- plotly::plot_ly(alpha = 1,
+                         nbinsx = binSize)
+    # dat[dat$sample == levels(colData(scEx)$sampleNames)[[1]],],
+    # x = ~counts, 
+    # # y = ~counts,
+    # type="histogram")
+  lev = levels(colData(scEx)$sampleNames)
+  for (idx in seq_along(lev)) {
+    fig <- fig %>% add_trace(
+      type = 'histogram', color = I(scol[idx]), name = lev[idx],
+      x = dat[dat$sample == levels(colData(scEx)$sampleNames)[[idx]],"counts"]
+    )
+  }
+  fig <- fig %>% layout(
+    barmode="stack",
+    bargap=0.1)
+  
+  fig
+  # marker = list(color = scols))
+  
+  
+  
+  # retVal <- ggplot(data = dat, aes(counts, fill = sample)) +
+  #   geom_histogram(bins = 50) +
+  #   labs(title = "Histogram for raw counts", x = "count", y = "Frequency") +
+  #   scale_fill_manual(values = scols, aesthetics = "fill")
+  # 
+  .schnappsEnv[["gQC_plotUmiHist"]] <- fig
+  return(fig)
 })
 
-output$gQC_plotSampleHist <- renderPlot({
+# gQC_plotSampleHist -----
+output$gQC_plotSampleHist <- plotly::renderPlotly({
   if (DEBUG) cat(file = stderr(), "gQC_plotSampleHist started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -250,7 +276,7 @@ output$gQC_plotSampleHist <- renderPlot({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/sampleHist.RData")
+  # cp = load(file = "~/SCHNAPPsDebug/sampleHist.RData")
   retVal <- gQC_sampleHistFunc(sampleInf, scols)
   .schnappsEnv[["gQC_plotSampleHist"]] <- retVal
   return(retVal)

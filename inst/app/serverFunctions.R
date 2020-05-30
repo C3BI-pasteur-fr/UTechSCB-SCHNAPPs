@@ -1399,7 +1399,7 @@ loadLiteData <- function(fileName = NULL) {
 
 
 defaultValue <- function(param = "coEtgMinExpr", val ) {
-  cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
+  if (DEBUG) cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
   # browser()
   if (!exists(".schnappsEnv")) return (val)
   if (exists(envir = .schnappsEnv, x = "defaultValues")) {
