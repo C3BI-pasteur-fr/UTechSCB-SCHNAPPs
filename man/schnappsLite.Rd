@@ -14,7 +14,8 @@ schnappsLite(
   DEBUGSAVE = FALSE,
   historyPath = NULL,
   maxCells = 3000,
-  defaultValues = list()
+  defaultValues = list(),
+  AllowClustering = FALSE
 )
 }
 \arguments{
@@ -36,8 +37,9 @@ schnappsLite(
 
 \item{maxCells}{maximal number of cells to use. Used to limit memory usage for server}
 
-\item{defaultValues}{list of default values to use for inputs
-historyPath should be used to generate Report}
+\item{defaultValues}{list of default values to use for inputs}
+
+\item{AllowClustering}{whether to include functionality to cluster cells.}
 }
 \description{
 shiny server relevant functions

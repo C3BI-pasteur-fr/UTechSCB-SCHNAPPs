@@ -74,6 +74,11 @@ sCA_dataInp <- callModule(
   "sCA_dataInput"
 )
 
+# observe button ----
+observeEvent(input$updateDGEParameters, handlerExpr = {
+  sCA_dge()
+})
+
 # observer for button ----
 observe(label = "ob_DGEParams", {
   if (DEBUG) cat(file = stderr(), "observe DGEVars\n")
