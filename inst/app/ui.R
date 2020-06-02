@@ -9,6 +9,7 @@
 suppressMessages(require(shiny))
 source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 suppressMessages(require(shinydashboard))
+suppressMessages(require(shinydashboardPlus))
 suppressMessages(require(plotly))
 suppressMessages(require(shinythemes))
 suppressMessages(require(ggplot2))

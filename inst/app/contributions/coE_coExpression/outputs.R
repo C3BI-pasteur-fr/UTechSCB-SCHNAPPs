@@ -9,6 +9,7 @@ callModule(
   coE_heatmapReactive
 )
 
+
 # 2D plot with selection of cells ------
 # assigning it to a variable allows us to interact with the plot and collect selection events
 coE_selctedCluster <-
