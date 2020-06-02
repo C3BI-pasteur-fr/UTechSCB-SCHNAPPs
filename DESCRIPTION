@@ -30,6 +30,7 @@ Imports:
     scran,
     Seurat,
     shinydashboard,
+    shinydashboardPlus,
     shinythemes,
     shinyTree,
     shinyWidgets,
