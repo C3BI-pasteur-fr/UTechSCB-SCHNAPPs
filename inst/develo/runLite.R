@@ -65,7 +65,7 @@ scShinyUI <- NULL
 scShinyServer <- NULL
 # packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 
-devscShinyApp = TRUE
+devscShinyApp = F
 packagePath <<- "inst/app"
 
 source(paste0(packagePath, "/server.R"), local = TRUE)
@@ -75,7 +75,7 @@ source(paste0(packagePath, "/ui-lite.R"), local = T)
 
 # load data
 maxCells = 3000
-data = "~/Downloads/rnEPDC.lite.RData"
+data = "~/Downloads/HPVC.RData"
 # data = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
 assign(".SCHNAPPs_LiteData", loadLiteData(file = data), envir = .schnappsEnv)
 

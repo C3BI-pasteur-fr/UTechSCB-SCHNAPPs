@@ -11,6 +11,7 @@
 ### might remove the following if we include the source(ui.R)
 suppressMessages(require(shiny))
 source(paste0(packagePath, "/toolTips.R"), local = TRUE)
+suppressMessages(require(shinydashboardPlus))
 suppressMessages(require(shinydashboard))
 suppressMessages(require(plotly))
 suppressMessages(require(shinythemes))
