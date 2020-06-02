@@ -677,9 +677,9 @@ DE_scaterNormalization <- reactive(label = "scaterNorm", {
     }
     return(NULL)
   }
-  # if (.schnappsEnv$DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/DE_scaterNormalization.RData", list = c(ls()))
-  # }
+  }
   # cp=load(file="~/SCHNAPPsDebug/DE_scaterNormalization.RData")
   
   # TODO ?? define scaling factor somewhere else???
@@ -727,7 +727,7 @@ DE_scaterNormalizationfunc <- function(scEx, scalingFactor = 10000) {
   #             yaxis = list(type = "log"))
   # 
   # p
-  scaterReads <- SingleCellExperiment::normalize(scaterReads)
+  scaterReads <- normalize(scaterReads)
   assays(scaterReads)['counts'] = NULL
   return(scaterReads)
 }

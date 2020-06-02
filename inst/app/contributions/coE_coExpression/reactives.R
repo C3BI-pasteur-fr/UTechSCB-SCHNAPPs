@@ -840,8 +840,12 @@ coE_heatmapReactive <- reactive({
   scEx_log <- scEx_log()
   projections <- projections()
   genesin <- input$coE_heatmap_geneids
+  nFindCluster <- input$coE_nFindMarker
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
+  projections <- projections()
+  direction <- input$coE_direction
+  lfc <- input$coE_lfc
   
   if (is.null(scEx_log) | is.null(projections)) {
     return(list(
@@ -859,6 +863,23 @@ coE_heatmapReactive <- reactive({
   # load(file = "~/SCHNAPPsDebug/heatmap.RData")
   
   featureData <- rowData(scEx_log)
+  if (genesin == "") {
+    wmarkers <- findMarkers(scEx_log, 
+                            projections$dbCluster,
+                            direction = direction,
+                            lfc = lfc)
+    
+    markerlist = lapply(wmarkers,FUN = function(x){
+      rownames(x)[order(x$p.value)[1:nFindCluster]]
+    }) %>% unlist %>% unique 
+    # %>% 
+    
+    genesin =  paste(featureData[markerlist, "symbol"], collapse  = ", ")
+    updateTextInput(session = session, inputId = "coE_heatmap_geneids",
+                    value = genesin)
+  }
+  
+  
   scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]])
   retVal <- coE_heatmapFunc(
     featureData = featureData, scEx_matrix = scEx_matrix,
@@ -871,3 +892,5 @@ coE_heatmapReactive <- reactive({
   })
   return(retVal)
 })
+
+
