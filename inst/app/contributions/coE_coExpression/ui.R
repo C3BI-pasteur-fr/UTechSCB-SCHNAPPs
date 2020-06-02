@@ -33,6 +33,20 @@ tabList <- list(
       ),
       fluidRow(
         column(
+          width = 3,
+          numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 5, min=2)
+        ),
+        column(
+          width = 3,
+          numericInput("coE_lfc", "min log fold change", 1, min=0.1)
+        ),
+        column(
+          width = 3,
+          selectInput("coE_direction", "direction", "any", choices = c("up", "down", "any"))
+        )),
+      
+      fluidRow(
+        column(
           width = 12,
           pHeatMapUI("coExpHeatmapModule")
         )
