@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.55</span>
       </span>
     </div>
 
@@ -69,6 +69,9 @@
     <li>
       <a href="../../articles/pkdown/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
     </li>
+    <li>
+      <a href="../../articles/pkdown/scranWorkflow.html">Follow scran workflow to analyze single-cell RNA-seq data</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -89,12 +92,12 @@
 
       
 
-      </header><div class="row">
+      </header><script src="SCHNAPPs_usage_files/header-attrs-2.2/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SCHNAPPs - Single Cell sHiNy APP(s)</h1>
             
-            <h4 class="date">2020-04-27</h4>
+            <h4 class="date">2020-06-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/blob/master/vignettes/pkdown/SCHNAPPs_usage.Rmd"><code>vignettes/pkdown/SCHNAPPs_usage.Rmd</code></a></small>
       <div class="hidden name"><code>SCHNAPPs_usage.Rmd</code></div>
@@ -117,7 +120,7 @@ devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("BiocSingular")
-install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</code></pre>
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</code></pre>
 <div id="history-functionality" class="section level2">
 <h2 class="hasAnchor">
 <a href="#history-functionality" class="anchor"></a>history functionality</h2>
@@ -282,6 +285,7 @@ While loading data
 Parameters - Normalization
 </p>
 </div>
+<p>In SCHNAPPs there is only one normalization at a time. multiple normalization could be calculated but there is no way to compare them or switch between them.</p>
 <ul>
 <li>
 <p>rawNormalization:</p>
@@ -312,8 +316,7 @@ Parameters - Normalization
 <ul>
 <li><p>Number of dimensions to use</p></li>
 <li><p>number of features to use for anchor finding</p></li>
-<li>number of neighbors (k) <a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>
-</li>
+<li><p>number of neighbors (k) <a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p></li>
 <li><p>number of neighbors when weighting</p></li>
 </ul>
 <p>Source <a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
@@ -356,6 +359,7 @@ Parameters - Normalization
 Parameters - General
 </p>
 </div>
+<p>The clustering process populates the dbCluster projection. To compare different clustering methods a given dbCluster can be renamed</p>
 <p>Quickcluster from the scran package is used for clustering of cells.</p>
 <ul>
 <li>
@@ -487,7 +491,8 @@ Parameters - tSNE
 </li>
 <li>
 <p>X</p>
-Dimension for the X axis.</li>
+<p>Dimension for the X axis.</p>
+</li>
 <li>
 <p>Y</p>
 <p>Dimension for the Y axis.</p>
@@ -1095,15 +1100,15 @@ Modular heatmaps - dendrogram
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p> During the execution of a task, a message is displayed at the lower right corner. While the message is displayed other requests will wait. Though all mouse clicks and keyboard are normally retained (depending on the OS and computer characteristics), it is recommended to wait until the messages disappeared. Some internal SHINY processes that are not part of the actually SCHNAPPs application might also take considerable time. This can be checked using a monitoring tool (MAC: Activity Monitor).<a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p>Since internally we call the singleCellExperiment object scEx, we first search for this name in the RData file. Otherwise the first SingleCellExperiment object is taken. For simplicity it is strongly recommended to have only one SingleCellExperiment in the RData file. <br> If only the “logcounts” slot is availbale it is taken as the “counts” slot since we require the “counts” slot. This also allows loading only transformed data. <br> When loading multiple RData files, it is strongly recommended not to use only logcount data as this hasn’t been tested well enough.<a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p> scaterNorm: <br><code>ta = table(sampinfo)</code><br><code>ta = ta[ta&gt;0]</code><br><code>mtab = min(ta)</code><br><code>stp = round((mtab - 21) /10)</code><br><code>scaterReads &lt;- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp),clusters = sampinfo,subset.row = genes2use)</code><br><code>scaterReads &lt;- SingleCellExperiment::normalize(scaterReads)</code><a href="#fnref3" class="footnote-back">↩</a></p></li>
-<li id="fn4"><p>gene_norm:<br><code>nenner &lt;- Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])</code><br><code>nenner[nenner == 0] &lt;- 1</code><br><code>A@x &lt;- A@x / (nenner[A@j + 1L])</code><br><code>scEx_bcnorm &lt;- SingleCellExperiment(assay = list(logcounts = as(A, "dgTMatrix")),colData = colData(scEx),rowData = rowData(scEx)</code><br>) <code>x &lt;- uniqTsparse(assays(scEx_bcnorm)[[1]])</code><br><code>slot(x, "x") &lt;- log(1 + slot(x, "x"), base = 2) * scalingFactor</code><a href="#fnref4" class="footnote-back">↩</a></p></li>
-<li id="fn5"><p>test:<br><code>hello   foo</code><a href="#fnref5" class="footnote-back">↩</a></p></li>
-<li id="fn6"><p> SeuratStandard:<br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- NormalizeData(seur.list[[i]])</code><br><code>seur.list[[i]] &lt;- FindVariableFeatures(seur.list[[i]], selection.method = "vst", nfeatures = 2000)</code><br><code>}</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, dims = 1:dims, anchor.features = anchorsF, k.filter = kF)</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight</code><br><code>DefaultAssay(integrated) &lt;- "integrated"</code><br><code>result &lt;- ScaleData(integrated)</code> <a href="#fnref6" class="footnote-back">↩</a></p></li>
-<li id="fn7"><p> SeuratSCtransform:<br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list, anchor.features = features)</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT",anchor.features = features, k.filter = k.filter)</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>anchors = unique(c(anchors, keep.features))</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, normalization.method = "SCT")</code><br><code>result &lt;- integrated@assays$integrated@data * scalingFactor</code> <a href="#fnref7" class="footnote-back">↩</a></p></li>
-<li id="fn8"><p> SeratRefBased <br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)</code><br><code>#keep.features is the user supplied list of genes</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list, anchor.features = features)</code><br><code>reference_dataset &lt;- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT", anchor.features = features, k.filter = k.filter, reference = reference_dataset)</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, normalization.method = "SCT")</code><a href="#fnref8" class="footnote-back">↩</a></p></li>
-<li id="fn9"><p> <code>seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)</code><br><code>seurDat &lt;- FindClusters(seurDat, resolution = resolution)</code><a href="#fnref9" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p> During the execution of a task, a message is displayed at the lower right corner. While the message is displayed other requests will wait. Though all mouse clicks and keyboard are normally retained (depending on the OS and computer characteristics), it is recommended to wait until the messages disappeared. Some internal SHINY processes that are not part of the actually SCHNAPPs application might also take considerable time. This can be checked using a monitoring tool (MAC: Activity Monitor).<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Since internally we call the singleCellExperiment object scEx, we first search for this name in the RData file. Otherwise the first SingleCellExperiment object is taken. For simplicity it is strongly recommended to have only one SingleCellExperiment in the RData file. <br> If only the “logcounts” slot is availbale it is taken as the “counts” slot since we require the “counts” slot. This also allows loading only transformed data. <br> When loading multiple RData files, it is strongly recommended not to use only logcount data as this hasn’t been tested well enough.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p> scaterNorm: <br><code>ta = table(sampinfo)</code><br><code>ta = ta[ta&gt;0]</code><br><code>mtab = min(ta)</code><br><code>stp = round((mtab - 21) /10)</code><br><code>scaterReads &lt;- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp),clusters = sampinfo,subset.row = genes2use)</code><br><code>scaterReads &lt;- SingleCellExperiment::normalize(scaterReads)</code><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>gene_norm:<br><code>nenner &lt;- Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])</code><br><code>nenner[nenner == 0] &lt;- 1</code><br><code>A@x &lt;- A@x / (nenner[A@j + 1L])</code><br><code>scEx_bcnorm &lt;- SingleCellExperiment(assay = list(logcounts = as(A, "dgTMatrix")),colData = colData(scEx),rowData = rowData(scEx)</code><br>) <code>x &lt;- uniqTsparse(assays(scEx_bcnorm)[[1]])</code><br><code>slot(x, "x") &lt;- log(1 + slot(x, "x"), base = 2) * scalingFactor</code><a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>test:<br><code>hello   foo</code><a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p> SeuratStandard:<br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- NormalizeData(seur.list[[i]])</code><br><code>seur.list[[i]] &lt;- FindVariableFeatures(seur.list[[i]], selection.method = "vst", nfeatures = 2000)</code><br><code>}</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, dims = 1:dims, anchor.features = anchorsF, k.filter = kF)</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight</code><br><code>DefaultAssay(integrated) &lt;- "integrated"</code><br><code>result &lt;- ScaleData(integrated)</code> <a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p> SeuratSCtransform:<br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list, anchor.features = features)</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT",anchor.features = features, k.filter = k.filter)</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>anchors = unique(c(anchors, keep.features))</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, normalization.method = "SCT")</code><br><code>result &lt;- integrated@assays$integrated@data * scalingFactor</code> <a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p> SeratRefBased <br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)</code><br><code>#keep.features is the user supplied list of genes</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list, anchor.features = features)</code><br><code>reference_dataset &lt;- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT", anchor.features = features, k.filter = k.filter, reference = reference_dataset)</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, normalization.method = "SCT")</code><a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p> <code>seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)</code><br><code>seurDat &lt;- FindClusters(seurDat, resolution = resolution)</code><a href="#fnref9" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>

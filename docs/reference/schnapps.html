@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.55</span>
       </span>
     </div>
 
@@ -110,6 +110,9 @@
     </li>
     <li>
       <a href="../articles/pkdown/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
+    </li>
+    <li>
+      <a href="../articles/pkdown/scranWorkflow.html">Follow scran workflow to analyze single-cell RNA-seq data</a>
     </li>
   </ul>
 </li>
@@ -150,7 +153,8 @@
   <span class='kw'>defaultValueRegExGene</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='kw'>DEBUG</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>DEBUGSAVE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>historyPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>historyPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>defaultValues</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>()
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -183,6 +187,10 @@
     <tr>
       <th>historyPath</th>
       <td><p>location (directory) where history directories and data will be stored.</p></td>
+    </tr>
+    <tr>
+      <th>defaultValues</th>
+      <td><p>list of default values to use for inputs</p></td>
     </tr>
     </table>
 

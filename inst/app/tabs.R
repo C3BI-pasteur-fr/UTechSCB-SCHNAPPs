@@ -412,7 +412,7 @@ generalParametersTab <- function() {
             )
           ),
         ), # seurat clustering
-        tabPanel("Scran clustering",
+        tabPanel("Quickcluster",
           value = "scran_Cluster", # name of reactive to be used
           width = 12,
           fluidRow(
@@ -437,9 +437,10 @@ generalParametersTab <- function() {
               textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%", value = defaultValue("geneSelectionClustering", ""))
             )
           ),
-          checkbsTT(item = "geneSelectionClustering"),
-        ), # Scran clustering tab Panel
-
+          checkbsTT(item = "geneSelectionClustering")
+          
+        ), # quickclustering tab Panel
+        # tabPanel(),
         fluidRow(
           column(12, offset = 0, textOutput("Nclusters"))
         ),

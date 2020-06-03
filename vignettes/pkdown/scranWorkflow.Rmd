@@ -1,0 +1,327 @@
+---
+title: "Follow scran workflow to analyze single-cell RNA-seq data"
+author: 
+- name: Bernd Jagla
+  email: bernd.jagla@gmail.com
+date: "2.6.2020"
+output:
+  html_document
+package: SCHNAPPs
+bibliography: ref.bib
+vignette: >
+  %\VignetteIndexEntry{Follow scran workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}    
+---
+
+
+```{r, echo=FALSE, results="hide", message=FALSE}
+require(knitr)
+opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(scran)
+library(scater)
+library(SCHNAPPs)
+library(BiocParallel)
+register(SerialParam()) # avoid problems with fastMNN parallelization.
+set.seed(100)
+```
+
+# Introduction
+
+This vignette shows how SCHNAPPs can be applied as a single-cell RNA-sequencing platform by comparing it to a standard workflow as decribed under SCRAN (https://bioconductor.org/packages/release/bioc/vignettes/scran/inst/doc/scran.html).
+
+
+# Data setup
+
+We pre-compute the scran workflow and make its results available for comparison within SCHNAPPs.
+
+We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.
+
+```{r setupData, include=FALSE}
+
+# BiocManager::install("scRNAseq")
+library(scRNAseq)
+sce <- GrunPancreasData()
+sce
+```
+
+We prepare the singleCellExperiment object to contain the col/row Data that is needed by SCHNAPPs. 
+At this point, which is usually performed by the bioinformatician who is preparing the data, we can also add other information and documentation. 
+
+colData has to contain the columns
+barcode = a unique identifier per experiment
+sampleNames = a name for a collection of cells.
+
+rowData has to contian the columns
+symbol = the gene symbol
+Description = a text describing the gene
+id = unique identifier, e.g. ENSG number
+
+The following stats
+
+```{r}
+qcstats <- scater::perCellQCMetrics(sce)
+colData(sce) = cbind(colData(sce), qcstats)
+colData(sce)$barcode = rownames(colData(sce))
+colData(sce)$sampleNames = factor(colData(sce)$sample)
+
+rowData(sce)$Description = ""
+rowData(sce)$id = rownames(rowData(sce))
+
+```
+
+To show the effect of the scater filtering we also calculate those. Missing values are handled as 
+
+```{r}
+qcfilter <- quickPerCellQC(qcstats, percent_subsets="altexps_ERCC_percent")
+qcfilter[is.na(qcfilter$high_altexps_ERCC_percent),"high_altexps_ERCC_percent"] = T
+colData(sce) = cbind(colData(sce), qcfilter)
+
+```
+
+Now start SCHNAPPs.
+
+We reset the standards to empty for the gene and cell filtering to not introduce any bias
+
+Gene selection - regular expression for selection of genes to be removed = ""
+Gene selection - Min expression over all cell = 1
+Cell selection - Min # of UMIs = 1
+
+and then load the data we just created.
+
+We now show which filters have been applied to the data in the scran workflow. We use the perCellQCMetrics metrics that cannot be calculated from within SCHNAPPs but could be precalculated. 
+We can then visualize the cells that are filtered out and recover the thresholds used in individual steps:
+
+
+1. based on ERCC percentage:
+
+This percentage is precalculated from the scr
+
+The data can be visualized in the 2D plot (co-expression - selected) with the following paramters:
+X : altexps_ERCC_percent
+Y: sample
+color: high_altexps_ERCC_Percent
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Filter based on ERCC percentage', echo=FALSE}
+knitr::include_graphics('images/scran_1.png')
+```
+
+2. filter low expressing cells
+
+
+Using a similar 2D plot with the following paramters:
+X : detected
+Y: sample
+color: low_n_features
+
+we can selecte and remove cells with low expressing features.
+
+```{r, out.width='90%', fig.align='center', fig.cap='Filter based on detected genes', echo=FALSE}
+knitr::include_graphics('images/scran_2.png')
+```
+
+We end up with the same 1219 cells as in the vignette from scran.
+
+
+# Normalization
+
+
+```{r scranWkfl, message=FALSE, warning=FALSE}
+# here we redo the scran workflow with different clustering algorithms 
+# and store the results in the singleCellExperiment object that we are going to use in SCHNAPPs
+
+sce <- sce[,!qcfilter$discard]
+# summary(qcfilter$discard)
+
+library(scran)
+clusters <- quickCluster(sce)
+sce <- computeSumFactors(sce, clusters=clusters)
+summary(sizeFactors(sce))
+
+sce <- logNormCounts(sce)
+
+dec <- modelGeneVar(sce)
+# plot(dec$mean, dec$total, xlab="Mean log-expression", ylab="Variance")
+# curve(metadata(dec)$trend(x), col="blue", add=TRUE)
+
+dec2 <- modelGeneVarWithSpikes(sce, 'ERCC')
+
+# Get the top 10% of genes.
+top.hvgs <- getTopHVGs(dec, prop=0.1)
+sce <- runPCA(sce, subset_row=top.hvgs)
+# reducedDimNames(sce)
+sced <- denoisePCA(sce, dec2, subset.row=getTopHVGs(dec2, prop=0.1))
+ncol(reducedDim(sced, "PCA"))
+output <- getClusteredPCs(reducedDim(sce))
+npcs <- metadata(output)$chosen
+reducedDim(sce, "PCAsub") <- reducedDim(sce, "PCA")[,1:npcs,drop=FALSE]
+# npcs
+# In this case, using the PCs that we chose from getClusteredPCs().
+g1 <- buildSNNGraph(sce, use.dimred="PCAsub")
+cluster <- igraph::cluster_walktrap(g1)$membership
+sce$cluster <- factor(cluster)
+
+# In this case, using the PCs that we chose from getClusteredPCs().
+g <- buildSNNGraph(sce, use.dimred="PCAsub", type = "jaccard")
+cluster <- igraph::cluster_walktrap(g)$membership
+sce$cluster2 <- factor(cluster)
+
+g <- buildSNNGraph(sce, use.dimred="PCAsub", type = "number")
+cluster <- igraph::cluster_walktrap(g)$membership
+sce$cluster3 <- factor(cluster)
+
+
+
+# table(sce$cluster) 
+sce <- runTSNE(sce, dimred="PCAsub")
+# plotTSNE(sce, colour_by="cluster", text_by="cluster")
+# plotTSNE(sce, colour_by="cluster2", text_by="cluster2")
+# plotTSNE(sce, colour_by="cluster3", text_by="cluster3")
+
+
+library(pheatmap)
+ass.prob <- bootstrapCluster(sce, FUN=function(x) {
+    g <- buildSNNGraph(x, use.dimred="PCAsub")
+    igraph::cluster_walktrap(g)$membership
+}, clusters=sce$cluster)
+
+# pheatmap(ass.prob, cluster_cols=FALSE, cluster_rows=FALSE,
+#     col=colorRampPalette(c("white", "blue"))(100))
+
+```
+
+We save all results from to be able to compare to what SCHNAPPs has to offer
+
+
+```{r}
+save(file = "scran.grunPancreas.RData", list = c("sce"))
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on SCHNAPPs quickCluster', echo=FALSE}
+knitr::include_graphics('images/scran_3.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on rank', echo=FALSE}
+knitr::include_graphics('images/scran_4.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on Jaccard', echo=FALSE}
+knitr::include_graphics('images/scran_5.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on number', echo=FALSE}
+knitr::include_graphics('images/scran_6.png')
+```
+
+cluster = buildSNNGraph(type = "rank")
+
+```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between quickcluster and rank', echo=FALSE}
+knitr::include_graphics('images/scran_7.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between quickcluster and Jaccard', echo=FALSE}
+knitr::include_graphics('images/scran_8.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between quickcluster and number', echo=FALSE}
+knitr::include_graphics('images/scran_9.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between rank and Jaccard', echo=FALSE}
+knitr::include_graphics('images/scran_10.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between rank and number', echo=FALSE}
+knitr::include_graphics('images/scran_11.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='heatmap of findMarker genes', echo=FALSE}
+knitr::include_graphics('images/scran_12.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Heatmaps can be modified using additional options', echo=FALSE}
+knitr::include_graphics('images/scran_13.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Violin plot with permutataions', echo=FALSE}
+knitr::include_graphics('images/scran_14.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='grouped violin plots', echo=FALSE}
+knitr::include_graphics('images/scran_15.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='3D tSNE plot with expression of specified genes', echo=FALSE}
+knitr::include_graphics('images/scran_16.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Panel Plot', echo=FALSE}
+knitr::include_graphics('images/scran_17.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='DGE between specific groups of cells', echo=FALSE}
+knitr::include_graphics('images/scran_18.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='DGE results as Volcano plot', echo=FALSE}
+knitr::include_graphics('images/scran_19.png')
+```
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Table of DGE', echo=FALSE}
+knitr::include_graphics('images/scran_20.png')
+```
+
+
+SCHNAPPs uses the projection "dbCluster" for the current clustering result. In order to compare different clustering procedures the rename projection tool allows the user to copy the results do a different name.
+
+```{r, out.width='90%', fig.align='center', fig.cap='Projections can be renamed', echo=FALSE}
+knitr::include_graphics('images/scran_21.png')
+```
+
+Cells can be grouped and named using the 2D plot, Those are are binary groups, i.e. a cells belongs either to the group or not. There are cases where this binary lababling is not sufficient. For example if there are multiple indipendant groups of cells. The combine projections tabs allows combining such groups. In addition it is also possible to rename levels of factorials. Those are also copied to a new projection such that no information is lost.
+
+```{r, out.width='90%', fig.align='center', fig.cap='Select cells for copy/paste', echo=FALSE}
+knitr::include_graphics('images/scran_22.png')
+```
+
+
+
