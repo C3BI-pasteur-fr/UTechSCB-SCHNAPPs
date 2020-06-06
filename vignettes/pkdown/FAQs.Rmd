@@ -104,6 +104,14 @@ knitr::include_graphics('images/cd8vscd4.png')
 ```
 
 
+### How to evaluate if the clusters are biologically relevant?
+
+<video controls>
+  <source src="images/sampleRepresentCluster.mp4" type="video/mp4">
+</video>
+
+
+
 ### How to identify cells in a cluster of a Tsne plot and list them ? 
 
 Using the 2D plot, select tsne1 and tsne2. Using the mouse select the cells of interest. Check "more options", then check "show cell names".
