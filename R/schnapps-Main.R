@@ -69,6 +69,8 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   scShinyUI <- NULL
   scShinyServer <- NULL
   packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+  devscShinyApp <<- FALSE
+  devscShinyApp <- FALSE
   source(paste0(packagePath, "/server.R"), local = TRUE)
   source(paste0(packagePath, "/ui.R"), local = TRUE)
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)

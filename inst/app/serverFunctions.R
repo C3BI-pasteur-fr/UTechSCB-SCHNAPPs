@@ -1405,7 +1405,7 @@ defaultValue <- function(param = "coEtgMinExpr", val ) {
   if (!exists(".schnappsEnv")) return (val)
   if (exists(envir = .schnappsEnv, x = "defaultValues")) {
     if ( param %in% names(.schnappsEnv$defaultValues)) {
-      cat(file = stderr(), paste( "value: ", str(.schnappsEnv$defaultValues[[param]]), "\n"))
+      if (.schnappsEnv$DEBUG) cat(file = stderr(), paste( "value: ", str(.schnappsEnv$defaultValues[[param]]), "\n"))
       return(.schnappsEnv$defaultValues[[param]])
     }
   } 

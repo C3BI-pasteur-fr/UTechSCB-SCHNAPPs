@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 
 ```{r setup, include=FALSE}
 library(SCHNAPPs)
+library("htmltools")
+library("vembedr")
+
 ```
 
 ## Scientific questions
@@ -106,9 +109,10 @@ knitr::include_graphics('images/cd8vscd4.png')
 
 ### How to evaluate if the clusters are biologically relevant?
 
-<video controls>
-  <source src="images/sampleRepresentCluster.mp4" type="video/mp4">
-</video>
+
+```{r, echo=FALSE}
+embed_youtube("kL00ceA51vs")
+```
 
 
 

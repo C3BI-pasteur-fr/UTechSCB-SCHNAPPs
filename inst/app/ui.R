@@ -23,6 +23,8 @@ suppressMessages(require(shinyjs))
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
     packagePath <- "inst/app"
+  } else {
+    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
   }
 } else {
   packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
