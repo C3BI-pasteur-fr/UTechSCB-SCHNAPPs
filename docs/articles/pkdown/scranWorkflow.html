@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.55</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.59</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Follow scran workflow to analyze single-cell RNA-seq data</h1>
                         <h4 class="author">Bernd Jagla</h4>
-                  <a class="author_email" href="mailto:#"></a><a href="mailto:bernd.jagla@gmail.com" class="email">bernd.jagla@gmail.com</a>
+                  <a class="author_email" href="mailto:#">bernd <dot> jagla <at> pasteur <dot> fr</dot></at></dot></a>
       
                   
             <h4 class="date">2.6.2020</h4>
@@ -109,6 +109,12 @@
 
     
     
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scran</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scater</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SCHNAPPs</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">BiocParallel</span>)
+<span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/register.html">register</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html">SerialParam</a></span>()) <span class="co"># avoid problems with fastMNN parallelization.</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">100</span>)</pre></body></html></div>
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
@@ -119,64 +125,50 @@
 <a href="#data-setup" class="anchor"></a>Data setup</h1>
 <p>We pre-compute the scran workflow and make its results available for comparison within SCHNAPPs.</p>
 <p>We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.</p>
+<div class="sourceCode" id="cb2"><html><body><pre class="r">
+<span class="co"># BiocManager::install("scRNAseq")</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scRNAseq</span>)
+<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scRNAseq/man/GrunPancreasData.html">GrunPancreasData</a></span>()
+<span class="no">sce</span>
+<span class="co">## class: SingleCellExperiment </span>
+<span class="co">## dim: 20064 1728 </span>
+<span class="co">## metadata(0):</span>
+<span class="co">## assays(1): counts</span>
+<span class="co">## rownames(20064): A1BG-AS1__chr19 A1BG__chr19 ... ZZEF1__chr17</span>
+<span class="co">##   ZZZ3__chr1</span>
+<span class="co">## rowData names(2): symbol chr</span>
+<span class="co">## colnames(1728): D2ex_1 D2ex_2 ... D17TGFB_95 D17TGFB_96</span>
+<span class="co">## colData names(2): donor sample</span>
+<span class="co">## reducedDimNames(0):</span>
+<span class="co">## spikeNames(0):</span>
+<span class="co">## altExpNames(1): ERCC</span></pre></body></html></div>
 <p>We prepare the singleCellExperiment object to contain the col/row Data that is needed by SCHNAPPs. At this point, which is usually performed by the bioinformatician who is preparing the data, we can also add other information and documentation.</p>
 <p>colData has to contain the columns barcode = a unique identifier per experiment sampleNames = a name for a collection of cells.</p>
 <p>rowData has to contian the columns symbol = the gene symbol Description = a text describing the gene id = unique identifier, e.g. ENSG number</p>
-<p>The following stats</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="no">qcstats</span> <span class="kw">&lt;-</span> <span class="kw pkg">scater</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/perCellQCMetrics.html">perCellQCMetrics</a></span>(<span class="no">sce</span>)
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">qcstats</span> <span class="kw">&lt;-</span> <span class="kw pkg">scater</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/perCellQCMetrics.html">perCellQCMetrics</a></span>(<span class="no">sce</span>)
 <span class="fu">colData</span>(<span class="no">sce</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>), <span class="no">qcstats</span>)
 <span class="fu">colData</span>(<span class="no">sce</span>)$<span class="no">barcode</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>))
 <span class="fu">colData</span>(<span class="no">sce</span>)$<span class="no">sampleNames</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>)$<span class="no">sample</span>)
 
 <span class="fu">rowData</span>(<span class="no">sce</span>)$<span class="no">Description</span> <span class="kw">=</span> <span class="st">""</span>
 <span class="fu">rowData</span>(<span class="no">sce</span>)$<span class="no">id</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">rowData</span>(<span class="no">sce</span>))</pre></body></html></div>
-<p>To show the effect of the scater filtering we also calculate those. Missing values are handled as</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">qcfilter</span> <span class="kw">&lt;-</span> <span class="fu">quickPerCellQC</span>(<span class="no">qcstats</span>, <span class="kw">percent_subsets</span><span class="kw">=</span><span class="st">"altexps_ERCC_percent"</span>)
+<p>To show the effect of the scater filtering we also calculate those. Missing values are handled as genes with high ERCC expressing genes.</p>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">qcfilter</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/quickPerCellQC.html">quickPerCellQC</a></span>(<span class="no">qcstats</span>, <span class="kw">percent_subsets</span><span class="kw">=</span><span class="st">"altexps_ERCC_percent"</span>)
 <span class="no">qcfilter</span>[<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">qcfilter</span>$<span class="no">high_altexps_ERCC_percent</span>),<span class="st">"high_altexps_ERCC_percent"</span>] <span class="kw">=</span> <span class="no">T</span>
 <span class="fu">colData</span>(<span class="no">sce</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>), <span class="no">qcfilter</span>)</pre></body></html></div>
-<p>Now start SCHNAPPs.</p>
-<p>We reset the standards to empty for the gene and cell filtering to not introduce any bias</p>
-<p>Gene selection - regular expression for selection of genes to be removed = "" Gene selection - Min expression over all cell = 1 Cell selection - Min # of UMIs = 1</p>
-<p>and then load the data we just created.</p>
-<p>We now show which filters have been applied to the data in the scran workflow. We use the perCellQCMetrics metrics that cannot be calculated from within SCHNAPPs but could be precalculated. We can then visualize the cells that are filtered out and recover the thresholds used in individual steps:</p>
-<ol style="list-style-type: decimal">
-<li>based on ERCC percentage:</li>
-</ol>
-<p>This percentage is precalculated from the scr</p>
-<p>The data can be visualized in the 2D plot (co-expression - selected) with the following paramters: X : altexps_ERCC_percent Y: sample color: high_altexps_ERCC_Percent</p>
-<div class="figure" style="text-align: center">
-<img src="images/scran_1.png" alt="Filter based on ERCC percentage" width="90%"><p class="caption">
-Filter based on ERCC percentage
-</p>
-</div>
-<ol start="2" style="list-style-type: decimal">
-<li>filter low expressing cells</li>
-</ol>
-<p>Using a similar 2D plot with the following paramters: X : detected Y: sample color: low_n_features</p>
-<p>we can selecte and remove cells with low expressing features.</p>
-<div class="figure" style="text-align: center">
-<img src="images/scran_2.png" alt="Filter based on detected genes" width="90%"><p class="caption">
-Filter based on detected genes
-</p>
-</div>
-<p>We end up with the same 1219 cells as in the vignette from scran.</p>
-</div>
-<div id="normalization" class="section level1">
-<h1 class="hasAnchor">
-<a href="#normalization" class="anchor"></a>Normalization</h1>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co"># here we redo the scran workflow with different clustering algorithms </span>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># here we redo the scran workflow with different clustering algorithms </span>
 <span class="co"># and store the results in the singleCellExperiment object that we are going to use in SCHNAPPs</span>
-
+<span class="no">sceOrg</span> <span class="kw">=</span> <span class="no">sce</span>
 <span class="no">sce</span> <span class="kw">&lt;-</span> <span class="no">sce</span>[,!<span class="no">qcfilter</span>$<span class="no">discard</span>]
 <span class="co"># summary(qcfilter$discard)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scran</span>)
 <span class="no">clusters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/quickCluster.html">quickCluster</a></span>(<span class="no">sce</span>)
+
 <span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/computeSumFactors.html">computeSumFactors</a></span>(<span class="no">sce</span>, <span class="kw">clusters</span><span class="kw">=</span><span class="no">clusters</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="fu">sizeFactors</span>(<span class="no">sce</span>))</pre></body></html></div>
-<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## 0.006722 0.442629 0.801312 1.000000 1.295809 9.227575</code></pre>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu">logNormCounts</span>(<span class="no">sce</span>)
+<span class="co"># summary(sizeFactors(sce))</span>
+
+<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/logNormCounts.html">logNormCounts</a></span>(<span class="no">sce</span>)
 
 <span class="no">dec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">sce</span>)
 <span class="co"># plot(dec$mean, dec$total, xlab="Mean log-expression", ylab="Variance")</span>
@@ -186,12 +178,11 @@ Filter based on detected genes
 
 <span class="co"># Get the top 10% of genes.</span>
 <span class="no">top.hvgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html">getTopHVGs</a></span>(<span class="no">dec</span>, <span class="kw">prop</span><span class="kw">=</span><span class="fl">0.1</span>)
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu">runPCA</span>(<span class="no">sce</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">top.hvgs</span>)
+<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">sce</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">top.hvgs</span>)
 <span class="co"># reducedDimNames(sce)</span>
 <span class="no">sced</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/denoisePCA.html">denoisePCA</a></span>(<span class="no">sce</span>, <span class="no">dec2</span>, <span class="kw">subset.row</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html">getTopHVGs</a></span>(<span class="no">dec2</span>, <span class="kw">prop</span><span class="kw">=</span><span class="fl">0.1</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="fu">reducedDim</span>(<span class="no">sced</span>, <span class="st">"PCA"</span>))</pre></body></html></div>
-<pre><code>## [1] 50</code></pre>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getClusteredPCs.html">getClusteredPCs</a></span>(<span class="fu">reducedDim</span>(<span class="no">sce</span>))
+<span class="co"># ncol(reducedDim(sced, "PCA"))</span>
+<span class="no">output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getClusteredPCs.html">getClusteredPCs</a></span>(<span class="fu">reducedDim</span>(<span class="no">sce</span>))
 <span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fu">metadata</span>(<span class="no">output</span>)$<span class="no">chosen</span>
 <span class="fu">reducedDim</span>(<span class="no">sce</span>, <span class="st">"PCAsub"</span>) <span class="kw">&lt;-</span> <span class="fu">reducedDim</span>(<span class="no">sce</span>, <span class="st">"PCA"</span>)[,<span class="fl">1</span>:<span class="no">npcs</span>,<span class="kw">drop</span><span class="kw">=</span><span class="fl">FALSE</span>]
 <span class="co"># npcs</span>
@@ -199,6 +190,11 @@ Filter based on detected genes
 <span class="no">g1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
 <span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g1</span>)$<span class="no">membership</span>
 <span class="no">sce</span>$<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>)
+<span class="co"># table(sce$cluster)</span>
+
+<span class="no">g1a</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
+<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g1a</span>)$<span class="no">membership</span>
+<span class="no">sce</span>$<span class="no">cluster1a</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>)
 
 <span class="co"># In this case, using the PCs that we chose from getClusteredPCs().</span>
 <span class="no">g</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">"jaccard"</span>)
@@ -212,7 +208,7 @@ Filter based on detected genes
 
 
 <span class="co"># table(sce$cluster) </span>
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu">runTSNE</span>(<span class="no">sce</span>, <span class="kw">dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
+<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runTSNE.html">runTSNE</a></span>(<span class="no">sce</span>, <span class="kw">dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
 <span class="co"># plotTSNE(sce, colour_by="cluster", text_by="cluster")</span>
 <span class="co"># plotTSNE(sce, colour_by="cluster2", text_by="cluster2")</span>
 <span class="co"># plotTSNE(sce, colour_by="cluster3", text_by="cluster3")</span>
@@ -224,78 +220,221 @@ Filter based on detected genes
     <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g</span>)$<span class="no">membership</span>
 }, <span class="kw">clusters</span><span class="kw">=</span><span class="no">sce</span>$<span class="no">cluster</span>)
 
+<span class="no">sceOrg</span>$<span class="no">cluster</span> <span class="kw">=</span> <span class="fl">0</span>
+<span class="no">sceOrg</span>$<span class="no">cluster1a</span> <span class="kw">=</span> <span class="fl">0</span>
+<span class="no">sceOrg</span>$<span class="no">cluster2</span> <span class="kw">=</span> <span class="fl">0</span>
+<span class="no">sceOrg</span>$<span class="no">cluster3</span> <span class="kw">=</span> <span class="fl">0</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster1a</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster2</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster3</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
+<span class="no">sceOrg</span>$<span class="no">cluster</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster</span>
+<span class="no">sceOrg</span>$<span class="no">cluster1a</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster1a</span>
+<span class="no">sceOrg</span>$<span class="no">cluster2</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster2</span>
+<span class="no">sceOrg</span>$<span class="no">cluster3</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster3</span>
+<span class="no">sceOrg</span>$<span class="no">cluster</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster</span>)
+<span class="no">sceOrg</span>$<span class="no">cluster1a</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster1a</span>)
+<span class="no">sceOrg</span>$<span class="no">cluster2</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster2</span>)
+<span class="no">sceOrg</span>$<span class="no">cluster3</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster3</span>)
+
 <span class="co"># pheatmap(ass.prob, cluster_cols=FALSE, cluster_rows=FALSE,</span>
 <span class="co">#     col=colorRampPalette(c("white", "blue"))(100))</span></pre></body></html></div>
-<p>We save all results from to be able to compare to what SCHNAPPs has to offer</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span>(<span class="kw">file</span> <span class="kw">=</span> <span class="st">"scran.grunPancreas.RData"</span>, <span class="kw">list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"sce"</span>))</pre></body></html></div>
+<p>We save all results including the cluster assignments from the scran workflow to be able to compare to SCHNAPPs.</p>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span>(<span class="kw">file</span> <span class="kw">=</span> <span class="st">"scran.grunPancreas.RData"</span>, <span class="kw">list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"sceOrg"</span>))</pre></body></html></div>
+</div>
+<div id="schnapps" class="section level1">
+<h1 class="hasAnchor">
+<a href="#schnapps" class="anchor"></a>SCHNAPPs</h1>
+<p>Now start SCHNAPPs.</p>
+<p>Please see the help and other documentation on how to enable tracking data changes and saving plots (historyPath option). The defaultValues allows us to preset any user defineable variable in the GUI.</p>
+<p>This is partially done to simplify your life as you don’t have to set all the parameters partially to avoid mistakes and for this to show the correct set-up.</p>
+<p>The variables are described in the code chunk. To note: the number of genes to use is set to 951, which is the same value as in the scran vignette. We don’t have a way to calculate this. But we are aware that changing this value has substaintial effects for the cluster assignment. We strongly believe that the optimization of these parameters is not trivial and we are currently looking for solutions how to solve this. Similar argumenation goes for the number of PCs to use for the clustering algorithm.</p>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SCHNAPPs</span>)
+<span class="no">defaultValues</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
+
+<span class="co"># input</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"sampleInput"</span>]] <span class="kw">=</span><span class="fl">FALSE</span> <span class="co"># don't subsample</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"whichscLog"</span>]] <span class="kw">=</span> <span class="st">"calcLog"</span> <span class="co"># calculate normalization</span>
+
+<span class="co"># Normaliztion</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"normalizationRadioButton"</span>]] <span class="kw">=</span> <span class="st">"DE_scaterNormalization"</span> <span class="co"># use scaterNorm</span>
+
+<span class="co"># General parameters</span>
+<span class="co">## PArameters for PCA</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"pcaScale"</span>]] <span class="kw">=</span> <span class="fl">FALSE</span> <span class="co"># don't scale</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"pcaN"</span>]] <span class="kw">=</span> <span class="fl">951</span> <span class="co"># number of genes to use.</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"pcaRank"</span>]] <span class="kw">=</span> <span class="fl">14</span> <span class="co"># number PCs to use for clustering</span>
+
+
+<span class="co"># Parameters for clustering</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"tabsetCluster"</span>]] <span class="kw">=</span> <span class="st">"snnGraph"</span> <span class="co"># use SNN graph function</span>
+
+<span class="co"># preset Alluvial plot axes</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"alluiv1"</span>]] <span class="kw">=</span> <span class="st">"cluster"</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"alluiv2"</span>]] <span class="kw">=</span> <span class="st">"dbCluster"</span>
+
+
+<span class="co"># Gene selection</span>
+<span class="co"># we usually remove genes from mitochrondrium and Ribosome associated proteins using the following regular expression ("^MT-|^RP|^MRP"). This is not done in the scran vignette </span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"selectIds"</span>]] <span class="kw">=</span> <span class="st">""</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"minGenes"</span>]] <span class="kw">=</span> <span class="fl">1</span> <span class="co"># min number of reads per cell</span>
+
+
+
+<span class="co"># Cell selection</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"minGenesGS"</span>]] <span class="kw">=</span> <span class="fl">1</span> <span class="co"># minimum number of UMIs (sum) over all cells.</span>
+<span class="co"># cells to be removed</span>
+<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"cellsFiltersOut"</span>]] <span class="kw">=</span> <span class="st">[4047 chars quoted with '"']</span>
+
+<span class="fu"><a href="../../reference/schnapps.html">schnapps</a></span>(<span class="kw">defaultValues</span> <span class="kw">=</span> <span class="no">defaultValues</span>)</pre></body></html></div>
+<div id="removal-of-cells" class="section level2">
+<h2 class="hasAnchor">
+<a href="#removal-of-cells" class="anchor"></a>Removal of cells</h2>
+<p>This section shows how to remove the cells that have been identified in the scran vignette. To follow we have to remove the cells already selected. and set “Cells to be removed” under Cell selection - additional parameters to an empty string as shown below:</p>
 <div class="figure" style="text-align: center">
-<img src="images/scran_3.png" alt="Cluster assignment in tSNE space based on SCHNAPPs quickCluster" width="90%"><p class="caption">
-Cluster assignment in tSNE space based on SCHNAPPs quickCluster
+<img src="images/scran_1a.png" alt="Filter based on ERCC percentage" width="90%"><p class="caption">
+Filter based on ERCC percentage
+</p>
+</div>
+<p>and click on apply changes.</p>
+<p>Then load the data we just created.</p>
+<div class="figure" style="text-align: center">
+<img src="images/scran_1b.png" alt="Filter based on ERCC percentage" width="90%"><p class="caption">
+Filter based on ERCC percentage
+</p>
+</div>
+<p>We now show which filters have been applied to the data in the scran workflow. We use the perCellQCMetrics metrics that cannot be calculated from within SCHNAPPs but could be precalculated. We can then visualize the cells that are filtered out and recover the thresholds used in individual steps:</p>
+<div id="based-on-ercc-percentage" class="section level3">
+<h3 class="hasAnchor">
+<a href="#based-on-ercc-percentage" class="anchor"></a>based on ERCC percentage:</h3>
+<p>This percentage is precalculated from the scr</p>
+<p>The data can be visualized in the 2D plot (co-expression - selected) with the following paramters: X : altexps_ERCC_percent Y: sample color: high_altexps_ERCC_Percent</p>
+<div class="figure" style="text-align: center">
+<img src="images/scran_1.png" alt="Filter based on ERCC percentage" width="90%"><p class="caption">
+Filter based on ERCC percentage
+</p>
+</div>
+<p>The selected cell names can be copy/pasted to the “Cells to be removed” under Cell selection - additional parameters" as described above.</p>
+</div>
+<div id="filter-low-expressing-cells" class="section level3">
+<h3 class="hasAnchor">
+<a href="#filter-low-expressing-cells" class="anchor"></a>filter low expressing cells</h3>
+<p>Using a similar 2D plot with the following paramters: X : detected Y: sample color: low_n_features</p>
+<p>we can select and remove cells with low expressing features as described above.</p>
+<div class="figure" style="text-align: center">
+<img src="images/scran_2.png" alt="Filter based on detected genes" width="90%"><p class="caption">
+Filter based on detected genes
+</p>
+</div>
+<p>We end up with the same 1219 cells as in the vignette from scran.</p>
+</div>
+</div>
+</div>
+<div id="normalization-clustering" class="section level1">
+<h1 class="hasAnchor">
+<a href="#normalization-clustering" class="anchor"></a>Normalization / clustering</h1>
+<p>We use “scaterNorm”, which is applying exactly the same procedure that is used in the vignette. The user has several other options available that are better described in the online documentation.</p>
+<p>The snnGraph method is used for the clustering.</p>
+</div>
+<div id="results-are-the-same" class="section level1">
+<h1 class="hasAnchor">
+<a href="#results-are-the-same" class="anchor"></a>Results are the same</h1>
+<p>The alluvial plot between the cluster assignment from the scran package and the cluster assignment from SCHNAPPs (dbCluster) shows that they are the same.</p>
+<div class="figure" style="text-align: center">
+<img src="images/alluvialAllGood.png" alt="Cluster assignment comparison using Alluvial plot" width="90%"><p class="caption">
+Cluster assignment comparison using Alluvial plot
+</p>
+</div>
+<p>The same result can be concluded from plotting the cluster assignments in a 2D plot:</p>
+<div class="figure" style="text-align: center">
+<img src="images/2dAllGood.png" alt="Cluster assignment comparison using 2D plot" width="90%"><p class="caption">
+Cluster assignment comparison using 2D plot
+</p>
+</div>
+</div>
+<div id="characterization-of-results" class="section level1">
+<h1 class="hasAnchor">
+<a href="#characterization-of-results" class="anchor"></a>Characterization of results</h1>
+<p>The following will show a few possible results that can be achieved using SCHNAPPs:</p>
+<div id="co-expression---all-clusters" class="section level2">
+<h2 class="hasAnchor">
+<a href="#co-expression---all-clusters" class="anchor"></a>Co-expression - All clusters</h2>
+<div class="figure" style="text-align: center">
+<img src="images/heatmapAllCells.png" alt="Co-expression - All clusters; After list of gene names has been set to empty SCHNAPPs will automatically fill the list with characteristic genes for each cluster." width="90%"><p class="caption">
+Co-expression - All clusters; After list of gene names has been set to empty SCHNAPPs will automatically fill the list with characteristic genes for each cluster.
+</p>
+</div>
+<p>The following video shows how to use the heatmap module. If the field with the gene names is empty the the function FindMarkers is used to identify the genes that are most characteristic for each cluster. This list of genes is used for the heatmap.</p>
+<iframe src="https://www.youtube.com/embed/aiKPccCmZgk" width="420" height="315" frameborder="0" allowfullscreen=""></iframe>
+<p>The genes CPA1, CTRB1, PLA2G1B, PRSS1, PRSS3P2 are highly expressed in cluster 2. GCG, TTR are highly expressed in cluster 5.</p>
+</div>
+<div id="co-expression---selected" class="section level2">
+<h2 class="hasAnchor">
+<a href="#co-expression---selected" class="anchor"></a>Co-expression - selected</h2>
+<p>In the following we describe a few possibilities of the 2D plot</p>
+<div id="co-expression-of-two-lists-of-genes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#co-expression-of-two-lists-of-genes" class="anchor"></a>co-expression of two lists of genes</h3>
+<p>We can now compare the genes previously found and see how these cells express genes from different clusters.</p>
+<div class="figure" style="text-align: center">
+<img src="images/coexpresCl2Cl5.png" alt="2D plot of the sum of expression of two different lists of genes, colored by cluster association." width="90%"><p class="caption">
+2D plot of the sum of expression of two different lists of genes, colored by cluster association.
+</p>
+</div>
+<p>The cell density can be used to identify where the majority of cells lies or if and where many cells are drawn on top of eachother.</p>
+<div class="figure" style="text-align: center">
+<img src="images/2dCellDensity.png" alt="2D plot of the sum of expression of two different lists of genes, colored by density of cells." width="90%"><p class="caption">
+2D plot of the sum of expression of two different lists of genes, colored by density of cells.
+</p>
+</div>
+<p>The composition of clusters relative to the donor information can be also using the same tool as shown below:</p>
+<div class="figure" style="text-align: center">
+<img src="images/histogramDonor.png" alt="Histogram of cell count per cluster assignment and split by donor information." width="90%"><p class="caption">
+Histogram of cell count per cluster assignment and split by donor information.
 </p>
 </div>
 <div class="figure" style="text-align: center">
-<img src="images/scran_4.png" alt="Cluster assignment in tSNE space based on rank" width="90%"><p class="caption">
-Cluster assignment in tSNE space based on rank
+<img src="images/nameGroupCell.png" alt="UMAP projection. Selecting and naming of a group of cells." width="90%"><p class="caption">
+UMAP projection. Selecting and naming of a group of cells.
 </p>
 </div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_5.png" alt="Cluster assignment in tSNE space based on Jaccard" width="90%"><p class="caption">
-Cluster assignment in tSNE space based on Jaccard
-</p>
+<p>Cells can be grouped and named using the 2D plot, Those are are binary groups, i.e. a cells belongs either to the group or not.</p>
+<p>The following video shows how to name groups of cells: * Cells have to be selected in the 2D plot. * Give a name * ensure that the reference for the selection is set to “plot” * click “change current selection”</p>
+<p>To note: * in-between, the cells seem not to be selected anymore, but that is a “feature” of the underlying visualization functions. * using the a previously defined group of cells allows to avoid selecting cells that are potentially hidden. This can happen, when the 2D coordinates have changed. This also allows a more cytometry way of thinking, where concurrent selections of cells are used to filter.</p>
+<p>After having selected multiple groups, we have these groups as projections available with TRUE/FALSe assignment for each cell. Sometimes, we want to combine these projections, e.g. if there are more than two cell types. This is done under Parameters - Projections - combine projections:</p>
+<ul>
+<li>Select the two projections that should be combined</li>
+<li>name the new projection</li>
+<li>repeat as needed.</li>
+</ul>
+<p>Since it is not ensured that these projections are not overlapping, the individual values are concatenated and a new factor is created. The levels of these factors can be changed under the “rename levels” tab. The tables allows verifying the meaning of the levels.</p>
+<p>When renaming the levels, don’t forget to add a meaningfull name, otherwise “X” is chosen for you.</p>
+<p>If this happens, don’t worry, this can be changed in the “rename projections” tab, where projections can be deleted, but only those you have created manually.</p>
+<iframe src="https://www.youtube.com/embed/xOSWcLKsZf0" width="420" height="315" frameborder="0" allowfullscreen=""></iframe>
 </div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_6.png" alt="Cluster assignment in tSNE space based on number" width="90%"><p class="caption">
-Cluster assignment in tSNE space based on number
-</p>
 </div>
-<p>cluster = buildSNNGraph(type = “rank”)</p>
+<div id="violin-plots" class="section level2">
+<h2 class="hasAnchor">
+<a href="#violin-plots" class="anchor"></a>Violin plots</h2>
+<p>The violin plot can show all possible combinations if “show Permutations” is selected, otherwise a normal violoin plot is shown (not shown here).</p>
 <div class="figure" style="text-align: center">
-<img src="images/scran_7.png" alt="Alluvial plot comparision between quickcluster and rank" width="90%"><p class="caption">
-Alluvial plot comparision between quickcluster and rank
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_8.png" alt="Alluvial plot comparision between quickcluster and Jaccard" width="90%"><p class="caption">
-Alluvial plot comparision between quickcluster and Jaccard
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_9.png" alt="Alluvial plot comparision between quickcluster and number" width="90%"><p class="caption">
-Alluvial plot comparision between quickcluster and number
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_10.png" alt="Alluvial plot comparision between rank and Jaccard" width="90%"><p class="caption">
-Alluvial plot comparision between rank and Jaccard
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_11.png" alt="Alluvial plot comparision between rank and number" width="90%"><p class="caption">
-Alluvial plot comparision between rank and number
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_12.png" alt="heatmap of findMarker genes" width="90%"><p class="caption">
-heatmap of findMarker genes
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_13.png" alt="Heatmaps can be modified using additional options" width="90%"><p class="caption">
-Heatmaps can be modified using additional options
-</p>
-</div>
-<div class="figure" style="text-align: center">
-<img src="images/scran_14.png" alt="Violin plot with permutataions" width="90%"><p class="caption">
+<img src="images/violinPermutation.png" alt="Violin plot with permutataions" width="90%"><p class="caption">
 Violin plot with permutataions
 </p>
 </div>
+<p>Under “grouped” a second variable can be used. Here, grp1-7 are clusters of cells that have been identified from the UMAP presentation.</p>
 <div class="figure" style="text-align: center">
-<img src="images/scran_15.png" alt="grouped violin plots" width="90%"><p class="caption">
+<img src="images/groupedViolin.png" alt="grouped violin plots" width="90%"><p class="caption">
 grouped violin plots
 </p>
 </div>
+</div>
+<div id="three-dimensional-plot" class="section level2">
+<h2 class="hasAnchor">
+<a href="#three-dimensional-plot" class="anchor"></a>Three dimensional plot</h2>
+<p>The sum of expression for a list of genes is shown in the 3D tSNE plot that can be found under Data Exploration -</p>
 <div class="figure" style="text-align: center">
-<img src="images/scran_16.png" alt="3D tSNE plot with expression of specified genes" width="90%"><p class="caption">
+<img src="images/3dDEExpression.png" alt="3D tSNE plot with expression of specified genes" width="90%"><p class="caption">
 3D tSNE plot with expression of specified genes
 </p>
 </div>
@@ -304,33 +443,60 @@ grouped violin plots
 Panel Plot
 </p>
 </div>
+</div>
+<div id="differential-gene-expression-dge" class="section level2">
+<h2 class="hasAnchor">
+<a href="#differential-gene-expression-dge" class="anchor"></a>Differential gene expression (DGE)</h2>
+<p>This short video shows how to perform a DGE analysis. The individual steps are also explained afterwards in more detail.</p>
+<iframe src="https://www.youtube.com/embed/lFHfZKt3zro" width="420" height="315" frameborder="0" allowfullscreen=""></iframe>
+<div id="selections-of-groups-of-cells" class="section level3">
+<h3 class="hasAnchor">
+<a href="#selections-of-groups-of-cells" class="anchor"></a>selections of groups of cells</h3>
+<p>The “selection of input cells” allows subsetting the cells even before the visualization.</p>
+<p>Cells to be compared can be either selected in the two plot directly, of if cells are only selected in the first plot, all other cells are being used.</p>
 <div class="figure" style="text-align: center">
 <img src="images/scran_18.png" alt="DGE between specific groups of cells" width="90%"><p class="caption">
 DGE between specific groups of cells
 </p>
 </div>
+</div>
+<div id="volcano-plot" class="section level3">
+<h3 class="hasAnchor">
+<a href="#volcano-plot" class="anchor"></a>Volcano plot</h3>
+<p>Genes can be selected in the volcano plot and their names/symbols are shown above the plot to be copy/pasted.</p>
 <div class="figure" style="text-align: center">
 <img src="images/scran_19.png" alt="DGE results as Volcano plot" width="90%"><p class="caption">
 DGE results as Volcano plot
 </p>
 </div>
+</div>
+<div id="dge-table" class="section level3">
+<h3 class="hasAnchor">
+<a href="#dge-table" class="anchor"></a>DGE table</h3>
+<p>A complete table is available, that can also be downloaded.</p>
 <div class="figure" style="text-align: center">
 <img src="images/scran_20.png" alt="Table of DGE" width="90%"><p class="caption">
 Table of DGE
 </p>
 </div>
+</div>
+</div>
+<div id="comparing-different-clustering-methods" class="section level2">
+<h2 class="hasAnchor">
+<a href="#comparing-different-clustering-methods" class="anchor"></a>Comparing different clustering methods</h2>
 <p>SCHNAPPs uses the projection “dbCluster” for the current clustering result. In order to compare different clustering procedures the rename projection tool allows the user to copy the results do a different name.</p>
 <div class="figure" style="text-align: center">
 <img src="images/scran_21.png" alt="Projections can be renamed" width="90%"><p class="caption">
 Projections can be renamed
 </p>
 </div>
-<p>Cells can be grouped and named using the 2D plot, Those are are binary groups, i.e. a cells belongs either to the group or not. There are cases where this binary lababling is not sufficient. For example if there are multiple indipendant groups of cells. The combine projections tabs allows combining such groups. In addition it is also possible to rename levels of factorials. Those are also copied to a new projection such that no information is lost.</p>
-<div class="figure" style="text-align: center">
-<img src="images/scran_22.png" alt="Select cells for copy/paste" width="90%"><p class="caption">
-Select cells for copy/paste
-</p>
 </div>
+</div>
+<div id="please-help" class="section level1">
+<h1 class="hasAnchor">
+<a href="#please-help" class="anchor"></a>Please help</h1>
+<p>We hope you find SCHNAPPs useful. Please don’t forget to cite our work when you publish, nor tell us if you find any bugs or have questions/suggestions.</p>
+<p>bernd <dot> jagla <at> pasteur <dot> fr</dot></at></dot></p>
 </div>
   </div>
 

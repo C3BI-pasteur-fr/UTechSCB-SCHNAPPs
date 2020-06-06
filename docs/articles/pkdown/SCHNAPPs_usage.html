@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.55</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.59</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SCHNAPPs - Single Cell sHiNy APP(s)</h1>
             
-            <h4 class="date">2020-06-02</h4>
+            <h4 class="date">2020-06-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/blob/master/vignettes/pkdown/SCHNAPPs_usage.Rmd"><code>vignettes/pkdown/SCHNAPPs_usage.Rmd</code></a></small>
       <div class="hidden name"><code>SCHNAPPs_usage.Rmd</code></div>
@@ -700,12 +700,14 @@ Co-expression - All clusters
 <li>
 <p>Comma seperated gene names</p>
 <p>Comma separated list of genes to be displayed in the heatmap for all cells.</p>
+<p>If this field is emptied, the FindMarkers functions is used to identify characteristic genes for each cluster. The “number of marker genes to plot” number of markers for each cluster (a unique list) is used to identify the genes.</p>
 </li>
 <li>
 <p>Heatmap plot</p>
 <p>Uses the heatmap module see Modules Heatmap in this document</p>
 </li>
 </ul>
+<video controls><source src="images/coExpressionAllclusters.mp4" type="video/mp4"></source></video>
 </div>
 <div id="selected" class="section level3">
 <h3 class="hasAnchor">
@@ -1082,6 +1084,19 @@ Modular heatmaps - dendrogram
 <p>Order of columns</p>
 <p>The columns can be ordered manually by any of the projections available.</p>
 </li>
+<li>
+<p>min/max values for heatmap</p>
+<p>Allows changing the relative color axis. Due to the limited number of available colors changing this value allows to visualize difference in any expression range .</p>
+</li>
+<li><p>Width of image in pixel</p></li>
+<li>
+<p>height of image in pixel</p>
+<p>Set the size of the image. This allows making the gene names visible</p>
+</li>
+<li>
+<p>color palette to choose from</p>
+<p>change colors.</p>
+</li>
 </ul>
 </li>
 </ul>
@@ -1090,8 +1105,8 @@ Modular heatmaps - dendrogram
 <div id="create-input-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#create-input-data" class="anchor"></a>Create input data</h1>
-<pre><code><a href="https://rdrr.io/pkg/BiocManager/man/install.html">BiocManager::install("SingleR")
-</a></code></pre>
+<p>under construction.</p>
+<p>Please see scranWorkflow for an example or the contributions at <a href="https://github.com/baj12/SCHNAPPsContributions" class="uri">https://github.com/baj12/SCHNAPPsContributions</a></p>
 </div>
 <div id="notes" class="section level1">
 <h1 class="hasAnchor">

@@ -2,10 +2,11 @@
 title: "Follow scran workflow to analyze single-cell RNA-seq data"
 author: 
 - name: Bernd Jagla
-  email: bernd.jagla@gmail.com
+  email: bernd <DOT> jagla <AT> pasteur <DOT> fr
 date: "2.6.2020"
 output:
-  html_document
+  html_document:
+    code_folding: hide
 package: SCHNAPPs
 bibliography: ref.bib
 vignette: >
@@ -17,10 +18,12 @@ vignette: >
 
 ```{r, echo=FALSE, results="hide", message=FALSE}
 require(knitr)
+library("htmltools")
+library("vembedr")
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 ```
 
-```{r setup, echo=FALSE, message=FALSE}
+```{r setup, echo=TRUE, message=FALSE}
 library(scran)
 library(scater)
 library(SCHNAPPs)
@@ -40,7 +43,7 @@ We pre-compute the scran workflow and make its results available for comparison 
 
 We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.
 
-```{r setupData, include=FALSE}
+```{r setupData, include=TRUE, collapse=TRUE}
 
 # BiocManager::install("scRNAseq")
 library(scRNAseq)
@@ -60,9 +63,7 @@ symbol = the gene symbol
 Description = a text describing the gene
 id = unique identifier, e.g. ENSG number
 
-The following stats
-
-```{r}
+```{r schnappsPrep}
 qcstats <- scater::perCellQCMetrics(sce)
 colData(sce) = cbind(colData(sce), qcstats)
 colData(sce)$barcode = rownames(colData(sce))
@@ -73,65 +74,17 @@ rowData(sce)$id = rownames(rowData(sce))
 
 ```
 
-To show the effect of the scater filtering we also calculate those. Missing values are handled as 
+To show the effect of the scater filtering we also calculate those. Missing values are handled as genes with high ERCC expressing genes.
 
 ```{r}
+
 qcfilter <- quickPerCellQC(qcstats, percent_subsets="altexps_ERCC_percent")
 qcfilter[is.na(qcfilter$high_altexps_ERCC_percent),"high_altexps_ERCC_percent"] = T
 colData(sce) = cbind(colData(sce), qcfilter)
 
 ```
 
-Now start SCHNAPPs.
-
-We reset the standards to empty for the gene and cell filtering to not introduce any bias
-
-Gene selection - regular expression for selection of genes to be removed = ""
-Gene selection - Min expression over all cell = 1
-Cell selection - Min # of UMIs = 1
-
-and then load the data we just created.
-
-We now show which filters have been applied to the data in the scran workflow. We use the perCellQCMetrics metrics that cannot be calculated from within SCHNAPPs but could be precalculated. 
-We can then visualize the cells that are filtered out and recover the thresholds used in individual steps:
-
-
-1. based on ERCC percentage:
-
-This percentage is precalculated from the scr
-
-The data can be visualized in the 2D plot (co-expression - selected) with the following paramters:
-X : altexps_ERCC_percent
-Y: sample
-color: high_altexps_ERCC_Percent
-
-
-
-```{r, out.width='90%', fig.align='center', fig.cap='Filter based on ERCC percentage', echo=FALSE}
-knitr::include_graphics('images/scran_1.png')
-```
-
-2. filter low expressing cells
-
-
-Using a similar 2D plot with the following paramters:
-X : detected
-Y: sample
-color: low_n_features
-
-we can selecte and remove cells with low expressing features.
-
-```{r, out.width='90%', fig.align='center', fig.cap='Filter based on detected genes', echo=FALSE}
-knitr::include_graphics('images/scran_2.png')
-```
-
-We end up with the same 1219 cells as in the vignette from scran.
-
-
-# Normalization
-
-
-```{r scranWkfl, message=FALSE, warning=FALSE}
+```{r scranWkfl, message=FALSE, warning=FALSE, cache=TRUE, eval=FALSE}
 # here we redo the scran workflow with different clustering algorithms 
 # and store the results in the singleCellExperiment object that we are going to use in SCHNAPPs
 sceOrg = sce
@@ -218,95 +171,252 @@ sceOrg$cluster3 = as.factor(sceOrg$cluster3)
 
 ```
 
-We save all results from to be able to compare to what SCHNAPPs has to offer
+We save all results including the cluster assignments from the scran workflow to be able to compare to SCHNAPPs.
 
 
-```{r}
+```{r save file,  cache=TRUE, eval=FALSE}
 save(file = "scran.grunPancreas.RData", list = c("sceOrg"))
 ```
 
+# SCHNAPPs
+
+Now start SCHNAPPs.
+
+Please see the help and other documentation on how to enable tracking data changes and saving plots (historyPath option). The defaultValues allows us to preset any user defineable variable in the GUI.
+
+This is partially done to simplify your life as you don't have to set all the parameters partially to avoid mistakes and for this to show the correct set-up.
+
+The variables are described in the code chunk. 
+To note: the number of genes to use is set to 951, which is the same value as in the scran vignette. We don't have a way to calculate this. But we are aware that changing this value has substaintial effects for the cluster assignment. We strongly believe that the optimization of these parameters is not trivial and we are currently looking for solutions how to solve this. Similar argumenation goes for the number of PCs to use for the clustering algorithm.
 
 
-```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on SCHNAPPs quickCluster', echo=FALSE}
-knitr::include_graphics('images/scran_3.png')
+```{r start schnapps, eval=FALSE }
+library(SCHNAPPs)
+defaultValues = list()
+
+# input
+defaultValues[["sampleInput"]] =FALSE # don't subsample
+defaultValues[["whichscLog"]] = "calcLog" # calculate normalization
+
+# Normaliztion
+defaultValues[["normalizationRadioButton"]] = "DE_scaterNormalization" # use scaterNorm
+
+# General parameters
+## PArameters for PCA
+defaultValues[["pcaScale"]] = FALSE # don't scale
+defaultValues[["pcaN"]] = 951 # number of genes to use.
+defaultValues[["pcaRank"]] = 14 # number PCs to use for clustering
+
+
+# Parameters for clustering
+defaultValues[["tabsetCluster"]] = "snnGraph" # use SNN graph function
+
+# preset Alluvial plot axes
+defaultValues[["alluiv1"]] = "cluster"
+defaultValues[["alluiv2"]] = "dbCluster"
+
+
+# Gene selection
+# we usually remove genes from mitochrondrium and Ribosome associated proteins using the following regular expression ("^MT-|^RP|^MRP"). This is not done in the scran vignette 
+defaultValues[["selectIds"]] = ""
+defaultValues[["minGenes"]] = 1 # min number of reads per cell
+
+
+
+# Cell selection
+defaultValues[["minGenesGS"]] = 1 # minimum number of UMIs (sum) over all cells.
+# cells to be removed
+defaultValues[["cellsFiltersOut"]] = "D2ex_54, D2ex_64, D2ex_93, D2ex_95, D2ex_96, D3en1_8, D3en1_9, D3en1_12, D3en1_14, D3en1_15, D3en1_18, D3en1_19, D3en1_20, D3en1_21, D3en1_22, D3en1_23, D3en1_25, D3en1_31, D3en1_32, D3en1_34, D3en1_35, D3en1_36, D3en1_39, D3en1_43, D3en1_44, D3en1_47, D3en1_51, D3en1_52, D3en1_53, D3en1_57, D3en1_58, D3en1_59, D3en1_61, D3en1_62, D3en1_64, D3en1_66, D3en1_70, D3en1_72, D3en1_74, D3en1_76, D3en1_77, D3en1_78, D3en1_80, D3en1_82, D3en1_86, D3en1_91, D3en1_92, D3en1_95, D3en1_96, D3en2_1, D3en2_4, D3en2_8, D3en2_9, D3en2_10, D3en2_11, D3en2_14, D3en2_15, D3en2_18, D3en2_19, D3en2_20, D3en2_28, D3en2_29, D3en2_34, D3en2_35, D3en2_36, D3en2_40, D3en2_41, D3en2_43, D3en2_44, D3en2_46, D3en2_47, D3en2_49, D3en2_53, D3en2_54, D3en2_59, D3en2_65, D3en2_67, D3en2_69, D3en2_70, D3en2_75, D3en2_76, D3en2_77, D3en2_78, D3en2_79, D3en2_80, D3en2_82, D3en2_84, D3en2_86, D3en2_87, D3en2_88, D3en2_89, D3en2_95, D3en2_96, D3en3_3, D3en3_4, D3en3_12, D3en3_13, D3en3_14, D3en3_15, D3en3_17, D3en3_19, D3en3_20, D3en3_22, D3en3_23, D3en3_24, D3en3_25, D3en3_26, D3en3_31, D3en3_33, D3en3_35, D3en3_37, D3en3_38, D3en3_42, D3en3_43, D3en3_45, D3en3_47, D3en3_49, D3en3_56, D3en3_57, D3en3_58, D3en3_60, D3en3_61, D3en3_62, D3en3_63, D3en3_66, D3en3_69, D3en3_70, D3en3_71, D3en3_76, D3en3_79, D3en3_88, D3en3_90, D3en3_91, D3en3_93, D3en3_96, D3en4_1, D3en4_5, D3en4_10, D3en4_11, D3en4_13, D3en4_15, D3en4_17, D3en4_18, D3en4_21, D3en4_24, D3en4_27, D3en4_28, D3en4_29, D3en4_34, D3en4_36, D3en4_37, D3en4_40, D3en4_44, D3en4_45, D3en4_49, D3en4_50, D3en4_51, D3en4_52, D3en4_53, D3en4_55, D3en4_57, D3en4_59, D3en4_62, D3en4_66, D3en4_67, D3en4_70, D3en4_75, D3en4_76, D3en4_77, D3en4_78, D3en4_79, D3en4_80, D3en4_88, D3en4_93, D3en4_94, D3en4_95, D3ex_1, D3ex_2, D3ex_7, D3ex_8, D3ex_10, D3ex_11, D3ex_13, D3ex_14, D3ex_15, D3ex_17, D3ex_18, D3ex_19, D3ex_20, D3ex_21, D3ex_22, D3ex_23, D3ex_25, D3ex_26, D3ex_27, D3ex_28, D3ex_29, D3ex_30, D3ex_31, D3ex_32, D3ex_33, D3ex_35, D3ex_37, D3ex_38, D3ex_42, D3ex_43, D3ex_44, D3ex_45, D3ex_46, D3ex_47, D3ex_49, D3ex_50, D3ex_52, D3ex_53, D3ex_56, D3ex_57, D3ex_58, D3ex_59, D3ex_60, D3ex_61, D3ex_62, D3ex_63, D3ex_64, D3ex_65, D3ex_67, D3ex_69, D3ex_70, D3ex_72, D3ex_73, D3ex_75, D3ex_78, D3ex_79, D3ex_80, D3ex_81, D3ex_82, D3ex_84, D3ex_85, D3ex_86, D3ex_89, D3ex_93, D3ex_94, D3ex_95, D3ex_96, D74_4, D74_11, D74_19, D74_30, D74_38, D74_50, D74_72, D74_80, D71_13, D71_24, D71_25, D71_46, D71_50, D71_74, D71_77, D71_96, D72_6, D72_17, D72_26, D72_51, D72_56, D72_60, D73_53, D73_66, D73_74, D73_75, D73_77, D73_80, D73_88, D10631_1, D10631_6, D10631_13, D10631_16, D10631_28, D10631_30, D10631_31, D10631_32, D10631_35, D10631_49, D10631_59, D10631_77, D10631_86, D101_2, D101_3, D101_4, D101_6, D101_9, D101_12, D101_15, D101_18, D101_19, D101_20, D101_23, D101_26, D101_30, D101_32, D101_33, D101_38, D101_39, D101_40, D101_41, D101_47, D101_49, D101_54, D101_55, D101_60, D101_61, D101_62, D101_63, D101_64, D101_65, D101_67, D101_68, D101_70, D101_71, D101_75, D101_76, D101_78, D101_79, D101_80, D101_85, D101_86, D101_87, D101_90, D101_92, D101_94, D101_96, D102_2, D102_5, D102_8, D102_9, D102_10, D102_12, D102_13, D102_15, D102_16, D102_19, D102_20, D102_22, D102_23, D102_27, D102_28, D102_29, D102_30, D102_31, D102_32, D102_33, D102_34, D102_35, D102_36, D102_37, D102_38, D102_41, D102_42, D102_43, D102_44, D102_46, D102_48, D102_49, D102_52, D102_53, D102_56, D102_60, D102_62, D102_65, D102_67, D102_70, D102_72, D102_74, D102_77, D102_84, D102_85, D102_88, D102_89, D102_90, D102_92, D102_95, D17All1_13, D17All1_94, D17All2_5, D17All2_50, D17All2_89, D17TGFB_60, D17TGFB_62, D2ex_94, D3en1_40, D3en2_51, D3en3_18, D3en3_40, D3en3_77, D3en3_81, D3en3_83, D3en4_90, D3en4_96, D74_48, D74_84, D74_96, D71_89, D72_94, D73_47, D10631_47, D10631_75, D10631_78, D10631_79, D10631_80, D10631_83, D10631_84, D10631_94, D101_8, D101_11, D101_46, D102_47, D102_80, D102_81, D102_83, D172444_94, D172444_95, D172444_96, D17All1_14, D17All1_15, D17All1_17, D17All1_85, D17All2_96, D17TGFB_96"
+
+schnapps(defaultValues = defaultValues)
+```
+
+## Removal of cells
+
+This section shows how to remove the cells that have been identified in the scran vignette. To follow we have to remove the cells already selected. and set "Cells to be removed" under Cell selection - additional parameters to an empty string as shown below:
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Filter based on ERCC percentage', echo=FALSE}
+knitr::include_graphics('images/scran_1a.png')
+```
+
+and click on apply changes.
+
+
+Then load the data we just created.
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Filter based on ERCC percentage', echo=FALSE}
+knitr::include_graphics('images/scran_1b.png')
 ```
 
 
+We now show which filters have been applied to the data in the scran workflow. We use the perCellQCMetrics metrics that cannot be calculated from within SCHNAPPs but could be precalculated. 
+We can then visualize the cells that are filtered out and recover the thresholds used in individual steps:
 
-```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on rank', echo=FALSE}
-knitr::include_graphics('images/scran_4.png')
+
+### based on ERCC percentage:
+
+This percentage is precalculated from the scr
+
+The data can be visualized in the 2D plot (co-expression - selected) with the following paramters:
+X : altexps_ERCC_percent
+Y: sample
+color: high_altexps_ERCC_Percent
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Filter based on ERCC percentage', echo=FALSE}
+knitr::include_graphics('images/scran_1.png')
+```
+
+The selected cell names can be copy/pasted to the "Cells to be removed" under Cell selection - additional parameters" as described above.
+
+### filter low expressing cells
+
+
+Using a similar 2D plot with the following paramters:
+X : detected
+Y: sample
+color: low_n_features
+
+we can select and remove cells with low expressing features as described above.
+
+```{r, out.width='90%', fig.align='center', fig.cap='Filter based on detected genes', echo=FALSE}
+knitr::include_graphics('images/scran_2.png')
+```
+
+We end up with the same 1219 cells as in the vignette from scran.
+
+
+# Normalization / clustering
+
+We use "scaterNorm", which is applying exactly the same procedure that is used in the vignette. The user has several other options available that are better described in the online documentation.
+
+The snnGraph method is used for the clustering.
+
+# Results are the same
+
+The alluvial plot between the cluster assignment from the scran package and the cluster assignment from SCHNAPPs (dbCluster) shows that they are the same.
+
+```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment comparison using Alluvial plot', echo=FALSE}
+knitr::include_graphics('images/alluvialAllGood.png')
+```
+
+The same result can be concluded from plotting the cluster assignments in a 2D plot:
+
+```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment comparison using 2D plot', echo=FALSE}
+knitr::include_graphics('images/2dAllGood.png')
+```
+
+# Characterization of results
+
+The following will show a few possible results that can be achieved using SCHNAPPs:
+
+## Co-expression - All clusters
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - All clusters; After list of gene names has been set to empty SCHNAPPs will automatically fill the list with characteristic genes for each cluster.', echo=FALSE}
+knitr::include_graphics('images/heatmapAllCells.png')
+```
+
+The following video shows how to use the heatmap module. If the field with the gene names is empty the the function FindMarkers is used to identify the genes that are most characteristic for each cluster. This list of genes is used for the heatmap. 
+
+```{r, echo=FALSE}
+embed_youtube("aiKPccCmZgk")
 ```
 
 
+The genes CPA1, CTRB1, PLA2G1B, PRSS1, PRSS3P2 are highly expressed in cluster 2. GCG, TTR are highly expressed in cluster 5.
 
-```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on Jaccard', echo=FALSE}
-knitr::include_graphics('images/scran_5.png')
+
+## Co-expression - selected
+
+In the following we describe a few possibilities of the 2D plot
+
+### co-expression of two lists of genes
+
+We can now compare the genes previously found and see how these cells express genes from different clusters.
+
+```{r, out.width='90%', fig.align='center', fig.cap='2D plot of the sum of expression of two different lists of genes, colored by cluster association.', echo=FALSE}
+knitr::include_graphics('images/coexpresCl2Cl5.png')
+```
+
+The cell density can be used to identify where the majority of cells lies or if and where many cells are drawn on top of eachother.
+
+```{r, out.width='90%', fig.align='center', fig.cap='2D plot of the sum of expression of two different lists of genes, colored by density of cells.', echo=FALSE}
+knitr::include_graphics('images/2dCellDensity.png')
+```
+
+The composition of clusters relative to the donor information can be also using the same tool as shown below:
+
+
+
+```{r, out.width='90%', fig.align='center', fig.cap='Histogram of cell count per cluster assignment and split by donor information.', echo=FALSE}
+knitr::include_graphics('images/histogramDonor.png')
 ```
 
 
-
-```{r, out.width='90%', fig.align='center', fig.cap='Cluster assignment in tSNE space based on number', echo=FALSE}
-knitr::include_graphics('images/scran_6.png')
+```{r, out.width='90%', fig.align='center', fig.cap='UMAP projection. Selecting and naming of a group of cells.', echo=FALSE}
+knitr::include_graphics('images/nameGroupCell.png')
 ```
 
-cluster = buildSNNGraph(type = "rank")
+Cells can be grouped and named using the 2D plot, Those are are binary groups, i.e. a cells belongs either to the group or not.
 
-```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between quickcluster and rank', echo=FALSE}
-knitr::include_graphics('images/scran_7.png')
+The following video shows how to name groups of cells:
+* Cells have to be selected in the 2D plot.
+* Give a name
+* ensure that the reference for the selection is set to "plot"
+* click "change current selection"
+
+To note: 
+* in-between, the cells seem not to be selected anymore, but that is a "feature" of the underlying visualization functions.
+* using the a previously defined group of cells allows to avoid selecting cells that are potentially hidden. This can happen, when the 2D coordinates have changed. This also allows a more cytometry way of thinking, where concurrent selections of cells are used to filter.
+
+After having selected multiple groups, we have these groups as projections available with TRUE/FALSe assignment for each cell. Sometimes, we want to combine these projections, e.g. if there are more than two cell types.
+This is done under Parameters - Projections - combine projections:
+
+* Select the two projections that should be combined
+* name the new projection
+* repeat as needed.
+
+Since it is not ensured that these projections are not overlapping, the individual values are concatenated and a new factor is created.
+The levels of these factors can be changed under the "rename levels" tab.
+The tables allows verifying the meaning of the levels.
+
+When renaming the levels, don't forget to add a meaningfull name, otherwise "X" is chosen for you.
+
+If this happens, don't worry, this can be changed in the "rename projections" tab, where projections can be deleted, but only those you have created manually.
+
+
+```{r, echo=FALSE}
+embed_youtube("xOSWcLKsZf0")
 ```
 
+## Violin plots
 
 
-```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between quickcluster and Jaccard', echo=FALSE}
-knitr::include_graphics('images/scran_8.png')
-```
-
-
-
-```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between quickcluster and number', echo=FALSE}
-knitr::include_graphics('images/scran_9.png')
-```
-
-
-
-```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between rank and Jaccard', echo=FALSE}
-knitr::include_graphics('images/scran_10.png')
-```
-
-
-
-```{r, out.width='90%', fig.align='center', fig.cap='Alluvial plot comparision between rank and number', echo=FALSE}
-knitr::include_graphics('images/scran_11.png')
-```
-
-
-
-```{r, out.width='90%', fig.align='center', fig.cap='heatmap of findMarker genes', echo=FALSE}
-knitr::include_graphics('images/scran_12.png')
-```
-
-
-
-```{r, out.width='90%', fig.align='center', fig.cap='Heatmaps can be modified using additional options', echo=FALSE}
-knitr::include_graphics('images/scran_13.png')
-```
-
-
+The violin plot can show all possible combinations if "show Permutations" is selected, otherwise a normal violoin plot is shown (not shown here).
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Violin plot with permutataions', echo=FALSE}
-knitr::include_graphics('images/scran_14.png')
+knitr::include_graphics('images/violinPermutation.png')
 ```
 
+
+Under "grouped" a second variable can be used. Here, grp1-7 are clusters of cells that have been identified from the UMAP presentation.
 
 
 ```{r, out.width='90%', fig.align='center', fig.cap='grouped violin plots', echo=FALSE}
-knitr::include_graphics('images/scran_15.png')
+knitr::include_graphics('images/groupedViolin.png')
 ```
 
+## Three dimensional plot
 
+The sum of expression for a list of genes is shown in the 3D tSNE plot that can be found under Data Exploration - 
 
 ```{r, out.width='90%', fig.align='center', fig.cap='3D tSNE plot with expression of specified genes', echo=FALSE}
-knitr::include_graphics('images/scran_16.png')
+knitr::include_graphics('images/3dDEExpression.png')
 ```
 
 
@@ -315,24 +425,44 @@ knitr::include_graphics('images/scran_16.png')
 knitr::include_graphics('images/scran_17.png')
 ```
 
+## Differential gene expression (DGE)
+
+This short video shows how to perform a DGE analysis. The individual steps are also explained afterwards in more detail.
+
+
+```{r, echo=FALSE} 
+embed_youtube("lFHfZKt3zro")
+```
+
+
+### selections of groups of cells
+
+The "selection of input cells" allows subsetting the cells even before the visualization.
+
+Cells to be compared can be either selected in the two plot directly, of if cells are only selected in the first plot, all other cells are being used.
 
 
 ```{r, out.width='90%', fig.align='center', fig.cap='DGE between specific groups of cells', echo=FALSE}
 knitr::include_graphics('images/scran_18.png')
 ```
 
+### Volcano plot
 
+Genes can be selected in the volcano plot and their names/symbols are shown above the plot to be copy/pasted.
 
 ```{r, out.width='90%', fig.align='center', fig.cap='DGE results as Volcano plot', echo=FALSE}
 knitr::include_graphics('images/scran_19.png')
 ```
 
+### DGE table
 
+A complete table is available, that can also be downloaded.
 
 ```{r, out.width='90%', fig.align='center', fig.cap='Table of DGE', echo=FALSE}
 knitr::include_graphics('images/scran_20.png')
 ```
 
+## Comparing different clustering methods
 
 SCHNAPPs uses the projection "dbCluster" for the current clustering result. In order to compare different clustering procedures the rename projection tool allows the user to copy the results do a different name.
 
@@ -340,11 +470,15 @@ SCHNAPPs uses the projection "dbCluster" for the current clustering result. In o
 knitr::include_graphics('images/scran_21.png')
 ```
 
-Cells can be grouped and named using the 2D plot, Those are are binary groups, i.e. a cells belongs either to the group or not. There are cases where this binary lababling is not sufficient. For example if there are multiple indipendant groups of cells. The combine projections tabs allows combining such groups. In addition it is also possible to rename levels of factorials. Those are also copied to a new projection such that no information is lost.
 
-```{r, out.width='90%', fig.align='center', fig.cap='Select cells for copy/paste', echo=FALSE}
-knitr::include_graphics('images/scran_22.png')
-```
+# Please help
+
+
+We hope you find SCHNAPPs useful. Please don't forget to cite our work when you publish, nor tell us if you find any bugs or have questions/suggestions.
+
+bernd <DOT> jagla <AT> pasteur <DOT> fr
+
+
 
 
 
