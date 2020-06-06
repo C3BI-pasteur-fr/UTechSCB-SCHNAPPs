@@ -173,9 +173,11 @@ tabList <- list(
       br(),
       fluidRow(
         column(
-          10,
-          offset = 1, height = "627px",
-          imageOutput("DE_scaterQC") %>% withSpinner() # PNG output with temp file
+          12,
+          offset = 0, 
+          div(style = "height:672px;",
+              imageOutput("DE_scaterQC") 
+          ) # PNG output with temp file
         )
       ),
       br(),

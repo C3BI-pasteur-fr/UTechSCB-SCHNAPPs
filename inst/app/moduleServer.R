@@ -894,6 +894,8 @@ tableSelectionServer <- function(input, output, session,
     dataTables <- dataTab()
     selectedRows <- input$cellNameTable_rows_selected
     scEx <- scEx()
+    inputData = inputData()
+    
     # update if expanded and not showing
     # input$refreshtable
 

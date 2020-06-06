@@ -134,14 +134,15 @@ We end up with the same 1219 cells as in the vignette from scran.
 ```{r scranWkfl, message=FALSE, warning=FALSE}
 # here we redo the scran workflow with different clustering algorithms 
 # and store the results in the singleCellExperiment object that we are going to use in SCHNAPPs
-
+sceOrg = sce
 sce <- sce[,!qcfilter$discard]
 # summary(qcfilter$discard)
 
 library(scran)
 clusters <- quickCluster(sce)
+
 sce <- computeSumFactors(sce, clusters=clusters)
-summary(sizeFactors(sce))
+# summary(sizeFactors(sce))
 
 sce <- logNormCounts(sce)
 
@@ -156,7 +157,7 @@ top.hvgs <- getTopHVGs(dec, prop=0.1)
 sce <- runPCA(sce, subset_row=top.hvgs)
 # reducedDimNames(sce)
 sced <- denoisePCA(sce, dec2, subset.row=getTopHVGs(dec2, prop=0.1))
-ncol(reducedDim(sced, "PCA"))
+# ncol(reducedDim(sced, "PCA"))
 output <- getClusteredPCs(reducedDim(sce))
 npcs <- metadata(output)$chosen
 reducedDim(sce, "PCAsub") <- reducedDim(sce, "PCA")[,1:npcs,drop=FALSE]
@@ -165,6 +166,11 @@ reducedDim(sce, "PCAsub") <- reducedDim(sce, "PCA")[,1:npcs,drop=FALSE]
 g1 <- buildSNNGraph(sce, use.dimred="PCAsub")
 cluster <- igraph::cluster_walktrap(g1)$membership
 sce$cluster <- factor(cluster)
+# table(sce$cluster)
+
+g1a <- buildSNNGraph(sce, use.dimred="PCAsub")
+cluster <- igraph::cluster_walktrap(g1a)$membership
+sce$cluster1a <- factor(cluster)
 
 # In this case, using the PCs that we chose from getClusteredPCs().
 g <- buildSNNGraph(sce, use.dimred="PCAsub", type = "jaccard")
@@ -190,6 +196,23 @@ ass.prob <- bootstrapCluster(sce, FUN=function(x) {
     igraph::cluster_walktrap(g)$membership
 }, clusters=sce$cluster)
 
+sceOrg$cluster = 0
+sceOrg$cluster1a = 0
+sceOrg$cluster2 = 0
+sceOrg$cluster3 = 0
+names(sceOrg$cluster) = colnames(sceOrg)
+names(sceOrg$cluster1a) = colnames(sceOrg)
+names(sceOrg$cluster2) = colnames(sceOrg)
+names(sceOrg$cluster3) = colnames(sceOrg)
+sceOrg$cluster[colnames(sce)] = sce$cluster
+sceOrg$cluster1a[colnames(sce)] = sce$cluster1a
+sceOrg$cluster2[colnames(sce)] = sce$cluster2
+sceOrg$cluster3[colnames(sce)] = sce$cluster3
+sceOrg$cluster = as.factor(sceOrg$cluster)
+sceOrg$cluster1a = as.factor(sceOrg$cluster1a)
+sceOrg$cluster2 = as.factor(sceOrg$cluster2)
+sceOrg$cluster3 = as.factor(sceOrg$cluster3)
+
 # pheatmap(ass.prob, cluster_cols=FALSE, cluster_rows=FALSE,
 #     col=colorRampPalette(c("white", "blue"))(100))
 
@@ -199,7 +222,7 @@ We save all results from to be able to compare to what SCHNAPPs has to offer
 
 
 ```{r}
-save(file = "scran.grunPancreas.RData", list = c("sce"))
+save(file = "scran.grunPancreas.RData", list = c("sceOrg"))
 ```
 
 

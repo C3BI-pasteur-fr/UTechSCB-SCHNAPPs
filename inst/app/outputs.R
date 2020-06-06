@@ -88,29 +88,32 @@ output$normalizationsParametersDynamic <- renderUI({
 
 cellSelectionValues <- reactiveVal(
   list(
-    minExpGenes = defaultValueRegExGene,
-    minGenes = 20,
-    maxGenes = 1000000,
-    cellPatternRM = "",
-    cellKeep = "",
-    cellKeepOnly = "",
-    cellsFiltersOut = "",
-    minNonExpGenes = ""
+    minExpGenes = defaultValue("minExpGenes", defaultValueRegExGene),
+    minGenes = defaultValue("minGenes", 20),
+    maxGenes = defaultValue("maxGenes", 1000000),
+    cellPatternRM = defaultValue("cellPatternRM", ""),
+    cellKeep = defaultValue("cellKeep", ""),
+    cellKeepOnly = defaultValue("cellKeepOnly", ""),
+    cellsFiltersOut = defaultValue("cellsFiltersOut", ""),
+    minNonExpGenes = defaultValue("minNonExpGenes", "")
   )
 )
 geneSelectionValues <- reactiveVal(
-  list(
-    selectIds = "^MT-|^RP|^MRP",
-    geneListSelection = NULL,
-    minGenesGS = 2,
-    genesKeep = ""
-  )
+  {
+    list(
+      selectIds = defaultValue("selectIds", "^MT-|^RP|^MRP"),
+      geneListSelection = defaultValue("geneListSelection", NULL),
+      minGenesGS = defaultValue("minGenesGS", 2),
+      genesKeep = defaultValue("genesKeep", "")
+    )
+  }
 )
 
 observeEvent(
   label = "ob20",
   eventExpr = input$updateCellSelectionParameters,
   handlerExpr = {
+    if (DEBUG) cat(file = stderr(), "observe updateCellSelectionParameters\n")
     cellSelectionValues(list(
       minExpGenes = input$minExpGenes,
       minGenes = input$minGenes,
@@ -1014,9 +1017,9 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
     ob_clusterParams$destroy()
     return(NULL)
   }
-
   
-    if (tabsetCluster == "seurat_Clustering") {
+  
+  if (tabsetCluster == "seurat_Clustering") {
     setRedGreenButtonCurrent(
       vars = list(
         c("tabsetCluster", input$tabsetCluster),
@@ -1085,6 +1088,16 @@ observeEvent(input$twoDselectedAddOpt, {
                          "highlightClass" = 'berndTest')
   )
 })
+
+# Heatmap for scran clustering ----
+# All clusters heat map ------
+callModule(
+  pHeatMapModule,
+  "clusterBootstrap",
+  clusterBootstrapReactive
+)
+
+
 
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))

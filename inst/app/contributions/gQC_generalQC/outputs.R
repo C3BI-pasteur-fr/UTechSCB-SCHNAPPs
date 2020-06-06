@@ -231,7 +231,7 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
   lev = levels(colData(scEx)$sampleNames)
   for (idx in seq_along(lev)) {
     fig <- fig %>% add_trace(
-      type = 'histogram', color = I(scol[idx]), name = lev[idx],
+      type = 'histogram', color = I(scols[idx]), name = lev[idx],
       x = dat[dat$sample == levels(colData(scEx)$sampleNames)[[idx]],"counts"]
     )
   }
