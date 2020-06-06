@@ -636,10 +636,18 @@ knitr::include_graphics('images/coexpressionAll.png')
 * Comma seperated gene names
 
     Comma separated list of genes to be displayed in the heatmap for all cells.
+    
+    If this field is emptied, the FindMarkers functions is used to identify characteristic genes for each cluster. The "number of marker genes to plot" number of markers for each cluster (a unique list) is used to identify the genes.
 
 * Heatmap plot
 
     Uses the heatmap module see Modules Heatmap in this document
+
+
+<video controls>
+  <source src="images/coExpressionAllclusters.mp4" type="video/mp4">
+</video>
+
 
 ### Selected
 
@@ -972,8 +980,19 @@ The color of the samples and clusters can be changed under Parameters - general 
     * Order of columns
 
         The columns can be ordered manually by any of the projections available.
+        
+    * min/max values for heatmap
+    
+        Allows changing the relative color axis. Due to the limited number of available colors changing this value allows to visualize difference in any expression range .
 
-
+    * Width of image in pixel
+    * height of image in pixel
+    
+        Set the size of the image. This allows making the gene names visible
+        
+    * color palette to choose from
+    
+      change colors.
 
 # Create input data
 
