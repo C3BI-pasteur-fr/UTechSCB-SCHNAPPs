@@ -864,7 +864,7 @@ coE_heatmapReactive <- reactive({
   
   featureData <- rowData(scEx_log)
   if (genesin == "") {
-    wmarkers <- findMarkers(scEx_log, 
+    wmarkers <- scran::findMarkers(scEx_log, 
                             projections$dbCluster,
                             direction = direction,
                             lfc = lfc)

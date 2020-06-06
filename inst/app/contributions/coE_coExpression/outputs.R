@@ -249,7 +249,12 @@ output$alluvial_plot <- renderPlot({
   if (alluiv1 == alluiv2 ) {
     return(NULL)
   }
-  
+  if(!alluiv1 %in% colnames(projections)) {
+    return(NULL)
+  }
+  if(!alluiv2 %in% colnames(projections)) {
+    return(NULL)
+  }
   # some debugging messages
   if (DEBUG) cat(file = stderr(), paste("alluvial_plot:\n"))
   # for development and debugging purposes

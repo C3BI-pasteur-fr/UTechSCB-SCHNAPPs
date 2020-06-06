@@ -711,25 +711,31 @@ DE_scaterNormalizationfunc <- function(scEx, scalingFactor = 10000) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("DE_scaterNormalizationfunc", id = "DE_scaterNormalizationfunc", duration = NULL)
   }
-  sampinfo = colData(scEx)$sampleNames
-  genes2use = rownames(scEx)
-  ta = table(sampinfo)
-  ta = ta[ta>0]
-  mtab = min(ta)
-  stp = round((mtab - 21) /10)
-  scaterReads <- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp), 
-                                          clusters = sampinfo, 
-                                          subset.row = genes2use)
-  # scaterReads <- scran::computeSumFactors(scEx, clusters = sampinfo)
-  # dt = data.frame(x=librarySizeFactors(scaterReads), y=sizeFactors(scaterReads))
-  # p = plot_ly(dt, x=~x,y=~y)  %>% add_markers()
-  # p <- layout(p, xaxis = list(type = "log"),
-  #             yaxis = list(type = "log"))
-  # 
-  # p
-  scaterReads <- normalize(scaterReads)
-  assays(scaterReads)['counts'] = NULL
-  return(scaterReads)
+  # sampinfo = colData(scEx)$sampleNames
+  # genes2use = rownames(scEx)
+  # ta = table(sampinfo)
+  # ta = ta[ta>0]
+  # mtab = min(ta)
+  # stp = round((mtab - 21) /10)
+  # scaterReads <- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp), 
+  #                                         clusters = sampinfo, 
+  #                                         subset.row = genes2use)
+  # # scaterReads <- scran::computeSumFactors(scEx, clusters = sampinfo)
+  # # dt = data.frame(x=librarySizeFactors(scaterReads), y=sizeFactors(scaterReads))
+  # # p = plot_ly(dt, x=~x,y=~y)  %>% add_markers()
+  # # p <- layout(p, xaxis = list(type = "log"),
+  # #             yaxis = list(type = "log"))
+  # # 
+  # # p
+  # scaterReads <- normalize(scaterReads)
+  # assays(scaterReads)['counts'] = NULL
+  # return(scaterReads)
+  clusters <- quickCluster(scEx)
+  scEx <- computeSumFactors(scEx, clusters=clusters)
+  
+  sce <- logNormCounts(scEx)
+  assays(sce)['counts'] = NULL
+  return(sce)
 }
 
 

@@ -112,7 +112,7 @@ inputTab <- function() {
         column(
           6,
 
-          checkboxInput("sampleInput", label = "sub sample", value = TRUE),
+          checkboxInput("sampleInput", label = "sub sample", value = defaultValue("sampleInput", TRUE)),
 
           numericInput("subsampleNum",
             label = "max number of cells",
@@ -164,6 +164,7 @@ geneSelectionTab <- function() {
       )
     ), checkbsTT("minGenesGS"),
     checkbsTT("updateGeneSelectionParameters"),
+    br(),
     box(
       title = "Gene selection parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
@@ -171,15 +172,15 @@ geneSelectionTab <- function() {
           width = 4,
           textInput("selectIds", "regular expression for selection of genes to be removed", value = defaultValue("selectIds", "^MT-|^RP|^MRP"))
         ), checkbsTT("selectIds"),
-        column(
-          width = 4,
-          h4("GeneList Selection"),
-          shinyTree::shinyTree("geneListSelection", checkbox = TRUE)
-        ), checkbsTT("geneListSelection"),
+        # column(
+        #   width = 4,
+        #   h4("GeneList Selection"),
+        #   shinyTree::shinyTree("geneListSelection", checkbox = TRUE)
+        # ), checkbsTT("geneListSelection"),
         column(
           width = 4,
           h4("Min expression over all cells"),
-          numericInput("minGenesGS", "Min # of UMIs over all cells", defaultValue("minGenesGS", 2), min = 2, max = 1000000)
+          numericInput("minGenesGS", "Min # of UMIs over all cells", defaultValue("minGenesGS", 2), min = 1, max = 1000000)
         )
       ), checkbsTT("minGenesGS"),
       fluidRow(
@@ -333,16 +334,22 @@ generalParametersTab <- function() {
         # The id lets us use input$tabset1 on the server to find the current tab
         id = "tabsetPCA",
         fluidRow(
-          column(6,
+          column(4,
             offset = 0,
             numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 50), min = 2),
             checkboxInput("pcaCenter", "center data", TRUE)
           ),
-          column(6,
+          column(4,
             offset = 0,
             numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 500), min = 50),
             checkboxInput("pcaScale", "scale data", defaultValue("pcaScale", TRUE))
           ),
+          column(4,
+                 offset = 0,
+                 selectInput("hvgSelection","How to select highly variable genes.", 
+                             choices = c("getTopHVGs","vst", "mvp", "disp"),
+                             selected = defaultValue("hvgSelection", "getTopHVGs"))
+                 )
         ),
         checkbsTT(item = "pcaRank"),
         checkbsTT("pcaN"),
@@ -396,6 +403,7 @@ generalParametersTab <- function() {
       tabBox(
         title = "Parameters for clustering", width = 12,
         id = "tabsetCluster",
+        selected = defaultValue("tabsetCluster", "scran_Cluster"),
         tabPanel("Seurat clustering",
           width = 12,
           value = "seurat_Clustering",
@@ -440,7 +448,21 @@ generalParametersTab <- function() {
           checkbsTT(item = "geneSelectionClustering")
           
         ), # quickclustering tab Panel
-        # tabPanel(),
+        tabPanel("SNNGraph",
+                 value = "snnGraph",
+                 width = 12,
+                 fluidRow(
+                   # column(
+                   #   width = 4,
+                   #   selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
+                   # ),
+                   column(
+                     width = 4,
+                     selectInput("snnType", "type to use", 
+                                 selected = defaultValue("snnType", "rank"),
+                                 choices = c("rank", "number", "jaccard"))
+                   )
+                 )),
         fluidRow(
           column(12, offset = 0, textOutput("Nclusters"))
         ),

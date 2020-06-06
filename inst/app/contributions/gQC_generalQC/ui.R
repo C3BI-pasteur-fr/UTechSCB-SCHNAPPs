@@ -134,7 +134,7 @@ tabList <- list(
     numericInput("gQC_binSize", "number of bins", 20, min=10),
     fluidRow(column(
       10,
-      offset = 1,
+      offset = 0,
       jqui_resizable(plotly::plotlyOutput("gQC_plotUmiHist"))
     )),
     br(),
@@ -147,7 +147,7 @@ tabList <- list(
     tags$h3("Histogram of cells per sample"),
     fluidRow(column(
       10,
-      offset = 1,
+      offset = 0,
       jqui_resizable(plotly::plotlyOutput("gQC_plotSampleHist"))
     )),
     br(),
@@ -159,7 +159,7 @@ tabList <- list(
     tags$h3("Variance of PCs"),
     fluidRow(column(
       10,
-      offset = 1,
+      offset = 0,
       plotOutput("gQC_variancePCA") %>% withSpinner()
     )),
     br(),

@@ -208,6 +208,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   gtitle <- paste(g_id, collapse = " ")
   if (nchar(gtitle) > 50) {
     gtitle <- paste(substr(gtitle, 1, 50), "...")
+    gtitle <- ""
   }
   
   suppressMessages(require(plotly))
