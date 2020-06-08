@@ -36,7 +36,7 @@ if ("crayon" %in% rownames(installed.packages()) == FALSE) {
   require(crayon)
 }
 
-
+# dimPlotPCA ----
 # <- reactive({
 output$dimPlotPCA <- renderPlot({
   if (DEBUG) {
@@ -99,6 +99,7 @@ output$dimPlotPCA <- renderPlot({
   # seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
   
   colnames(pca$x) = str_replace(colnames(pca$x), "PC", "PC_")
+  ndim = min(15,ncol(pca$x))
   # pca.res = irlba(A=t(x=seurDat@assays$RNA@data), nv=50)
   # not working
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
@@ -110,7 +111,7 @@ output$dimPlotPCA <- renderPlot({
   
   # DimPlot(seurDat, reduction = "pca")
   
-  d = DimHeatmap(seurDat, dims = 1:15, slot = 'data',
+  d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'data',
                  balanced = TRUE, fast = TRUE, projected = FALSE, 
                  reduction = "pca")
   d
@@ -1120,6 +1121,26 @@ useGenesFunc <-
     cat(file = stderr(), paste("useGenesFunc sum ret", sum(keepIDs),"\n"))
     return(keepIDs)
   }
+
+# PCAloadingsTable ----
+PCAloadingsTable <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "output$PCAloadingsTable\n")
+  }
+  pca <- pca()
+  
+  if (is.null(pca)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(
+      file = "~/SCHNAPPsDebug/PCAloadingsTable.RData",
+      list = c( ls())
+    )
+  }
+  # load("~/SCHNAPPsDebug/PCAloadingsTable.RData")
+  as.data.frame(pca$rotation)
+})
 
 # selected genes table ----
 gsSelectedGenesTable <- reactive({

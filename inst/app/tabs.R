@@ -44,108 +44,108 @@ inputTab <- function() {
           )
         )
       )
+    ),
+    br(),
+    boxPlus(
+      title = "Input files",
+      # helpID = ,
+      dropdown_icon = NULL,
+      closable = FALSE,
+      enable_dropdown = T,
+      dropdown_menu = actionButton(inputId = "inputHelp", label = "", icon = icon("fas fa-question")),
+      status = "primary", solidHeader = TRUE, width = 12,
+      footer = div(
+        "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
+        br(),
+        "Multiple files can be selected when using RData files with SingleCellExpression objects.",
+        br(),
+        "RData files are R data files generated using base::save()."
       ),
-      br(),
-      boxPlus(
-        title = "Input files",
-        # helpID = ,
-        dropdown_icon = NULL,
-        closable = FALSE,
-        enable_dropdown = T,
-        dropdown_menu = actionButton(inputId = "inputHelp", label = "", icon = icon("fas fa-question")),
-        status = "primary", solidHeader = TRUE, width = 12,
-        footer = div(
-          "Choose one or more .RData/.Rds file with singleCellExperiment object OR one .txt/.csv file with count data to upload",
-          br(),
-          "Multiple files can be selected when using RData files with SingleCellExpression objects.",
-          br(),
-          "RData files are R data files generated using base::save()."
+      
+      fluidRow(
+        column(
+          6,
+          offset = 3,
+          fileInput(
+            "file1",
+            "Count data upload",
+            accept = c(
+              ".Rds", ".RData", ".Rdata", ".txt", ".csv"
+            ),
+            placeholder = "no file selected",
+            multiple = TRUE,
+          ) %>% setId(id="fileInput"), checkbsTT("fileInput")
         ),
-
-        fluidRow(
-          column(
-            6,
-            offset = 3,
-            fileInput(
-              "file1",
-              "Count data upload",
-              accept = c(
-                ".Rds", ".RData", ".Rdata", ".txt", ".csv"
-              ),
-              placeholder = "no file selected",
-              multiple = TRUE,
-            ) %>% setId(id="fileInput"), checkbsTT("fileInput")
-          ),
-          boxPlus(
-            title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
-            # helpID = "inputHelpAdd",
-            closable = FALSE,
-            dropdown_icon = NULL,
-            enable_dropdown = T,
-            dropdown_menu = actionButton(inputId = "inputHelpAdd", label = "", icon = icon("fas fa-question")),
-            footer = "(Not required): Choose .CSV file with annotation to upload. This can be projections or gene based features.",
-            collapsible = TRUE, collapsed = TRUE,
-            fluidRow(
-              column(
-                6,
-                offset = 3,
-                fileInput(
-                  "annoFile",
-                  "Annotations to add",
-                  accept = c(
-                    ".txt", ".csv", ".mtx"
-                  ),
-                  placeholder = "no file selected",
-                  multiple = TRUE
-                ) %>% setId(id="fileInputAnnotation"), checkbsTT("annoFile")
-              )
+        boxPlus(
+          title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
+          # helpID = "inputHelpAdd",
+          closable = FALSE,
+          dropdown_icon = NULL,
+          enable_dropdown = T,
+          dropdown_menu = actionButton(inputId = "inputHelpAdd", label = "", icon = icon("fas fa-question")),
+          footer = "(Not required): Choose .CSV file with annotation to upload. This can be projections or gene based features.",
+          collapsible = TRUE, collapsed = TRUE,
+          fluidRow(
+            column(
+              6,
+              offset = 3,
+              fileInput(
+                "annoFile",
+                "Annotations to add",
+                accept = c(
+                  ".txt", ".csv", ".mtx"
+                ),
+                placeholder = "no file selected",
+                multiple = TRUE
+              ) %>% setId(id="fileInputAnnotation"), checkbsTT("annoFile")
             )
-            
+          )
+          
         )
       )
     ),
-
+    
     br(),
     box(
       title = "input options", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
           6,
-
+          
           checkboxInput("sampleInput", label = "sub sample", value = defaultValue("sampleInput", TRUE)),
-
+          
           numericInput("subsampleNum",
-            label = "max number of cells",
-            min = 500, max = 10000, step = 100, value = defaultValue("subsampleNum", 1000)
+                       label = "max number of cells",
+                       min = 500, max = 10000, step = 100, value = defaultValue("subsampleNum", 1000)
           )
         ),
-
+        
         checkbsTT("sampleInput"),
         column(
           6,
-
+          
           radioButtons("whichscLog",
-            label = "Compute normalizations?",
-            choices = c(
-              "disable log" = "disablescEx_log",
-              "use scEx from loaded data" = "useLog",
-              "calculate normalization here" = "calcLog"
-            ),
-            selected = defaultValue("whichscLog", "disablescEx_log")
+                       label = "Compute normalizations?",
+                       choices = c(
+                         "disable log" = "disablescEx_log",
+                         "use scEx from loaded data" = "useLog",
+                         "calculate normalization here" = "calcLog"
+                       ),
+                       selected = defaultValue("whichscLog", "disablescEx_log")
           )
           # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
         ),
         checkbsTT("disablescEx_log")
       )
     ),
-
+    
     br(),
     box(
       title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
       footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
       fluidRow(column(
         6,
-
+        
         textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
       )), checkbsTT("beforeFilterRegEx")
     )
@@ -190,36 +190,36 @@ geneSelectionTab <- function() {
         )
       )
     ), checkbsTT("genesKeep"),
-
+    
     br(),
     fluidRow(
       tabBox(
         title = "Gene selection tables", width = 12, id = "geneselectiontb",
         tabPanel("Genes kept",
-          height = "250px", width = 12, value = "Genes kept",
-          # box(
-          #   title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
-          #   collapsible = FALSE, collapsed = TRUE,
-          fluidRow(
-            column(
-              12,
-              tableSelectionUi("gsSelectedGenesMod")
-            )
-            # ), checkbsTT("gsSelectedGenesMod")
-          )
+                 height = "250px", width = 12, value = "Genes kept",
+                 # box(
+                 #   title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
+                 #   collapsible = FALSE, collapsed = TRUE,
+                 fluidRow(
+                   column(
+                     12,
+                     tableSelectionUi("gsSelectedGenesMod")
+                   )
+                   # ), checkbsTT("gsSelectedGenesMod")
+                 )
         ),
         tabPanel("genes removed",
-          height = "250px", value = "genes removed",
-          # box(
-          #   title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
-          #   collapsible = FALSE, collapsed = TRUE,
-          fluidRow(
-            column(
-              12,
-              tableSelectionUi("gsRMGenesMod")
-            ), checkbsTT("gsRMGenesMod")
-          )
-          # )
+                 height = "250px", value = "genes removed",
+                 # box(
+                 #   title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
+                 #   collapsible = FALSE, collapsed = TRUE,
+                 fluidRow(
+                   column(
+                     12,
+                     tableSelectionUi("gsRMGenesMod")
+                   ), checkbsTT("gsRMGenesMod")
+                 )
+                 # )
         )
       )
     )
@@ -329,75 +329,82 @@ generalParametersTab <- function() {
     fluidRow(div(h2("General parameters"), align = "center")),
     br(),
     fluidRow(
-      box(
-        title = "Parameters for PCA", solidHeader = TRUE, width = 12, status = "primary",
-        # The id lets us use input$tabset1 on the server to find the current tab
-        id = "tabsetPCA",
-        fluidRow(
-          column(4,
-            offset = 0,
-            numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 50), min = 2),
-            checkboxInput("pcaCenter", "center data", TRUE)
-          ),
-          column(4,
-            offset = 0,
-            numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 500), min = 50),
-            checkboxInput("pcaScale", "scale data", defaultValue("pcaScale", TRUE))
-          ),
-          column(4,
-                 offset = 0,
-                 selectInput("hvgSelection","How to select highly variable genes.", 
-                             choices = c("getTopHVGs","vst", "mvp", "disp"),
-                             selected = defaultValue("hvgSelection", "getTopHVGs"))
+      tabBox(title = "PCA", width = 12, id = "modPCA",
+             tabPanel(
+               title = "Parameters for PCA", solidHeader = TRUE, width = 12, value = "PCAparameters",
+               # The id lets us use input$tabset1 on the server to find the current tab
+               id = "tabsetPCA",
+               fluidRow(
+                 column(4,
+                        offset = 0,
+                        numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 50), min = 2),
+                        checkboxInput("pcaCenter", "center data", TRUE)
+                 ),
+                 column(4,
+                        offset = 0,
+                        numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 500), min = 50),
+                        checkboxInput("pcaScale", "scale data", defaultValue("pcaScale", TRUE))
+                 ),
+                 column(4,
+                        offset = 0,
+                        selectInput("hvgSelection","How to select highly variable genes.", 
+                                    choices = c("getTopHVGs","vst", "mvp", "disp"),
+                                    selected = defaultValue("hvgSelection", "getTopHVGs"))
                  )
-        ),
-        checkbsTT(item = "pcaRank"),
-        checkbsTT("pcaN"),
-        checkbsTT("pcaCenter"),
-        checkbsTT("pcaScale"),
-        fluidRow(
-          column(12,
-            offset = 0,
-            textInput("genes4PCA", "Genes to be used for PCA", width = "100%", value = defaultValue("genes4PCA",""))
-          ), checkbsTT("genes4PCA")
-        ),
-        fluidRow(
-          column(12,
-            offset = 0,
-            textInput("genesRMPCA", "Genes NOT to be used for PCA", width = "100%", value = defaultValue("genesRMPCA", ""))
-          ), checkbsTT("genesRMPCA")
-        ),
-        fluidRow(
-          column(
-            width = 12, offset = 1,
-            actionButton("updatePCAParameters", "apply changes", width = "80%")
-          )
-        )
+               ),
+               checkbsTT(item = "pcaRank"),
+               checkbsTT("pcaN"),
+               checkbsTT("pcaCenter"),
+               checkbsTT("pcaScale"),
+               fluidRow(
+                 column(12,
+                        offset = 0,
+                        textInput("genes4PCA", "Genes to be used for PCA", width = "100%", value = defaultValue("genes4PCA",""))
+                 ), checkbsTT("genes4PCA")
+               ),
+               fluidRow(
+                 column(12,
+                        offset = 0,
+                        textInput("genesRMPCA", "Genes NOT to be used for PCA", width = "100%", value = defaultValue("genesRMPCA", ""))
+                 ), checkbsTT("genesRMPCA")
+               ),
+               fluidRow(
+                 column(
+                   width = 12, offset = 1,
+                   actionButton("updatePCAParameters", "apply changes", width = "80%")
+                 )
+               )
+             ),
+             checkbsTT(item = "tabsetPCA"),
+             
+             tabPanel(
+               title = "DimPlot for PCA", solidHeader = TRUE, width = 12, value = "dimPlotPCA",
+               fluidRow(
+                 column(12,
+                        offset = 1,
+                        actionButton("updateDimPlot", "generate plot",
+                                     width = "80%",
+                                     style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
+                        )
+                 ),
+               ),
+               fluidRow(
+                 column(
+                   width = 12,
+                   jqui_resizable(plotOutput("dimPlotPCA", height = "1400px"))
+                 )
+               ),
+               checkbsTT(item = "dimPlotPCA"),
+             ),
+             tabPanel(
+               title = "Loadings", solidHeader = TRUE, width = 12, value = "loadingsPCA",
+               fluidRow(
+                 column(12,
+                        tableSelectionUi("PCAloadingsMod")
+                 )
+               )
+             )
       ),
-      checkbsTT(item = "tabsetPCA"),
-    ),
-    fluidRow(
-      box(
-        title = "DimPlot for PCA", solidHeader = TRUE, width = 12, status = "primary", collapsible = TRUE, collapsed = TRUE,
-        # The id lets us use input$tabset1 on the server to find the current tab
-        id = "dimPlotPCA",
-        fluidRow(
-          column(12,
-            offset = 1,
-            actionButton("updateDimPlot", "generate plot",
-              width = "80%",
-              style = "color: #fff; background-color: #A00272; border-color: #2e6da4"
-            )
-          ),
-        ),
-        fluidRow(
-          column(
-            width = 12,
-            jqui_resizable(plotOutput("dimPlotPCA"))
-          )
-        ),
-        checkbsTT(item = "dimPlotPCA"),
-      )
     ),
     fluidRow(
       tabBox(
@@ -405,48 +412,48 @@ generalParametersTab <- function() {
         id = "tabsetCluster",
         selected = defaultValue("tabsetCluster", "scran_Cluster"),
         tabPanel("Seurat clustering",
-          width = 12,
-          value = "seurat_Clustering",
-          fluidRow(
-            column(
-              width = 6,
-              numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = defaultValue("seurClustDims", 15), width = "100%"),
-              numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",15), width = "100%")
-            ),
-            column(
-              width = 6,
-              numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = defaultValue("seurClustresolution", 0.5), min = 0.1, width = "100%"),
-              # TOD implement more options
-            )
-          ),
+                 width = 12,
+                 value = "seurat_Clustering",
+                 fluidRow(
+                   column(
+                     width = 6,
+                     numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = defaultValue("seurClustDims", 15), width = "100%"),
+                     numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",15), width = "100%")
+                   ),
+                   column(
+                     width = 6,
+                     numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = defaultValue("seurClustresolution", 0.5), min = 0.1, width = "100%"),
+                     # TOD implement more options
+                   )
+                 ),
         ), # seurat clustering
         tabPanel("Quickcluster",
-          value = "scran_Cluster", # name of reactive to be used
-          width = 12,
-          fluidRow(
-            column(
-              width = 6,
-              selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("clusterSource", "logcounts"), width = "100%"),
-              selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = defaultValue("clusterMethod", "igraph"), width = "100%")
-            ),
-            column(
-              width = 6,
-              numericInput("minClusterSize", "minimum size of each cluster.", defaultValue("minClusterSize", 2), min = 2, width = "100%"),
-              selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = defaultValue("useRanks", "TRUE"), width = "100%")
-            )
-          ),
-          checkbsTT(item = "clusterSource"),
-          checkbsTT(item = "minClusterSize"),
-          checkbsTT(item = "clusterMethod"),
-          checkbsTT(item = "useRanks"),
-          fluidRow(
-            column(
-              12,
-              textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%", value = defaultValue("geneSelectionClustering", ""))
-            )
-          ),
-          checkbsTT(item = "geneSelectionClustering")
-          
+                 value = "scran_Cluster", # name of reactive to be used
+                 width = 12,
+                 fluidRow(
+                   column(
+                     width = 6,
+                     selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("clusterSource", "logcounts"), width = "100%"),
+                     selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = defaultValue("clusterMethod", "igraph"), width = "100%")
+                   ),
+                   column(
+                     width = 6,
+                     numericInput("minClusterSize", "minimum size of each cluster.", defaultValue("minClusterSize", 2), min = 2, width = "100%"),
+                     selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = defaultValue("useRanks", "TRUE"), width = "100%")
+                   )
+                 ),
+                 checkbsTT(item = "clusterSource"),
+                 checkbsTT(item = "minClusterSize"),
+                 checkbsTT(item = "clusterMethod"),
+                 checkbsTT(item = "useRanks"),
+                 fluidRow(
+                   column(
+                     12,
+                     textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%", value = defaultValue("geneSelectionClustering", ""))
+                   )
+                 ),
+                 checkbsTT(item = "geneSelectionClustering")
+                 
         ), # quickclustering tab Panel
         tabPanel("SNNGraph",
                  value = "snnGraph",
@@ -476,7 +483,7 @@ generalParametersTab <- function() {
       )
     ),
     # fluidRow(div(h3("Parameters for clustering"), align = "left")),
-
+    
     br(),
     # box(
     #   title = "Comments", solidHeader = TRUE, width = 12, status = "primary",

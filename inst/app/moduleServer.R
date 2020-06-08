@@ -1009,6 +1009,7 @@ tableSelectionServer <- function(input, output, session,
     reorderCells <- input$reorderCells
     selectedRows <- input$cellNameTable_rows_selected
     showAllCells <- input$showAllCells
+    showRowNames <- input$showRowNames
 
     # searchStr <-
     if (is.null(dataTables)) {
@@ -1060,7 +1061,7 @@ tableSelectionServer <- function(input, output, session,
       # if (DEBUG) cat(file = stderr(), paste(colState$search,"\n"))
       # browser()
       dtout <- DT::datatable(dataTables,
-        rownames = F,
+        rownames = showRowNames,
         filter = "top",
         selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
         options = list(
