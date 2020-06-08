@@ -321,7 +321,7 @@ The following will show a few possible results that can be achieved using SCHNAP
 knitr::include_graphics('images/heatmapAllCells.png')
 ```
 
-The following video shows how to use the heatmap module. If the field with the gene names is empty the the function FindMarkers is used to identify the genes that are most characteristic for each cluster. This list of genes is used for the heatmap. 
+The following video shows how to use the heatmap module. If the field with the gene names is empty the function FindMarkers is used to identify the genes that are most characteristic for each cluster. This list of genes is used for the heatmap. 
 
 ```{r, echo=FALSE}
 embed_youtube("aiKPccCmZgk")

@@ -421,6 +421,12 @@ callModule(
   gsRMGenesTable
 )
 
+callModule(
+  tableSelectionServer,
+  "PCAloadingsMod",
+  PCAloadingsTable
+)
+
 
 # DEBUGSAVEstring ----
 output$DEBUGSAVEstring <- renderText({
