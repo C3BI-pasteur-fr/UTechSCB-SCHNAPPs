@@ -56,3 +56,5 @@ scaterPlot.png
 # videos are on youtube
 *.mp4
 
+# specific files
+vignettes/pkdown/scran.grunPancreas.RData
