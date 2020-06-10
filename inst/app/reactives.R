@@ -1626,7 +1626,7 @@ scExLogMatrixDisplay <- reactive({
 })
 
 # pcaFunc ----
-pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, maxGenes = 1000, hvgSelection) {
+pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, featureData, pcaN, maxGenes = 1000, hvgSelection) {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1659,18 +1659,19 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, 
   switch(hvgSelection,
          "vst" = {
            pbmc <-
-             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "vst")
+             FindVariableFeatures(assays(scEx)[[1]], selection.method = "vst", nfeatures = pcaN)
+           
            geneshvg = rownames(scEx_log)[order(pbmc$vst.variance.standardized, decreasing = T)[1:pcaN]]
          },
          "mvp" = {
            pbmc <-
-             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot")
+             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot", nfeatures = pcaN)
            pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
            geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
          },
          "disp" = {
            pbmc <-
-             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "dispersion")
+             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "dispersion", nfeatures = pcaN)
            # NA values seem to have the highest variance. so we make sure to include them
            pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
            geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
@@ -1746,16 +1747,33 @@ pcaFunc <- function(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, 
     #   x <- x[keep,,drop=FALSE]
     #   rv <- rowVars((as.matrix(x)))
     # }
-    if (scale) {
-      rv <- rowVars((as.matrix(x)))
-      x <- x/sqrt(rv)
-      # rv <- rep(1, nrow(x))
+    ## This is not being in Seurat
+    # if (scale) {
+    #   rv <- rowVars((as.matrix(x)))
+    #   x <- x/sqrt(rv)
+    #   # rv <- rep(1, nrow(x))
+    # }
+    if (scale | center) {
+      set.seed(1)
+      x <- ScaleData(x, do.scale = scale, do.center = center, verbose = FALSE)
     }
-    x <- t(x)
-    pca <- runPCA(x, rank=rank, get.rotation=TRUE)
-    pca$x[1:3,1:3]
+    if (useSeuratPCA){
+      # Seurat:
+      reductObj = RunPCA(x, rank = rank, verbose = FALSE, assay = "RNA")
+      pca = list()
+      pca$rotation = Loadings(reductObj)
+      pca$x = Embeddings(reductObj)
+      pca$sdev = Stdev(reductObj)
+    } else {
+      # # scran:
+      x <- t(x)
+      pca <- runPCA(x, rank=rank, get.rotation=TRUE)
+    }
+    
+    # pca$x[1:3,1:3]
     rownames(pca$rotation) = genesin
     rownames(pca$x) = colnames(scEx_log)
+  
     pca
     # BiocSingular::runPCA(
     #   x,
@@ -1809,6 +1827,7 @@ pca <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
+  scEx <- scEx()
   scEx_log <- scEx_log()
   # only redo calculations if button is pressed.
   input$updatePCAParameters
@@ -1818,6 +1837,7 @@ pca <- reactive({
   scale <- isolate(input$pcaScale)
   pcaGenes <- isolate(input$genes4PCA)
   hvgSelection <- isolate(input$hvgSelection)
+  useSeuratPCA <- isolate(input$useSeuratPCA)
   
   if (is.null(scEx_log)) {
     if (DEBUG) {
@@ -1830,7 +1850,11 @@ pca <- reactive({
   if (is.null(center)) centr <- TRUE
   if (is.null(scale)) scale <- FALSE
   featureData <- rowData(scEx_log)
-  retVal <- pcaFunc(scEx_log, rank, center, scale, pcaGenes, featureData, pcaN, 
+  retVal <- pcaFunc(scEx = scEx, scEx_log = scEx_log, 
+                    rank = rank, center = center, 
+                    scale = scale, useSeuratPCA = useSeuratPCA, 
+                    pcaGenes = pcaGenes, featureData = featureData,
+                    pcaN =  pcaN, 
                     hvgSelection = hvgSelection)
   
   setRedGreenButton(
