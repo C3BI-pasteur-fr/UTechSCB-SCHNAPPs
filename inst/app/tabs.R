@@ -349,7 +349,8 @@ generalParametersTab <- function() {
                         offset = 0,
                         selectInput("hvgSelection","How to select highly variable genes.", 
                                     choices = c("getTopHVGs","vst", "mvp", "disp"),
-                                    selected = defaultValue("hvgSelection", "getTopHVGs"))
+                                    selected = defaultValue("hvgSelection", "getTopHVGs")),
+                        checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", FALSE))
                  )
                ),
                checkbsTT(item = "pcaRank"),
