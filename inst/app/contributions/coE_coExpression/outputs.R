@@ -259,21 +259,22 @@ output$alluvial_plot <- renderPlot({
   if (DEBUG) cat(file = stderr(), paste("alluvial_plot:\n"))
   # for development and debugging purposes
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/alluvial_plot.RData", list = c(ls(), ls(envir = globalenv())))
+    save(file = "~/SCHNAPPsDebug/alluvial_plot.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/alluvial_plot.RData")
   
   dat = projections[,c(alluiv1, alluiv2)]
   # dat$cells = rownames(projections)
   gg = ggplot(as.data.frame(dat),
-              aes_string( axis1 = alluiv1, axis2 = alluiv2)) +
-    geom_alluvium( width = 1/12) +
+              aes_string(  axis1 = alluiv1, axis2 = alluiv2)) +
+    geom_alluvium(aes_string(fill = alluiv1), width = 1/12) +
     geom_stratum(width = 1/12, fill = "black", color = "grey") +
-    geom_label(stat = "stratum", label.strata = TRUE) +
+    geom_label(stat = "stratum", infer.label = TRUE) +
     scale_x_discrete(limits = c(alluiv1, alluiv2), expand = c(.05, .05)) +
     scale_fill_brewer(type = "qual", palette = "Set1") +
     ggtitle(paste("Alluvial plot of ", alluiv1, "and", alluiv2))
   
+ 
   # create and return the plot
   # ggalluvial::(dummyNRow)
   return(gg)
