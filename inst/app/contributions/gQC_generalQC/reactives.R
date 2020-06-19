@@ -244,7 +244,7 @@ tsne <- reactive({
     showNotification("tsne", id = "tsne", duration = NULL)
   }
   
-  pca <- pca()
+  pca <- pcaReact()
   # only recalculate when button is pressed.
   input$updatetsneParameters
   gQC_tsneDim <- isolate(input$gQC_tsneDim)
@@ -356,7 +356,7 @@ umapReact <- reactive({
   # UMAP2 <- input$um_umap2
   runUMAP <- input$activateUMAP
   scEx_log <- scEx_log()
-  pca <- pca()
+  pca <- pcaReact()
   
   myseed <- isolate(input$gQC_um_randSeed)
   n_neighbors <- isolate(as.numeric(input$gQC_um_n_neighbors))

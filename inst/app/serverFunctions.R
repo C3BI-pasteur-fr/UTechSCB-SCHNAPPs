@@ -1376,8 +1376,13 @@ loadLiteData <- function(fileName = NULL) {
   cp = load(fileName)
   
   # The data has to be stored in scEx as it come from save from the main SCHNAPPs app
-  if (!all(c("scEx", "pca") %in% cp)) {
+  if (!all(c("scEx", "pcaReact") %in% cp)) {
+    # this is to cope with a change of reactive name
+    if (all(c("scEx", "pca") %in% cp)) {
+      pcaReact = pca
+    } else {
     return(NULL)
+    }
   }
   
   projections = colData(scEx)
@@ -1386,9 +1391,9 @@ loadLiteData <- function(fileName = NULL) {
   assays(counts)[["logcounts"]] = NULL
   logcounts = scEx
   assays(logcounts)[["counts"]] = NULL
-  # pca = reducedDims(scEx)[["PCA"]] # now stored separately
-  returnList = list(scEx = counts, scEx_log = logcounts, pca = pca, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol)
-  for (va in cp[!cp %in% c("scEx", "pca", "ccol", "scol")]) {
+  # pcaReact = reducedDims(scEx)[["PCA"]] # now stored separately
+  returnList = list(scEx = counts, scEx_log = logcounts, pcaReact = pcaReact, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol)
+  for (va in cp[!cp %in% c("scEx", "pcaReact", "ccol", "scol")]) {
     # .schnappsEnv = global envirnment for schnapps
     #  - projectionFunctions = list of 2 entries each: 1st: display name, 2nd reactive name (defined in a reactive.R)
     

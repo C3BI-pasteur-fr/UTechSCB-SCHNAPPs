@@ -24,6 +24,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
       packagePath <- "inst/app"
+      setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
     packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
