@@ -140,9 +140,15 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     sampCol = sampCol,
     ccols = ccols
   )
-  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
+  serializePlots <- function(data) {
+    lapply(data, function(plot) {
+      rawToChar(serialize(plot, NULL, ascii = TRUE))
+    })
+  }
+  
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- serializePlots(retVal)
    exportTestValues(coE_geneGrp_vio_plot = {
-    retVal
+     serializePlots(retVal)
   })
   return(retVal)
 })

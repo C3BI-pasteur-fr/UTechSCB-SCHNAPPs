@@ -224,10 +224,10 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
   
   fig <- plotly::plot_ly(alpha = 1,
                          nbinsx = binSize)
-    # dat[dat$sample == levels(colData(scEx)$sampleNames)[[1]],],
-    # x = ~counts, 
-    # # y = ~counts,
-    # type="histogram")
+  # dat[dat$sample == levels(colData(scEx)$sampleNames)[[1]],],
+  # x = ~counts, 
+  # # y = ~counts,
+  # type="histogram")
   lev = levels(colData(scEx)$sampleNames)
   for (idx in seq_along(lev)) {
     fig <- fig %>% add_trace(
@@ -294,7 +294,7 @@ output$gQC_variancePCA <- renderPlot({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_variancePCA", id = "gQC_variancePCA", duration = NULL)
   }
-  pca <- pca()
+  pca <- pcaReact()
   if (is.null(pca)) {
     return(NULL)
   }
@@ -532,29 +532,34 @@ observeEvent(eventExpr = input$gQC_rnProj,
 
 observe(label = "ob27b", {
   projections <- projections()
-  
+  projFactors <- projFactors()
   
   # only factorials?
   updateSelectInput(session, "gQC_combPrj1",
-                    choices = c(colnames(projections),
-                                selected = .schnappsEnv$gQC_combPrj1)
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$gQC_combPrj1
   )
   updateSelectInput(session, "gQC_combPrj2",
-                    choices = c(colnames(projections),
-                                selected = .schnappsEnv$gQC_combPrj2)
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$gQC_combPrj2
   )
   updateSelectInput(session, "gQC_rnProj",
-                    choices = c(colnames(projections),
-                                selected = .schnappsEnv$gQC_rnProj)
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$gQC_rnProj
   )
   updateSelectInput(session, "oldPrj",
-                    choices = c(colnames(projections),
-                                selected = .schnappsEnv$oldPrj)
+                    choices = c(colnames(projections)),
+                    selected = .schnappsEnv$oldPrj
   )
   updateSelectInput(session, "delPrj",
-                    choices = c(colnames(projectionsTable$newProjections),
-                                selected = .schnappsEnv$delPrj)
+                    choices = c(colnames(projectionsTable$newProjections)),
+                    selected = .schnappsEnv$delPrj
   )
+  updateSelectInput(session, "gQC_windProj",
+                    choices = projFactors,
+                    selected = .schnappsEnv$gQC_windProj
+  )
+  
   
 })
 observe(label = "ob27c", {
@@ -577,8 +582,53 @@ observe(label = "ob27g", {
   if (DEBUG) cat(file = stderr(), "observe: delPrj\n")
   .schnappsEnv$delPrj <- input$delPrj
 })
+observe(label = "ob27h", {
+  if (DEBUG) cat(file = stderr(), "observe: gQC_windProj\n")
+  .schnappsEnv$gQC_windProj <- input$gQC_windProj
+})
 
 
 # rename levels
 
 output$gQC_renameLev <- renderText({"text"})
+
+
+# WIND
+
+output$gQC_windHC <- renderPlot({
+  require(Wind)
+  if (DEBUG) cat(file = stderr(), "gQC_windHC started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "gQC_windHC")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "gQC_windHC")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("gQC_windHC", id = "gQC_windHC", duration = NULL)
+  }
+  
+  scEx_log <- scEx_log()
+  projections <- projections()
+  gQC_windProj <- input$gQC_windProj
+  
+  if (is.null(projections) | is.null(scEx_log)
+      ) {
+    return(NULL)
+  }
+  if (length(levels(projections[,gQC_windProj]))<3) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Projections have less than 3 levels", id = "gQC_windHCPR", duration = 20, type = "warning")
+    }
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gQC_windHC.RData", list = c(ls()))
+  }
+  # cp = load(file = "~/SCHNAPPsDebug/gQC_windHC.RData")
+  
+  Y <- as.matrix(assays(scEx_log)[[1]])
+  trueclass <- projections[,gQC_windProj]
+  ctStruct = createRef(Y, trueclass)
+  plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
+})

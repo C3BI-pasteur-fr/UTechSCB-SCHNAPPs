@@ -339,7 +339,7 @@ output$DE_downloadPanel <- downloadHandler(
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
-    pca <- pca()
+    pca <- pcaReact()
     # TODO should be taken from projections.
     tsne <- tsne()
 

@@ -39,37 +39,37 @@ if (!exists('AllowClustering')) {
   if (DEBUG) cat(file = stderr(), "ui-lite: AllowClustering not defined\n")
 }
 
-if (!AllowClustering)
-generalParametersTab <<- function(){
-  shinydashboard::tabItem(
-    "generalParameters",
-    fluidRow(div(h2("General parameters"), align = "center")),
-    br(),
-    box(
-      title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
-      collapsible = F, collapsed = F,
-      fluidRow(column(
-        width = 12, offset = 1,
-        actionButton("updateColors", "apply changes", width = "80%")
-      )),
+if (!AllowClustering){
+  generalParametersTab <<- function(){
+    shinydashboard::tabItem(
+      "generalParameters",
+      fluidRow(div(h2("General parameters"), align = "center")),
       br(),
-      fluidRow(
-        column(
-          width = 6,
-          uiOutput("sampleColorSelection")
-        ),
-        column(
-          width = 6,
-          uiOutput("clusterColorSelection")
+      box(
+        title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
+        collapsible = F, collapsed = F,
+        fluidRow(column(
+          width = 12, offset = 1,
+          actionButton("updateColors", "apply changes", width = "80%")
+        )),
+        br(),
+        fluidRow(
+          column(
+            width = 6,
+            uiOutput("sampleColorSelection")
+          ),
+          column(
+            width = 6,
+            uiOutput("clusterColorSelection")
+          )
         )
-      )
-    ),
-    checkbsTT(item = "updateColors"),
-    checkbsTT(item = "sampleColorSelection"),
-    checkbsTT(item = "clusterColorSelection")
-  )
+      ),
+      checkbsTT(item = "updateColors"),
+      checkbsTT(item = "sampleColorSelection"),
+      checkbsTT(item = "clusterColorSelection")
+    )
+  }
 }
-
 
 base::source(paste0(packagePath, "/serverFunctions.R"))
 
@@ -80,6 +80,7 @@ scShinyUI <- function(request) {
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
       packagePath <- "inst/app"
+      setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
     packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
@@ -116,7 +117,7 @@ scShinyUI <- function(request) {
     shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
   )
   
-
+  
   
   # general tabs
   allTabs <- list(
@@ -130,13 +131,13 @@ scShinyUI <- function(request) {
   
   # Basic menu Items
   allMenus <- list(
-
+    
     shinydashboard::menuItem("Introduction",
                              tabName = "Intro", icon = icon("dashboard")
     ),
     shinydashboard::menuItem("Parameters",
                              # id="parametersID",
-                             tabName = "parameters", icon = icon("gopuram"), parameterItems
+                             tabName = "parameters", icon = icon("gopuram")
     )
     # ,
     # shinydashboard::menuItem("rename projections",
@@ -203,7 +204,9 @@ scShinyUI <- function(request) {
   # search for parameter contribution submenu items (menuSubItem)
   # parameterContributions = ""
   
-  
+  if (.schnappsEnv$DEBUG) {
+    cat(file = stderr(), "HALLOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n")
+  }
   
   shinyUI(
     shinydashboard::dashboardPage(
@@ -212,8 +215,8 @@ scShinyUI <- function(request) {
       shinydashboard::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sideBarID",
-          allMenus
-        ),
+          allMenus,
+          
         htmlOutput("summaryStatsSideBar"),
         
         # downloadButton("report", "Generate report", class = "butt"),
@@ -231,21 +234,16 @@ scShinyUI <- function(request) {
         if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
         if (exists("historyPath", envir = .schnappsEnv)){
           br()
-        },
-        if (exists("historyPath", envir = .schnappsEnv)){
           # checkboxInput("save2History", "save to history file", FALSE)
           actionButton("comment2History", "Add comment to history")
-          
-        },
-        if (DEBUG) {
-          br()
-        },
-        if (DEBUG) {
-          actionButton("openBrowser", "open Browser")
         }
+        # if (DEBUG) {
+        #   actionButton("openBrowser", "open Browser")
+        # }
         # ,
         # verbatimTextOutput("save2Historystring")
         # ,verbatimTextOutput("currentTabInfo")
+        )
       ), # dashboard side bar
       shinydashboard::dashboardBody(
         shinyjs::useShinyjs(debug = TRUE),

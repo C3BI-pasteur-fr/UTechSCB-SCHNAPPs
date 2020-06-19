@@ -24,7 +24,11 @@ library("vembedr")
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 ```
 
-Please see the scran workflow for a more indepth workflow.
+Please see the Seurat workflow for a more indepth workflow.
+
+https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html
+
+
 
 ```{r}
 library(dplyr)
