@@ -20,6 +20,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install()
 BiocManager::install("BiocSingular")
 BiocManager::install("SingleR")
+devtools::install_github("haowulab/Wind")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 ```
 
