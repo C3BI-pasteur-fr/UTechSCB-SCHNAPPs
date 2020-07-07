@@ -30,21 +30,21 @@ scEx <- reactive({
 
 # pca ----
 if (!AllowClustering)
-  pca <<- reactive({
+  pcaReact <- reactive({
     cat(file = stderr(), green("lite: pca\n"))
     get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$pca
   })
 
 # dbCluster ----
 if (!AllowClustering)
-  dbCluster <<- reactive({
+  dbCluster <- reactive({
     cat(file = stderr(), green("lite: dbCluster\n"))
     get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$projections$dbCluster
   })
 
 # projections ----
 if (!AllowClustering)
-  projections <<- reactive({
+  projections <- reactive({
     if (DEBUG) {
       cat(file = stderr(), green("projections lite started.\n"))
     }
@@ -63,7 +63,7 @@ if (!AllowClustering)
     # input data being loaded
     scEx <- scEx()
     # pca is already fixed in the calculation so we don't need to recalculate it.
-    pca <- NULL
+    pcaReact <- NULL
     
     # in schnapps-lite we are only interested in adding the sessionProjections
     # to the already calculated other projections

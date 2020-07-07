@@ -1,0 +1,19 @@
+---
+title: "Patient-specific Pluripotent stem cellsâderived valvular cells to uncover the molecular mechanisms of  Mitral valve prolapse"
+output: 
+  html_document: 
+    self_contained: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Abstract
+
+Mitral valve prolapse (MVP) is where the mitral valve is thickened, too floppy and does not close properly leading to a regurgitation of the blood back to the left atrium, in the most severe clinical scenario. Mitral valve prolapse affects 1 in 40 individuals. Often non-symptomatic, MVP can also become a severe disease leading to heart failure. Syndromic MVPs are observed in rare and genetically well-characterized connective tissue syndromes such as Marfan syndrome, LoeysâDietz syndrome, or EhlersâDanlos syndrome. Common non-syndromic MVP is a progressive disease originating from a compromised development of embryonic valves although functional consequences are apparent in middle-aged patients. Thickening of valve leaflets is due to an excess of extracellular proteins secreted by valve interstitial cells (VICs) . The origin of overactivation of VICs was unknown  
+We used induced pluripotent stem cells derived from cells of a patient harboring a mutation in dachsous gene at the origin of MVP (HSdachMut) or healthy wild type cells (HSwt). After differentiation of these cells into VICs, we uncovered that diseased (MVP) cells featured a shortened or no cilia. This led to a dysregulation of the sonic hedgehog (SHH) pathway at the origin of an uncontrolled secretion of ECM proteins as shown by the single-cell RNA seq data. 
+
+Nat Commun. 2019 Apr 26;10(1):1929. doi: 10.1038/s41467-019-09459-5.
+
+`r shiny::includeHTML(system.file("extdata", "generalSCHNAPPs.html",package = "SCHNAPPs"))`
