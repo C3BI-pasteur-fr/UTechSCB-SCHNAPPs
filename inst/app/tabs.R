@@ -525,7 +525,7 @@ generalParametersTab <- function() {
   )
 }
 
-# # renameTab ----
+# # renameTab
 # renameTab <- function() {
 #   shinydashboard::tabItem(
 #     tabName = "renameProj",

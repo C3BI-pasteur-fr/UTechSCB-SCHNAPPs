@@ -747,7 +747,7 @@ output$RDSsave <- downloadHandler(
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
-    pca <- pca()
+    pca <- pcaReact()
     # TODO should be taken from projections
     tsne <- tsne()
     ccol = clusterCols$colPal
@@ -985,7 +985,7 @@ observeEvent(
 observe(label = "ob_pca",
         {
           if (DEBUG) cat(file = stderr(), "observe ob_pca\n")
-          # out <- pca()
+          # out <- pcaReact()
           # if (is.null(out)) {
           #   .schnappsEnv$calculated_gQC_tsneDim <- "NA"
           # }
