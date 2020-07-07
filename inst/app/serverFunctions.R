@@ -219,9 +219,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   )
   if (divXBy != "None") {
     subsetData[, dimX] <- subsetData[, dimX] / subsetData[, divXBy]
+    subsetData = subsetData[!is.infinite(subsetData[, dimX]), ]
   }
   if (divYBy != "None" & dimY != "histogram") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
+    subsetData = subsetData[!is.infinite(subsetData[, dimY]), ]
   }
   
   typeX <- typeY <- "linear"

@@ -285,6 +285,7 @@ tsne <- reactive({
   return(retVal)
 })
 
+# tsneFunc ----
 tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_tsneSeed) {
   if (DEBUG) cat(file = stderr(), "tsneFunc started.\n")
   start.time <- base::Sys.time()
@@ -448,7 +449,7 @@ myProjections <- list(
   c("umap", "umapReact")
 )
 
-# myHeavyCalculations ----
+# myHeavyCalculations 
 # declare function as heavy
 # myHeavyCalculations <- list(
 #   c("scaterReads", "scaterReads"),
@@ -456,7 +457,7 @@ myProjections <- list(
 # )
 
 
-#' tsnePlot
+#' tsnePlot ----
 #' function that plots in 3D the tsne projection
 tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
   if (DEBUG) cat(file = stderr(), "tsnePlot started.\n")

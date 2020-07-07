@@ -443,6 +443,7 @@ observeEvent(
   }
 )
 
+# output$gQC_orgLevels ----
 output$gQC_orgLevels = renderText({
   rnProj = input$gQC_rnProj
   projections = projections()
@@ -469,7 +470,7 @@ verifyLevelModal <- function(NLevel, failed = FALSE) {
   )
 }
 
-
+# gQC_renameLevButton ----
 observeEvent(eventExpr = input$gQC_renameLevButton,
              label = "rnBtn",
              handlerExpr = {
@@ -593,7 +594,7 @@ observe(label = "ob27h", {
 output$gQC_renameLev <- renderText({"text"})
 
 
-# WIND
+# WIND ----
 
 output$gQC_windHC <- renderPlot({
   require(Wind)
