@@ -107,7 +107,7 @@ modTab <- shinydashboard::tabItem(
              column(
                width = 12,
                tags$p(tags$b("original values")),
-               textOutput("gQC_orgLevels", ),
+               textOutput("gQC_orgLevels"),
                br()
              )
            ),
@@ -121,6 +121,23 @@ modTab <- shinydashboard::tabItem(
              column(
                width = 6,
                actionButton("gQC_renameLevButton", "apply")
+             )
+           )
+         ),
+         tabPanel(
+           title = "WIND", width = 12, value = "gQC_wind",
+           tags$p("from WIND package compute hierachy of projection"),
+           br(),
+           fluidRow(
+             column(
+               width = 6,
+               selectInput("gQC_windProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
+             )
+           ),
+           fluidRow(
+             column(
+               width = 12,
+               plotOutput("gQC_windHC")
              )
            )
          )
