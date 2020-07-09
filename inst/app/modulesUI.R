@@ -74,7 +74,7 @@ clusterUI <- function(id) {
         dropdown_icon = NULL,
         closable = FALSE,
         enable_dropdown = T,
-        dropdown_menu = actionButton(inputId = "twoDselectedAddOpt", label = "", icon = icon("fas fa-question")),
+        dropdown_menu = actionButton(inputId = ns("twoDselectedAddOpt"), label = "", icon = icon("fas fa-question")),
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
           column(

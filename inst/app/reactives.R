@@ -56,7 +56,7 @@ output$dimPlotPCA <- renderPlot({
   input$updateDimPlot
   scEx_log <- isolate(scEx_log())
   scEx <- isolate(scEx())
-  pca <- isolate(pca())
+  pca <- isolate(pcaReact())
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "dimPlotPCA:NULL\n")
@@ -1127,7 +1127,7 @@ PCAloadingsTable <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "output$PCAloadingsTable\n")
   }
-  pca <- pca()
+  pca <- pcaReact()
   
   if (is.null(pca)) {
     return(NULL)
@@ -1648,7 +1648,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
   }
   # cp =load(file="~/SCHNAPPsDebug/pcaFunc.RData")
-  
+
   # if there are no genes provided take all genes
   genesin <- geneName2Index(pcaGenes, featureData)
   # if (is.null(genesin) || length(genesin) == 0) {
@@ -1813,7 +1813,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   ))
 }
 # pca ----
-pca <- reactive({
+pcaReact <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "pca started.\n")
   }
@@ -2022,7 +2022,7 @@ scran_Cluster <- function(){
   # input$updateClusteringParameters
   scEx <- scEx()
   scEx_log <- scEx_log()
-  pca <- pca()
+  pca <- pcaReact()
   
   # ignore these changes
   seed <- isolate(input$seed)
@@ -2068,7 +2068,7 @@ scran_Cluster <- function(){
       id = "dbClusterError",
       duration = NULL
     )
-    exit()
+    stop("error: clustering didn't produce a result")
   }
   setRedGreenButton(
     vars = list(
@@ -2107,7 +2107,7 @@ seurat_Clustering <- function() {
   
   scEx = scEx() # need to be run when updated
   scEx_log = scEx_log()
-  pca = pca()
+  pca = pcaReact()
   tabsetCluster = isolate(input$tabsetCluster)
   dims = isolate(input$seurClustDims)
   k.param = isolate(input$seurClustk.param)
@@ -2178,7 +2178,7 @@ snnGraph <- function(){
   
   scEx = scEx() # need to be run when updated
   scEx_log = scEx_log()
-  pca = pca()
+  pca = pcaReact()
   type = isolate(input$snnType)
   # clusterSource = isolate(input$snnClusterSource)
   tabsetCluster = isolate(input$tabsetCluster)
@@ -2274,7 +2274,7 @@ dbCluster <- reactive({
   clicked = input$updateClusteringParameters
   scEx = scEx() # need to be run when updated
   scEx_log = scEx_log()
-  pca = pca()
+  pca = pcaReact()
   tabsetCluster = isolate(input$tabsetCluster)
   
   
@@ -2352,7 +2352,7 @@ projections <- reactive({
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
   scEx <- scEx()
-  pca <- pca()
+  pca <- pcaReact()
   prjs <- sessionProjections$prjs
   newPrjs <- projectionsTable$newProjections
   if (.schnappsEnv$DEBUGSAVE) {
@@ -2563,7 +2563,6 @@ initializeGroupNames <- reactive({
   }
   isolate({
     grpNs <- groupNames$namesDF
-    save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls()))
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls()))
     }
@@ -2988,7 +2987,7 @@ reacativeReport <- function() {
     )
   
   report.env <- getReactEnv(DEBUG = DEBUG)
-  pca <- pca()
+  pca <- pcaReact()
   tsne <- tsne()
   
   scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)

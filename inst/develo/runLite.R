@@ -1,3 +1,4 @@
+.schnappsEnv <- new.env(parent=emptyenv())
 localContributionDir = "~/Rstudio/scShinyHub-github/bjContributions/"
 # localContributionDir = ""
 defaultValueSingleGene = "itgae" # CD52
@@ -66,8 +67,9 @@ scShinyServer <- NULL
 # packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 
 devscShinyApp = F
-packagePath <<- "inst/app"
+packagePath <- "inst/app"
 
+source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 source(paste0(packagePath, "/server.R"), local = TRUE)
 source(paste0(packagePath, "/ui.R"), local = T)
 source(paste0(packagePath, "/server-lite.R"), local = TRUE)
@@ -75,7 +77,7 @@ source(paste0(packagePath, "/ui-lite.R"), local = T)
 
 # load data
 maxCells = 3000
-data = "~/Downloads/HPVC.RData"
+data = "inst/develo/testApp/HPVC.lite.RData"
 # data = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
 assign(".SCHNAPPs_LiteData", loadLiteData(file = data), envir = .schnappsEnv)
 
@@ -113,7 +115,7 @@ if (nCells > maxCells){
 
 if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
   # error loading
-  exit()
+  stop(".schnappsEnv$.SCHNAPPs_LiteData not given\n")
 }
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)

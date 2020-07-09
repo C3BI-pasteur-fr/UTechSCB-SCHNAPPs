@@ -244,7 +244,7 @@ tsne <- reactive({
     showNotification("tsne", id = "tsne", duration = NULL)
   }
   
-  pca <- pca()
+  pca <- pcaReact()
   # only recalculate when button is pressed.
   input$updatetsneParameters
   gQC_tsneDim <- isolate(input$gQC_tsneDim)
@@ -285,6 +285,7 @@ tsne <- reactive({
   return(retVal)
 })
 
+# tsneFunc ----
 tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_tsneSeed) {
   if (DEBUG) cat(file = stderr(), "tsneFunc started.\n")
   start.time <- base::Sys.time()
@@ -356,7 +357,7 @@ umapReact <- reactive({
   # UMAP2 <- input$um_umap2
   runUMAP <- input$activateUMAP
   scEx_log <- scEx_log()
-  pca <- pca()
+  pca <- pcaReact()
   
   myseed <- isolate(input$gQC_um_randSeed)
   n_neighbors <- isolate(as.numeric(input$gQC_um_n_neighbors))
@@ -448,7 +449,7 @@ myProjections <- list(
   c("umap", "umapReact")
 )
 
-# myHeavyCalculations ----
+# myHeavyCalculations 
 # declare function as heavy
 # myHeavyCalculations <- list(
 #   c("scaterReads", "scaterReads"),
@@ -456,7 +457,7 @@ myProjections <- list(
 # )
 
 
-#' tsnePlot
+#' tsnePlot ----
 #' function that plots in 3D the tsne projection
 tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
   if (DEBUG) cat(file = stderr(), "tsnePlot started.\n")
