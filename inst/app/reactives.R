@@ -1756,6 +1756,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     if (scale | center) {
       set.seed(1)
       x <- ScaleData(x, do.scale = scale, do.center = center, verbose = FALSE)
+      genesin = rownames(x) # ScaleData can remove genes.
     }
     if (useSeuratPCA){
       # Seurat:
