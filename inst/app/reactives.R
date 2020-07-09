@@ -1923,13 +1923,14 @@ scranCluster <- function(pca,
     # (as defined by calcAverage) below min.mean. This removes low-abundance genes with many
     # tied ranks, especially due to zeros, which may reduce the precision of the clustering.
     # We suggest setting min.mean to 1 for read count data and 0.1 for UMI data.
-    min.mean = 0.1,
-    BPPARAM = MulticoreParam(
-      workers = ifelse(detectCores() > 1, detectCores() - 1, 1)
-    ),
-    block.BPPARAM = MulticoreParam(
-      workers = ifelse(detectCores() > 1, detectCores() - 1, 1)
-    )
+    min.mean = 0.1
+    # ,
+    # BPPARAM = MulticoreParam(
+    #   workers = ifelse(detectCores() > 1, detectCores() - 1, 1)
+    # ),
+    # block.BPPARAM = MulticoreParam(
+    #   workers = ifelse(detectCores() > 1, detectCores() - 1, 1)
+    # )
   )
   switch(clusterSource,
          # "PCA" = {
