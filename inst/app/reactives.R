@@ -2252,11 +2252,112 @@ snnGraph <- function(){
     ),
     button = "updateClusteringParameters"
   )
-  
-  
   return(retVal)
-  
 }
+
+
+
+# simlrFunc ----
+simlrFunc  <- function(){
+  if (DEBUG) {
+    cat(file = stderr(), "simlrFunc started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "simlrFunc")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "simlrFunc")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("simlrFunc", id = "simlrFunc", duration = NULL)
+  }
+  
+  # scEx = scEx() # need to be run when updated
+  scEx_log = scEx_log()
+  # pca = pcaReact()
+  nClust = isolate(input$smilr_nClust)
+  maxClust = isolate(input$smilr_maxClust)
+  # clusterSource = isolate(input$snnClusterSource)
+  tabsetCluster = isolate(input$tabsetCluster)
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/simlrFunc_Clustering.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/simlrFunc_Clustering.RData")
+  
+  if (tabsetCluster != "simlrFunc" | is.null(scEx_log)){
+    return(NULL)
+  }
+
+  if(!"SIMLR" %in% rownames(installed.packages())) {
+    return(NULL)
+  }
+  require(SIMLR)
+  if (Sys.getenv("RSTUDIO") == "1" && !nzchar(Sys.getenv("RSTUDIO_TERM")) && 
+      Sys.info()["sysname"] == "Darwin" && getRversion() == "4.0.2") {
+    parallel:::setDefaultClusterOptions(setup_strategy = "sequential")
+  }
+  
+  retVal <- tryCatch(
+    {
+      if (nClust == 0) {
+         estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
+                                                    NUMC=2:maxClust,
+                                          cores.ratio = 1)
+         nClust = max(which.min(estimates$K1), which.min(estimates$K2))
+      }
+      sim = SIMLR(X = as.matrix(assays(scEx_log)[[1]]), 
+                  c = nClust, 
+                  cores.ratio = 1)
+      
+      cluster <- factor(sim$y$cluster)
+      cluster
+    },
+    error = function(e) {
+      cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("snnClusterError", id = "snnClusterError", type = "error", duration = NULL)
+      }
+      
+      return(NULL)
+    },
+    warning = function(e) {
+      if (DEBUG) cat(file = stderr(), paste("\nSNN clustering produced Warning:\n", e, "\n"))
+      cluster
+    }
+  )
+  if ("barcode" %in% colnames(colData(scEx_log))) {
+    barCode <- colData(scEx_log)$barcode
+  } else {
+    barCode <- rownames(colData(scEx_log))
+  }
+  
+  if (is.null(retVal)) {return(NULL)}
+  
+  
+  retVal <- data.frame(
+    Barcode = barCode,
+    Cluster = retVal
+  )
+  rownames(retVal) <- rownames(colData(scEx_log))
+  
+  setRedGreenButton(
+    vars = list(
+      # c("snnClusterSource", isolate(input$snnClusterSource)),
+      c("snnType", isolate(input$snnType)),
+      c("tabsetCluster", isolate(input$tabsetCluster)),
+      c("smilr_nClust", isolate(input$smilr_nClust)),
+      c("smilr_maxClust", isolate(input$smilr_maxClust))
+    ),
+    button = "updateClusteringParameters"
+  )
+  return(retVal)
+}
+
+
+
+
 # dbCluster ----
 dbCluster <- reactive({
   if (DEBUG) {

@@ -471,6 +471,27 @@ generalParametersTab <- function() {
                                  choices = c("rank", "number", "jaccard"))
                    )
                  )),
+        tabPanel("SMILR",
+                 value = "simlrFunc",
+                 width = 12,
+                 fluidRow(
+                   # column(
+                   #   width = 4,
+                   #   selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
+                   # ),
+                   column(
+                     width = 4,
+                     numericInput("smilr_nClust", "number of clusters (0 = estimate)", 
+                                  value = defaultValue("smilr_nClust", 10),
+                                  min = 0, max = 1000)
+                   ),
+                   column(
+                     width = 4,
+                     numericInput("smilr_maxClust", "max number of clusters when estimating)", 
+                                  value = defaultValue("smilr_maxClust", 20),
+                                  min = 2, max = 1000)
+                   )
+                 )),
         fluidRow(
           column(12, offset = 0, textOutput("Nclusters"))
         ),
