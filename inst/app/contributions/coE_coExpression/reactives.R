@@ -404,6 +404,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
                                 dbCluster, coE_showPermutations = FALSE, sampCol, ccols) {
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc started.\n")
   start.time <- base::Sys.time()
+  require(BiocParallel)
   on.exit({
     printTimeEnd(start.time, "coE_geneGrp_vioFunc")
     if (!is.null(getDefaultReactiveDomain())) {
