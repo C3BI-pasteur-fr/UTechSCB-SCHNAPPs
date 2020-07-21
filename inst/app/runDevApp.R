@@ -15,7 +15,7 @@ defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
-# historyPath = NULL
+historyPath = NULL
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
