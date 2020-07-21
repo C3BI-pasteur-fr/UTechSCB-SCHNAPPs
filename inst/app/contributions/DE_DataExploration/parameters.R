@@ -622,7 +622,7 @@ DE_logNormalizationGenefunc <- function(scEx, inputGenes, scalingFactor = 10000)
   # bc_sums <- Matrix::colSums(assays(scEx)[[1]])
   # median_sum <- median(bc_sums)
   genesin <- geneName2Index(inputGenes, rowData(scEx))
-  if (is_empty(genesin)) {
+  if (rlang::is_empty(genesin)) {
     genesin <- rownames(scEx)
   }
   A <- as(assays(scEx)[[1]], "dgTMatrix")
