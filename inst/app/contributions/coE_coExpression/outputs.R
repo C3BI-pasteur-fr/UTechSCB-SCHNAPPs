@@ -146,10 +146,11 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     })
   }
   
-  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- serializePlots(retVal)
-   exportTestValues(coE_geneGrp_vio_plot = {
-     serializePlots(retVal)
-  })
+  # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- serializePlots(retVal)
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
+  #  exportTestValues(coE_geneGrp_vio_plot = {
+  #    serializePlots(retVal)
+  # })
   return(retVal)
 })
 
