@@ -1769,7 +1769,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
       # # scran:
       x <- t(x)
       pca <- runPCA(x, rank=rank, get.rotation=TRUE, BPPARAM = BiocParallel::SerialParam())
-    PARAM}
+    }
     
     # pca$x[1:3,1:3]
     rownames(pca$rotation) = genesin
@@ -2672,7 +2672,7 @@ initializeGroupNames <- reactive({
     # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
     # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
     # this will invalidate all previous selections.
-    if (is_empty(grpNs) | !all(colnames(scEx) %in% rownames(grpNs))) {
+    if (rlang::is_empty(grpNs) | !all(colnames(scEx) %in% rownames(grpNs))) {
       df <-
         data.frame(
           all = rep(TRUE, dim(scEx)[2]),
