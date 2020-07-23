@@ -1755,12 +1755,12 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     # }
     if (scale | center) {
       set.seed(1)
-      x <- ScaleData(x, do.scale = scale, do.center = center, verbose = T, BPPARAM = BiocParallel::SerialParam())
+      x <- ScaleData(x, do.scale = scale, do.center = center, verbose = T)
       genesin = rownames(x) # ScaleData can remove genes.
     }
     if (useSeuratPCA){
       # Seurat:
-      reductObj = RunPCA(x, rank = rank, verbose = FALSE, assay = "RNA", BPPARAM = BiocParallel::SerialParam())
+      reductObj = RunPCA(x, rank = rank, verbose = FALSE, assay = "RNA")
       pca = list()
       pca$rotation = Loadings(reductObj)
       pca$x = Embeddings(reductObj)

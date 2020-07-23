@@ -99,7 +99,7 @@ if (all(c("future", "parallel") %in% rownames(installed.packages()))) {
   library(future)
   options(future.globals.maxSize = 4000 * 1024^2)
   maxCores <- parallel::detectCores() - 1
-  maxCores <- 4 # 32GB memory
+  maxCores <- 1 # 32GB memory
   plan("multiprocess", workers = maxCores)
 }
 

@@ -146,6 +146,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     })
   }
   
+  # removed because it was too long and took too much memory
   # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- serializePlots(retVal)
   .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
   #  exportTestValues(coE_geneGrp_vio_plot = {
