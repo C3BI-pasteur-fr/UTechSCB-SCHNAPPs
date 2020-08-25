@@ -1,8 +1,11 @@
-pandoc: 2.7.2
-pkgdown: 1.4.1
+pandoc: '2.4'
+pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   Readme: Readme.html
   FAQs: pkdown/FAQs.html
   SCHNAPPs_usage: pkdown/SCHNAPPs_usage.html
+  child.tartour.anova: pkdown/children/child.tartour.anova.html
+  customReportFromHistory: pkdown/customReportFromHistory.html
+last_built: 2020-08-25T14:18Z
 

@@ -19,13 +19,13 @@ Basic information is already provided in the history. Here we just show how to c
 # not yet in implemented but should be
 
 
-```{r}
+```{r, eval=FALSE}
 sampNames <- levels(colData(scEx)$sampleNames)
 sampleCols=list()
 sampleCols$colPal <- allowedColors[seq_along(sampNames)]
 ```
 
-```{r}
+```{r, eval=FALSE}
 source("../../inst/app/contributions/sCA_subClusterAnalysis/reactives.R")
 ```
 
@@ -34,7 +34,7 @@ source("../../inst/app/contributions/sCA_subClusterAnalysis/reactives.R")
 
 ## histogram raw counts
 
-```{r histogram raw counts}
+```{r histogram raw counts, eval=FALSE}
 dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
 dat$sample <- colData(scEx)$sampleNames
 scols <- sampleCols$colPal
@@ -48,7 +48,7 @@ retVal
 
 ## sample info
 
-```{r sampleInfo}
+```{r sampleInfo, eval=FALSE}
 samples = colData(scEx)$sampleNames
 counts <- table(samples)
 df <- as.data.frame(counts)
@@ -59,12 +59,12 @@ ggplot(data = df,aes(x=samples, y=Freq, fill=samples)) + geom_bar(stat = "identi
 
 ## Violin Plot
 
-```{r}
+```{r, eval=FALSE}
 source("../../inst/app/contributions/coE_coExpression//reactives.R")
 ```
 
 
-```{r violin}
+```{r violin, eval=FALSE}
   geneListStr <- c("PDCD1")
   projectionVar <- "dbCluster"
   minExpr <- 1
@@ -101,7 +101,7 @@ retVal
 ## panel plot
 
 
-```{r,fig.height=60, fig.width=12}
+```{r,fig.height=60, fig.width=12, eval=FALSE}
   .schnappsEnv <- new.env(parent=emptyenv())
 
 source("~/Rstudio/Schnapps/inst/app/contributions/DE_DataExploration/reactives.R")
@@ -125,7 +125,7 @@ retVal
 ## 2D plot (module)
 
 
-```{r}
+```{r, eval=FALSE}
 # g_id should be a valid rowname
 # geneNames needed for umicounts
 # geneNames2 needed for umicounts2
@@ -165,7 +165,7 @@ p1
 The som as implemented in SCHNAPPs will cluster the genes and output genes that cluster with a target gene. This makes sense when looking a given dbCluster and try to identify co-expressed genes. 
 Here, we go through all the clusters and print out those groups of genes
 
-```{r}
+```{r, eval=FALSE}
 suppressMessages(require(kohonen))
 suppressMessages(require(Rsomoclu))
 iData = as.matrix(assays(scEx_log)[[1]])
@@ -199,7 +199,7 @@ cols2use <- which(projections$dbCluster == dbCl)
 ## custom DGE
 
 
-```{r}
+```{r, eval=FALSE}
 myDiffExpFunctions <- list(
   c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
   c("t-test", "sCA_dge_ttest"),
@@ -246,24 +246,24 @@ DT::datatable(top.genes)
 
 requires specific sample names and projections (lung) data cannot be shared but this can be used as a template nonetheless
 
-```{R}
+```{R, eval=FALSE}
 #load scEx
 load(file = "~/Rstudio/Schnapps/history/hist_2020-Feb-19.13.03/scEx.360f308aaa23.RData")
 ```
 
-```{R}
+```{R, eval=FALSE}
 #load scEx_log
 load(file = "~/Rstudio/Schnapps/history/hist_2020-Feb-19.13.03/scEx_log.360f5fa7f8ba.RData")
 ```
 
 
-```{R}
+```{R, eval=FALSE}
 #load projections with umap
 load(file = "~/Rstudio/Schnapps/history/hist_2020-Feb-19.13.03/projections.360f2ba33a1b.RData")
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 
 scEx <- scEx$scEx
 featureData <- rowData(scEx)
@@ -280,7 +280,7 @@ projectionsAll = projections
 
 
 
-```{r cell types}
+```{r cell types, eval=FALSE}
 cellTypeMarkers = list(
   t.cells = c("CD3G", "CD3D", "CD3E", "CD2"),
   cd8 = c("CD8A", "GZMA"), # CD8+ T cells

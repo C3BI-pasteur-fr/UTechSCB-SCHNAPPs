@@ -1,19 +1,19 @@
 ### summary stats on input data
 
-```{r}
+```{r, eval=FALSE}
 cat(file = stderr(), paste(anovaName, "\n"))
 ```
 
 
 #### number of umis per sample
 
-```{r}
+```{r, eval=FALSE}
 table(projections$sampleNames)
 ```
 
 #### number umis per organ (lung = TRUE)
 
-```{r}
+```{r, eval=FALSE}
 table(projections$lung)
 ```
 
@@ -21,7 +21,7 @@ table(projections$lung)
 ### full table
 
 
-```{R}
+```{R, eval=FALSE}
 
 rData <- rowData(inputData)
 cellMeta <- colData(inputData)
@@ -53,7 +53,7 @@ DT::datatable(as.data.frame(aov2Results[!is.na(aov2Results$`F value`), ]))
 
 ### table genes of interest
 
-```{r}
+```{r, eval=FALSE}
 tmp = aov2Results[intGenes, ]
 intGenes[is.na(tmp$symbol)]
 tmp = tmp[!is.na(tmp$symbol),]
@@ -69,7 +69,7 @@ pValIntGenes[,anovaName] = intGTable[rownames(pValIntGenes), "Pr..F."]
 
 ### Panel plot samples/count (gene of interest)
 
-```{r,fig.height=60, fig.width=12}
+```{r,fig.height=60, fig.width=12, eval=FALSE}
   .schnappsEnv <- new.env(parent=emptyenv())
 
 source("~/Rstudio/Schnapps/inst/app/contributions/DE_DataExploration/reactives.R")
@@ -92,7 +92,7 @@ retVal
 
 ### Panel plot lung/count (gene of interest)
 
-```{r,fig.height=60, fig.width=12}
+```{r,fig.height=60, fig.width=12, eval=FALSE}
 retVal = panelPlotFunc(inputData, projections, intGenes, "lung", "UMI.count", FALSE, 4, "lung/kidney", colnames(inputData)) 
 retVal
 ```
@@ -102,13 +102,13 @@ retVal
 
 Interesting genes defined as having a sum of squares >2 and a Pr(>F) < 0.05
 
-```{r}
+```{r, eval=FALSE}
 interestingRes = aov2Results[aov2Results$`Sum Sq`>2 & aov2Results$`Pr(>F)`<0.05,]
 DT::datatable(as.data.frame(interestingRes))
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 genesIn = rownames(interestingRes)[order(interestingRes$`Pr(>F)`,na.last = T,decreasing = F)[1:18]]
 tmp = t(apply(assays(inputData[interestingRes[genesIn,"ensg"],])[[1]],1,FUN = function(x) {table(projections[which(x>0),"lung"])}))
 rownames(tmp) = featureData[rownames(tmp), "symbol"]
@@ -116,7 +116,7 @@ colnames(tmp) = c("lung", "kidney")
 DT::datatable(tmp, caption = "Table of genes which are 'significant' and how many cells expressing that gene  per organ")
 ```
 
-```{r}
+```{r, eval=FALSE}
 tmp = t(apply(assays(inputData[interestingRes[genesIn,"ensg"],])[[1]],1,FUN = function(x) {table(projections[which(x>0),"sampleNames"])}))
 rownames(tmp) = featureData[rownames(tmp), "symbol"]
 # colnames(tmp) = c("lung", "kidney")
@@ -126,7 +126,7 @@ DT::datatable(tmp, caption = "Table of genes which are 'significant' and how man
 
 
 
-```{r,fig.height=18, fig.width=12}
+```{r,fig.height=18, fig.width=12, eval=FALSE}
 
 
 retVal = panelPlotFunc(inputData, projections, genesIn, "sampleNames", "UMI.count", FALSE, 3, "best 9 genes all samples", rownames(projections)) 
@@ -137,14 +137,14 @@ retVal
 
 ### Panel plot lung/count (best)
 
-```{r,fig.height=18, fig.width=12}
+```{r,fig.height=18, fig.width=12, eval=FALSE}
 retVal = panelPlotFunc(inputData, projections, genesIn, "lung", "UMI.count", FALSE, 3, "best 9 genes lung/kidney", colnames(inputData)) 
 retVal
 ```
 
 ### Panel plot UMAP1/2 (best)
 
-```{r,fig.height=18, fig.width=12}
+```{r,fig.height=18, fig.width=12, eval=FALSE}
 
 if ("UMAP1" %in% colnames(projections)) {
   retVal = panelPlotFunc(inputData, projections, genesIn, "UMAP1", "UMAP2", FALSE, 3, "best genes ", colnames(inputData)) 
@@ -156,7 +156,7 @@ retVal
 
 ### Panel plot PC1/2 (best)
 
-```{r,fig.height=18, fig.width=12}
+```{r,fig.height=18, fig.width=12, eval=FALSE}
 retVal = panelPlotFunc(inputData, projections, genesIn, "PC1", "PC2", FALSE, 3, "best  genes ", colnames(inputData)) 
 retVal
 ```
