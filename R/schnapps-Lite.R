@@ -69,6 +69,13 @@ schnappsLite <- function(data="RdataFile",
   assign("defaultValues", defaultValues, envir = .schnappsEnv)
   # assign("historyFile", historyFile, envir = .schnappsEnv)
   
+  # dummy function to satisfy the checker
+  # this function will be defined when serverFunctions.R is read
+  # ui.R, reactives.R, server.R (inst/app)
+  loadLiteData <- function(file="") {
+    file
+  }
+  
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL
   scShinyServer <- NULL
@@ -128,5 +135,4 @@ schnappsLite <- function(data="RdataFile",
 # library(SCHNAPPs)
 #
 # schnapps(localContributionDir = "~/Rstudio/__shHubgit/bjContributions",  defaultValueSingleGene = "cd52", defaultValueMultiGenes = "S100A4, CD52, S100A9, S100A8,")
-
 
