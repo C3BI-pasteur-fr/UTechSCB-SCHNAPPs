@@ -14,14 +14,10 @@ LazyData: true
 Depends: 
     R (>= 3.6)
 Imports:
-    dplyr,
-    shiny,
     shinyjs,
     colourpicker,
     DT,
-    knitr,
     manhattanly,
-    mclust,
     ggalluvial,
     pheatmap,
     psychTools,
@@ -29,24 +25,20 @@ Imports:
     scater,
     scran,
     Seurat,
-    shinydashboard,
     shinydashboardPlus,
     shinythemes,
     shinyTree,
     shinyWidgets,
-    SingleCellExperiment,
     ggpubr,
     SummarizedExperiment,
     threejs,
-    BiocParallel,
     tidyverse,
-    multtest,
     TRONCO,
-    rintrojs,
-    tibble
-Suggests:
+    rintrojs
+suggests:
     igraph,
     future,
+    multtest,
     vembedr,
     parallel,
     reshape2,
@@ -70,7 +62,7 @@ Suggests:
     debugme,
     shinyBS,
     crayon
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 URL: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs
 BugReports: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues
 biocViews: Visualization, GUI, DimensionReduction, 
