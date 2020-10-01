@@ -3,7 +3,7 @@ suppressMessages(require(Seurat))
 suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
-source(paste0(packagePath, "/outputs.R"), local = TRUE)
+# base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
 
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
@@ -36,87 +36,6 @@ if ("crayon" %in% rownames(installed.packages()) == FALSE) {
 } else {
   require(crayon)
 }
-
-# dimPlotPCA ----
-# <- reactive({
-output$dimPlotPCA <- renderPlot({
-  if (DEBUG) {
-    cat(file = stderr(), "dimPlotPCA started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "dimPlotPCA")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "dimPlotPCA")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("dimPlotPCA", id = "dimPlotPCA", duration = NULL)
-  }
-  
-  input$updateDimPlot
-  scEx_log <- isolate(scEx_log())
-  scEx <- isolate(scEx())
-  pca <- isolate(pcaReact())
-  if (is.null(scEx_log)) {
-    if (DEBUG) {
-      cat(file = stderr(), "dimPlotPCA:NULL\n")
-    }
-    return(0)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
-  }
-  # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
-  
-  # return NuLL because it is not working correctly
-  # return(NULL)
-  
-  scEx = scEx[rownames(pca$rotation),]
-  scEx_log = scEx_log[rownames(pca$rotation),]
-  
-  cellMeta = colData(scEx_log)
-  rData = rowData(scEx)
-  meta.data = cellMeta[,"sampleNames", drop = FALSE]
-  dat = assays(scEx)[[1]][rownames(scEx_log),]
-  rownames(dat) = rData[rownames(scEx_log),"symbol"]
-  rownames(pca$rotation) = rData[rownames(pca$rotation),"symbol"]
-  seurDat <- CreateSeuratObject(
-    counts = dat,
-    meta.data = meta.data
-  )
-  
-  # TODO use scEx_log
-  logDat = assays(scEx_log)[[1]]
-  rData = rowData(scEx_log)
-  rownames(logDat) = rData$symbol
-  seurDat@assays$RNA@data = as(logDat,"dgCMatrix")
-  # seurDat <- NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
-  # seurDat <- FindVariableFeatures(seurDat, selection.method = "vst", nfeatures = 2000)
-  
-  # recalculating because createDimReducObject is not working
-  all.genes <- rownames(seurDat)
-  # seurDat <- ScaleData(seurDat, features = all.genes)
-  # seurDat <- RunPCA(seurDat, features = VariableFeatures(object = seurDat))
-  
-  colnames(pca$x) = str_replace(colnames(pca$x), "PC", "PC_")
-  ndim = min(15,ncol(pca$x))
-  # pca.res = irlba(A=t(x=seurDat@assays$RNA@data), nv=50)
-  # not working
-  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
-                                          loadings = pca$rotation, 
-                                          stdev = pca$var_pcs, 
-                                          key = "PC_", 
-                                          assay = "RNA")
-  # seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
-  
-  # DimPlot(seurDat, reduction = "pca")
-  
-  d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'data',
-                 balanced = TRUE, fast = TRUE, projected = FALSE, 
-                 reduction = "pca")
-  d
-})
 
 # add comment to history ----
 
