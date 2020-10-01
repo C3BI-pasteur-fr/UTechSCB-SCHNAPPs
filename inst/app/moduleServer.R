@@ -848,7 +848,7 @@ tableSelectionServer <- function(input, output, session,
   assign(ns("modSelectedRows"), c(), envir = .schnappsEnv)
   assign(ns("currentStart"), 0, envir = .schnappsEnv)
   
-  observe(label = "cellNameTable", {
+  observe(label = "cellNameTablesave2Hist", {
     clicked <- input$save2HistTabUi
     myns <- session$ns("cellNameTable")
     if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi \n")
@@ -877,16 +877,16 @@ tableSelectionServer <- function(input, output, session,
   
   
   output$rowSelection <- renderText({
-    if (DEBUG) cat(file = stderr(), "cellSelection\n")
+    if (DEBUG) cat(file = stderr(), "rowSelection\n")
     start.time <- Sys.time()
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
-        printTimeEnd(start.time, "cellSelection")
-        removeNotification(id = "cellSelection")
+        printTimeEnd(start.time, "rowSelection")
+        removeNotification(id = "rowSelection")
       }
     )
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("cellSelection", id = "cellSelection", duration = NULL)
+      showNotification("rowSelection", id = "rowSelection", duration = NULL)
     }
     
     ns <- session$ns
@@ -911,11 +911,11 @@ tableSelectionServer <- function(input, output, session,
       return(NULL)
     }
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("cellSelection", id = "cellSelection", duration = NULL)
+      showNotification("rowSelection", id = "rowSelection", duration = NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
-        file = paste0("~/SCHNAPPsDebug/cellSelection-", ns("bkup"), ".RData", collapse = "."),
+        file = paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".RData", collapse = "."),
         list = c(ls())
       )
     }
@@ -934,16 +934,17 @@ tableSelectionServer <- function(input, output, session,
       # with just scEx we will cannot display the genes in the removed table
       # TODO need to check what we are comparing here. Just added "rowData(scEx)$symbol" because genes were not showing in some tables
       # also check that removed genes / cells table are working
-      retVal <- retVal[retVal %in% c(rowData(scEx)$symbol, inputData$symbol, colnames(scEx))]
+      # retVal <- retVal[retVal %in% c(rowData(scEx)$symbol, inputData$symbol, colnames(scEx))]
       retVal <- paste0(retVal, collapse = ", ")
     } else {
       retVal <- NULL
     }
     
-    printTimeEnd(start.time, "tableSelectionServer-cellSelection")
+    printTimeEnd(start.time, "tableSelectionServer-rowSelection")
     exportTestValues(tableSelectionServercellSelection = {
       retVal
     })
+    if (DEBUG) cat(file = stderr(), paste("rowSelection retval: ",retVal, "\n"))
     return(retVal)
   })
   
@@ -970,10 +971,10 @@ tableSelectionServer <- function(input, output, session,
   })
   
   # observe: cellNameTable_rows_selected ----
-  observe(label = "ob44", {
-    if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_rows_selected\n")
-    assign(ns("modSelectedRows"), input$cellNameTable_rows_selected, envir = .schnappsEnv)
-  })
+  # observe(label = "ob44", {
+  #   if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_rows_selected\n")
+  #   assign(ns("modSelectedRows"), input$cellNameTable_rows_selected, envir = .schnappsEnv)
+  # })
   
   # observe: cellNameTable_state ----
   observe(label = "ob45", {
@@ -1007,7 +1008,7 @@ tableSelectionServer <- function(input, output, session,
     ns <- session$ns
     nsStr <- ns("-")
     reorderCells <- input$reorderCells
-    selectedRows <- input$cellNameTable_rows_selected
+    selectedRows <- isolate(input$cellNameTable_rows_selected)
     showAllCells <- input$showAllCells
     showRowNames <- input$showRowNames
     
@@ -1063,7 +1064,9 @@ tableSelectionServer <- function(input, output, session,
       dtout <- DT::datatable(dataTables,
                              rownames = showRowNames,
                              filter = "top",
-                             selection = list(mode = "multiple", selected = get(ns("modSelectedRows"), envir = .schnappsEnv)),
+                             selection = list(mode = "multiple"
+                                              # , selected = get(ns("modSelectedRows"), envir = .schnappsEnv)
+                                              ),
                              options = list(
                                orderClasses = TRUE,
                                autoWidth = TRUE,
