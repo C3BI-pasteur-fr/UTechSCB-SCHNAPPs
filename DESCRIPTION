@@ -14,11 +14,14 @@ LazyData: true
 Depends: 
     R (>= 3.6)
 Imports:
+    DT,
     dplyr,
     shiny,
+    shinyTree,
+    shinydashboard
+Suggests:
     shinyjs,
     colourpicker,
-    DT,
     knitr,
     manhattanly,
     mclust,
@@ -29,10 +32,8 @@ Imports:
     scater,
     scran,
     Seurat,
-    shinydashboard,
     shinydashboardPlus,
     shinythemes,
-    shinyTree,
     shinyWidgets,
     SingleCellExperiment,
     ggpubr,
@@ -43,8 +44,7 @@ Imports:
     multtest,
     TRONCO,
     rintrojs,
-    tibble
-Suggests:
+    tibble,
     igraph,
     future,
     vembedr,
