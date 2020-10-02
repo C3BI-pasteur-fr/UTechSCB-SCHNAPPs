@@ -39,7 +39,6 @@ Shiny app (referred to as "app" in this document) for the exploration and analys
 ```
 if (!require("devtools"))
   install.packages("devtools")
-devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("BiocSingular")
