@@ -1,4 +1,5 @@
 suppressMessages(require(tibble))
+suppressMessages(require(Seurat))
 suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
@@ -1307,7 +1308,7 @@ scExFunc <-
     # TODO something is fishy here
     scExNew <- scExOrg[keepGenes, keepCells]
     if (changed) {
-      cat(file = stderr(), "--- scExFunc chagged\n")
+      cat(file = stderr(), "--- scExFunc changed\n")
       scExNew <-
         scExFunc(scExOrg[keepGenes, keepCells], useCells[keepCells], useGenes[keepGenes], minGene, minG, maxG)
       if (is.null(scExNew)) {
