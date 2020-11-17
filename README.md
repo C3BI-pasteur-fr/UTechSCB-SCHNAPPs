@@ -17,13 +17,13 @@ https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1
 update.packages()
 if (!require("devtools"))
   install.packages("devtools")
-devtools::install_github("mul118/shinyMCE")
+# devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 # update bioconductor packages if required
 BiocManager::install()
-BiocManager::install("BiocSingular")
-BiocManager::install("SingleR")
+# BiocManager::install("BiocSingular")
+BiocManager::install("SingleR") # needed to prepare data.
 devtools::install_github("haowulab/Wind")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 ```
