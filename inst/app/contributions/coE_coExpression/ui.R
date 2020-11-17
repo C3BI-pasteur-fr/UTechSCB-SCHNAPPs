@@ -11,7 +11,8 @@ menuList <- list(
                            shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
                            shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
                            shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
-                           shinydashboard::menuSubItem("alluvialTab", tabName = "alluvialTab")
+                           if(("ggalluvial" %in% rownames(installed.packages())))
+                             shinydashboard::menuSubItem("alluvialTab", tabName = "alluvialTab")
                            # shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )

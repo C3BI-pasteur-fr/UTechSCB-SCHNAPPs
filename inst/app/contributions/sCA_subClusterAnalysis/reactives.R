@@ -118,6 +118,7 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   if (!"DESeq2" %in% rownames(installed.packages())) {
     warning("Please install DESeq2 - learn more at https://bioconductor.org/packages/release/bioc/html/DESeq2.html")
     showNotification("Please install DESeq2", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
+    return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls()))
@@ -204,6 +205,7 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   if (!"DESeq2" %in% rownames(installed.packages())) {
     warning("Please install DESeq2 - learn more at https://bioconductor.org/packages/release/bioc/html/DESeq2.html")
     showNotification("Please install DESeq2", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
+    return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls()))
@@ -392,6 +394,13 @@ sCA_dge <- reactive({
     cells.1 = gCells$c1, cells.2 = gCells$c2
   ))
 
+  if(is.null(retVal)) {
+    return(NULL)
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("dge: NULL,did you install everything?", id = "dgewarning", duration = 10, type = "warning")
+    }
+  }
+  
   if (nrow(retVal) == 0) {
     if (DEBUG) cat(file = stderr(), "dge: nothing found\n")
     if (!is.null(getDefaultReactiveDomain())) {
