@@ -16,7 +16,7 @@ if ("shinyBS" %in% rownames(installed.packages())) {
   # tabs.R
   # must not contain "\n", or other special characters.
   .schnappsEnv$sbTT_file1 <- bsPopover("file1", title = "", "input file with csv data or an RData/RDs file with SingleCellExperiment objects. If multiple files are given only common genes are used. Projections/colData is filled with NA values. csv files cannot be combined.")
-  .schnappsEnv$sbTT_sampleInput <- bsPopover("sampleInput", title = "", "sub sample. In case logcount data is provided and used (see use scEx from loaded data) only the cells sampled will be used.")
+  .schnappsEnv$sbTT_sampleInput <- bsPopover("sampleInput", title = "", "sub sample this amount of cells from each sample. In case logcount data is provided and used (see use scEx from loaded data) only the cells sampled will be used.")
   .schnappsEnv$sbTT_subsampleNum <- bsPopover("subsampleNum", title = "", "max number of cells")
   .schnappsEnv$sbTT_disablescEx_log <- bsPopover("disablescEx_log", title = "", "disable Normalization")
   .schnappsEnv$sbTT_beforeFilterRegEx <- bsPopover("beforeFilterRegEx", title = "", "regular expression to count genes/cell")

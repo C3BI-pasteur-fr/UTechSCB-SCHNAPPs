@@ -230,15 +230,18 @@ output$DE_panelPlot <- renderPlot({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c("scEx_log", "projections", "genesin",
+                                                               "dimx4", "dimy4", "sameScale", "nCol", "sampdesc" , "cellNs"
+                                                               ), compress = F)
   }
-  # load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
+  # cp = load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
 
   genesin <- toupper(genesin)
   genesin <- gsub(" ", "", genesin, fixed = TRUE)
   genesin <- strsplit(genesin, ",")
   genesin <- genesin[[1]]
 
+  if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
   retVal <- panelPlotFunc(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs )
 
   setRedGreenButton(
@@ -259,7 +262,18 @@ output$DE_panelPlot <- renderPlot({
   exportTestValues(DE_panelPlot = {
     ls()
   })
-  .schnappsEnv[["DE_panelPlot"]] <- retVal
+  af = panelPlotFunc
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  
+  .schnappsEnv[["DE_panelPlot"]] <- list(panelPlotFunc = af,
+                                         scEx_log = scEx_log, 
+                                         projections=projections, 
+                                         genesin=genesin, dimx4=dimx4, 
+                                         dimy4=dimy4, sameScale=sameScale, 
+                                         nCol=nCol, sampdesc=sampdesc,
+                                         cellNs=cellNs
+                                         )
   retVal
 })
 

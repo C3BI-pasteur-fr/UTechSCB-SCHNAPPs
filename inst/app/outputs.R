@@ -94,7 +94,7 @@ output$dimPlotPCA <- renderPlot({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
+  # cp =load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
   
   # return NuLL because it is not working correctly
   # return(NULL)
@@ -138,6 +138,7 @@ output$dimPlotPCA <- renderPlot({
   # seurDat <- ProjectDim(object = seurDat, reduction = "pca", assay = "RNA")
   
   # DimPlot(seurDat, reduction = "pca")
+  # seurDat <- ProjectDim(seurDat, reduction = "pca", assay = 'RNA')
   
   d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'data',
                  balanced = TRUE, fast = TRUE, projected = FALSE, 

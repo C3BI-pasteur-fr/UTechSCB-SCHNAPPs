@@ -146,9 +146,13 @@ clusterServer <- function(input, output, session,
       return()
     }
     add2history(
-      type = "renderPlotly", input = input,
-      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
-      comment = paste(myns)
+      type = "save", input = isolate( reactiveValuesToList(input)),
+      comment = paste("# ",myns, "\n",
+                      "# fun = plotData$plotData$panelPlotFunc\n", 
+                      "# environment(fun) = environment()\n",
+                      "# do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+      ),
+      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )
   })
   # clusterServer - updateInput ----
@@ -214,7 +218,6 @@ clusterServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("selectedCellNames", id = "selectedCellNames", duration = NULL)
     }
-    # browser()
     projections <- projections()
     req(projections)
     brushedPs <- plotly::event_data("plotly_selected", source = "subset")
@@ -240,6 +243,7 @@ clusterServer <- function(input, output, session,
       save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position"))
     }
     # load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
+    # browser()
     
     # in case no normalization is done
     if (is.null(scEx_log)) {
@@ -277,6 +281,12 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
     cells.names <- brushedPs$key
+    if (is.null(cells.names) )
+      if (length(brushedPs) >0)
+        if (nrow(brushedPs) > 0) {
+          cells.names = rownames(projections[which(projections[,dimX] %in% brushedPs$x & 
+                                                     projections[,dimY] %in% brushedPs$y),])
+        }
     cells.names <- cells.names[cells.names %in% colnames(scEx_log)]
     cells.names <- unique(cells.names[!is.na(cells.names)])
     # if (DEBUG) {
@@ -344,7 +354,9 @@ clusterServer <- function(input, output, session,
         grpSubset <- grpNs[rownames(subsetData), ]
         if (!grpN %in% colnames(grpSubset)) {
           if (!is.null(getDefaultReactiveDomain())) {
-            showNotification("group name is not available", id = "nogrpN", duration = NULL, type = "error")
+            # showing too often 
+            # TODO check why and where
+            # showNotification("group name is not available", id = "nogrpN", duration = NULL, type = "error")
           }
           return(NULL)
         }
@@ -492,7 +504,17 @@ clusterServer <- function(input, output, session,
     )
     
     # save p1 to .schnappsEnv for saving to history
-    .schnappsEnv[[paste0("historyPlot-", myns)]] <- p1
+    af = plot2Dprojection
+    # remove env because it is too big
+    environment(af) = new.env(parent = emptyenv())
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(panelPlotFunc = af,
+                                                         scEx_log,
+                                                         projections = tdata, g_id, featureData, geneNames,
+                                                         geneNames2, dimX, dimY, clId, grpN, legend.position,
+                                                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+    )
+    
+    # .schnappsEnv[[paste0("historyPlot-", myns)]] <- p1
     
     # add2history(type = "renderPlotly", plotData = p1, comment = paste(myns))
     # if (save2History) recHistory(myns, p1)
@@ -568,6 +590,7 @@ clusterServer <- function(input, output, session,
     isolate({
       # we should react on a changed filename, but that would imply calculating pca's etc directly after loading
       scEx <- scEx()
+      acn = allCellNames()
       prjs <- sessionProjections$prjs
       # brushedPs <- plotly::event_data("plotly_selected", source = "subset")
       # scEx <- scEx()
@@ -596,9 +619,9 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "save: changeGroups\n")
       save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls()))
       cat(file = stderr(), "done save: changeGroups\n")
-      # browser()
+      browser()
     }
-    # load(file="~/SCHNAPPsDebug/changeGroups.RData")
+    # cp = load(file="~/SCHNAPPsDebug/changeGroups.RData")
     # in case the cell selection has changed
     grpNs <- grpNs[colnames(scEx), ]
     if (!grpN %in% colnames(grpNs)) {
@@ -614,7 +637,8 @@ clusterServer <- function(input, output, session,
     groupNames$namesDF <- grpNs
     updateSelectInput(session, "groupNames",
                       choices = c("plot", colnames(grpNs)),
-                      selected = grpN
+                      # selected = grpN
+                      selected = "plot"
     )
     updateTextInput(
       session = session, inputId = "groupName",
@@ -622,22 +646,47 @@ clusterServer <- function(input, output, session,
     )
     
     if (ncol(prjs) > 0) {
-      # make sure we are working with the correct cells. This might change when cells were removed.
-      prjs <- prjs[colnames(scEx), ]
+      # We overwrite the common columns
+      comColPrjs = which(colnames(prjs) %in% colnames(grpNs) )
       # didn't find a way to easily overwrite columns
-      for (cn in colnames(grpNs)) {
-        if (cn %in% colnames(prjs)) {
-          prjs[, cn] <- grpNs[, cn]
-        } else {
-          prjs <- base::cbind(prjs, grpNs[, cn], deparse.level = 0)
-          colnames(prjs)[ncol(prjs)] <- cn
-        }
+      # we need to add 1 to comColPrjs because tibble added rownames column 
+      prjs[rownames(grpNs), comColPrjs] = grpNs[, comColPrjs]
+      
+      newColsGrpns = which(!colnames(grpNs) %in% colnames(prjs))
+      if(length(newColsGrpns) > 0) {
+        # prj has all the rows from the very first input data set.
+        # prjs <- tibble::rownames_to_column(prjs)
+        prjs <- dplyr::left_join(
+          tibble::rownames_to_column(prjs), 
+          tibble::rownames_to_column(grpNs[,newColsGrpns, drop=FALSE]), 
+          by='rowname')
+        rownames(prjs) = prjs[,1]
+        prjs = prjs[,-1]
       }
       
-      sessionProjections$prjs <- prjs
+      # for (cn in colnames(grpNs)) {
+      #   if (cn %in% colnames(prjs)) {
+      #     prjs[, cn] <- grpNs[, cn]
+      #   } else {
+      #     prjs <- base::cbind(prjs, grpNs[, cn], deparse.level = 0)
+      #     colnames(prjs)[ncol(prjs)] <- cn
+      #   }
+      # }
+      
+      # sessionProjections$prjs <- prjs
     } else {
-      sessionProjections$prjs <- grpNs
+      prjs = data.frame(row.names = acn)
+      prjs <- dplyr::left_join(
+        tibble::rownames_to_column(prjs), 
+        tibble::rownames_to_column(grpNs), 
+        by='rowname')
+      rownames(prjs) = prjs[,1]
+      prjs = prjs[,-1]
     }
+    prjs[is.na(prjs)] <- FALSE
+    prjs$all = TRUE
+    if ('rowname' %in% colnames(prjs)) prjs = prjs [,-which(colnames(prjs)=='rowname')]
+    sessionProjections$prjs = prjs
     selectedGroupName <<- grpN
   })
   
@@ -870,7 +919,7 @@ tableSelectionServer <- function(input, output, session,
     }
     req(.schnappsEnv[[paste0("historyPlot-", myns)]])
     add2history(
-      type = "renderDT", input = input, comment = "Table",
+      type = "renderDT", input = isolate( reactiveValuesToList(input)), comment = "Table",
       tableData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )
   })
@@ -948,7 +997,7 @@ tableSelectionServer <- function(input, output, session,
     return(retVal)
   })
   
-  proxy <- DT::dataTableProxy(ns("cellNameTable"))
+  proxy <- DT::dataTableProxy("cellNameTable")
   
   observeEvent(input$selectAll, {
     if (DEBUG) cat(file = stderr(), "observe input$selectAll\n")
@@ -1029,7 +1078,13 @@ tableSelectionServer <- function(input, output, session,
     
     maxCol <- min(20, ncol(dataTables))
     if (dim(dataTables)[1] > 1) {
-      numericCols <- colnames(dataTables %>% select_if(is.numeric))
+      # if the number of columns is big this can take really long
+      # but this only happens if we are plotting the count matrix, so we assume that all columns are numeric
+      if( ncol(dataTables) > 1000) {
+        numericCols <- colnames(dataTables)
+      } else {
+        numericCols <- colnames(dataTables %>% select_if(is.numeric)) 
+      }
       nonNumericCols <- which(!colnames(dataTables) %in% numericCols) # to keep non numeric columns...
       numericCols <- which(colnames(dataTables) %in% numericCols)
       if (reorderCells && length(selectedRows) > 0) {
@@ -1040,7 +1095,7 @@ tableSelectionServer <- function(input, output, session,
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
       if (showAllCells) cols2disp <- colnames(dataTables)
-      dataTables <- as.data.frame(dataTables[1:100, cols2disp])
+      dataTables <- as.data.frame(dataTables[, cols2disp])
       colState <- get(ns("colState"), envir = .schnappsEnv)
       if (length(colState) == 0) {
         colState <- list(
@@ -1066,7 +1121,7 @@ tableSelectionServer <- function(input, output, session,
                              filter = "top",
                              selection = list(mode = "multiple"
                                               # , selected = get(ns("modSelectedRows"), envir = .schnappsEnv)
-                                              ),
+                             ),
                              options = list(
                                orderClasses = TRUE,
                                autoWidth = TRUE,
@@ -1146,7 +1201,7 @@ pHeatMapModule <- function(input, output, session,
       return()
     }
     add2history(
-      type = "tronco", input = input,
+      type = "tronco", input = isolate( reactiveValuesToList(input)),
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
       comment = paste(myns)
     )
@@ -1216,7 +1271,8 @@ pHeatMapModule <- function(input, output, session,
   })
   
   # pHeatMapModule - pHeatMapPlot ----
-  output$pHeatMapPlot <- renderImage({
+  output$pHeatMapPlot <- renderImage(deleteFile = T,
+                                     {
     if (DEBUG) cat(file = stderr(), "pHeatMapPlot started.\n")
     start.time <- base::Sys.time()
     on.exit({

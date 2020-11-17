@@ -231,21 +231,6 @@ output$alluvial_plot <- renderPlot({
     showNotification("alluvial_plot", id = "alluvial_plot", duration = NULL)
   }
   
-  # load reactive data
-  if (DEBUG) {
-    cat(file = stderr(), "alluvial_plot started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "alluvial_plot")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "alluvial_plot")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("alluvial_plot", id = "alluvial_plot", duration = NULL)
-  }
-  
   projections <- projections()
   alluiv1 <- input$alluiv1
   alluiv2 <- input$alluiv2
@@ -263,8 +248,6 @@ output$alluvial_plot <- renderPlot({
   if(!alluiv2 %in% colnames(projections)) {
     return(NULL)
   }
-  # some debugging messages
-  if (DEBUG) cat(file = stderr(), paste("alluvial_plot:\n"))
   # for development and debugging purposes
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/alluvial_plot.RData", list = c(ls()))
@@ -273,43 +256,41 @@ output$alluvial_plot <- renderPlot({
   
   dat = projections[,c(alluiv1, alluiv2)]
   # dat$cells = rownames(projections)
-  gg = ggplot(as.data.frame(dat),
-              aes_string(  axis1 = alluiv1, axis2 = alluiv2)) +
-    geom_alluvium(aes_string(fill = alluiv1), width = 1/12) +
-    geom_stratum(width = 1/12, fill = "black", color = "grey") +
-    geom_label(stat = "stratum", infer.label = TRUE) +
-    scale_x_discrete(limits = c(alluiv1, alluiv2), expand = c(.05, .05)) +
-    scale_fill_brewer(type = "qual", palette = "Set1") +
-    ggtitle(paste("Alluvial plot of ", alluiv1, "and", alluiv2))
+  gg = alluvialPlotFunc(dat, alluiv1, alluiv2) 
+  af = alluvialPlotFunc
+  environment(af) = new.env(parent = emptyenv())
+  # for saving to history
+  .schnappsEnv[["coE_alluvialPlot"]] <- list(panelPlotFunc = af,
+                                         dat = dat, 
+                                         alluiv1=alluiv1, 
+                                         alluiv2=alluiv2)
   
- 
-  # create and return the plot
-  # ggalluvial::(dummyNRow)
   return(gg)
 })
 
 # observe alluiv ----
 observe({
-  projections <- projections()
-  
-  req(projections)
+  # projections <- projections()
+  # 
+  # req(projections)
+  projF = projFactors()
   # save(file = "~/SCHNAPPsDebug/alluvial_plot2.RData", list = c(ls(), ls(envir = globalenv())))
   # load(file="~/SCHNAPPsDebug/alluvial_plot2.RData")
-  facs = which(lapply(projections, class) == "factor")
-  idx=1
-  for (ff in facs){
-    if(length(levels(projections[,ff]))>100){
-      facs = facs[-idx]
-    }
-    idx = idx + 1
-  }
+  # facs = which(lapply(projections, class) == "factor")
+  # idx=1
+  # for (ff in facs){
+  #   if(length(levels(projections[,ff]))>100){
+  #     facs = facs[-idx]
+  #   }
+  #   idx = idx + 1
+  # }
   
   updateSelectInput(session, "alluiv1",
-                    choices = c(colnames(projections)[facs]),
+                    choices = projF,
                     selected = .schnappsEnv$alluiv1
   )
   updateSelectInput(session, "alluiv2",
-                    choices = c(colnames(projections)[facs]),
+                    choices = projF,
                     selected = .schnappsEnv$alluiv2
   )
 })

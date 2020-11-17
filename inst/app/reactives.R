@@ -19,7 +19,15 @@ clusterCols <- reactiveValues(colPal = allowedColors)
 
 # Here, we store projections that are created during the session. These can be selections of cells or other values that
 # are not possible to precalculate.
-sessionProjections <- reactiveValues(prjs = data.frame())
+sessionProjections <- reactiveValues(
+  prjs = data.frame()
+  )
+
+# 
+allCellNames <- reactiveVal(
+  label = "CellNames",
+  value = ""
+)
 
 DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
@@ -74,7 +82,7 @@ observeEvent(input$openBrowser, {
 observeEvent(input$commentok, {
   # cat(file = stderr(), paste0("commentok: \n"))
   comment <- input$Comment4history
-  add2history(type = "text", comment = "",  input=input, text2add = comment)
+  add2history(type = "text", comment = "",  input=isolate( reactiveValuesToList(input)), text2add = comment)
   removeModal()
 })
 # inputDataFunc ----
@@ -409,7 +417,7 @@ inputDataFunc <- function(inFile) {
   # if (is.null(rowData(dataTables$scEx)$symbol)){
   #
   # }
-  
+  isolate(allCellNames(rownames(colData(dataTables$scEx))))
   inputFileStats$stats <- stats
   return(dataTables)
 } # end of inputDataFunc
@@ -496,7 +504,7 @@ appendAnnotation <- function(scEx, annFile) {
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
     if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls()))
+      save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls()))
     }
     # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
@@ -653,14 +661,34 @@ inputData <- reactive({
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
   inputFile$annFile <- paste(annFile$name, collapse = ", ")
   
+  # subsample this number of cells per sample
+  # no replacement. it is possible that one sample is more represented if the required number of cells is larger than there are cells for this sample.
+  # save(file = "~/SCHNAPPsDebug/inputData.RData", list = c(ls()), compress = F)
+  # load(file='~/SCHNAPPsDebug/inputData.RData')
   if (sampleCells) {
-    samp <- base::sample(
-      x = ncol(assays(retVal$scEx)[["counts"]]),
-      size = min(subsampleNum, ncol(assays(retVal$scEx)[["counts"]])),
-      replace = FALSE
-    )
-    retVal$scEx <- retVal$scEx[, samp]
+    tb = table(colData(retVal$scEx)$sampleNames)
+    smpIdx = c()
+    for (nm in names(tb)) {
+      nidx = which(colData(retVal$scEx)$sampleNames == nm)
+      if (length(nidx) <= subsampleNum){ 
+        smpIdx = c(smpIdx, nidx)
+      } else { 
+        samp <- base::sample(
+          x = length(nidx),
+          size = subsampleNum,
+          replace = FALSE
+        )
+        smpIdx = c(smpIdx, nidx[samp])
+      }
+    }
+    # samp <- base::sample(
+    #   x = ncol(assays(retVal$scEx)[["counts"]]),
+    #   size = min(subsampleNum, ncol(assays(retVal$scEx)[["counts"]])),
+    #   replace = FALSE
+    # )
+    retVal$scEx <- retVal$scEx[, smpIdx]
   }
+  
   exportTestValues(inputData = {
     list(
       assays(retVal$scEx)[["counts"]],
@@ -670,6 +698,8 @@ inputData <- reactive({
   })
   return(retVal)
 })
+
+
 
 medianENSGfunc <- function(scEx) {
   if (DEBUG) {
@@ -1240,7 +1270,7 @@ scExFunc <-
       removeNotification(id = "scExFunc1")
       removeNotification(id = "scExFunc2")
     }
-    
+    # browser()
     # change names to be hopefully a bit more clear
     changed <- FALSE # trace if something changed
     keepGenes <- useGenes
@@ -1382,7 +1412,7 @@ scEx <- reactive({
     maxG = maxG
   )
   scEx = retVal
-  add2history(type = "save", input = input, comment = "scEx", scEx = retVal)
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), comment = "scEx", scEx = retVal)
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
   })
@@ -1466,7 +1496,7 @@ scEx_log <- reactive({
   }
   .schnappsEnv$calculated_normalizationRadioButton <- normMethod
   
-  add2history(type = "save", input = input, comment = "scEx_log", scEx_log = scEx_log)
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), comment = "scEx_log", scEx_log = scEx_log)
   
   exportTestValues(scEx_log = {
     assays(scEx_log)["logcounts"]
@@ -1568,7 +1598,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
   }
   # cp =load(file="~/SCHNAPPsDebug/pcaFunc.RData")
-
+  
   # if there are no genes provided take all genes
   genesin <- geneName2Index(pcaGenes, featureData)
   # if (is.null(genesin) || length(genesin) == 0) {
@@ -1694,7 +1724,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     # pca$x[1:3,1:3]
     rownames(pca$rotation) = genesin
     rownames(pca$x) = colnames(scEx_log)
-  
+    
     pca
     # BiocSingular::runPCA(
     #   x,
@@ -1884,17 +1914,17 @@ scranCluster <- function(pca,
     },
     error = function(e) {
       cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
-      if (grepl("rank variances of zero", as.character(e))) {
+      # if (grepl("rank variances of zero", as.character(e))) {
         if (useRanks) {
           if (!is.null(getDefaultReactiveDomain())) {
-            showNotification("quickClusterError", id = "quickClusterError", type = "error", duration = NULL)
+            showNotification(paste("quickClusterError\n", e), id = "quickClusterError", type = "error", duration = NULL)
           }
           cat(file = stderr(), "\nNot using ranks due to identical ranks\n")
           params$use.ranks <- F
           return(do.call("quickCluster", params))
         }
         cat(file = stderr(), "\nRemove duplicated cells\n")
-      }
+      # }
       return(NULL)
     },
     warning = function(e) {
@@ -1907,7 +1937,9 @@ scranCluster <- function(pca,
   } else {
     barCode <- rownames(colData(scEx_log))
   }
-  
+  if (is.null(retVal)){
+    retVal = rep(0,length(barCode))
+  }
   retVal <- data.frame(
     Barcode = barCode,
     Cluster = retVal
@@ -2121,9 +2153,9 @@ snnGraph <- function(){
   #        #   params$assay.type <- "counts"
   #        # },
   #        "logcounts" = {
-           reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
-           sce = scEx_log
-           assay.type <- "logcounts"
+  reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
+  sce = scEx_log
+  assay.type <- "logcounts"
   #        },
   #        "counts" = {
   #          reducedDims(scEx) <- SimpleList(PCA = pca$x)
@@ -2209,7 +2241,7 @@ simlrFunc  <- function(){
   if (tabsetCluster != "simlrFunc" | is.null(scEx_log)){
     return(NULL)
   }
-
+  
   if(!"SIMLR" %in% rownames(installed.packages())) {
     return(NULL)
   }
@@ -2222,10 +2254,10 @@ simlrFunc  <- function(){
   retVal <- tryCatch(
     {
       if (nClust == 0) {
-         estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
-                                                    NUMC=2:maxClust,
-                                          cores.ratio = 1)
-         nClust = max(which.min(estimates$K1), which.min(estimates$K2))
+        estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
+                                                      NUMC=2:maxClust,
+                                                      cores.ratio = 1)
+        nClust = max(which.min(estimates$K1), which.min(estimates$K2))
       }
       sim = SIMLR(X = as.matrix(assays(scEx_log)[[1]]), 
                   c = nClust, 
@@ -2376,7 +2408,9 @@ projections <- reactive({
   # input data being loaded
   scEx <- scEx()
   pca <- pcaReact()
+  # manually specified groups of cells (see 2D plot in moduleServer.R)
   prjs <- sessionProjections$prjs
+  # derived/modified projections from projections tab
   newPrjs <- projectionsTable$newProjections
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projections.bf.RData", list = c(ls()))
@@ -2485,8 +2519,8 @@ projections <- reactive({
     }
   }
   
-  if (ncol(prjs) > 0 & nrow(prjs) == nrow(projections)) {
-    projections <- cbind(projections, prjs)
+  if (ncol(prjs) > 0 ) {
+    projections <- cbind(projections, prjs[rownames(projections),])
   }
   # # remove columns with only one unique value
   # rmC <- c()
@@ -2776,7 +2810,7 @@ beforeFilterPrj <- reactive({
   if (is(bfc, "numeric")) {
     bfc = data.frame(before.filter = bfc)
     # rownames(bfc) = colnames(scEx)
-   }
+  }
   cn <- colnames(scEx)
   retVal <- bfc[cn,]
   

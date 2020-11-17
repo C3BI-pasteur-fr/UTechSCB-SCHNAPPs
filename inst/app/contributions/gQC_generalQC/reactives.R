@@ -21,7 +21,7 @@ observe(label = "save2histumi", {
   if (is.null(clicked)) return()
   if (clicked < 1) return()
   
-  add2history(type = "renderPlot", input = input, comment = "UMI histogram",  
+  add2history(type = "renderPlot", input = isolate( reactiveValuesToList(input)), comment = "UMI histogram",  
               plotData = .schnappsEnv[["gQC_plotUmiHist"]])
   
 })
@@ -44,7 +44,7 @@ observe({
   
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlot", input = input, comment = "Sample histogram",  
+  add2history(type = "renderPlot", input = isolate( reactiveValuesToList(input)), comment = "Sample histogram",  
               plotData = .schnappsEnv[["gQC_plotSampleHist"]])
   
 })
@@ -66,10 +66,20 @@ observe(label = "save2histvar", {
   
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlot", input = input, comment = "PC variance",  
+  # add2history(type = "renderPlot", input = isolate( reactiveValuesToList(input)), comment = "PC variance",  
+  #             plotData = .schnappsEnv[["gQC_variancePCA"]])
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste0("# PC variance",
+                               "# fun = plotData$plotData$panelPlotFunc\n", 
+                               "# environment(fun) = environment()\n",
+                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"),
               plotData = .schnappsEnv[["gQC_variancePCA"]])
   
 })
+
+plotHistVarPC <- function(df, pc, var) {
+  ggplot(data = df,aes(x=pc, y=var)) + geom_bar(stat = "identity")
+}  
 
 
 # gQC_scaterReadsFunc ----
@@ -167,7 +177,11 @@ gQC_sampleHistFunc <- function(sampleInf, scols) {
   
   plotly::plot_ly(x=sampleInf, 
                   type="histogram", 
-                  marker = list(color = scols))
+                  marker = list(color = scols[unique(sampleInf)])) %>%
+    layout(
+      title = "Number of cells per sample",
+      xaxis = list(title = "Samples"),
+      yaxis = list(title = "Count"))
   # counts <- table(sampleInf)
   # df <- as.data.frame(counts)
   # ggplot(data = df,aes(x=sampleInf, y=Freq, fill=sampleInf)) + geom_bar(stat = "identity")  + 

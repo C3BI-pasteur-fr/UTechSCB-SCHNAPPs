@@ -161,7 +161,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
+  # cp =load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
   
   retVal <- tsnePlot(projections, dimX, dimY, dimZ, dimCol, scols, ccols)
   
@@ -237,7 +237,10 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
   }
   fig <- fig %>% layout(
     barmode="stack",
-    bargap=0.1)
+    bargap=0.1,
+    title = "Histogram of UMIs",
+    yaxis = list(title = "Number of samples"),
+    xaxis = list(title = "UMI count"))
   
   fig
   # marker = list(color = scols))
@@ -309,8 +312,15 @@ output$gQC_variancePCA <- renderPlot({
   
   
   df <- data.frame(var = pca$var_pcs, pc = 1:length(pca$var_pcs))
-  retVal <- ggplot(data = df,aes(x=pc, y=var)) + geom_bar(stat = "identity")  
-  .schnappsEnv[["gQC_variancePCA"]] <- retVal
+  retVal <- plotHistVarPC(df, pc, var) 
+  
+  af = plotHistVarPC
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  .schnappsEnv[["gQC_variancePCA"]] <- list(panelPlotFunc = af,
+                                            df, pc, var)
+  
+  # .schnappsEnv[["gQC_variancePCA"]] <- retVal
   return(retVal)
   # barplot(pca$var_pcs, main = "Variance captured by first PCs")
 })
@@ -325,6 +335,7 @@ observeEvent(
     oldPrj <- input$oldPrj
     newPrj <- input$newPrj
     projections <- projections()
+    acn = allCellNames()
     newPrjs <- projectionsTable$newProjections
     
     if (is.null(projections)) {
@@ -337,7 +348,8 @@ observeEvent(
         list = c("normaliztionParameters", ls())
       )
     }
-    # load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
+    # cp = load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
+    browser()
     if (newPrj %in% colnames(projections)) {
       showNotification(
         "New column name already used",
@@ -347,9 +359,17 @@ observeEvent(
       return(NULL)
     }
     if (ncol(newPrjs) == 0) {
-      newPrjs <- projections[, oldPrj, drop = FALSE]
+      newPrjs = data.frame(row.names = acn)
+      newPrjs[,newPrj] = NA
+      newPrjs[rownames(projections),newPrj] <- projections[, oldPrj, drop = FALSE]
     } else {
-      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
+      # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
+      newPrjs <- dplyr::left_join(
+        tibble::rownames_to_column(newPrjs), 
+        tibble::rownames_to_column(projections[, oldPrj, drop = FALSE]), 
+        by='rowname')
+      rownames(newPrjs) = newPrjs[,1]
+      newPrjs = newPrjs[,-1]
     }
     colnames(newPrjs)[ncol(newPrjs)] <- newPrj
     projectionsTable$newProjections <- newPrjs
@@ -380,6 +400,7 @@ observeEvent(
     if (!delPrj %in% colnames(newPrjs)) {
       return(NULL)
     }
+    browser()
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/delPrjsButton.RData",
@@ -427,16 +448,25 @@ observeEvent(
       )
       return(NULL)
     }
-    combProjections = paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor()
+    browser()
+    combProjections = data.frame(row.names = rownames(projections), 
+                                 paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor())
     if (length(levels(combProjections)) > 100) {
       out = showModal(verifyLevelModal(NLevel = length(levels(combProjections))))
       # browser()
     }
     if (ncol(newPrjs) == 0) {
-      newPrjs <- data.frame(newPrj = combProjections)
-      rownames(newPrjs) = rownames(projections)
+      newPrjs <- data.frame(row.names = acn)
+      newPrjs[rownames(combProjections),newPrj] = combProjections
+      # rownames(newPrjs) = rownames(projections)
     } else {
-      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], combProjections)
+      # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], combProjections)
+      newPrjs <- dplyr::left_join(
+        tibble::rownames_to_column(newPrjs), 
+        tibble::rownames_to_column(combProjections), 
+        by='rowname')
+      rownames(newPrjs) = newPrjs[,1]
+      newPrjs = newPrjs[,-1]
     }
     colnames(newPrjs)[ncol(newPrjs)] <- newPrj
     projectionsTable$newProjections  <- newPrjs
@@ -490,6 +520,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
+               browser()
                
                if(is.null(
                  tryCatch({
@@ -500,7 +531,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,rnProj])
                    }
                    newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
-                   levels(newPrjs[,ncol(newPrjs)]) = newLbVec
+                   levels(newPrjs[,ncol(newPrjs)]) = stringr::str_trim(newLbVec)
                  }, error=function(w){
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
                    showNotification("problem with names", id = "renameProbl", duration = NULL)
@@ -615,7 +646,7 @@ output$gQC_windHC <- renderPlot({
   gQC_windProj <- input$gQC_windProj
   
   if (is.null(projections) | is.null(scEx_log)
-      ) {
+  ) {
     return(NULL)
   }
   if (length(levels(projections[,gQC_windProj]))<3) {

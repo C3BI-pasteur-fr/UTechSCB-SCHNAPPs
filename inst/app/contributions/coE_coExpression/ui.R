@@ -196,7 +196,7 @@ tabList <- list(
                  width = 4,
                  numericInput("coEminExpr", "min expression of genes:",
                               value = defaultValue("coEminExpr", 1),
-                              min = 1, max = 100000
+                              min = -1000, max = 100000
                  )
                )
              ),
@@ -230,7 +230,7 @@ tabList <- list(
                  width = 4,
                  numericInput("coEminExpr2", "min expression of genes:",
                               defaultValue("coEminExpr2", 1),
-                              min = 1, max = 100000
+                              min = -1000, max = 100000
                  )
                ),
              ),
@@ -258,7 +258,10 @@ tabList <- list(
               column(width = 12, 
                      plotOutput("alluvial_plot") # %>% withSpinner()
               )
-            )
+            ),
+            br(),
+            actionButton("save2HistAlluvial", "save to history")
+            
           )
           
   )
