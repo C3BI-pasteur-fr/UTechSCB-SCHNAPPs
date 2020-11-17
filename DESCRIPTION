@@ -18,6 +18,15 @@ Imports:
     dplyr,
     shiny,
     shinyTree,
+    psychTools,
+    pryr,
+    colourpicker,
+    Seurat,
+    shinyjs,
+    shinyWidgets,
+    reactlog,
+    cowplot,
+    ggpubr,
     shinydashboard
 Suggests:
     shinyjs,
