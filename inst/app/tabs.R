@@ -472,7 +472,8 @@ generalParametersTab <- function() {
                                  choices = c("rank", "number", "jaccard"))
                    )
                  )),
-        tabPanel("SMILR",
+        if ("SIMLR" %in% rownames(installed.packages()))
+        tabPanel("SIMLR",
                  value = "simlrFunc",
                  width = 12,
                  fluidRow(
@@ -482,14 +483,14 @@ generalParametersTab <- function() {
                    # ),
                    column(
                      width = 4,
-                     numericInput("smilr_nClust", "number of clusters (0 = estimate)", 
-                                  value = defaultValue("smilr_nClust", 10),
+                     numericInput("simlr_nClust", "number of clusters (0 = estimate)", 
+                                  value = defaultValue("simlr_nClust", 10),
                                   min = 0, max = 1000)
                    ),
                    column(
                      width = 4,
-                     numericInput("smilr_maxClust", "max number of clusters when estimating)", 
-                                  value = defaultValue("smilr_maxClust", 20),
+                     numericInput("simlr_maxClust", "max number of clusters when estimating)", 
+                                  value = defaultValue("simlr_maxClust", 20),
                                   min = 2, max = 1000)
                    )
                  )),

@@ -1917,9 +1917,9 @@ scranCluster <- function(pca,
       # if (grepl("rank variances of zero", as.character(e))) {
         if (useRanks) {
           if (!is.null(getDefaultReactiveDomain())) {
-            showNotification(paste("quickClusterError\n", e), id = "quickClusterError", type = "error", duration = NULL)
+            showNotification(paste("Not using ranks due to identical ranks\n"), id = "quickClusterError", type = "error", duration = NULL)
           }
-          cat(file = stderr(), "\nNot using ranks due to identical ranks\n")
+          cat(file = stderr(), paste("\nNot using ranks due to identical ranks\n", e))
           params$use.ranks <- F
           return(do.call("quickCluster", params))
         }
@@ -2170,7 +2170,7 @@ snnGraph <- function(){
       cluster <- factor(igraph::cluster_walktrap(g1)$membership)
     },
     error = function(e) {
-      cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
+      cat(file = stderr(), paste("\nProblem with SNNGRAPH:\n\n", as.character(e), "\n\n"))
       if (!is.null(getDefaultReactiveDomain())) {
         showNotification("snnClusterError", id = "snnClusterError", type = "error", duration = NULL)
       }
@@ -2228,8 +2228,8 @@ simlrFunc  <- function(){
   # scEx = scEx() # need to be run when updated
   scEx_log = scEx_log()
   # pca = pcaReact()
-  nClust = isolate(input$smilr_nClust)
-  maxClust = isolate(input$smilr_maxClust)
+  nClust = isolate(input$simlr_nClust)
+  maxClust = isolate(input$simlr_maxClust)
   # clusterSource = isolate(input$snnClusterSource)
   tabsetCluster = isolate(input$tabsetCluster)
   
@@ -2250,8 +2250,7 @@ simlrFunc  <- function(){
       Sys.info()["sysname"] == "Darwin" && getRversion() == "4.0.2") {
     parallel:::setDefaultClusterOptions(setup_strategy = "sequential")
   }
-  
-  retVal <- tryCatch(
+ retVal <- tryCatch(
     {
       if (nClust == 0) {
         estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
@@ -2267,7 +2266,7 @@ simlrFunc  <- function(){
       cluster
     },
     error = function(e) {
-      cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
+      cat(file = stderr(), paste("\nProblem with simlrFunc:\n\n", as.character(e), "\n\n"))
       if (!is.null(getDefaultReactiveDomain())) {
         showNotification("snnClusterError", id = "snnClusterError", type = "error", duration = NULL)
       }
@@ -2299,8 +2298,8 @@ simlrFunc  <- function(){
       # c("snnClusterSource", isolate(input$snnClusterSource)),
       c("snnType", isolate(input$snnType)),
       c("tabsetCluster", isolate(input$tabsetCluster)),
-      c("smilr_nClust", isolate(input$smilr_nClust)),
-      c("smilr_maxClust", isolate(input$smilr_maxClust))
+      c("simlr_nClust", isolate(input$simlr_nClust)),
+      c("simlr_maxClust", isolate(input$simlr_maxClust))
     ),
     button = "updateClusteringParameters"
   )
