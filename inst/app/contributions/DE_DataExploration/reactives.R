@@ -103,7 +103,11 @@ observe(label = "save2HistScater", {
   }
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlot", input = input, comment = "scater plot",  
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste0("scater plot", 
+                               "# fun = plotData$plotData$panelPlotFunc\n", 
+                               "# environment(fun) = environment()\n",
+                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"), 
               plotData = .schnappsEnv[["DE_scaterPNG"]])
   
 })
@@ -123,9 +127,13 @@ observe(label = "save2HistPanel", {
   }
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlot", input = input, comment = "Panel plot",  
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste0("# Panel plot\n",
+                               "# fun = plotData$plotData$panelPlotFunc\n", 
+                               "# environment(fun) = environment()\n",
+                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
               plotData = .schnappsEnv[["DE_panelPlot"]])
-  
 })
 
 
@@ -148,7 +156,7 @@ DE_scaterPNG <- reactive({
     showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
   }
   if (DEBUG) cat(file = stderr(), "DE_scaterPNG\n")
-
+  
   clicked <- input$runScater
   cat(file = stderr(), paste("DE_scaterPNG", clicked, "\n"))
   # takes too long, commenting out for course
@@ -173,24 +181,24 @@ DE_scaterPNG <- reactive({
   }
   scaterReads <- isolate(scaterReads())
   if (is.null(scaterReads)) {
-      return(list(
-        src = "",
-        contentType = "image/png",
-        width = 10,
-        height = 10,
-        alt = "Scater plot will be here when 'apply changes' is clicked"
-      ))
+    return(list(
+      src = "",
+      contentType = "image/png",
+      width = 10,
+      height = 10,
+      alt = "Scater plot will be here when 'apply changes' is clicked"
+    ))
   }
-
-
+  scols <- isolate(sampleCols$colPal)
+  
   width <- session$clientData$output_plot_width
   height <- session$clientData$output_plot_height
-
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/scater.Rmd')
-
+  # cp=load(file='~/SCHNAPPsDebug/scater.Rmd')
+  
   # calculations
   if (is.null(width)) {
     width <- 96 * 7
@@ -198,18 +206,19 @@ DE_scaterPNG <- reactive({
   if (is.null(height)) {
     height <- 96 * 7
   }
-
+  
   myPNGwidth <- width / 96
   myPNGheight <- height / 96
-
+  
   outfile <- paste0(tempdir(), "/scaterPlot.png")
   # outfile <- paste0("~/SCHNAPPsDebug",'/scaterPlot.png')
   if (DEBUG) cat(file = stderr(), paste("output file: ", outfile, "\n"))
   if (DEBUG) cat(file = stderr(), paste("output file normalized: ", normalizePath(outfile, mustWork = FALSE), "\n"))
   n <- min(nrow(scaterReads), 50)
-
+  
   rownames(scaterReads) <- rowData(scaterReads)$symbol
-  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n)
+  p1 = pltHighExp(plotHighestExprs, scaterReads, n, scols) 
+  
   tryCatch(
     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
     error = function(e) {
@@ -227,8 +236,13 @@ DE_scaterPNG <- reactive({
     alt = "Scater plot should be here"
   )
   # end calculation
-  .schnappsEnv[["DE_scaterPNG"]] <- p1
+  af = pltHighExp
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
   
+  .schnappsEnv[["DE_scaterPNG"]] <- list(panelPlotFunc = af,
+                                         plotHighestExprs, scaterReads, n, scols
+  )
   setRedGreenButton(
     vars = list(
       c("scaterRan", 1)
@@ -262,21 +276,21 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
   } else {
     expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, ])
   }
-
+  
   validate(need(
     is.na(sum(expression)) != TRUE,
     "Gene symbol incorrect or gene not expressed"
   ))
-
+  
   projections <- cbind(projections, expression)
   names(projections)[ncol(projections)] <- "values"
   if (!all(c("tsne1", "tsne2", "tsne3") %in% colnames(projections))) {
     showNotification("some tsne projections are not available.",
-      id = "DE_tsne_pltERROR",
-      duration = NULL, type = "error"
+                     id = "DE_tsne_pltERROR",
+                     duration = NULL, type = "error"
     )
   }
-
+  
   p <-
     plotly::plot_ly(
       projections,
@@ -308,27 +322,27 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
   }
   featureData <- rowData(scEx_log)
   geneid <- geneName2Index(g_id, featureData)
-
+  
   if (length(geneid) == 0) {
     return(NULL)
   }
-
+  
   # expression <- exprs(scEx_log)[geneid, ]
   if (length(geneid) == 1) {
     expression <- assays(scEx_log)[[1]][geneid, ]
   } else {
     expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, ])
   }
-
+  
   projections <- cbind(projections, expression)
   names(projections)[length(projections)] <- "values"
-
+  
   p1 <-
     ggplot(projections, aes(factor(dbCluster), values, fill = factor(dbCluster))) +
     geom_violin(scale = "width") +
     scale_color_manual(values = ccols) +
     scale_fill_manual(values = ccols, aesthetics = "fill") +
-
+    
     stat_summary(
       fun = median,
       geom = "point",
@@ -353,7 +367,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
     xlab("Cluster") +
     ylab("Expression") +
     ggtitle(paste(featureData[geneid, "symbol"], collapse = ", "))
-
+  
   return(p1)
 }
 
@@ -373,7 +387,9 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
 # cellNs cell names to be used
 
 
-panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs) {
+panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs,
+                          lowCol = "red", highCol = "blue", midCol = "white",
+                          midFunc = function(x){(max(x)-min(x))/2}) {
   
   featureData <- rowData(scEx_log)
   # featureData$symbol = toupper(featureData$symbol)
@@ -432,22 +448,29 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
   #     if (DEBUG) cat(file = stderr(), genesin[i])
   #   }
   # } else {
+  printData = data.frame(gene = character(), dimx = numeric(), dimy = numeric(), col = numeric)
+  # save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c(ls()), compress = F)
+  # cp = load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
+  
   for (i in 1:length(genesin)) {
     geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-    subsetTSNE <- projections[cellNs, ]
+    subsetTSNE <- projections[cellNs, ] # only work the subset of cells
     
+    # color for each cell based on the expression
+    # this will always show the max value per cell
+    # this should apply when sameScale = FALSE
     Col <- rbPal(10)[
       as.numeric(
         cut(
           as.numeric(
             assays(scEx_log)[[1]][
               rownames(featureData[geneIdx, ]),
-              ]
+            ]
           ),
           breaks = 10
         )
       )
-      ]
+    ]
     
     names(Col) <- rownames(projections)
     plotCol <- Col[rownames(subsetTSNE)]
@@ -455,19 +478,31 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
       projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, , drop = FALSE])
       subsetTSNE <- projections[cellNs, ]
     }
-    
-    plotIdx <- plotIdx + 1
-    
-    plotList[[plotIdx]] <- ggplot(subsetTSNE, aes_string(x = dimx4, y = dimy4))
-    if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
-      subsetTSNE[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, rownames(subsetTSNE), drop = FALSE])
-      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
-    } else {
-      plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_point(color = plotCol, show.legend = FALSE) + ggtitle(genesin[i])
+    colData = assays(scEx_log)[[1]][
+      rownames(featureData[geneIdx, ]),cellNs
+    ]
+    if (!sameScale){
+      colData = (colData -min(colData) )/ (max(colData) - min(colData)) 
     }
-    if (!is.null(ylim)) {
-      plotList[[plotIdx]] <- plotList[[plotIdx]] + ylim(ylim)
-    }
+    printData = rbind(printData, data.frame(gene = genesin[i], 
+                                            dimx = subsetTSNE[cellNs, dimx4] , 
+                                            dimy = subsetTSNE[cellNs, dimy4],
+                                            col = colData
+    ))
+    # plotIdx <- plotIdx + 1
+    # plotList[[plotIdx]] <- ggplot(subsetTSNE, aes_string(x = dimx4, y = dimy4))
+    # 
+    # # TODO show.legend should be based on sameScale
+    # if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
+    #   subsetTSNE[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, rownames(subsetTSNE), drop = FALSE])
+    #   plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_boxplot(show.legend = FALSE) + ggtitle(genesin[i])
+    # } else {
+    #   plotList[[plotIdx]] <- plotList[[plotIdx]] + geom_point(color = plotCol, show.legend = FALSE) + ggtitle(genesin[i])
+    # }
+    # if (!is.null(ylim)) {
+    #   plotList[[plotIdx]] <- plotList[[plotIdx]] + ylim(ylim)
+    # }
+    # plotList[[plotIdx]] <- plotList[[plotIdx]] 
     # plot(subsetTSNE[, dimx4], subsetTSNE[, dimy4],
     #      col = plotCol, pch = 16, frame.plot = TRUE,
     #      ann = FALSE, ylim = ylim
@@ -476,13 +511,36 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
     # if (DEBUG) cat(file = stderr(), ppgrp)
   }
   # }
-  require(ggpubr)
-  retVal <-
-    ggarrange(
-      plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),
-      label.x = "test", legend = "right",
-      common.legend = T
-    )
+  # 
+  require(cowplot)
+  printData = printData[order(printData$col, decreasing = F),]
+  printData$gene = factor(printData$gene, levels = unique(genesin))
+  if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
+    retVal <- ggplot(printData, aes(dimx, dimy)) + geom_boxplot(show.legend = FALSE)
+  } else {
+    retVal <- ggplot(printData, aes(dimx, dimy)) + geom_point(aes(colour = col), alpha = 0.4) 
+  }
+  if (sameScale){
+    retVal = retVal + 
+      facet_wrap(vars(gene),ncol = nCol) 
+  } else {
+    retVal = retVal + facet_wrap(vars(gene),ncol = nCol,scales = "free")
+  }
+  retVal = retVal + xlab(dimx4) + 
+    ylab(dimy4) 
+  # +
+  #   scale_colour_gradient2()
+  
+  retVal =  retVal + scale_color_gradient2(low = lowCol, high = highCol, mid = midCol, midpoint = midFunc(colData))
+   
+ 
+ require(ggpubr)
+  # retVal <-
+  #   ggarrange(
+  #     plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),
+  #     label.x = "test", legend = "right",
+  #     common.legend = T
+  #   )
   retVal <-
     annotate_figure(retVal,
                     top = text_grob(sampdesc)

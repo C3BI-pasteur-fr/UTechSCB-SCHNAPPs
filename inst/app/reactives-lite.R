@@ -191,7 +191,7 @@ if (!AllowClustering)
       projections$sampleNames <- "1"
     }
     # TODO figure out how to limit this.
-    # add2history(type = "save", input = input, comment = "projections", projections = projections)
+    # add2history(type = "save", input = isolate( reactiveValuesToList(input)), comment = "projections", projections = projections)
     
     
     exportTestValues(projections = {

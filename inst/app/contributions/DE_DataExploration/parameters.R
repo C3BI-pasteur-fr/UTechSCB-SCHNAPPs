@@ -1,4 +1,5 @@
 suppressMessages(require(Matrix))
+suppressMessages(require(Seurat))
 # normalization parameters
 
 # choice for the radio buttion
@@ -216,6 +217,7 @@ DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
   cellMeta <- colData(scEx)
   # split in different samples
   meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
+  
   integrated <- tryCatch(
     {
       seurDat <- CreateSeuratObject(
@@ -228,7 +230,10 @@ DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
       }
 
       features <- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)
-      keep.features = keep.features[keep.features %in% rownames(scEx)]
+      
+      if (length(keep.features)>1) {
+        keep.features = keep.features[keep.features %in% rownames(scEx)]
+      }
       features = unique(c(features, keep.features))
       
       seur.list <- PrepSCTIntegration(
@@ -240,8 +245,8 @@ DE_seuratSCtransformFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
         object.list = seur.list, normalization.method = "SCT",
         anchor.features = features, verbose = TRUE, k.filter = k.filter
       )
-      keep.features = keep.features[keep.features %in% rownames(scEx)]
-      anchors = unique(c(anchors, keep.features))
+      # keep.features = keep.features[keep.features %in% rownames(scEx)]
+      # anchors = unique(c(anchors, keep.features))
       integrated <- IntegrateData(
         anchorset = anchors, normalization.method = "SCT",
         verbose = TRUE

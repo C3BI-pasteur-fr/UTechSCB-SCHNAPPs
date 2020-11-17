@@ -148,7 +148,7 @@ tabList <- list(
   shinydashboard::tabItem(
     "gQC_umiHist",
     tags$h3("Histogram of UMI counts"),
-    numericInput("gQC_binSize", "number of bins", 20, min=10),
+    numericInput("gQC_binSize", "number of bins", 200, min=10),
     fluidRow(column(
       10,
       offset = 0,

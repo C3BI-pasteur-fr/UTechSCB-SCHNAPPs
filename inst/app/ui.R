@@ -16,7 +16,7 @@ suppressMessages(require(ggplot2))
 suppressMessages(require(DT))
 suppressMessages(require(edgeR))
 suppressMessages(require(pheatmap))
-suppressMessages(require(threejs))
+# suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinyjs))
 

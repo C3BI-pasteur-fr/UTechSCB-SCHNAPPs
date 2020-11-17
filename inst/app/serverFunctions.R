@@ -19,6 +19,10 @@ printTimeEnd <- function(start.time, messtr) {
   }
 }
 
+pltHighExp <- function(plotHighestExprs, scaterReads, n, scols) {
+  require(scater)
+  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n) + scale_color_manual(values= scols)
+}
 
 # some comments removed because they cause too much traffic ----
 geneName2Index <- function(g_id, featureData) {
@@ -187,6 +191,31 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   } else {
     subsetData <- projections
   }
+  
+  # Clean data from NA
+  for (colNa in c(dimX, dimY, dimCol)) {
+    if(! colNa %in% colnames(subsetData)) next()
+    naRows = which(is.na(subsetData[,colNa]))
+    if (length(naRows) > 0) {
+      if (is.factor(subsetData[,colNa])) {
+        if (! "NA" %in% levels(subsetData[,colNa])){
+          warning("we found NA in a factor\n")
+          levels(subsetData[,colNa]) = c(levels(subsetData[,colNa]), "NA")
+          subsetData[naRows,colNa] = "NA"
+        }
+      } else {
+        if (is.character(subsetData[,colNa])) {
+          warning("we setting NA to character\n")
+          subsetData[naRows,colNa] = "NA"
+        } else {
+          if (is.numeric(subsetData[,colNa])) { # remove lines
+            warning("we are removing rows due to NA\n")
+            subsetData = subsetData[-naRows,]
+          }
+        }
+      }
+    }
+  }
   #ensure that the highest values are plotted last.
   if (dimCol %in% colnames(subsetData)){
     if (is.numeric(subsetData[,dimCol])){
@@ -263,20 +292,30 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   }
   # save(file = "~/SCHNAPPsDebug/2dplot.RData", list = ls())
   # load("~/SCHNAPPsDebug/2dplot.RData")
-  
+  dimxFact=FALSE
+  dimyFact=FALSE
+  dimyNum=FALSE
   if (dimY != "histogram"){
+    if (is.numeric(subsetData[, dimY]) ) {
+      dimyNum = TRUE
+    }
     if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
       subsetData[, dimX] <- as.character(subsetData[, dimX])
+      dimxFact = TRUE
     }
     if (is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY])) {
       subsetData[, dimY] <- as.character(subsetData[, dimY])
+      dimyFact = TRUE
     }
   } else {
     # if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
     #   # barchart
     #   # subsetData[, dimX] <- as.character(subsetData[, dimX])
     # } else {
+    
+    #
     # histogram
+    #
     
     if (is(subsetData[,dimCol], "factor")) {
       one_plot <- function(d) {
@@ -325,6 +364,83 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     
   }
   
+  # 
+  # violoin plot (X = factor, Y = numeric)
+  # if color factor with two levels split
+  # 
+  
+  if (dimxFact & dimyNum) {
+    p1 <- plotly::plot_ly(
+      data = subsetData, 
+      source = "subset",
+      key = rownames(subsetData)
+    )
+    if (is.factor(subsetData[,dimCol])) {
+      p1 = subsetData %>% 
+        plotly::plot_ly( 
+                source = "subset",
+                type = 'violin') 
+      for ( lv in levels(subsetData[,dimCol])) {
+        p1 = p1 %>%
+          add_trace(
+            x = formula(paste0("~get(dimX)[subsetData[,dimCol] == \"", lv, "\"]")),
+            y = formula(paste0("~get(dimY)[subsetData[,dimCol] == \"", lv, "\"]")),
+            # key = rownames(formula(paste0("~get(dimCol)[subsetData[,dimCol] == \"", lv, "\"]"))),
+            name = lv,
+            points = 'all',
+            pointpos = 0,
+            scalegroup = lv,
+            legendgroup = lv,
+            # alignmentgroup = lv,
+            marker = list(size = 1),
+            unselected = list ( 
+              marker = list(size = 1)),
+            selected = list ( 
+              marker = list(size = 6)),
+            box = list(
+              visible = T
+            ),
+            meanline = list(
+              visible = T
+            )
+          )
+      }
+      p1 = p1 %>% layout(
+        xaxis = xAxis,
+        yaxis = yAxis,
+        title = gtitle,
+        dragmode = "select",
+        violinmode = 'group'
+      ) 
+      # p1
+      return (p1)
+    }
+    # ignore color
+    p1 = p1 %>%
+      add_trace(
+        x = ~ get(dimX),
+        y = ~ get(dimY),
+        type = "violin",
+        # text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+        text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData)),
+        box = list(
+          visible = T
+        ),
+        meanline = list(
+          visible = T
+        ),
+        showlegend = TRUE
+      ) %>%
+      layout(
+        xaxis = xAxis,
+        yaxis = yAxis,
+        title = gtitle,
+        dragmode = "select"
+      )
+    return(p1)
+  }
+  
+  
   if (dimCol == "cellDensity") {
     subsetData$cellDensity <- get_density(subsetData[,dimX], subsetData[,dimY], n = 100)
   }
@@ -363,7 +479,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   
   selectedCells <- NULL
   if (length(grpN) > 0) {
-    if (length(grpNs[rownames(subsetData), grpN] == "TRUE") > 0 & sum(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE) > 0) {
+    if (length(grpNs[rownames(subsetData), grpN] == "TRUE") > 0 & 
+        sum(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE) > 0) {
       grpNSub <- grpNs[rownames(subsetData), ]
       selectedCells <- rownames(grpNSub[grpNSub[, grpN] == "TRUE", ])
     }
@@ -1052,6 +1169,7 @@ getReactEnv <- function(DEBUG) {
 # add2history ----
 
 add2history <- function(type, comment = "", input = input, ...) {
+  if (DEBUG) cat(file = stderr(), paste0("add2history", type, "\n"))
   if (!exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
     return(NULL)
@@ -1061,7 +1179,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   arg <- list(...)
   if(is.null(arg[[1]])) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()), compress = F)
   }
   # cp =load(file='~/SCHNAPPsDebug/add2history.RData')
   if (type == "text") {
@@ -1074,15 +1192,16 @@ add2history <- function(type, comment = "", input = input, ...) {
     
   }
   
+  # browser()
   if (type == "save") {
-    # browser()
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[1])
-    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
+    inp = input
+    save(file = tfile, list = c(names(varnames[1]), "inp"), compress = F)
     # the load is commented out because it is not used at the moment and only takes time to load
     line <- paste0(
       "```{R}\n#load ", names(varnames[1]), "\n#load(file = \"", basename(tfile),
-      "\")\n```\n"
+      "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
   }
@@ -1096,7 +1215,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       # orca(plotData$plotData, file = tfile, format = "png")
       withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
       line <- paste0(
-        # "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
+        # "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
         # "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n",
         "\n![](",basename(tfile),")\n\n"
       )
@@ -1111,10 +1230,10 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "input"))
+    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
     
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]) ,"$filename <- NULL \n",
       "\ndo.call(TRONCO::pheatmap, ", names(varnames[1]), ")\n```\n"
     )
@@ -1125,10 +1244,10 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "input"))
+    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
     
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1139,15 +1258,17 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "input"))
+    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
     
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
     
   }
+  if (DEBUG) cat(file = stderr(), paste0("add2history done\n"))
+  
 }
 
 
@@ -1246,10 +1367,6 @@ heatmapModuleFunction <- function(
   
   heatmapData$filename <- outfile
   # heatmapData$filename = NULL
-  # if (length(addColNames) > 0 & moreOptions) {
-  if (length(addColNames) > 0) {
-    heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
-  }
   # if (length(addColNames) > 0 & moreOptions) {
   if (length(addColNames) > 0) {
     heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
@@ -1383,7 +1500,7 @@ loadLiteData <- function(fileName = NULL) {
     if (all(c("scEx", "pca") %in% cp)) {
       pcaReact = pca
     } else {
-    return(NULL)
+      return(NULL)
     }
   }
   

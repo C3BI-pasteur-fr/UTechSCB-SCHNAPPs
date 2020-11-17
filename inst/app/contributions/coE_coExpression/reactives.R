@@ -60,7 +60,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   
   annCols <- list(
     "sampleNames" = sampCol,
-    "Cluster" = ccols
+    "dbCluster" = ccols
   )
   
   retVal <- list(
@@ -383,14 +383,14 @@ combinePermutations <- function(perm1, perm2) {
 }
 
 # finner
-finner <- function(xPerm, r, genesin, featureData, scEx_log, perms) {
+finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minExpr) {
   comb <- gtools::combinations(xPerm, r, genesin)
   for (cIdx in 1:nrow(comb)) {
     map <-
       rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
     # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
     
-    permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= 1) == length(comb[cIdx, 1:ncol(comb)])
+    permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, 1:ncol(comb)])
     perms[permIdx] <- paste0(comb[cIdx, 1:ncol(comb)], collapse = "+")
   }
   perms
@@ -427,7 +427,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
+  # cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
   
   if (length(map) == 0) {
     if (!is.null(getDefaultReactiveDomain())) {
@@ -461,7 +461,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
           duration = NULL
         )
       }
-      x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData, scEx, perms))
+      x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData, scEx, perms, minExpr))
       
       for (idx in 1:length(x)) {
         perms <- combinePermutations(perms, x[[idx]])
@@ -757,7 +757,7 @@ observe(label = "save2histVio", {
   }
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlot", input = input, comment = "violin plot",  
+  add2history(type = "renderPlot", input = isolate( reactiveValuesToList(input)), comment = "violin plot",  
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
   
 })
@@ -892,6 +892,46 @@ coE_heatmapReactive <- reactive({
     retVal
   })
   return(retVal)
+})
+
+
+## alluvialPlotFunc ----
+
+alluvialPlotFunc <- function(dat, alluiv1, alluiv2) {
+  gg = ggplot(as.data.frame(dat),
+              aes_string(  axis1 = alluiv1, axis2 = alluiv2)) +
+    geom_alluvium(aes_string(fill = alluiv1), width = 1/12) +
+    geom_stratum(width = 1/12, fill = "black", color = "grey") +
+    geom_label(stat = "stratum", infer.label = TRUE) +
+    scale_x_discrete(limits = c(alluiv1, alluiv2), expand = c(.05, .05)) +
+    scale_fill_brewer(type = "qual", palette = "Set1") +
+    ggtitle(paste("Alluvial plot of ", alluiv1, "and", alluiv2))
+}
+
+## save2HistAlluvial observer ---- 
+observe(label = "save2HistAlluvial", {
+  clicked  = input$save2HistAlluvial
+  if (DEBUG) cat(file = stderr(), "observe save2HistAlluvial \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste0("# Alluvial plot\n",
+                               "# fun = plotData$plotData$panelPlotFunc\n", 
+                               "# environment(fun) = environment()\n",
+                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["coE_alluvialPlot"]])
+  
 })
 
 

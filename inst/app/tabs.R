@@ -349,8 +349,8 @@ generalParametersTab <- function() {
                         offset = 0,
                         selectInput("hvgSelection","How to select highly variable genes.", 
                                     choices = c("getTopHVGs","vst", "mvp", "disp"),
-                                    selected = defaultValue("hvgSelection", "getTopHVGs")),
-                        checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", FALSE))
+                                    selected = defaultValue("hvgSelection", "vst")),
+                        checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", TRUE))
                  )
                ),
                checkbsTT(item = "pcaRank"),
@@ -411,7 +411,7 @@ generalParametersTab <- function() {
       tabBox(
         title = "Parameters for clustering", width = 12,
         id = "tabsetCluster",
-        selected = defaultValue("tabsetCluster", "scran_Cluster"),
+        selected = defaultValue("tabsetCluster", "seurat_Clustering"),
         tabPanel("Seurat clustering",
                  width = 12,
                  value = "seurat_Clustering",
