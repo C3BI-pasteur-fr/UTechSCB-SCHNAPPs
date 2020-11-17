@@ -1054,7 +1054,7 @@ getReactEnv <- function(DEBUG) {
           "\`", var, "\`()"
         ))),
         error = function(e) {
-          browser()
+          # browser()
           cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
           e
         },

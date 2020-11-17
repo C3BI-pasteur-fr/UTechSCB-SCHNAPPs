@@ -619,7 +619,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "save: changeGroups\n")
       save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls()))
       cat(file = stderr(), "done save: changeGroups\n")
-      browser()
+      # browser()
     }
     # cp = load(file="~/SCHNAPPsDebug/changeGroups.RData")
     # in case the cell selection has changed

@@ -349,7 +349,7 @@ observeEvent(
       )
     }
     # cp = load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
-    browser()
+    # browser()
     if (newPrj %in% colnames(projections)) {
       showNotification(
         "New column name already used",
@@ -400,7 +400,7 @@ observeEvent(
     if (!delPrj %in% colnames(newPrjs)) {
       return(NULL)
     }
-    browser()
+    # browser()
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/delPrjsButton.RData",
@@ -448,7 +448,7 @@ observeEvent(
       )
       return(NULL)
     }
-    browser()
+    # browser()
     combProjections = data.frame(row.names = rownames(projections), 
                                  paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor())
     if (length(levels(combProjections)) > 100) {
@@ -520,7 +520,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
-               browser()
+               # browser()
                
                if(is.null(
                  tryCatch({
