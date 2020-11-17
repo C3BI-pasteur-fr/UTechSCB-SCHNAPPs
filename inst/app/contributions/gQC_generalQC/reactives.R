@@ -1,5 +1,5 @@
 suppressMessages(require(uwot))
-suppressMessages(require(tidyverse))
+# suppressMessages(require(tidyverse))
 suppressMessages(require(SingleCellExperiment))
 
 # here we define reactive values/variables
@@ -484,6 +484,7 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
   })
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("tsnePlot", id = "tsnePlot", duration = NULL)
+    removeNotification(id = "tsnePlotERROR")
   }
   
   projections <- as.data.frame(projections)

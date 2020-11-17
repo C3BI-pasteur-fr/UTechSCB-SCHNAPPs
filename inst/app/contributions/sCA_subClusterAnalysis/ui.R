@@ -112,7 +112,7 @@ tabList <- list(
       #     ),
       # br(),
       
-      
+      if ("manhattanly" %in% rownames(installed.packages()))
       tabPanel(
         title = "Volcano plot",  width = 12, 
         collapsible = FALSE, collapsed = FALSE,
@@ -141,6 +141,7 @@ tabList <- list(
         fluidRow(
           column(
             width = 12,
+            if ("manhattanly" %in% rownames(installed.packages()))
             jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
           )
         ),

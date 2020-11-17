@@ -374,9 +374,10 @@ generalParametersTab <- function() {
                    width = 12, offset = 1,
                    actionButton("updatePCAParameters", "apply changes", width = "80%")
                  )
-               )
+               ),
+               checkbsTT(item = "tabsetPCA")
              ),
-             checkbsTT(item = "tabsetPCA"),
+             
              
              tabPanel(
                title = "DimPlot for PCA", solidHeader = TRUE, width = 12, value = "dimPlotPCA",

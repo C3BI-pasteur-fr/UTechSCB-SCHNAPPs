@@ -1438,7 +1438,15 @@ heatmapModuleFunction <- function(
   heatmapData$mat[heatmapData$mat <= minMaxVal[1]] = minMaxVal[1]
   heatmapData$mat[heatmapData$mat >= minMaxVal[2]] = minMaxVal[2]
   
-  
+  if (!"TRONCO" %in% rownames(installed.packages())) {
+    return(list(
+      src = "empty.png",
+      contentType = "image/png",
+      width = 96,
+      height = 96,
+      alt = "pHeatMapPlot should be here (no rows)"
+    ))
+  }
   do.call(TRONCO::pheatmap, heatmapData)
   
   

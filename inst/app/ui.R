@@ -11,7 +11,7 @@ source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 suppressMessages(require(shinydashboard))
 suppressMessages(require(shinydashboardPlus))
 suppressMessages(require(plotly))
-suppressMessages(require(shinythemes))
+# suppressMessages(require(shinythemes))
 suppressMessages(require(ggplot2))
 suppressMessages(require(DT))
 suppressMessages(require(edgeR))
@@ -45,6 +45,14 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # }
 # input, cell/gene selection tabs
 # source('tabs.R',  local = TRUE)
+
+# "introjsUI"
+if ("introjsUI" %in% rownames(installed.packages())) {
+  suppressMessages(require(introjsUI))
+} else {
+  introjsUI = function(...) {}
+}
+
 
 scShinyUI <- function(request) {
   source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
@@ -210,7 +218,7 @@ scShinyUI <- function(request) {
       ), # dashboard side bar
       shinydashboard::dashboardBody(
         shinyjs::useShinyjs(debug = TRUE),
-        rintrojs::introjsUI(),
+        introjsUI(),
         inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
         inlineCSS(list(.green = "background-color: lightgreen")),
         getallTabs(),
