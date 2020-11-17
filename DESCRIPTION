@@ -1,7 +1,7 @@
 Package: SCHNAPPs
 Type: Package
 Title: Single Cell Shiny Application for Analysing Single Cell Transcriptomics Data
-Version: 1.5.1
+Version: 1.5.2
 Authors@R: c(person("Bernd", "Jagla", role = c("aut", "cre"), email = "bernd.jagla@pasteur.fr", comment = c(ORCID = "0000-0002-7696-0484")))
 Maintainer: Bernd Jagla <bernd.jagla@pasteur.fr>
 Description: Single Cell sHiny APPlication (SCHNAPPs) is a R/Shiny based application to interact, manipulate, explore, and analyze single cell RNA-seq experiments, including MARS-seq and others.
@@ -15,44 +15,32 @@ Depends:
     R (>= 3.6)
 Imports:
     DT,
-    dplyr,
     shiny,
     shinyTree,
     psychTools,
     pryr,
     colourpicker,
     Seurat,
+    scater,
+    scran,
     shinyjs,
     shinyWidgets,
     reactlog,
-    cowplot,
     ggpubr,
     shinydashboard
 Suggests:
-    shinyjs,
-    MASS,
-    colourpicker,
     knitr,
     manhattanly,
     ggalluvial,
     pheatmap,
-    psychTools,
     rmarkdown,
-    scater,
-    scran,
-    Seurat,
     shinydashboardPlus,
     shinythemes,
-    shinyWidgets,
-    ggpubr,
     SummarizedExperiment,
     threejs,
     tidyverse,
     TRONCO,
     rintrojs,
-    tibble,
-    igraph,
-    future,
     multtest,
     vembedr,
     parallel,
@@ -61,7 +49,6 @@ Suggests:
     shinyAce,
     RJSONIO,
     mgcv,
-    cowplot,
     kableExtra,
     pdftools,
     shinyjqui,
@@ -75,8 +62,7 @@ Suggests:
     orca,
     reactlog,
     debugme,
-    shinyBS,
-    crayon
+    shinyBS
 RoxygenNote: 7.1.1
 URL: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs
 BugReports: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues
