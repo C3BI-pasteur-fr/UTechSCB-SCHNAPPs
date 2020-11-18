@@ -233,8 +233,8 @@ pHeatMapUI <- function(id) {
             selectInput(
               ns("orderNames"),
               label = "order of columns",
-              choices = defaultValue(ns("orderNames"), ""),
-              selected = defaultValue(ns("orderNames"), ""),
+              choices = defaultValue(ns("orderNames"), "sampleNames"),
+              selected = defaultValue(ns("orderNames"), "sampleNames"),
               multiple = TRUE
             ),
             sliderInput(

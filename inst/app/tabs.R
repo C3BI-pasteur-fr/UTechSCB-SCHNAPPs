@@ -115,7 +115,7 @@ inputTab <- function() {
           checkboxInput("sampleInput", label = "sub sample", value = defaultValue("sampleInput", TRUE)),
           
           numericInput("subsampleNum",
-                       label = "max number of cells",
+                       label = "max number of cells per sample",
                        min = 500, max = 10000, step = 100, value = defaultValue("subsampleNum", 1000)
           )
         ),
