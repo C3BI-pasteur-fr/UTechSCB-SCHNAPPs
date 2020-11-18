@@ -1,5 +1,6 @@
 cat(file = stderr(), "outputs.R started.\n")
 suppressMessages(require(shinyTree))
+suppressMessages(require(stringr))
 # require(rintrojs)
 # SUMMARY STATS ----------------------------------------------------------------
 base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)

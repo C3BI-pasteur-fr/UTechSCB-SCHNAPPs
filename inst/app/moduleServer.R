@@ -1175,6 +1175,16 @@ pHeatMapModule <- function(input, output, session,
   
   outfilePH <- NULL
   
+  observe(label = "ColNames", {
+    if (DEBUG) cat(file = stderr(), paste0("observe: ColNames\n"))
+    .schnappsEnv[[ns('ColNames')]] <- input$ColNames
+  })
+  observe(label = "orderNames", {
+    if (DEBUG) cat(file = stderr(), paste0("observe: orderNames\n"))
+    .schnappsEnv[[ns('orderNames')]] <- input$orderNames
+  })
+  
+  
   # observe save 2 history ----
   observe(label = "save2histHM", {
     clicked <- input$save2HistHM
@@ -1233,11 +1243,11 @@ pHeatMapModule <- function(input, output, session,
     # Can also set the label and select items
     updateSelectInput(session, "ColNames",
                       choices = colnames(proje),
-                      selected = "sampleNames"
+                      selected = .schnappsEnv[[ns('ColNames')]]
     )
     updateSelectInput(session, "orderNames",
                       choices = colnames(proje),
-                      selected = "sampleNames"
+                      selected = .schnappsEnv[[ns('orderNames')]]
     )
     
     # updateSelectInput(session, "dimension_y",
