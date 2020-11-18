@@ -13,6 +13,12 @@ https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1
 
 ## Installation
 
+Developper tools need to be installed please see for further information:
+
+Windows: https://cran.r-project.org/bin/windows/
+
+MAC: https://cran.r-project.org/bin/macosx/
+
 ```
 update.packages()
 if (!require("devtools"))
