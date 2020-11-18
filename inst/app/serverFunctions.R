@@ -509,6 +509,10 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   }
   # add density on y-axis if sorted by barcode
   if (dimX == "__dimXorder") {
+    if (!is.numeric(subsetData[, dimY])) {
+      cat(file=stderr(), paste("\nWARNING: ", dimY, "is not numeric\n\n"))
+      return(NULL)
+      }
     density <- stats::density(subsetData[, dimY], na.rm = T)
     library(MASS)
     fit <- fitdistr(subsetData[!is.na(subsetData[, dimY]), dimY], "normal", na.rm = T)

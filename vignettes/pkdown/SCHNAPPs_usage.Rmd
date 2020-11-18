@@ -51,11 +51,7 @@ devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")
 To take advantage of the history functionality orca needs to be installed:
 (https://github.com/plotly/orca#installation)
 
-orca is part of ploty so nothing to be done for R. But the pdftools are required:
-
-```
-install.packages("pdftools")
-```
+orca is part of ploty so nothing to be done for R.
 
 Notes:
 
