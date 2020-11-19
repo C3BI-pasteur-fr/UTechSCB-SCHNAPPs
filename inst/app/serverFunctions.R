@@ -1203,8 +1203,13 @@ add2history <- function(type, comment = "", input = input, ...) {
     inp = input
     save(file = tfile, list = c(names(varnames[1]), "inp"), compress = F)
     # the load is commented out because it is not used at the moment and only takes time to load
+    if(comment %in% c("scEx", "scEx_log")) {
+      commentOutLoad = "#"
+    } else {
+      commentOutLoad = ""
+    }
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\n#load(file = \"", basename(tfile),
+      "```{R}\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
       "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)

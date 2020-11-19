@@ -148,9 +148,9 @@ clusterServer <- function(input, output, session,
     add2history(
       type = "save", input = isolate( reactiveValuesToList(input)),
       comment = paste("# ",myns, "\n",
-                      "# fun = plotData$plotData$panelPlotFunc\n", 
-                      "# environment(fun) = environment()\n",
-                      "# do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+                      "fun = plotData$plotData$panelPlotFunc\n", 
+                      "environment(fun) = environment()\n",
+                      "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
       ),
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )

@@ -926,9 +926,9 @@ observe(label = "save2HistAlluvial", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste0("# Alluvial plot\n",
-                               "# fun = plotData$plotData$panelPlotFunc\n", 
-                               "# environment(fun) = environment()\n",
-                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+                               "fun = plotData$plotData$panelPlotFunc\n", 
+                               "environment(fun) = environment()\n",
+                               "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),
               plotData = .schnappsEnv[["coE_alluvialPlot"]])
   
