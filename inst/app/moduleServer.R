@@ -1211,9 +1211,14 @@ pHeatMapModule <- function(input, output, session,
       return()
     }
     add2history(
-      type = "tronco", input = isolate( reactiveValuesToList(input)),
-      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]],
-      comment = paste(myns)
+      type = "save", input = isolate( reactiveValuesToList(input)),
+      comment = paste("# ",myns, "\n",
+                      "fun = plotData$plotData$panelPlotFunc\n", 
+                      "environment(fun) = environment()\n",
+                      "plotData$plotData$outfile=NULL\n",
+                      "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+      ),
+      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )
   })
   
@@ -1342,6 +1347,23 @@ pHeatMapModule <- function(input, output, session,
     
     if (retVal[["src"]] == "empty.png") {
       .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
+    } else {
+      af = heatmapModuleFunction
+      # remove env because it is too big
+      environment(af) = new.env(parent = emptyenv())
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(panelPlotFunc = af,
+                                                           heatmapData = heatmapData,
+                                                           addColNames = addColNames,
+                                                           orderColNames = orderColNames,
+                                                           colTree = colTree,
+                                                           scale = scale,
+                                                           pWidth = pWidth,
+                                                           pHeight = pHeight,
+                                                           colPal = colPal,
+                                                           minMaxVal = minMaxVal,
+                                                           proje = proje,
+                                                           outfile = outfile
+      )
     }
     return(retVal)
   })

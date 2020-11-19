@@ -69,7 +69,7 @@ observe(label = "save2histvar", {
   # add2history(type = "renderPlot", input = isolate( reactiveValuesToList(input)), comment = "PC variance",  
   #             plotData = .schnappsEnv[["gQC_variancePCA"]])
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
-              comment = paste0("# PC variance",
+              comment = paste0("# PC variance\n",
                                "fun = plotData$plotData$panelPlotFunc\n", 
                                "environment(fun) = environment()\n",
                                "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"),

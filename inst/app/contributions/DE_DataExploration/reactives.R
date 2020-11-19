@@ -104,7 +104,7 @@ observe(label = "save2HistScater", {
   if (is.null(clicked)) return()
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
-              comment = paste0("scater plot", 
+              comment = paste0("scater plot\n", 
                                "fun = plotData$plotData$panelPlotFunc\n", 
                                "environment(fun) = environment()\n",
                                "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"), 

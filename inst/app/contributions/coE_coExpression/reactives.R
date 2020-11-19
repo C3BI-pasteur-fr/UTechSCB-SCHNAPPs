@@ -741,7 +741,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExp
 
 
 
-# save to history violoin observer ----
+# save to history violoin observer 2----
 observe(label = "save2histVio", {
   clicked  = input$save2HistVio
   if (DEBUG) cat(file = stderr(), "observe input$save2HistVio \n")
@@ -757,8 +757,41 @@ observe(label = "save2histVio", {
   }
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlot", input = isolate( reactiveValuesToList(input)), comment = "violin plot",  
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# violin plot\n",
+                              "fun = plotData$plotData$panelPlotFunc\n", 
+                              "environment(fun) = environment()\n",
+                              "plotData$plotData$outfile=NULL\n",
+                              "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+              ),
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
+  
+})
+
+# save to history violoin observer ----
+observe(label = "save2histVio2", {
+  clicked  = input$save2HistVio2
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistVio2 \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# violin plot\n",
+                              "fun = plotData$plotData$panelPlotFunc\n", 
+                              "environment(fun) = environment()\n",
+                              "plotData$plotData$outfile=NULL\n",
+                              "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+              ),
+              plotData = .schnappsEnv[["coE_geneGrp_vio_plot2"]])
   
 })
 

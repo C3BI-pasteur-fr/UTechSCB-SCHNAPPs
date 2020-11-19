@@ -205,6 +205,8 @@ scShinyServer <- function(input, output, session) {
         suppressMessages(require(reactlog))
       }
       suppressMessages(require(Seurat))
+      .schnappsEnv = list()
+      .schnappsEnv$DEBUGSAVE = FALSE
       source(system.file(\"app\", \"serverFunctions.R\", package = \"SCHNAPPs\"))
       DEBUG=FALSE
       \n```\n" )
