@@ -105,9 +105,9 @@ observe(label = "save2HistScater", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste0("scater plot", 
-                               "# fun = plotData$plotData$panelPlotFunc\n", 
-                               "# environment(fun) = environment()\n",
-                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"), 
+                               "fun = plotData$plotData$panelPlotFunc\n", 
+                               "environment(fun) = environment()\n",
+                               "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"), 
               plotData = .schnappsEnv[["DE_scaterPNG"]])
   
 })
@@ -129,9 +129,9 @@ observe(label = "save2HistPanel", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste0("# Panel plot\n",
-                               "# fun = plotData$plotData$panelPlotFunc\n", 
-                               "# environment(fun) = environment()\n",
-                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+                               "fun = plotData$plotData$panelPlotFunc\n", 
+                               "environment(fun) = environment()\n",
+                               "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),
               plotData = .schnappsEnv[["DE_panelPlot"]])
 })
