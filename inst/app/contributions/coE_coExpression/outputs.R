@@ -140,15 +140,29 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     sampCol = sampCol,
     ccols = ccols
   )
-  serializePlots <- function(data) {
-    lapply(data, function(plot) {
-      rawToChar(serialize(plot, NULL, ascii = TRUE))
-    })
-  }
+  # serializePlots <- function(data) {
+  #   lapply(data, function(plot) {
+  #     rawToChar(serialize(plot, NULL, ascii = TRUE))
+  #   })
+  # }
   
   # removed because it was too long and took too much memory
   # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- serializePlots(retVal)
-  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
+  af = coE_geneGrp_vioFunc
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(panelPlotFunc = af,
+                                                 genesin = geneListStr,
+                                                 projections = projections,
+                                                 scEx = scEx_log,
+                                                 featureData = featureData,
+                                                 minExpr = minExpr,
+                                                 dbCluster = projectionVar,
+                                                 coE_showPermutations = coE_showPermutations,
+                                                 sampCol = sampCol,
+                                                 ccols = ccols
+  )
+  # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
   #  exportTestValues(coE_geneGrp_vio_plot = {
   #    serializePlots(retVal)
   # })
@@ -204,7 +218,20 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
     sampCol = sampCol,
     ccols = ccols
   )
-  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
+  af = coE_geneGrp_vioFunc2
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(panelPlotFunc = af,
+                                                       genesin = geneListStr,
+                                                       projections = projections,
+                                                       scEx = scEx_log,
+                                                       featureData = featureData,
+                                                       minExpr = minExpr,
+                                                       dbCluster = projectionVar,
+                                                       sampCol = sampCol,
+                                                       ccols = ccols)
+                                                       
+  # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
   exportTestValues(coE_geneGrp_vio_plot = {
     retVal
   })

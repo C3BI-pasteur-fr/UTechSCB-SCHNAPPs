@@ -631,7 +631,9 @@ observe({
   
   if (is.null(clicked)) return()
   if (clicked < 1) return()
-  add2history(type = "renderPlotly", input = isolate( reactiveValuesToList(input)), comment = "volcano plot",  
+  add2history(type = "renderPlotly", 
+              input = isolate( reactiveValuesToList(input)), 
+              comment = "volcano plot",  
               plotData = .schnappsEnv[["sCA_volcanoPlot"]])
   
 })
