@@ -369,39 +369,13 @@ coE_topExpCCTable <- reactive({
   return(retVal)
 })
 
-# combinePermutations ----
-combinePermutations <- function(perm1, perm2) {
-  perms <- rep("", length(perm1))
-  for (cIdx in 1:length(perm1)) {
-    if (perm2[cIdx] == "") {
-      perms[cIdx] <- perm1[cIdx]
-    } else {
-      perms[cIdx] <- perm2[cIdx]
-    }
-  }
-  perms
-}
-
-# finner
-finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minExpr) {
-  comb <- gtools::combinations(xPerm, r, genesin)
-  for (cIdx in 1:nrow(comb)) {
-    map <-
-      rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
-    # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
-    
-    permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, 1:ncol(comb)])
-    perms[permIdx] <- paste0(comb[cIdx, 1:ncol(comb)], collapse = "+")
-  }
-  perms
-}
-
-
 #' coE_geneGrp_vioFunc
 #' generates a ggplot object with a violin plot
 #' optionally creates all permutations.
 coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr = 1,
                                 dbCluster, coE_showPermutations = FALSE, sampCol, ccols) {
+  
+  
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc started.\n")
   start.time <- base::Sys.time()
   require(BiocParallel)
@@ -899,9 +873,9 @@ coE_heatmapReactive <- reactive({
   featureData <- rowData(scEx_log)
   if (genesin == "") {
     wmarkers <- scran::findMarkers(scEx_log, 
-                            projections$dbCluster,
-                            direction = direction,
-                            lfc = lfc)
+                                   projections$dbCluster,
+                                   direction = direction,
+                                   lfc = lfc)
     
     markerlist = lapply(wmarkers,FUN = function(x){
       rownames(x)[order(x$p.value)[1:nFindCluster]]

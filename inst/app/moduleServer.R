@@ -268,7 +268,7 @@ clusterServer <- function(input, output, session,
           return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ]))
         } else {
           # TODO message about setting plot
-          showNotification("Make sure 'the'group names' is set correctly ", id = "selectedCellNamesProbl", duration = NULL)
+          showNotification("Make sure 'the'group names' is set correctly ", id = "selectedCellNamesProbl", duration = 10)
           if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames:some return null\n")
           return(NULL)
         }
@@ -284,9 +284,18 @@ clusterServer <- function(input, output, session,
     if (is.null(cells.names) )
       if (length(brushedPs) >0)
         if (nrow(brushedPs) > 0) {
-          cells.names = rownames(projections[which(projections[,dimX] %in% brushedPs$x & 
-                                                     projections[,dimY] %in% brushedPs$y),])
+          cells.names = tryCatch(
+            {
+              
+              rownames(projections[which(projections[,dimX] %in% brushedPs$x & 
+                                           projections[,dimY] %in% brushedPs$y),])
+            },
+            error = function(e) {
+              cat(file = stderr(), "\n\ncaught exception with dimx:", dimX, " dimy: ", dimY,  "\n\n")
+              return(NULL)
+            })
         }
+    if(is.null(cells.names)) return(NULL)
     cells.names <- cells.names[cells.names %in% colnames(scEx_log)]
     cells.names <- unique(cells.names[!is.na(cells.names)])
     # if (DEBUG) {

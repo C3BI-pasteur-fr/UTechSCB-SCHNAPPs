@@ -150,7 +150,12 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- serializePlots(retVal)
   af = coE_geneGrp_vioFunc
   # remove env because it is too big
-  environment(af) = new.env(parent = emptyenv())
+  specEnv = emptyenv()
+  eval(envir = specEnv, {
+    finner = finner;
+    combinePermutations = combinePermutations
+  })
+  environment(af) = new.env(parent = specEnv)
   .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(panelPlotFunc = af,
                                                  genesin = geneListStr,
                                                  projections = projections,

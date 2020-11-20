@@ -1644,6 +1644,38 @@ dheader <- function() {
 # to be able to use %>%
 setId = function(inp, id) {return(tags$div(id=id, inp))}
 
+### used in coE - violin plot - permutations
+# combinePermutations ----
+combinePermutations <- function(perm1, perm2) {
+  perms <- rep("", length(perm1))
+  for (cIdx in 1:length(perm1)) {
+    if (perm2[cIdx] == "") {
+      perms[cIdx] <- perm1[cIdx]
+    } else {
+      perms[cIdx] <- perm2[cIdx]
+    }
+  }
+  perms
+}
+
+# finner
+finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minExpr) {
+  comb <- gtools::combinations(xPerm, r, genesin)
+  for (cIdx in 1:nrow(comb)) {
+    map <-
+      rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
+    # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
+    
+    permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, 1:ncol(comb)])
+    perms[permIdx] <- paste0(comb[cIdx, 1:ncol(comb)], collapse = "+")
+  }
+  perms
+}
+
+
+
+
+
 
 if (.schnappsEnv$DEBUG) {
   cat(file = stderr(), "end severFunctions.R\n")
