@@ -208,7 +208,7 @@ scShinyUI <- function(request) {
             }
           },
           if (DEBUG) {
-            actionButton("openBrowser", "open Browser")
+            # actionButton("openBrowser", "open Browser")
           },
           bookmarkButton()
         )
