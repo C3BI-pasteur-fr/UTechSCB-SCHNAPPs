@@ -222,14 +222,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       subsetData <- subsetData[order(subsetData[,dimCol]),]
     }
   }
-  # subsetData$dbCluster = factor(subsetData$dbCluster)
-  # if there are more than 18 samples ggplot cannot handle different shapes and we ignore the
-  # sample information
-  if (length(as.numeric(as.factor(subsetData$sampleNames))) > 18) {
-    subsetData$shape <- as.factor(1)
-  } else {
-    subsetData$shape <- as.numeric(as.factor(subsetData$sampleNames))
-  }
+  # # subsetData$dbCluster = factor(subsetData$dbCluster)
+  # # if there are more than 18 samples ggplot cannot handle different shapes and we ignore the
+  # # sample information
+  # if (length(as.numeric(as.factor(subsetData$sampleNames))) > 18) {
+  #   subsetData$shape <- as.factor(1)
+  # } else {
+  #   subsetData$shape <- as.numeric(as.factor(subsetData$sampleNames))
+  # }
   if (nrow(subsetData) == 0) {
     return(NULL)
   }
@@ -318,27 +318,33 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     #
     
     if (is(subsetData[,dimCol], "factor")) {
-      one_plot <- function(d) {
-        add_histogram(x = ~d[,dimX])  
-        # %>%
-        #   add_annotations(
-        #     ~unique(clarity), x = 0.5, y = 1, 
-        #     xref = "paper", yref = "paper", showarrow = FALSE
-        #   )
-      }
+      # one_plot <- function(d) {
+      #   add_histogram(x = ~d[,dimX])  
+      #   # %>%
+      #   #   add_annotations(
+      #   #     ~unique(clarity), x = 0.5, y = 1, 
+      #   #     xref = "paper", yref = "paper", showarrow = FALSE
+      #   #   )
+      # }
       p1 <- subsetData %>% split(.[dimCol])
       
       # %>% lapply(one_plot)
       p = plot_ly(alpha = 0.6)
       for (le in 1:length(p1)) {
         if(nrow(p1[[le]])>0){
-          
-          p = add_histogram(p, x = p1[[le]][,dimX], name = levels(subsetData[,dimCol])[le])
+          mcol = NULL
+          if (!is.null(colors)) {
+            mcol = list(color = colors[names(p1)[le]])
+          }
+          p = add_histogram(p, x = p1[[le]][,dimX], 
+                            name = levels(subsetData[,dimCol])[le],
+                            marker = mcol)
           print(le)
         }
       }
       p = p %>% layout(barmode = "stack")
-      p
+      # p
+      return (p)
       # plot_ly(alpha = 0.6) %>% lapply(p1, one_plot) %>%
       #   layout(barmode = "stack")
       # plot_ly(alpha = 0.6) %>% add_histogram(x=~p1[[3]][,dimX]) %>% add_histogram(x=~p1[[2]][,dimX]) %>%
