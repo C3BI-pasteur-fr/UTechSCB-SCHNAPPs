@@ -66,7 +66,7 @@ sCA_dgeTableReac <- reactive({
 callModule(
   tableSelectionServer,
   "sCA_dgeTable",
-  sCA_dgeTableReac
+  sCA_dgeTableReac, caption = "Tables with differentially expressed genes"
 )
 
 sCA_dataInp <- callModule(

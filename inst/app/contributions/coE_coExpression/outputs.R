@@ -31,14 +31,14 @@ callModule(
 callModule(
   tableSelectionServer,
   "coE_topExpGenes",
-  coE_topExpGenesTable
+  coE_topExpGenesTable, caption = "Tables with highest expressed genes"
 )
 
 # max expressed genes ----
 callModule(
   tableSelectionServer,
   "coE_topCCGenes",
-  coE_topExpCCTable
+  coE_topExpCCTable, caption = "Tables with highest expressed correlated genes"
 )
 # observe: updateHeatMapSelectedParameters ----
 observe(label = "ob_HeatMapSelectedParams", {

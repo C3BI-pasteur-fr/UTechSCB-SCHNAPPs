@@ -182,14 +182,14 @@ callModule(
 callModule(
   tableSelectionServer,
   "gQC_projectionTableMod",
-  projectionTable
+  projectionTable, caption = "Table with projections"
 )
 
 # gQC_projectionCombTableMod ----
 callModule(
   tableSelectionServer,
   "gQC_projCombTableMod",
-  projectionTable
+  projectionTable, caption = "Tables with projections"
 )
 
 # gQC_plotUmiHist ----
