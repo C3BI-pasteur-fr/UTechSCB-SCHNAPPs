@@ -1301,6 +1301,7 @@ pHeatMapModule <- function(input, output, session,
       showNotification("updateInput", id = "updateInput", duration = NULL)
     }
     heatmapData <- pheatmapList()
+    if(is.null(heatmapData)) return(NULL)
     updateSliderInput(session,
                       inputId = "heatmapMinMaxValue",
                       min = signif(min(heatmapData$mat), digits = 4),

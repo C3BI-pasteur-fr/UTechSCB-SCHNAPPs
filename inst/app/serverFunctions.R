@@ -1330,7 +1330,7 @@ heatmapModuleFunction <- function(
   pWidth = 300, 
   pHeight = 900,
   colPal= "none",
-  minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat)),
+  minMaxVal = NULL,
   proje = NULL,
   outfile = NULL
 ) {
@@ -1347,6 +1347,7 @@ heatmapModuleFunction <- function(
       alt = "pHeatMapPlot should be here (null)"
     ))
   }
+  if(is.null(minMaxVal)) minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat))
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
   }
