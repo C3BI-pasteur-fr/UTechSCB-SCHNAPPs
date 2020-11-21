@@ -173,11 +173,15 @@ gQC_sampleHistFunc <- function(sampleInf, scols) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_sampleHistFunc", id = "gQC_sampleHistFunc", duration = NULL)
   }
+  browser()
   
+  if (!is.factor(sampleInf)) {
+    sampleInf = as.factor(sampleInf)
+  }
   
   plotly::plot_ly(x=sampleInf, 
                   type="histogram", 
-                  marker = list(color = scols[unique(sampleInf)])) %>%
+                  marker = list(color = scols[levels(sampleInf)])) %>%
     layout(
       title = "Number of cells per sample",
       xaxis = list(title = "Samples"),
