@@ -317,7 +317,7 @@ output$gQC_variancePCA <- renderPlot({
   af = plotHistVarPC
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
-  .schnappsEnv[["gQC_variancePCA"]] <- list(panelPlotFunc = af,
+  .schnappsEnv[["gQC_variancePCA"]] <- list(plotFunc = af,
                                             df, pc, var)
   
   # .schnappsEnv[["gQC_variancePCA"]] <- retVal

@@ -733,7 +733,7 @@ observe(label = "save2histVio", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste("# violin plot\n",
-                              "fun = plotData$plotData$panelPlotFunc\n", 
+                              "fun = plotData$plotData$plotFunc\n", 
                               "environment(fun) = environment()\n",
                               "plotData$plotData$outfile=NULL\n",
                               "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
@@ -760,7 +760,7 @@ observe(label = "save2histVio2", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste("# violin plot\n",
-                              "fun = plotData$plotData$panelPlotFunc\n", 
+                              "fun = plotData$plotData$plotFunc\n", 
                               "environment(fun) = environment()\n",
                               "plotData$plotData$outfile=NULL\n",
                               "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
@@ -933,7 +933,7 @@ observe(label = "save2HistAlluvial", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste0("# Alluvial plot\n",
-                               "fun = plotData$plotData$panelPlotFunc\n", 
+                               "fun = plotData$plotData$plotFunc\n", 
                                "environment(fun) = environment()\n",
                                "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),

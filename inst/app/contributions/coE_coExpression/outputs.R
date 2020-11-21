@@ -156,7 +156,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     combinePermutations = combinePermutations
   })
   environment(af) = new.env(parent = specEnv)
-  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(panelPlotFunc = af,
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(plotFunc = af,
                                                  genesin = geneListStr,
                                                  projections = projections,
                                                  scEx = scEx_log,
@@ -226,7 +226,7 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
   af = coE_geneGrp_vioFunc2
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
-  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(panelPlotFunc = af,
+  .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(plotFunc = af,
                                                        genesin = geneListStr,
                                                        projections = projections,
                                                        scEx = scEx_log,
@@ -292,7 +292,7 @@ output$alluvial_plot <- renderPlot({
   af = alluvialPlotFunc
   environment(af) = new.env(parent = emptyenv())
   # for saving to history
-  .schnappsEnv[["coE_alluvialPlot"]] <- list(panelPlotFunc = af,
+  .schnappsEnv[["coE_alluvialPlot"]] <- list(plotFunc = af,
                                          dat = dat, 
                                          alluiv1=alluiv1, 
                                          alluiv2=alluiv2)
