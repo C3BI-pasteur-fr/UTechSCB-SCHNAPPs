@@ -1215,7 +1215,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       commentOutLoad = ""
     }
     line <- paste0(
-      "```{R}\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
+      "```{R, fig.cap = \"\"}\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
       "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1230,7 +1230,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       # orca(plotData$plotData, file = tfile, format = "png")
       withr::with_dir(normalizePath(.schnappsEnv$historyPath), orca(plotData$plotData, file = tfile, format = "png"))
       line <- paste0(
-        # "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
+        # "```{R, fig.cap = \"\"}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
         # "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n",
         "\n![](",basename(tfile),")\n\n"
       )
@@ -1248,7 +1248,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
     
     line <- paste0(
-      "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R, fig.cap = \"\"}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]) ,"$filename <- NULL \n",
       "\ndo.call(TRONCO::pheatmap, ", names(varnames[1]), ")\n```\n"
     )
@@ -1262,7 +1262,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
     
     line <- paste0(
-      "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R, fig.cap = \"\"}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)

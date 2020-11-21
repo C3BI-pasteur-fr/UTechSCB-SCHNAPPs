@@ -123,6 +123,7 @@ clusterServer <- function(input, output, session,
   
   # observe save  2 history ----
   observe(label = "save2histMod2d", {
+    # browser()
     clicked <- input$save2Hist
     if (DEBUG) cat(file = stderr(), "observe input$save2Hist \n")
     myns <- session$ns("-")
@@ -146,7 +147,9 @@ clusterServer <- function(input, output, session,
       return()
     }
     add2history(
-      type = "save", input = isolate( reactiveValuesToList(input)),
+      type = "save", input = c(isolate( reactiveValuesToList(input)), 
+                               isolate( reactiveValuesToList(
+                                 get("input", envir = parent.env(parent.env(environment())))))),
       comment = paste("# ",myns, "\n",
                       "fun = plotData$plotData$panelPlotFunc\n", 
                       "environment(fun) = environment()\n",
@@ -893,7 +896,7 @@ clusterServer <- function(input, output, session,
 
 
 tableSelectionServer <- function(input, output, session,
-                                 dataTab) {
+                                 dataTab, caption = "Table") {
   if (DEBUG) cat(file = stderr(), paste("tableSelectionServer", session$ns("test"), "\n"))
   ns <- session$ns
   # modSelectedRows <- c()
@@ -1131,6 +1134,7 @@ tableSelectionServer <- function(input, output, session,
                              selection = list(mode = "multiple"
                                               # , selected = get(ns("modSelectedRows"), envir = .schnappsEnv)
                              ),
+                             caption = caption,
                              options = list(
                                orderClasses = TRUE,
                                autoWidth = TRUE,

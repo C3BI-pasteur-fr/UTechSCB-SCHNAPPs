@@ -173,7 +173,7 @@ gQC_sampleHistFunc <- function(sampleInf, scols) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_sampleHistFunc", id = "gQC_sampleHistFunc", duration = NULL)
   }
-  browser()
+  # browser()
   
   if (!is.factor(sampleInf)) {
     sampleInf = as.factor(sampleInf)
