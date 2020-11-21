@@ -81,6 +81,7 @@ observeEvent(input$openBrowser, {
 # message.
 observeEvent(input$commentok, {
   # cat(file = stderr(), paste0("commentok: \n"))
+  # browser()
   comment <- input$Comment4history
   add2history(type = "text", comment = "",  input=isolate( reactiveValuesToList(input)), text2add = comment)
   removeModal()
@@ -321,10 +322,10 @@ inputDataFunc <- function(inFile) {
       colData(allScEx)$sampleNames <- factor(colData(allScEx)$sampleNames)
     }
     sampNames <- levels(colData(allScEx)$sampleNames)
-    isolate({
-      sampleCols$colPal <- allowedColors[seq_along(sampNames)]
-      names(sampleCols$colPal) <- sampNames
-    })
+    # isolate({
+    #   sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+    #   names(sampleCols$colPal) <- sampNames
+    # })
   } else {
     showNotification(
       "scEx - colData doesn't contain sampleNames",
@@ -655,7 +656,7 @@ inputData <- reactive({
   
   sampNames <- levels(colData(retVal$scEx)$sampleNames)
   isolate({
-    sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+    sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
     names(sampleCols$colPal) <- sampNames
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
