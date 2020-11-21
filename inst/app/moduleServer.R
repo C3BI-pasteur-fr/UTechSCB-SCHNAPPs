@@ -151,7 +151,7 @@ clusterServer <- function(input, output, session,
                                isolate( reactiveValuesToList(
                                  get("input", envir = parent.env(parent.env(environment())))))),
       comment = paste("# ",myns, "\n",
-                      "fun = plotData$plotData$panelPlotFunc\n", 
+                      "fun = plotData$plotData$plotFunc\n", 
                       "environment(fun) = environment()\n",
                       "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
       ),
@@ -519,11 +519,25 @@ clusterServer <- function(input, output, session,
     af = plot2Dprojection
     # remove env because it is too big
     environment(af) = new.env(parent = emptyenv())
-    .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(panelPlotFunc = af,
-                                                         scEx_log,
-                                                         projections = tdata, g_id, featureData, geneNames,
-                                                         geneNames2, dimX, dimY, clId, grpN, legend.position,
-                                                         grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
+                                                         scEx_log = scEx_log,
+                                                         projections = tdata,
+                                                         g_id = g_id, 
+                                                         featureData = featureData, 
+                                                         geneNames = geneNames, 
+                                                         geneNames2 = geneNames2, 
+                                                         dimX = dimX, 
+                                                         dimY = dimY, 
+                                                         clId = clId, 
+                                                         grpN = grpN, 
+                                                         legend.positio = legend.position,
+                                                         grpNs = grpNs, 
+                                                         logx = logx, 
+                                                         logy = logy, 
+                                                         divXBy = divXBy, 
+                                                         divYBy = divYBy, 
+                                                         dimCol = dimCol, 
+                                                         colors = myColors
     )
     
     # .schnappsEnv[[paste0("historyPlot-", myns)]] <- p1
@@ -1226,7 +1240,7 @@ pHeatMapModule <- function(input, output, session,
     add2history(
       type = "save", input = isolate( reactiveValuesToList(input)),
       comment = paste("# ",myns, "\n",
-                      "fun = plotData$plotData$panelPlotFunc\n", 
+                      "fun = plotData$plotData$plotFunc\n", 
                       "environment(fun) = environment()\n",
                       "plotData$plotData$outfile=NULL\n",
                       "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
@@ -1364,7 +1378,7 @@ pHeatMapModule <- function(input, output, session,
       af = heatmapModuleFunction
       # remove env because it is too big
       environment(af) = new.env(parent = emptyenv())
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(panelPlotFunc = af,
+      .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
                                                            heatmapData = heatmapData,
                                                            addColNames = addColNames,
                                                            orderColNames = orderColNames,

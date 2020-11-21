@@ -266,7 +266,7 @@ output$DE_panelPlot <- renderPlot({
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
   
-  .schnappsEnv[["DE_panelPlot"]] <- list(panelPlotFunc = af,
+  .schnappsEnv[["DE_panelPlot"]] <- list(plotFunc = af,
                                          scEx_log = scEx_log, 
                                          projections=projections, 
                                          genesin=genesin, dimx4=dimx4, 

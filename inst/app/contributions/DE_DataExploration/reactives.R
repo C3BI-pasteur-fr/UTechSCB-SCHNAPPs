@@ -105,7 +105,7 @@ observe(label = "save2HistScater", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste0("scater plot\n", 
-                               "fun = plotData$plotData$panelPlotFunc\n", 
+                               "fun = plotData$plotData$plotFunc\n", 
                                "environment(fun) = environment()\n",
                                "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"), 
               plotData = .schnappsEnv[["DE_scaterPNG"]])
@@ -129,7 +129,7 @@ observe(label = "save2HistPanel", {
   if (clicked < 1) return()
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
               comment = paste0("# Panel plot\n",
-                               "fun = plotData$plotData$panelPlotFunc\n", 
+                               "fun = plotData$plotData$plotFunc\n", 
                                "environment(fun) = environment()\n",
                                "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),
@@ -240,8 +240,11 @@ DE_scaterPNG <- reactive({
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
   
-  .schnappsEnv[["DE_scaterPNG"]] <- list(panelPlotFunc = af,
-                                         plotHighestExprs, scaterReads, n, scols
+  .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
+                                         plotHighestExprs = plotHighestExprs,
+                                         scaterReads = scaterReads, 
+                                         n = n,
+                                         scols = scols
   )
   setRedGreenButton(
     vars = list(
@@ -388,7 +391,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
 
 
 panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs,
-                          lowCol = "red", highCol = "blue", midCol = "white",
+                          lowCol = "blue", highCol = "red", midCol = "white",
                           midFunc = function(x){(max(x)-min(x))/2}) {
   
   featureData <- rowData(scEx_log)
