@@ -498,19 +498,19 @@ output$geneListSelection <- shinyTree::renderTree({
 callModule(
   tableSelectionServer,
   "gsSelectedGenesMod",
-  gsSelectedGenesTable
+  gsSelectedGenesTable, caption = "Tables with used genes"
 )
 
 callModule(
   tableSelectionServer,
   "gsRMGenesMod",
-  gsRMGenesTable
+  gsRMGenesTable, caption = "Tables with removed genes"
 )
 
 callModule(
   tableSelectionServer,
   "PCAloadingsMod",
-  PCAloadingsTable
+  PCAloadingsTable, caption = "Tables with PCA loadings"
 )
 
 
@@ -539,13 +539,15 @@ output$DEBUGSAVEstring <- renderText({
 # })
 
 # cellSelectionMod ----
-callModule(tableSelectionServer, "cellSelectionMod", inputSample)
+callModule(tableSelectionServer, 
+           "cellSelectionMod", 
+           inputSample, caption = "Tables with input cells")
 
 # normalizationResult ----
 callModule(
   tableSelectionServer,
   "normalizationResult",
-  scExLogMatrixDisplay
+  scExLogMatrixDisplay, caption = "Tables with normalization results"
 )
 
 # descriptionOfWork ----
