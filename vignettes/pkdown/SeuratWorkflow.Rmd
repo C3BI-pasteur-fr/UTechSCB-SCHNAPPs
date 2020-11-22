@@ -24,6 +24,8 @@ library("vembedr")
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 ```
 
+# Introduction
+
 Please see the Seurat workflow for a more indepth workflow.
 
 https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html

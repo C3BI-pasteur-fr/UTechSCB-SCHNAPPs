@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.61</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.18</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@
       <a href="../../articles/Readme.html">Readme</a>
     </li>
     <li>
-      <a href="../../articles/pkdown/FAQs.html">Frequently asked questions for common tasks</a>
+      <a href="../../articles/pkdown/FAQs.html">FAQs</a>
     </li>
     <li>
       <a href="../../articles/pkdown/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
@@ -95,7 +95,9 @@
 
       
 
-      </header><script src="scranWorkflow_files/header-attrs-2.2/header-attrs.js"></script><div class="row">
+      </header><script src="scranWorkflow_files/header-attrs-2.5/header-attrs.js"></script><link href="scranWorkflow_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="scranWorkflow_files/anchor-sections-1.0/anchor-sections.js"></script><link href="scranWorkflow_files/vembedr-0.1.4/css/vembedr.css" rel="stylesheet">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Follow scran workflow to analyze single-cell RNA-seq data</h1>
@@ -112,12 +114,13 @@
 
     
     
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scran</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scater</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SCHNAPPs</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">BiocParallel</span>)
-<span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/register.html">register</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html">SerialParam</a></span>()) <span class="co"># avoid problems with fastMNN parallelization.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">100</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">scran</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/">scater</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">SCHNAPPs</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Bioconductor/BiocParallel">BiocParallel</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/register.html">register</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html">SerialParam</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># avoid problems with fastMNN parallelization.</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></code></pre></div>
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
@@ -128,11 +131,12 @@
 <a href="#data-setup" class="anchor"></a>Data setup</h1>
 <p>We pre-compute the scran workflow and make its results available for comparison within SCHNAPPs.</p>
 <p>We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 <span class="co"># BiocManager::install("scRNAseq")</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scRNAseq</span>)
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scRNAseq/man/GrunPancreasData.html">GrunPancreasData</a></span>()
-<span class="no">sce</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">scRNAseq</span><span class="op">)</span>
+<span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scRNAseq/man/GrunPancreasData.html">GrunPancreasData</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">sce</span>
 <span class="co">## class: SingleCellExperiment </span>
 <span class="co">## dim: 20064 1728 </span>
 <span class="co">## metadata(0):</span>
@@ -143,107 +147,110 @@
 <span class="co">## colnames(1728): D2ex_1 D2ex_2 ... D17TGFB_95 D17TGFB_96</span>
 <span class="co">## colData names(2): donor sample</span>
 <span class="co">## reducedDimNames(0):</span>
-<span class="co">## spikeNames(0):</span>
-<span class="co">## altExpNames(1): ERCC</span></pre></body></html></div>
+<span class="co">## altExpNames(1): ERCC</span></code></pre></div>
 <p>We prepare the singleCellExperiment object to contain the col/row Data that is needed by SCHNAPPs. At this point, which is usually performed by the bioinformatician who is preparing the data, we can also add other information and documentation.</p>
 <p>colData has to contain the columns barcode = a unique identifier per experiment sampleNames = a name for a collection of cells.</p>
 <p>rowData has to contian the columns symbol = the gene symbol Description = a text describing the gene id = unique identifier, e.g. ENSG number</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">qcstats</span> <span class="kw">&lt;-</span> <span class="kw pkg">scater</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/perCellQCMetrics.html">perCellQCMetrics</a></span>(<span class="no">sce</span>)
-<span class="fu">colData</span>(<span class="no">sce</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>), <span class="no">qcstats</span>)
-<span class="fu">colData</span>(<span class="no">sce</span>)$<span class="no">barcode</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>))
-<span class="fu">colData</span>(<span class="no">sce</span>)$<span class="no">sampleNames</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>)$<span class="no">sample</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">qcstats</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/perCellQCMetrics.html">perCellQCMetrics</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span>, <span class="va">qcstats</span><span class="op">)</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">barcode</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">sampleNames</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">sample</span><span class="op">)</span>
 
-<span class="fu">rowData</span>(<span class="no">sce</span>)$<span class="no">Description</span> <span class="kw">=</span> <span class="st">""</span>
-<span class="fu">rowData</span>(<span class="no">sce</span>)$<span class="no">id</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">rowData</span>(<span class="no">sce</span>))</pre></body></html></div>
+<span class="fu">rowData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">Description</span> <span class="op">=</span> <span class="st">""</span>
+<span class="fu">rowData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">id</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>To show the effect of the scater filtering we also calculate those. Missing values are handled as genes with high ERCC expressing genes.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">qcfilter</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/quickPerCellQC.html">quickPerCellQC</a></span>(<span class="no">qcstats</span>, <span class="kw">percent_subsets</span><span class="kw">=</span><span class="st">"altexps_ERCC_percent"</span>)
-<span class="no">qcfilter</span>[<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">qcfilter</span>$<span class="no">high_altexps_ERCC_percent</span>),<span class="st">"high_altexps_ERCC_percent"</span>] <span class="kw">=</span> <span class="no">T</span>
-<span class="fu">colData</span>(<span class="no">sce</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="fu">colData</span>(<span class="no">sce</span>), <span class="no">qcfilter</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># here we redo the scran workflow with different clustering algorithms </span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">qcfilter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/quickPerCellQC.html">quickPerCellQC</a></span><span class="op">(</span><span class="va">qcstats</span>, percent_subsets<span class="op">=</span><span class="st">"altexps_ERCC_percent"</span><span class="op">)</span>
+<span class="va">qcfilter</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">qcfilter</span><span class="op">$</span><span class="va">high_altexps_ERCC_percent</span><span class="op">)</span>,<span class="st">"high_altexps_ERCC_percent"</span><span class="op">]</span> <span class="op">=</span> <span class="cn">T</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span>, <span class="va">qcfilter</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># here we redo the scran workflow with different clustering algorithms </span>
 <span class="co"># and store the results in the singleCellExperiment object that we are going to use in SCHNAPPs</span>
-<span class="no">sceOrg</span> <span class="kw">=</span> <span class="no">sce</span>
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="no">sce</span>[,!<span class="no">qcfilter</span>$<span class="no">discard</span>]
+<span class="va">sceOrg</span> <span class="op">=</span> <span class="va">sce</span>
+<span class="va">sce</span> <span class="op">&lt;-</span> <span class="va">sce</span><span class="op">[</span>,<span class="op">!</span><span class="va">qcfilter</span><span class="op">$</span><span class="va">discard</span><span class="op">]</span>
 <span class="co"># summary(qcfilter$discard)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scran</span>)
-<span class="no">clusters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/quickCluster.html">quickCluster</a></span>(<span class="no">sce</span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">scran</span><span class="op">)</span>
+<span class="va">clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/quickCluster.html">quickCluster</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span>
 
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/computeSumFactors.html">computeSumFactors</a></span>(<span class="no">sce</span>, <span class="kw">clusters</span><span class="kw">=</span><span class="no">clusters</span>)
+<span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/computeSumFactors.html">computeSumFactors</a></span><span class="op">(</span><span class="va">sce</span>, clusters<span class="op">=</span><span class="va">clusters</span><span class="op">)</span>
 <span class="co"># summary(sizeFactors(sce))</span>
 
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/logNormCounts.html">logNormCounts</a></span>(<span class="no">sce</span>)
+<span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/logNormCounts.html">logNormCounts</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span>
 
-<span class="no">dec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">sce</span>)
+<span class="va">dec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span>
 <span class="co"># plot(dec$mean, dec$total, xlab="Mean log-expression", ylab="Variance")</span>
 <span class="co"># curve(metadata(dec)$trend(x), col="blue", add=TRUE)</span>
 
-<span class="no">dec2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVarWithSpikes.html">modelGeneVarWithSpikes</a></span>(<span class="no">sce</span>, <span class="st">'ERCC'</span>)
+<span class="va">dec2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVarWithSpikes.html">modelGeneVarWithSpikes</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">'ERCC'</span><span class="op">)</span>
 
 <span class="co"># Get the top 10% of genes.</span>
-<span class="no">top.hvgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html">getTopHVGs</a></span>(<span class="no">dec</span>, <span class="kw">prop</span><span class="kw">=</span><span class="fl">0.1</span>)
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">sce</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">top.hvgs</span>)
+<span class="va">top.hvgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html">getTopHVGs</a></span><span class="op">(</span><span class="va">dec</span>, prop<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span>
+<span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span><span class="op">(</span><span class="va">sce</span>, subset_row<span class="op">=</span><span class="va">top.hvgs</span><span class="op">)</span>
 <span class="co"># reducedDimNames(sce)</span>
-<span class="no">sced</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/denoisePCA.html">denoisePCA</a></span>(<span class="no">sce</span>, <span class="no">dec2</span>, <span class="kw">subset.row</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html">getTopHVGs</a></span>(<span class="no">dec2</span>, <span class="kw">prop</span><span class="kw">=</span><span class="fl">0.1</span>))
+<span class="va">sced</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/denoisePCA.html">denoisePCA</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">dec2</span>, subset.row<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html">getTopHVGs</a></span><span class="op">(</span><span class="va">dec2</span>, prop<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>
 <span class="co"># ncol(reducedDim(sced, "PCA"))</span>
-<span class="no">output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getClusteredPCs.html">getClusteredPCs</a></span>(<span class="fu">reducedDim</span>(<span class="no">sce</span>))
-<span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fu">metadata</span>(<span class="no">output</span>)$<span class="no">chosen</span>
-<span class="fu">reducedDim</span>(<span class="no">sce</span>, <span class="st">"PCAsub"</span>) <span class="kw">&lt;-</span> <span class="fu">reducedDim</span>(<span class="no">sce</span>, <span class="st">"PCA"</span>)[,<span class="fl">1</span>:<span class="no">npcs</span>,<span class="kw">drop</span><span class="kw">=</span><span class="fl">FALSE</span>]
+<span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getClusteredPCs.html">getClusteredPCs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/reducedDims.html">reducedDim</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span>
+<span class="va">npcs</span> <span class="op">&lt;-</span> <span class="fu">metadata</span><span class="op">(</span><span class="va">output</span><span class="op">)</span><span class="op">$</span><span class="va">chosen</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/reducedDims.html">reducedDim</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"PCAsub"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/reducedDims.html">reducedDim</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"PCA"</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="va">npcs</span>,drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">]</span>
 <span class="co"># npcs</span>
 <span class="co"># In this case, using the PCs that we chose from getClusteredPCs().</span>
-<span class="no">g1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
-<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g1</span>)$<span class="no">membership</span>
-<span class="no">sce</span>$<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>)
+<span class="va">g1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">sce</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
+<span class="va">cluster</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g1</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
+<span class="va">sce</span><span class="op">$</span><span class="va">cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span>
 <span class="co"># table(sce$cluster)</span>
 
-<span class="no">g1a</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
-<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g1a</span>)$<span class="no">membership</span>
-<span class="no">sce</span>$<span class="no">cluster1a</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>)
+<span class="va">g1a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">sce</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
+<span class="va">cluster</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g1a</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
+<span class="va">sce</span><span class="op">$</span><span class="va">cluster1a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span>
 
 <span class="co"># In this case, using the PCs that we chose from getClusteredPCs().</span>
-<span class="no">g</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">"jaccard"</span>)
-<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g</span>)$<span class="no">membership</span>
-<span class="no">sce</span>$<span class="no">cluster2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>)
+<span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">sce</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span>, type <span class="op">=</span> <span class="st">"jaccard"</span><span class="op">)</span>
+<span class="va">cluster</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
+<span class="va">sce</span><span class="op">$</span><span class="va">cluster2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span>
 
-<span class="no">g</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">sce</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">"number"</span>)
-<span class="no">cluster</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g</span>)$<span class="no">membership</span>
-<span class="no">sce</span>$<span class="no">cluster3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>)
+<span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">sce</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span>, type <span class="op">=</span> <span class="st">"number"</span><span class="op">)</span>
+<span class="va">cluster</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
+<span class="va">sce</span><span class="op">$</span><span class="va">cluster3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">cluster</span><span class="op">)</span>
 
 
 
 <span class="co"># table(sce$cluster) </span>
-<span class="no">sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runTSNE.html">runTSNE</a></span>(<span class="no">sce</span>, <span class="kw">dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
+<span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runTSNE.html">runTSNE</a></span><span class="op">(</span><span class="va">sce</span>, dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
 <span class="co"># plotTSNE(sce, colour_by="cluster", text_by="cluster")</span>
 <span class="co"># plotTSNE(sce, colour_by="cluster2", text_by="cluster2")</span>
 <span class="co"># plotTSNE(sce, colour_by="cluster3", text_by="cluster3")</span>
 
 
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">pheatmap</span>)
-<span class="no">ass.prob</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/bootstrapCluster.html">bootstrapCluster</a></span>(<span class="no">sce</span>, <span class="kw">FUN</span><span class="kw">=</span><span class="kw">function</span>(<span class="no">x</span>) {
-    <span class="no">g</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span>(<span class="no">x</span>, <span class="kw">use.dimred</span><span class="kw">=</span><span class="st">"PCAsub"</span>)
-    <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span>(<span class="no">g</span>)$<span class="no">membership</span>
-}, <span class="kw">clusters</span><span class="kw">=</span><span class="no">sce</span>$<span class="no">cluster</span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pheatmap</span><span class="op">)</span>
+<span class="va">ass.prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/bootstrapCluster.html">bootstrapCluster</a></span><span class="op">(</span><span class="va">sce</span>, FUN<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
+    <span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">x</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
+    <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
+<span class="op">}</span>, clusters<span class="op">=</span><span class="va">sce</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span>
 
-<span class="no">sceOrg</span>$<span class="no">cluster</span> <span class="kw">=</span> <span class="fl">0</span>
-<span class="no">sceOrg</span>$<span class="no">cluster1a</span> <span class="kw">=</span> <span class="fl">0</span>
-<span class="no">sceOrg</span>$<span class="no">cluster2</span> <span class="kw">=</span> <span class="fl">0</span>
-<span class="no">sceOrg</span>$<span class="no">cluster3</span> <span class="kw">=</span> <span class="fl">0</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster1a</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster2</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster3</span>) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sceOrg</span>)
-<span class="no">sceOrg</span>$<span class="no">cluster</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster</span>
-<span class="no">sceOrg</span>$<span class="no">cluster1a</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster1a</span>
-<span class="no">sceOrg</span>$<span class="no">cluster2</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster2</span>
-<span class="no">sceOrg</span>$<span class="no">cluster3</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">sce</span>)] <span class="kw">=</span> <span class="no">sce</span>$<span class="no">cluster3</span>
-<span class="no">sceOrg</span>$<span class="no">cluster</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster</span>)
-<span class="no">sceOrg</span>$<span class="no">cluster1a</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster1a</span>)
-<span class="no">sceOrg</span>$<span class="no">cluster2</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster2</span>)
-<span class="no">sceOrg</span>$<span class="no">cluster3</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="no">sceOrg</span>$<span class="no">cluster3</span>)
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster</span> <span class="op">=</span> <span class="fl">0</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster1a</span> <span class="op">=</span> <span class="fl">0</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster2</span> <span class="op">=</span> <span class="fl">0</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster3</span> <span class="op">=</span> <span class="fl">0</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster1a</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster2</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster3</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">)</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="va">sce</span><span class="op">$</span><span class="va">cluster</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster1a</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="va">sce</span><span class="op">$</span><span class="va">cluster1a</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster2</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="va">sce</span><span class="op">$</span><span class="va">cluster2</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster3</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="va">sce</span><span class="op">$</span><span class="va">cluster3</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster1a</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster1a</span><span class="op">)</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster2</span><span class="op">)</span>
+<span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster3</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster3</span><span class="op">)</span>
 
 <span class="co"># pheatmap(ass.prob, cluster_cols=FALSE, cluster_rows=FALSE,</span>
-<span class="co">#     col=colorRampPalette(c("white", "blue"))(100))</span></pre></body></html></div>
+<span class="co">#     col=colorRampPalette(c("white", "blue"))(100))</span></code></pre></div>
 <p>We save all results including the cluster assignments from the scran workflow to be able to compare to SCHNAPPs.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span>(<span class="kw">file</span> <span class="kw">=</span> <span class="st">"scran.grunPancreas.RData"</span>, <span class="kw">list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"sceOrg"</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"scran.grunPancreas.RData"</span>, list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sceOrg"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="schnapps" class="section level1">
 <h1 class="hasAnchor">
@@ -252,44 +259,45 @@
 <p>Please see the help and other documentation on how to enable tracking data changes and saving plots (historyPath option). The defaultValues allows us to preset any user defineable variable in the GUI.</p>
 <p>This is partially done to simplify your life as you don’t have to set all the parameters partially to avoid mistakes and for this to show the correct set-up.</p>
 <p>The variables are described in the code chunk. To note: the number of genes to use is set to 951, which is the same value as in the scran vignette. We don’t have a way to calculate this. But we are aware that changing this value has substaintial effects for the cluster assignment. We strongly believe that the optimization of these parameters is not trivial and we are currently looking for solutions how to solve this. Similar argumenation goes for the number of PCs to use for the clustering algorithm.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SCHNAPPs</span>)
-<span class="no">defaultValues</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">SCHNAPPs</a></span><span class="op">)</span>
+<span class="va">defaultValues</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># input</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"sampleInput"</span>]] <span class="kw">=</span><span class="fl">FALSE</span> <span class="co"># don't subsample</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"whichscLog"</span>]] <span class="kw">=</span> <span class="st">"calcLog"</span> <span class="co"># calculate normalization</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"sampleInput"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span><span class="cn">FALSE</span> <span class="co"># don't subsample</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"whichscLog"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">"calcLog"</span> <span class="co"># calculate normalization</span>
 
 <span class="co"># Normaliztion</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"normalizationRadioButton"</span>]] <span class="kw">=</span> <span class="st">"DE_scaterNormalization"</span> <span class="co"># use scaterNorm</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"normalizationRadioButton"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">"DE_scaterNormalization"</span> <span class="co"># use scaterNorm</span>
 
 <span class="co"># General parameters</span>
 <span class="co">## PArameters for PCA</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"pcaScale"</span>]] <span class="kw">=</span> <span class="fl">FALSE</span> <span class="co"># don't scale</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"pcaN"</span>]] <span class="kw">=</span> <span class="fl">951</span> <span class="co"># number of genes to use.</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"pcaRank"</span>]] <span class="kw">=</span> <span class="fl">14</span> <span class="co"># number PCs to use for clustering</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"pcaScale"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="cn">FALSE</span> <span class="co"># don't scale</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"pcaN"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fl">951</span> <span class="co"># number of genes to use.</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"pcaRank"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fl">14</span> <span class="co"># number PCs to use for clustering</span>
 
 
 <span class="co"># Parameters for clustering</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"tabsetCluster"</span>]] <span class="kw">=</span> <span class="st">"snnGraph"</span> <span class="co"># use SNN graph function</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"tabsetCluster"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">"snnGraph"</span> <span class="co"># use SNN graph function</span>
 
 <span class="co"># preset Alluvial plot axes</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"alluiv1"</span>]] <span class="kw">=</span> <span class="st">"cluster"</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"alluiv2"</span>]] <span class="kw">=</span> <span class="st">"dbCluster"</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"alluiv1"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">"cluster"</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"alluiv2"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">"dbCluster"</span>
 
 
 <span class="co"># Gene selection</span>
 <span class="co"># we usually remove genes from mitochrondrium and Ribosome associated proteins using the following regular expression ("^MT-|^RP|^MRP"). This is not done in the scran vignette </span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"selectIds"</span>]] <span class="kw">=</span> <span class="st">""</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"minGenes"</span>]] <span class="kw">=</span> <span class="fl">1</span> <span class="co"># min number of reads per cell</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"selectIds"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">""</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"minGenes"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span> <span class="co"># min number of reads per cell</span>
 
 
 
 <span class="co"># Cell selection</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"minGenesGS"</span>]] <span class="kw">=</span> <span class="fl">1</span> <span class="co"># minimum number of UMIs (sum) over all cells.</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"minGenesGS"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span> <span class="co"># minimum number of UMIs (sum) over all cells.</span>
 <span class="co"># cells to be removed</span>
-<span class="no">defaultValues</span><span class="kw">[[</span><span class="st">"cellsFiltersOut"</span>]] <span class="kw">=</span> <span class="st">[4047 chars quoted with '"']</span>
+<span class="va">defaultValues</span><span class="op">[[</span><span class="st">"cellsFiltersOut"</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="st">[4047 chars quoted with '"']</span>
 
-<span class="fu"><a href="../../reference/schnapps.html">schnapps</a></span>(<span class="kw">defaultValues</span> <span class="kw">=</span> <span class="no">defaultValues</span>)</pre></body></html></div>
+<span class="fu"><a href="../../reference/schnapps.html">schnapps</a></span><span class="op">(</span>defaultValues <span class="op">=</span> <span class="va">defaultValues</span><span class="op">)</span></code></pre></div>
 <div id="removal-of-cells" class="section level2">
 <h2 class="hasAnchor">
 <a href="#removal-of-cells" class="anchor"></a>Removal of cells</h2>
@@ -368,7 +376,11 @@ Co-expression - All clusters; After list of gene names has been set to empty SCH
 </p>
 </div>
 <p>The following video shows how to use the heatmap module. If the field with the gene names is empty the function FindMarkers is used to identify the genes that are most characteristic for each cluster. This list of genes is used for the heatmap.</p>
-<iframe src="https://www.youtube.com/embed/aiKPccCmZgk" width="420" height="315" frameborder="0" allowfullscreen=""></iframe>
+<div class="vembedr">
+<div>
+<iframe src="https://www.youtube.com/embed/aiKPccCmZgk" width="533" height="300" frameborder="0" allowfullscreen=""></iframe>
+</div>
+</div>
 <p>The genes CPA1, CTRB1, PLA2G1B, PRSS1, PRSS3P2 are highly expressed in cluster 2. GCG, TTR are highly expressed in cluster 5.</p>
 </div>
 <div id="co-expression---selected" class="section level2">
@@ -413,7 +425,11 @@ UMAP projection. Selecting and naming of a group of cells.
 <p>Since it is not ensured that these projections are not overlapping, the individual values are concatenated and a new factor is created. The levels of these factors can be changed under the “rename levels” tab. The tables allows verifying the meaning of the levels.</p>
 <p>When renaming the levels, don’t forget to add a meaningfull name, otherwise “X” is chosen for you.</p>
 <p>If this happens, don’t worry, this can be changed in the “rename projections” tab, where projections can be deleted, but only those you have created manually.</p>
-<iframe src="https://www.youtube.com/embed/xOSWcLKsZf0" width="420" height="315" frameborder="0" allowfullscreen=""></iframe>
+<div class="vembedr">
+<div>
+<iframe src="https://www.youtube.com/embed/xOSWcLKsZf0" width="533" height="300" frameborder="0" allowfullscreen=""></iframe>
+</div>
+</div>
 </div>
 </div>
 <div id="violin-plots" class="section level2">
@@ -451,7 +467,11 @@ Panel Plot
 <h2 class="hasAnchor">
 <a href="#differential-gene-expression-dge" class="anchor"></a>Differential gene expression (DGE)</h2>
 <p>This short video shows how to perform a DGE analysis. The individual steps are also explained afterwards in more detail.</p>
-<iframe src="https://www.youtube.com/embed/lFHfZKt3zro" width="420" height="315" frameborder="0" allowfullscreen=""></iframe>
+<div class="vembedr">
+<div>
+<iframe src="https://www.youtube.com/embed/lFHfZKt3zro" width="533" height="300" frameborder="0" allowfullscreen=""></iframe>
+</div>
+</div>
 <div id="selections-of-groups-of-cells" class="section level3">
 <h3 class="hasAnchor">
 <a href="#selections-of-groups-of-cells" class="anchor"></a>selections of groups of cells</h3>
@@ -518,7 +538,7 @@ Projections can be renamed
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

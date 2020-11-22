@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.61</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.18</span>
       </span>
     </div>
 
@@ -67,7 +67,7 @@
       <a href="articles/Readme.html">Readme</a>
     </li>
     <li>
-      <a href="articles/pkdown/FAQs.html">Frequently asked questions for common tasks</a>
+      <a href="articles/pkdown/FAQs.html">FAQs</a>
     </li>
     <li>
       <a href="articles/pkdown/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
@@ -110,19 +110,28 @@
 <a href="#overview" class="anchor"></a>Overview</h2>
 <p>Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Pasteur Institute, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur.</p>
 </div>
+<div id="citation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h2>
+<p><a href="https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1" class="uri">https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1</a></p>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
+<p>Developper tools need to be installed please see for further information:</p>
+<p>Windows: <a href="https://cran.r-project.org/bin/windows/" class="uri">https://cran.r-project.org/bin/windows/</a></p>
+<p>MAC: <a href="https://cran.r-project.org/bin/macosx/" class="uri">https://cran.r-project.org/bin/macosx/</a></p>
 <pre><code><a href="https://rdrr.io/r/utils/update.packages.html">update.packages()
 if (!require("devtools"))
   install.packages("devtools")
-devtools::install_github("mul118/shinyMCE")
+# devtools::install_github("mul118/shinyMCE")
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 # update bioconductor packages if required
 BiocManager::install()
-BiocManager::install("BiocSingular")
-BiocManager::install("SingleR")
+# BiocManager::install("BiocSingular")
+BiocManager::install("SingleR") # needed to prepare data.
+devtools::install_github("haowulab/Wind")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)</a></code></pre>
 <div id="history-functionality" class="section level3">
 <h3 class="hasAnchor">
@@ -152,7 +161,7 @@ save(file = "scEx.Rdata", list = "scEx")</a></code></pre>
 <h2 class="hasAnchor">
 <a href="#running-schnapps" class="anchor"></a>Running schnapps</h2>
 <p>To start the app:</p>
-<pre><code><a href="https://rdrr.io/pkg/SCHNAPPs/man">library(SCHNAPPs)
+<pre><code><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">library(SCHNAPPs)
 schnapps()</a></code></pre>
 <div id="history-functionality-1" class="section level3">
 <h3 class="hasAnchor">
@@ -221,7 +230,7 @@ schnapps()</a></code></pre>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
