@@ -63,7 +63,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     "dbCluster" = ccols
   )
   
-  retVal <- list(
+  retVal <- tryCatch({list(
     # mat = expression[nonZeroRows, order(annotation[, 1], annotation[, 2])],
     mat = expression[, order(annotation[, 1], annotation[, 2])],
     cluster_rows = TRUE,
@@ -84,7 +84,12 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
         "RdBu"
     )))(6),
     annotation_colors = annCols
+  )},
+  error = function(x) {return(NULL)}
   )
+  # TODO Error handling
+  if (is.null(retVal) ) return(NULL)
+      
   
   # print debugging information on the console
   printTimeEnd(start.time, "inputData")
@@ -126,12 +131,7 @@ coE_heatmapSelectedReactive <- reactive({
   ccols <- isolate(clusterCols$colPal)
   # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
   
-  if (is.null(scCells) || length(scCells) == 0) {
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("No cells selected", id = "coE_heatmapSelectedReactiveProbl", type = "error", duration = 10)
-    }
-  }
-  
+   
   if (is.null(scEx_log) ||is.null(scCells) || length(scCells) == 0 ||
       is.null(projections)) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
@@ -149,6 +149,11 @@ coE_heatmapSelectedReactive <- reactive({
   # output$coE_heatmapNull = NULL
   # }
   
+  if (is.null(scCells) || length(scCells) == 0) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("No cells selected", id = "coE_heatmapSelectedReactiveProbl", type = "error", duration = 10)
+    }
+  }
   
   scEx_matrix <- assays(scEx_log)[[1]]
   featureData <- rowData(scEx_log)
@@ -208,17 +213,17 @@ coE_topExpGenesTable <- reactive({
   scCells <- isolate(sc$selectedCells())
   # coEtgMinExprShow <- input$coEtgMinExprShow
   
+   if (is.null(scEx_log) || is.null(scCells)) {
+    if (DEBUG) if (is.null(scEx_log)) cat(file = stderr(), "coE_topExpGenesTable scEx_log null.\n")
+    if (DEBUG) if (is.null(scCells)) cat(file = stderr(), "coE_topExpGenesTable scCells null.\n")
+    return(NULL)
+  }
   if (is.null(scCells) || length(scCells) == 0) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("No cells selected", id = "coE_topExpGenesTableProbl", type = "error", duration = 10)
     }
   }
   
-  if (is.null(scEx_log) || is.null(scCells)) {
-    if (DEBUG) if (is.null(scEx_log)) cat(file = stderr(), "coE_topExpGenesTable scEx_log null.\n")
-    if (DEBUG) if (is.null(scCells)) cat(file = stderr(), "coE_topExpGenesTable scCells null.\n")
-    return(NULL)
-  }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls()))
   }

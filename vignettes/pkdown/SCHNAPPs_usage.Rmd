@@ -31,7 +31,7 @@ library(SCHNAPPs)
 
 # Overview
 
-Shiny app (referred to as "app" in this document) for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies or other. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well.
+Shiny app (referred to as "app" in this document) for the exploration and analysis of single cell RNA-Seq data as it comes from 10X or MARS-Seq technologies or other. It has been developed as a responds to user requests by the scientific community of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users (biologists, immunologists) of our platform to explore their single cell RNA-Seqe data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well.
 
 
 # Installation
@@ -55,8 +55,12 @@ orca is part of ploty so nothing to be done for R.
 
 Notes:
 
-If the historyPath variable is set to a valid directory, all major events are stored in an Rmd file and associated RData files that all located in subdirectory of the historyPath. A time-stamp in the name of the subdirectory enables identifying and distinguishing different executions. It is recommended to rename these directories once the session is closed. Major events are: 1. loading of data, change of cells/genes and projections.
-In addition to these events that are automatically stored, the user can save individual tables and graphs using the appropiate buttons. During the execution of the app the Rmd file is only opened and appened to if an event is handled. Thus, using an editor that doesn't loc the file the Rmd can be modified at the same time the app is running. Just make sure you save the Rmd file each time a modification is done. A good editor is the RStudio editor.
+* If the historyPath variable is set to a valid directory, all major events are stored in an Rmd file and associated RData files that are all located in subdirectories of the historyPath. 
+* A time-stamp in the name of the subdirectory enables identifying and distinguishing different executions. 
+* It is recommended to rename these directories once the session is closed. 
+* Major events are: 1. loading of data, change of cells/genes.
+* In addition to these events that are automatically stored, the user can save individual tables and graphs using the "add2history" buttons. 
+* During the execution of the app the Rmd file is only opened and appended to if an event is handled. Thus, using an editor that doesn't loc the file, the Rmd can be modified at the same time the app is running. Just make sure you save the Rmd file each time a modification is done. A good editor is the RStudio editor.
 
 # Running schnapps
 
