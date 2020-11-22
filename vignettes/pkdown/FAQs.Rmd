@@ -23,9 +23,9 @@ library("vembedr")
 
 ## Scientific questions
 
-### Identify Dead cells
+### How can I identify dead cells
 
-Dead cells can have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. Though they have to be present in the original input data set.
+Dead cells generally have high mitochondrial or ribosomal protein content. Using SCHNAPPs those can be identified before and after removing of such genes from the data set. 
 
 #### before removing genes
 
@@ -58,7 +58,7 @@ The cells in the violin plot are not selectable (for the moment). In order to id
 
 ### Can MARS-Seq data be analyzed?
 
-Yes, additional annotations can be either directly into a singlecellexperiment object that is loaded in the app as colData, or using a CSV file with corresponding information. 
+Yes, additional annotations can be introduced either directly into a SingleCellExperiment object that is loaded in the app as colData, or using a CSV file with corresponding information. 
 
 Use 
 
@@ -69,7 +69,7 @@ to set the relevant information.
 
 ### How to normalize by ribosomal proteins?
 
-Once you have identified the gene names you want to use this list of genes can be used under Parameters - Normalization - gene_norm: 
+Once you have identified the gene names you want to use, this list of genes can be used under Parameters - Normalization - gene_norm: 
 
 ```{r, out.width='90%', fig.align='center', fig.cap='normalize by ribosomal proteins', echo=FALSE}
 knitr::include_graphics('images/normByRP.png')
@@ -88,7 +88,7 @@ knitr::include_graphics('images/geneSelectionRMGenes.png')
 ```
 
 
-### What is the best representation to use to compare gene expression level ( UMI/gene) ? 
+### What is the best representation to use to compare gene expression level (UMI/gene) ? 
 
 Gene/UMI expression can be visualized in different plots:
 
@@ -100,7 +100,7 @@ knitr::include_graphics('images/DataexplorationPanel.png')
 
 * Using the parameters UmiCountPerGenes and UmiCountPerGenes2 allow plotting the expression of one or more genes (i.e. the sum of all UMIs) that are set with these variables. These two parameters can be found under X/Y when selecting the projections to be used for the X/Y axes. With these parameters, the expression of two sets of genes can be compared and the information of individual cells can be retained. Zooming and coloring allows drilling down and identifying individual cells. Using “more options” these can then be annotated. Following such annotation, this information can be used in other plots as a projection. Those projections are currently binary, i.e. have the values False and True or 0 and 1, indicating if a cell belongs to a group or not.
 
-The figure below shows the combined expression of marker genes for B and T cells in an PBMC experiment. Note that the first gene name is B-cells:, This will allow you to annotate the selection. It will give rise to a warning, but that will disappear after a few seconds.
+The figure below shows the combined expression of marker genes for B and T cells in an PBMC experiment. MS4A1 is an mRNA marker for B-cells, whereas cd8a is expressed in T-cells. Note that the first gene name is "B-cells". This will allow you to annotate the selection. It will give rise to a warning, but that will disappear after a few seconds.
 
 ```{r, out.width='90%', fig.align='center', fig.cap='2D plot CD8 vs CD4 cell expression', echo=FALSE}
 knitr::include_graphics('images/cd8vscd4.png')
@@ -109,6 +109,7 @@ knitr::include_graphics('images/cd8vscd4.png')
 
 ### How to evaluate if the clusters are biologically relevant?
 
+Please set the speed of the video to your liking. It be too fast... ;)
 
 ```{r, echo=FALSE}
 embed_youtube("kL00ceA51vs")
@@ -164,7 +165,7 @@ Contributions for trajectory inference already available are SCORPIUS, ElPiGraph
 ### Can new packages be implemented ?
 
 The software architecture  of the application makes it easy for the bioinformatician to integrate new visualizations and analyses. 
-please see https://github.com/baj12/SCHNAPPsContributions 
+Please see https://github.com/baj12/SCHNAPPsContributions 
 
 
 ## Common problems

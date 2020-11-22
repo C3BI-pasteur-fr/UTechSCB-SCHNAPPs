@@ -425,6 +425,7 @@ observeEvent(
     newPrj <- make.names(input$gQC_newCombPrj)
     projections <- projections()
     newPrjs <- projectionsTable$newProjections
+    acn = allCellNames()
     
     if (is.null(projections)) {
       return(NULL)
