@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.61</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.18</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@
       <a href="../../articles/Readme.html">Readme</a>
     </li>
     <li>
-      <a href="../../articles/pkdown/FAQs.html">Frequently asked questions for common tasks</a>
+      <a href="../../articles/pkdown/FAQs.html">FAQs</a>
     </li>
     <li>
       <a href="../../articles/pkdown/SCHNAPPs_usage.html">SCHNAPPs - Single Cell sHiNy APP(s)</a>
@@ -95,8 +95,9 @@
 
       
 
-      </header><script src="SeuratWorkflow_files/header-attrs-2.2/header-attrs.js"></script><script src="SeuratWorkflow_files/htmlwidgets-1.5.1/htmlwidgets.js"></script><script src="SeuratWorkflow_files/jquery-1.12.4/jquery.min.js"></script><link href="SeuratWorkflow_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
-<script src="SeuratWorkflow_files/datatables-binding-0.13/datatables.js"></script><link href="SeuratWorkflow_files/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet">
+      </header><script src="SeuratWorkflow_files/header-attrs-2.5/header-attrs.js"></script><link href="SeuratWorkflow_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="SeuratWorkflow_files/anchor-sections-1.0/anchor-sections.js"></script><script src="SeuratWorkflow_files/htmlwidgets-1.5.2/htmlwidgets.js"></script><script src="SeuratWorkflow_files/jquery-1.12.4/jquery.min.js"></script><link href="SeuratWorkflow_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="SeuratWorkflow_files/datatables-binding-0.16/datatables.js"></script><link href="SeuratWorkflow_files/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet">
 <link href="SeuratWorkflow_files/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet">
 <script src="SeuratWorkflow_files/dt-core-1.10.20/js/jquery.dataTables.min.js"></script><link href="SeuratWorkflow_files/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet">
 <script src="SeuratWorkflow_files/crosstalk-1.1.0.1/js/crosstalk.min.js"></script><div class="row">
@@ -116,18 +117,24 @@
 
     
     
-<p>Please see the scran workflow for a more indepth workflow.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">Seurat</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">patchwork</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SCHNAPPs</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SingleCellExperiment</span>)
+<div id="introduction" class="section level1">
+<h1 class="hasAnchor">
+<a href="#introduction" class="anchor"></a>Introduction</h1>
+<p>Please see the Seurat workflow for a more indepth workflow.</p>
+<p><a href="https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html" class="uri">https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html</a></p>
+<p>This workflow uses a dataset of Peripheral Blood Mononuclear Cells (PBMC) freely available from 10X Genomics. There are 2,700 single cells that were sequenced on the Illumina NextSeq 500.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat">Seurat</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">SCHNAPPs</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span>
 <span class="co"># Load the pbm dataset</span>
-<span class="no">pbm.data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Read10X.html">Read10X</a></span>(<span class="kw">data.dir</span> <span class="kw">=</span> <span class="st">"~/Downloads/filtered_gene_bc_matrices/hg19/"</span>)
+<span class="va">pbm.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Read10X.html">Read10X</a></span><span class="op">(</span>data.dir <span class="op">=</span> <span class="st">"~/Downloads/filtered_gene_bc_matrices/hg19/"</span><span class="op">)</span>
 <span class="co"># Initialize the Seurat object with the raw (non-normalized data).</span>
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/CreateSeuratObject.html">CreateSeuratObject</a></span>(<span class="kw">counts</span> <span class="kw">=</span> <span class="no">pbm.data</span>, <span class="kw">project</span> <span class="kw">=</span> <span class="st">"pbm3k"</span>, <span class="kw">min.cells</span> <span class="kw">=</span> <span class="fl">3</span>, <span class="kw">min.features</span> <span class="kw">=</span> <span class="fl">200</span>)
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">pbm.data</span>, project <span class="op">=</span> <span class="st">"pbm3k"</span>, min.cells <span class="op">=</span> <span class="fl">3</span>, min.features <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>
 
-<span class="no">pbm</span><span class="kw">[[</span><span class="st">"percent.mt"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/PercentageFeatureSet.html">PercentageFeatureSet</a></span>(<span class="no">pbm</span>, <span class="kw">pattern</span> <span class="kw">=</span> <span class="st">"^MT-"</span>)
+<span class="va">pbm</span><span class="op">[[</span><span class="st">"percent.mt"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/PercentageFeatureSet.html">PercentageFeatureSet</a></span><span class="op">(</span><span class="va">pbm</span>, pattern <span class="op">=</span> <span class="st">"^MT-"</span><span class="op">)</span>
 
 <span class="co">## in case of human samples:</span>
 <span class="co"># pbm &lt;- CellCycleScoring(</span>
@@ -138,43 +145,44 @@
 
 
 
-<span class="no">scEx</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/as.SingleCellExperiment.html">as.SingleCellExperiment</a></span>(<span class="no">pbm</span>)
+<span class="va">scEx</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/as.SingleCellExperiment.html">as.SingleCellExperiment</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="fu">colData</span>(<span class="no">scEx</span>)) <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"sampleNames"</span>,   <span class="st">"nCount_RNA"</span>,   <span class="st">"nFeature_RNA"</span>, <span class="st">"percent.mt"</span> , <span class="st">"ident"</span>       )
-<span class="fu">colData</span>(<span class="no">scEx</span>)$<span class="no">barcode</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">colData</span>(<span class="no">scEx</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sampleNames"</span>,   <span class="st">"nCount_RNA"</span>,   <span class="st">"nFeature_RNA"</span>, <span class="st">"percent.mt"</span> , <span class="st">"ident"</span>       <span class="op">)</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">barcode</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">rowData</span>(<span class="no">scEx</span>)$<span class="no">Description</span> <span class="kw">=</span> <span class="st">""</span>
-<span class="fu">rowData</span>(<span class="no">scEx</span>)$<span class="no">id</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">rowData</span>(<span class="no">scEx</span>))
-<span class="fu">rowData</span>(<span class="no">scEx</span>)$<span class="no">symbol</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">rowData</span>(<span class="no">scEx</span>))
+<span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">Description</span> <span class="op">=</span> <span class="st">""</span>
+<span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">id</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
+<span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">symbol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
 
-<span class="no">pbm</span></pre></body></html></div>
+<span class="va">pbm</span></code></pre></div>
 <pre><code>## An object of class Seurat 
 ## 13714 features across 2700 samples within 1 assay 
 ## Active assay: RNA (13714 features, 0 variable features)</code></pre>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/subset.Seurat.html">subset</a></span>(<span class="no">pbm</span>, <span class="kw">subset</span> <span class="kw">=</span> <span class="no">nFeature_RNA</span> <span class="kw">&gt;</span> <span class="fl">200</span> <span class="kw">&amp;</span> <span class="no">nFeature_RNA</span> <span class="kw">&lt;</span> <span class="fl">2500</span> <span class="kw">&amp;</span> <span class="no">percent.mt</span> <span class="kw">&lt;</span> <span class="fl">5</span>)
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="no">pbm</span>[-<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(<span class="no">pbm</span>)<span class="kw">==</span><span class="fl">0</span>),]
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/NormalizeData.html">NormalizeData</a></span>(<span class="no">pbm</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/subset.Seurat.html">subset</a></span><span class="op">(</span><span class="va">pbm</span>, subset <span class="op">=</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;</span> <span class="fl">200</span> <span class="op">&amp;</span> <span class="va">nFeature_RNA</span> <span class="op">&lt;</span> <span class="fl">2500</span> <span class="op">&amp;</span> <span class="va">percent.mt</span> <span class="op">&lt;</span> <span class="fl">5</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="va">pbm</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span>,<span class="op">]</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/NormalizeData.html">NormalizeData</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
 
-<span class="no">pbm</span> <span class="kw">&lt;-</span><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindVariableFeatures.html">FindVariableFeatures</a></span>(<span class="no">pbm</span>, <span class="kw">selection.method</span> <span class="kw">=</span> <span class="st">"vst"</span>, <span class="kw">nfeatures</span> <span class="kw">=</span> <span class="fl">2000</span>)
+<span class="va">pbm</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span>, selection.method <span class="op">=</span> <span class="st">"vst"</span>, nfeatures <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>
 
-<span class="no">top10</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/VariableFeatures.html">VariableFeatures</a></span>(<span class="no">pbm</span>), <span class="fl">10</span>)
-<span class="no">all.VariableFeatures</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/VariableFeatures.html">VariableFeatures</a></span>(<span class="no">pbm</span>)
-<span class="no">all.genes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">pbm</span>)
+<span class="va">top10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/VariableFeatures.html">VariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span>
+<span class="va">all.VariableFeatures</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/VariableFeatures.html">VariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<span class="va">all.genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
 <span class="co"># Why do they scale on all features???</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/ScaleData.html">ScaleData</a></span>(<span class="no">pbm</span>, <span class="kw">features</span> <span class="kw">=</span> <span class="no">all.VariableFeatures</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/ScaleData.html">ScaleData</a></span><span class="op">(</span><span class="va">pbm</span>, features <span class="op">=</span> <span class="va">all.VariableFeatures</span><span class="op">)</span>
 
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunPCA.html">RunPCA</a></span>(<span class="no">pbm</span>, <span class="kw">features</span> <span class="kw">=</span> <span class="no">all.VariableFeatures</span>, <span class="kw">rank</span> <span class="kw">=</span> <span class="fl">50</span>)
-<span class="no">scranPCA</span> <span class="kw">=</span> <span class="kw pkg">BiocSingular</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html">runPCA</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>((<span class="kw pkg">Seurat</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Assays.html">Assays</a></span>(<span class="no">pbm</span>,<span class="kw">slot</span> <span class="kw">=</span> <span class="st">"RNA"</span>)@<span class="kw">scale.data</span>))[<span class="no">all.VariableFeatures</span>,]) , <span class="kw">rank</span> <span class="kw">=</span> <span class="fl">50</span>)
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">pbm</span>, features <span class="op">=</span> <span class="va">all.VariableFeatures</span>, rank <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+<span class="va">scranPCA</span> <span class="op">=</span> <span class="fu">BiocSingular</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html">runPCA</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Assays.html">Assays</a></span><span class="op">(</span><span class="va">pbm</span>,slot <span class="op">=</span> <span class="st">"RNA"</span><span class="op">)</span><span class="op">@</span><span class="va">scale.data</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="va">all.VariableFeatures</span>,<span class="op">]</span><span class="op">)</span> , rank <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindNeighbors.html">FindNeighbors</a></span>(<span class="no">pbm</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">10</span>)
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindClusters.html">FindClusters</a></span>(<span class="no">pbm</span>, <span class="kw">resolution</span> <span class="kw">=</span> <span class="fl">0.5</span>, <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindNeighbors.html">FindNeighbors</a></span><span class="op">(</span><span class="va">pbm</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindClusters.html">FindClusters</a></span><span class="op">(</span><span class="va">pbm</span>, resolution <span class="op">=</span> <span class="fl">0.5</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="no">pbm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunUMAP.html">RunUMAP</a></span>(<span class="no">pbm</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">10</span>, <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunUMAP.html">RunUMAP</a></span><span class="op">(</span><span class="va">pbm</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="fu">colData</span>(<span class="no">scEx</span>)$<span class="no">seurartCluster</span> <span class="kw">=</span> -<span class="fl">1</span>
-<span class="fu">colData</span>(<span class="no">scEx</span>)[<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span>(<span class="no">pbm</span>)),<span class="st">"seurartCluster"</span>] <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span>(<span class="no">pbm</span>)
-<span class="fu">colData</span>(<span class="no">scEx</span>)$<span class="no">seurartCluster</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(<span class="fu">colData</span>(<span class="no">scEx</span>)$<span class="no">seurartCluster</span>)</pre></body></html></div>
+<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span> <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span><span class="op">)</span>,<span class="st">"seurartCluster"</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span><span class="op">)</span></code></pre></div>
 <div id="comparing-biocsingular-and-seurat-pca-calculations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#comparing-biocsingular-and-seurat-pca-calculations" class="anchor"></a>comparing BiocSingular and Seurat PCA calculations:</h2>
@@ -187,18 +195,21 @@
 <li>
 <p>BiocSingular </p>
 <div id="htmlwidget-224a177bc8d0026d195b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-224a177bc8d0026d195b">{"x":{"filter":"none","data":[["AAACATACAACCAC-1","AAACATTGAGCTAC-1","AAACATTGATCAGC-1"],[-4.71606885483825,-0.503934612562218,-3.17556831366895],[-0.526504991038634,4.58419850565029,-3.47741474467558],[-0.848004823269263,5.88435595219519,-0.912638100491363]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PC1<\/th>\n      <th>PC2<\/th>\n      <th>PC3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-224a177bc8d0026d195b">{"x":{"filter":"none","data":[["AAACATACAACCAC-1","AAACATTGAGCTAC-1","AAACATTGATCAGC-1"],[-4.71606885483824,-0.503934612562218,-3.17556831366895],[-0.526504991038634,4.58419850565029,-3.47741474467559],[-0.848004823269218,5.88435595219513,-0.912638100491362]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PC1<\/th>\n      <th>PC2<\/th>\n      <th>PC3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </li>
 </ul>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">pbm</span></pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pbm</span></code></pre></div>
 <pre><code>## An object of class Seurat 
 ## 13713 features across 2638 samples within 1 assay 
 ## Active assay: RNA (13713 features, 2000 variable features)
 ##  2 dimensional reductions calculated: pca, umap</code></pre>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"># Assays(pbm)</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Assays(pbm)</span></code></pre></div>
 <p>We have now created a SingleCellExperiment object with all information from Seurat. We will now try to recreate these results with SCHNAPPs:</p>
 <p>We have to save the object in a file that can be opened with the “load” command.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span>(<span class="kw">file</span> <span class="kw">=</span> <span class="st">"seurat.pbm.RData"</span>, <span class="kw">list</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"scEx"</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"seurat.pbm.RData"</span>, list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"scEx"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>To reproduce the results the following parameters have to be set in SCHNAPPs:</p>
 <ul>
 <li>Cell selection: ** Min # of UMIs = 1</li>
@@ -385,6 +396,7 @@ Alluvial plot
 </div>
 <p>Q.E.D.</p>
 </div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -402,7 +414,7 @@ Alluvial plot
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
