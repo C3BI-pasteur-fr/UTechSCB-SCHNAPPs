@@ -89,7 +89,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   )
   # TODO Error handling
   if (is.null(retVal) ) return(NULL)
-      
+  
   
   # print debugging information on the console
   printTimeEnd(start.time, "inputData")
@@ -131,7 +131,7 @@ coE_heatmapSelectedReactive <- reactive({
   ccols <- isolate(clusterCols$colPal)
   # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
   
-   
+  
   if (is.null(scEx_log) ||is.null(scCells) || length(scCells) == 0 ||
       is.null(projections)) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
@@ -213,7 +213,7 @@ coE_topExpGenesTable <- reactive({
   scCells <- isolate(sc$selectedCells())
   # coEtgMinExprShow <- input$coEtgMinExprShow
   
-   if (is.null(scEx_log) || is.null(scCells)) {
+  if (is.null(scEx_log) || is.null(scCells)) {
     if (DEBUG) if (is.null(scEx_log)) cat(file = stderr(), "coE_topExpGenesTable scEx_log null.\n")
     if (DEBUG) if (is.null(scCells)) cat(file = stderr(), "coE_topExpGenesTable scCells null.\n")
     return(NULL)
@@ -877,16 +877,28 @@ coE_heatmapReactive <- reactive({
   
   featureData <- rowData(scEx_log)
   if (genesin == "") {
-    wmarkers <- scran::findMarkers(scEx_log, 
-                                   projections$dbCluster,
-                                   direction = direction,
-                                   lfc = lfc)
-    
-    markerlist = lapply(wmarkers,FUN = function(x){
-      rownames(x)[order(x$p.value)[1:nFindCluster]]
-    }) %>% unlist %>% unique 
+    markerlist =  tryCatch({
+      wmarkers <- scran::findMarkers(scEx_log, 
+                                     projections$dbCluster,
+                                     direction = direction,
+                                     lfc = lfc)
+      
+      lapply(wmarkers,FUN = function(x){
+        rownames(x)[order(x$p.value)[1:nFindCluster]]
+      }) %>% unlist %>% unique
+    }, error = function(e) {
+      return(NULL)
+    })
     # %>% 
-    
+    if (is.null(markerlist)) {
+      return(list(
+        src = "empty.png",
+        contentType = "image/png",
+        width = 96,
+        height = 96,
+        alt = "heatmap should be here"
+      ))
+    }
     genesin =  paste(featureData[markerlist, "symbol"], collapse  = ", ")
     updateTextInput(session = session, inputId = "coE_heatmap_geneids",
                     value = genesin)

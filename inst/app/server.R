@@ -166,17 +166,15 @@ scShinyServer <- function(input, output, session) {
         .schnappsEnv$historyFile = "history2.Rmd"
       }
       .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
-      line=paste0("
----
+      line=paste0("---
 title: \"history\"
-output: html_document
+output:
   bookdown::html_document2:
     toc: true
     toc_depth: 3
     toc_float: true
     number_sections: true
     code_folding: hide
-    number-offset: 2.3
 ---
 
 ```{r setup, include=FALSE}
