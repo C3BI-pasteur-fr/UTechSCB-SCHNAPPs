@@ -1,5 +1,5 @@
 ---
-title: "Frequently asked questions for common tasks"
+title: "FAQs"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{FAQs}
