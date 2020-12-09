@@ -175,9 +175,9 @@ gQC_sampleHistFunc <- function(sampleInf, scols) {
   }
   # browser()
   
-  if (!is.factor(sampleInf)) {
-    sampleInf = as.factor(sampleInf)
-  }
+  # if (!is.factor(sampleInf)) {
+    sampleInf = factor(sampleInf)
+  # }
   
   plotly::plot_ly(x=sampleInf, 
                   type="histogram", 

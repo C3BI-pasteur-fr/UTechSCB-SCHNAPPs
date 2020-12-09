@@ -286,7 +286,18 @@ clusterServer <- function(input, output, session,
     cells.names <- brushedPs$key
     if (is.null(cells.names) )
       if (length(brushedPs) >0)
-        if (nrow(brushedPs) > 0) {
+        if (nrow(brushedPs) > 0) { 
+          # browser()
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
+          # cat(file = stderr(), "changeGroups\n")
           cells.names = tryCatch(
             {
               
@@ -653,11 +664,12 @@ clusterServer <- function(input, output, session,
     if (!grpN %in% colnames(grpNs)) {
       grpNs[, grpN] <- FALSE
     }
+    grpNs[, grpN] = as.logical(grpNs[, grpN])
     if (!addToSelection) {
       grpNs[rownames(visibleCells), grpN] <- FALSE
     }
     grpNs[cells.names, grpN] <- TRUE
-    grpNs[, grpN] <- as.factor(grpNs[, grpN])
+    # grpNs[, grpN] <- as.factor(grpNs[, grpN])
     # Set  reactive value
     # cat(file = stderr(), paste("DEBUG: ",colnames(grpNs)," \n"))
     groupNames$namesDF <- grpNs
@@ -670,48 +682,53 @@ clusterServer <- function(input, output, session,
       session = session, inputId = "groupName",
       value = grpN
     )
-    
-    if (ncol(prjs) > 0) {
-      # We overwrite the common columns
-      comColPrjs = which(colnames(prjs) %in% colnames(grpNs) )
-      # didn't find a way to easily overwrite columns
-      # we need to add 1 to comColPrjs because tibble added rownames column 
-      prjs[rownames(grpNs), comColPrjs] = grpNs[, comColPrjs]
-      
-      newColsGrpns = which(!colnames(grpNs) %in% colnames(prjs))
-      if(length(newColsGrpns) > 0) {
-        # prj has all the rows from the very first input data set.
-        # prjs <- tibble::rownames_to_column(prjs)
+    tryCatch({
+      if (ncol(prjs) > 0) {
+        # We overwrite the common columns
+        comColPrjs = which(colnames(prjs) %in% colnames(grpNs) )
+        # didn't find a way to easily overwrite columns
+        # we need to add 1 to comColPrjs because tibble added rownames column 
+        prjs[rownames(grpNs), comColPrjs] = grpNs[, comColPrjs]
+        
+        newColsGrpns = which(!colnames(grpNs) %in% colnames(prjs))
+        if(length(newColsGrpns) > 0) {
+          # prj has all the rows from the very first input data set.
+          # prjs <- tibble::rownames_to_column(prjs)
+          prjs <- dplyr::left_join(
+            tibble::rownames_to_column(prjs), 
+            tibble::rownames_to_column(grpNs[,newColsGrpns, drop=FALSE]), 
+            by='rowname')
+          rownames(prjs) = prjs[,1]
+          prjs = prjs[,-1]
+        }
+        
+        # for (cn in colnames(grpNs)) {
+        #   if (cn %in% colnames(prjs)) {
+        #     prjs[, cn] <- grpNs[, cn]
+        #   } else {
+        #     prjs <- base::cbind(prjs, grpNs[, cn], deparse.level = 0)
+        #     colnames(prjs)[ncol(prjs)] <- cn
+        #   }
+        # }
+        
+        # sessionProjections$prjs <- prjs
+      } else {
+        prjs = data.frame(row.names = acn)
         prjs <- dplyr::left_join(
           tibble::rownames_to_column(prjs), 
-          tibble::rownames_to_column(grpNs[,newColsGrpns, drop=FALSE]), 
+          tibble::rownames_to_column(grpNs), 
           by='rowname')
         rownames(prjs) = prjs[,1]
         prjs = prjs[,-1]
       }
-      
-      # for (cn in colnames(grpNs)) {
-      #   if (cn %in% colnames(prjs)) {
-      #     prjs[, cn] <- grpNs[, cn]
-      #   } else {
-      #     prjs <- base::cbind(prjs, grpNs[, cn], deparse.level = 0)
-      #     colnames(prjs)[ncol(prjs)] <- cn
-      #   }
-      # }
-      
-      # sessionProjections$prjs <- prjs
-    } else {
-      prjs = data.frame(row.names = acn)
-      prjs <- dplyr::left_join(
-        tibble::rownames_to_column(prjs), 
-        tibble::rownames_to_column(grpNs), 
-        by='rowname')
-      rownames(prjs) = prjs[,1]
-      prjs = prjs[,-1]
-    }
-    prjs[is.na(prjs)] <- FALSE
-    prjs$all = TRUE
-    if ('rowname' %in% colnames(prjs)) prjs = prjs [,-which(colnames(prjs)=='rowname')]
+      prjs[is.na(prjs)] <- FALSE
+      prjs$all = TRUE
+      if ('rowname' %in% colnames(prjs)) prjs = prjs [,-which(colnames(prjs)=='rowname')]
+    },
+    error = function(e){
+      browser()
+      cat(file = stderr(), paste("error in grp", e))
+    })
     sessionProjections$prjs = prjs
     selectedGroupName <<- grpN
   })
@@ -1316,85 +1333,85 @@ pHeatMapModule <- function(input, output, session,
   # pHeatMapModule - pHeatMapPlot ----
   output$pHeatMapPlot <- renderImage(deleteFile = T,
                                      {
-    if (DEBUG) cat(file = stderr(), "pHeatMapPlot started.\n")
-    start.time <- base::Sys.time()
-    on.exit({
-      printTimeEnd(start.time, "pHeatMapPlot")
-      if (!is.null(getDefaultReactiveDomain())) {
-        removeNotification(id = "pHeatMapPlot")
-      }
-    })
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("pHeatMapPlot", id = "pHeatMapPlot", duration = NULL)
-    }
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "pHeatMapPlotWARNING")
-    }
-    
-    ns <- session$ns
-    heatmapData <- pheatmapList()
-    addColNames <- input$ColNames
-    orderColNames <- input$orderNames
-    # moreOptions <- input$moreOptions
-    colTree <- input$showColTree
-    scale <- input$normRow
-    myns <- ns("pHeatMap")
-    save2History <- input$save2History
-    pWidth <- input$heatmapWidth
-    pHeight <- input$heatmapHeight
-    colPal <- input$colPal
-    minMaxVal <- input$heatmapMinMaxValue
-    # maxVal <- input$heatmapMaxValue
-    
-    proje <- projections()
-    if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
-    if (.schnappsEnv$DEBUGSAVE) {
-      cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
-      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
-      cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
-    }
-    # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
-    outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
-    outfile <- normalizePath(outfile, mustWork = FALSE)
-    
-    
-    
-    retVal <- heatmapModuleFunction(
-      heatmapData = heatmapData,
-      addColNames = addColNames,
-      orderColNames = orderColNames,
-      colTree = colTree,
-      scale = scale,
-      pWidth = pWidth,
-      pHeight = pHeight,
-      colPal = colPal,
-      minMaxVal = minMaxVal,
-      proje = proje,
-      outfile = outfile
-    )
-    
-    if (retVal[["src"]] == "empty.png") {
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
-    } else {
-      af = heatmapModuleFunction
-      # remove env because it is too big
-      environment(af) = new.env(parent = emptyenv())
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
-                                                           heatmapData = heatmapData,
-                                                           addColNames = addColNames,
-                                                           orderColNames = orderColNames,
-                                                           colTree = colTree,
-                                                           scale = scale,
-                                                           pWidth = pWidth,
-                                                           pHeight = pHeight,
-                                                           colPal = colPal,
-                                                           minMaxVal = minMaxVal,
-                                                           proje = proje,
-                                                           outfile = outfile
-      )
-    }
-    return(retVal)
-  })
+                                       if (DEBUG) cat(file = stderr(), "pHeatMapPlot started.\n")
+                                       start.time <- base::Sys.time()
+                                       on.exit({
+                                         printTimeEnd(start.time, "pHeatMapPlot")
+                                         if (!is.null(getDefaultReactiveDomain())) {
+                                           removeNotification(id = "pHeatMapPlot")
+                                         }
+                                       })
+                                       if (!is.null(getDefaultReactiveDomain())) {
+                                         showNotification("pHeatMapPlot", id = "pHeatMapPlot", duration = NULL)
+                                       }
+                                       if (!is.null(getDefaultReactiveDomain())) {
+                                         removeNotification(id = "pHeatMapPlotWARNING")
+                                       }
+                                       
+                                       ns <- session$ns
+                                       heatmapData <- pheatmapList()
+                                       addColNames <- input$ColNames
+                                       orderColNames <- input$orderNames
+                                       # moreOptions <- input$moreOptions
+                                       colTree <- input$showColTree
+                                       scale <- input$normRow
+                                       myns <- ns("pHeatMap")
+                                       save2History <- input$save2History
+                                       pWidth <- input$heatmapWidth
+                                       pHeight <- input$heatmapHeight
+                                       colPal <- input$colPal
+                                       minMaxVal <- input$heatmapMinMaxValue
+                                       # maxVal <- input$heatmapMaxValue
+                                       
+                                       proje <- projections()
+                                       if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
+                                       if (.schnappsEnv$DEBUGSAVE) {
+                                         cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
+                                         save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", list = c(ls(), "heatmapData", "input", "output", "session", "pheatmapList", "ns"))
+                                         cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
+                                       }
+                                       # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
+                                       outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
+                                       outfile <- normalizePath(outfile, mustWork = FALSE)
+                                       
+                                       
+                                       
+                                       retVal <- heatmapModuleFunction(
+                                         heatmapData = heatmapData,
+                                         addColNames = addColNames,
+                                         orderColNames = orderColNames,
+                                         colTree = colTree,
+                                         scale = scale,
+                                         pWidth = pWidth,
+                                         pHeight = pHeight,
+                                         colPal = colPal,
+                                         minMaxVal = minMaxVal,
+                                         proje = proje,
+                                         outfile = outfile
+                                       )
+                                       
+                                       if (retVal[["src"]] == "empty.png") {
+                                         .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
+                                       } else {
+                                         af = heatmapModuleFunction
+                                         # remove env because it is too big
+                                         environment(af) = new.env(parent = emptyenv())
+                                         .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
+                                                                                              heatmapData = heatmapData,
+                                                                                              addColNames = addColNames,
+                                                                                              orderColNames = orderColNames,
+                                                                                              colTree = colTree,
+                                                                                              scale = scale,
+                                                                                              pWidth = pWidth,
+                                                                                              pHeight = pHeight,
+                                                                                              colPal = colPal,
+                                                                                              minMaxVal = minMaxVal,
+                                                                                              proje = proje,
+                                                                                              outfile = outfile
+                                         )
+                                       }
+                                       return(retVal)
+                                     })
   
   # pHeatMapModule - additionalOptions ----
   # output$additionalOptions <- renderUI({

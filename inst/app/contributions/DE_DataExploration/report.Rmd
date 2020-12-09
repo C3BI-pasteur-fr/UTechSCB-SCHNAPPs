@@ -19,7 +19,7 @@ if (exists("params")) {
   require(ggplot2)
   require(DT)
   require(pheatmap)
-  require(threejs)
+  # require(threejs)
   # require(sm)
   require(RColorBrewer)
   require(mclust)

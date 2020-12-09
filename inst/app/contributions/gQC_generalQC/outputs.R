@@ -364,6 +364,7 @@ observeEvent(
       newPrjs[rownames(projections),newPrj] <- projections[, oldPrj, drop = FALSE]
     } else {
       # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
+      # browser()
       newPrjs <- dplyr::left_join(
         tibble::rownames_to_column(newPrjs), 
         tibble::rownames_to_column(projections[, oldPrj, drop = FALSE]), 
@@ -462,6 +463,7 @@ observeEvent(
       # rownames(newPrjs) = rownames(projections)
     } else {
       # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], combProjections)
+      # browser()
       newPrjs <- dplyr::left_join(
         tibble::rownames_to_column(newPrjs), 
         tibble::rownames_to_column(combProjections), 
@@ -509,6 +511,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                rnProj = input$gQC_rnProj
                newProjName = make.names(input$gQC_newRnPrj)
                projections = projections()
+               acn = allCellNames()
                newPrjs <- projectionsTable$newProjections
                if (is.null(projections)) {
                  return(NULL)
@@ -527,13 +530,23 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                  tryCatch({
                    newLbVec = str_split(newLables, ",")[[1]]
                    if (ncol(newPrjs) == 0) {
-                     newPrjs <- projections[,rnProj, drop = FALSE]
+                     newPrjs = data.frame(row.names = acn)
+                     newPrjs[,newPrj] = NA
+                     newPrjs[rownames(projections),newPrj] <- projections[, rnProj, drop = FALSE]
                    } else {
-                     newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,rnProj])
+                     # browser()
+                     newPrjs <- dplyr::left_join(
+                       tibble::rownames_to_column(newPrjs), 
+                       tibble::rownames_to_column(projections[, rnProj, drop = FALSE]), 
+                       by='rowname')
+                     rownames(newPrjs) = newPrjs[,1]
+                     newPrjs = newPrjs[,-1]
+                     # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,rnProj])
                    }
                    newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
                    levels(newPrjs[,ncol(newPrjs)]) = stringr::str_trim(newLbVec)
                  }, error=function(w){
+                   # browser()
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
                    showNotification("problem with names", id = "renameProbl", duration = NULL)
                    return(NULL)
