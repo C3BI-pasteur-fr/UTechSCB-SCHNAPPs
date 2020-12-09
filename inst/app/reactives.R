@@ -21,7 +21,7 @@ clusterCols <- reactiveValues(colPal = allowedColors)
 # are not possible to precalculate.
 sessionProjections <- reactiveValues(
   prjs = data.frame()
-  )
+)
 
 # 
 allCellNames <- reactiveVal(
@@ -1593,6 +1593,8 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   }
   if (!is.null(getDefaultReactiveDomain())) {
     removeNotification(id = "pcawarning")
+    removeNotification(id = "pcawarning2")
+    removeNotification(id = "pcawarning3")
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
@@ -1605,33 +1607,44 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   # if (is.null(genesin) || length(genesin) == 0) {
   #   genesin <- rownames(scEx_log)
   # }
-  
   geneshvg = c()
-  switch(hvgSelection,
-         "vst" = {
-           pbmc <-
-             FindVariableFeatures(assays(scEx)[[1]], selection.method = "vst", nfeatures = pcaN)
-           
-           geneshvg = rownames(scEx_log)[order(pbmc$vst.variance.standardized, decreasing = T)[1:pcaN]]
-         },
-         "mvp" = {
-           pbmc <-
-             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot", nfeatures = pcaN)
-           pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
-           geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
-         },
-         "disp" = {
-           pbmc <-
-             FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "dispersion", nfeatures = pcaN)
-           # NA values seem to have the highest variance. so we make sure to include them
-           pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
-           geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
-         },
-         "getTopHVGs" = {
-           dec <- modelGeneVar(scEx_log)
-           geneshvg <- getTopHVGs(dec, prop=0.1)
-         }
-  )
+  tryCatch({
+    
+    switch(hvgSelection,
+           "vst" = {
+             pbmc <-
+               FindVariableFeatures(assays(scEx)[[1]], selection.method = "vst", nfeatures = pcaN)
+             
+             geneshvg = rownames(scEx_log)[order(pbmc$vst.variance.standardized, decreasing = T)[1:pcaN]]
+           },
+           "mvp" = {
+             pbmc <-
+               FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot", nfeatures = pcaN)
+             pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
+             geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
+           },
+           "disp" = {
+             pbmc <-
+               FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "dispersion", nfeatures = pcaN)
+             # NA values seem to have the highest variance. so we make sure to include them
+             pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
+             geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
+           },
+           "getTopHVGs" = {
+             dec <- modelGeneVar(scEx_log)
+             geneshvg <- getTopHVGs(dec, prop=0.1)
+           }
+    )
+  }, error = function(e){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        paste("Problem with PCA: Find variables not working ", e),
+        type = "error",
+        id = "pcawarning",
+        duration = NULL
+      )
+    }
+  })
   # We insist that the genes we select manually are included and then take 
   genesin = c(genesin, geneshvg, rownames(scEx_log))[1:pcaN]
   
@@ -1640,13 +1653,23 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
         paste("Problem with PCA: Too many PCs requested, setting to ", rank),
-        type = "warning",
-        id = "pcawarning",
+        type = "error",
+        id = "pcawarning2",
         duration = NULL
       )
     }
   }
-  
+  if (rank < 3 ) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        paste("Problem with PCA: not enough genes, aboarding!"),
+        type = "error",
+        id = "pcawarning3",
+        duration = NULL
+      )
+    }
+    return(NULL)
+  }
   withWarnings <- function(expr) {
     wHandler <- function(w) {
       if (DEBUG) {
@@ -1916,15 +1939,15 @@ scranCluster <- function(pca,
     error = function(e) {
       cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
       # if (grepl("rank variances of zero", as.character(e))) {
-        if (useRanks) {
-          if (!is.null(getDefaultReactiveDomain())) {
-            showNotification(paste("Not using ranks due to identical ranks\n"), id = "quickClusterError", type = "error", duration = NULL)
-          }
-          cat(file = stderr(), paste("\nNot using ranks due to identical ranks\n", e))
-          params$use.ranks <- F
-          return(do.call("quickCluster", params))
+      if (useRanks) {
+        if (!is.null(getDefaultReactiveDomain())) {
+          showNotification(paste("Not using ranks due to identical ranks\n"), id = "quickClusterError", type = "error", duration = NULL)
         }
-        cat(file = stderr(), "\nRemove duplicated cells\n")
+        cat(file = stderr(), paste("\nNot using ranks due to identical ranks\n", e))
+        params$use.ranks <- F
+        return(do.call("quickCluster", params))
+      }
+      cat(file = stderr(), "\nRemove duplicated cells\n")
       # }
       return(NULL)
     },
@@ -2251,7 +2274,7 @@ simlrFunc  <- function(){
       Sys.info()["sysname"] == "Darwin" && getRversion() == "4.0.2") {
     parallel:::setDefaultClusterOptions(setup_strategy = "sequential")
   }
- retVal <- tryCatch(
+  retVal <- tryCatch(
     {
       if (nClust == 0) {
         estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),

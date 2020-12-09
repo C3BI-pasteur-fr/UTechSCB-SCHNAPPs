@@ -384,9 +384,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     if (is.factor(subsetData[,dimCol])) {
       p1 = subsetData %>% 
         plotly::plot_ly( 
-                source = "subset",
-                type = 'violin') 
+          source = "subset",
+          type = 'violin') 
       for ( lv in levels(subsetData[,dimCol])) {
+        if (lv %in% names(colors)){
+          col = I(colors[lv])
+        } else {
+          col = NULL
+        }
         p1 = p1 %>%
           add_trace(
             x = formula(paste0("~get(dimX)[subsetData[,dimCol] == \"", lv, "\"]")),
@@ -408,8 +413,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
             ),
             meanline = list(
               visible = T
-            )
+            ),
+            color = col
           )
+        # p1
+      
       }
       p1 = p1 %>% layout(
         xaxis = xAxis,
@@ -418,7 +426,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         dragmode = "select",
         violinmode = 'group'
       ) 
-      # p1
+       # p1
       return (p1)
     }
     # ignore color
@@ -497,6 +505,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     shape[selRows] <- "b"
     x1 <- subsetData[selectedCells, dimX, drop = FALSE]
     y1 <- subsetData[selectedCells, dimY, drop = FALSE]
+    if(is.logical(x1)) {
+      x1 = as.factor(x1)
+    }
+    if(is.logical(y1)) {
+      y1 = as.factor(y1)
+    }
     p1 <- p1 %>%
       add_trace(
         data = subsetData[selectedCells, ],
@@ -518,7 +532,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     if (!is.numeric(subsetData[, dimY])) {
       cat(file=stderr(), paste("\nWARNING: ", dimY, "is not numeric\n\n"))
       return(NULL)
-      }
+    }
     density <- stats::density(subsetData[, dimY], na.rm = T)
     library(MASS)
     fit <- fitdistr(subsetData[!is.na(subsetData[, dimY]), dimY], "normal", na.rm = T)
