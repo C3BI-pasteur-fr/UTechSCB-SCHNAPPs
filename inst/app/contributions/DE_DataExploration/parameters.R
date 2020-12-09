@@ -9,7 +9,7 @@ myNormalizationChoices <- list(
   gene_norm = "DE_logGeneNormalization",
   SeuratLogNorm = "DE_seuratLogNorm",
   SeuratStandard = "DE_seuratStandard",
-  SeuratSCtransform = "DE_seuratSCtransform",
+  "integrate and SCtransform (Seurat)" = "DE_seuratSCtransform",
   SeuratRefBased = "DE_seuratRefBased"
 )
 
