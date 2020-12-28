@@ -107,9 +107,9 @@ output$DE_gene_vio_plot <- renderPlot({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_gene_vio_plot.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/DE_gene_vio_plot.RData", list = c(ls()),compress = F)
   }
-  # load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
+  # cp = load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
 
 
   p1 <- DE_geneViolinFunc(scEx_log[, cellNs], g_id, projections[cellNs, ], ccols)
@@ -331,7 +331,7 @@ output$DE_tsne_plt <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls()), compress = F)
   }
   # load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
 

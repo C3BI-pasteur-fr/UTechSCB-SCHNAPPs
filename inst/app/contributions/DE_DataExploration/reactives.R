@@ -3,7 +3,7 @@ suppressMessages(require(ggplot2))
 # for 2D plot in ExpressionPanel
 deProjTable <- reactive({
   projections <- projections()
-  selectedCells <- DE_Exp_dataInput()
+  selectedCells <- DE_Exp_dataInput() #DE_Exp_dataInput
   cellNs <- selectedCells$cellNames()
   
   if (DEBUG) cat(file = stderr(), "observeEvent: input$DE_clusterPP\n")
@@ -11,7 +11,8 @@ deProjTable <- reactive({
   if (is.null(projections) | is.null(cellNs)) {
     return(NULL)
   }
-  cellNs <- which(cellNs %in% rownames(projections))
+  # browser()
+  cellNs <- cellNs[cellNs %in% rownames(projections)]
   projections[cellNs, ]
 })
 

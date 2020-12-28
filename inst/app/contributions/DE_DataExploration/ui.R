@@ -40,26 +40,29 @@ tabList <- list(
           )
         )
       ),
+      fluidRow(div(tags$h3("Expression based on subset of cells"), align = "center")),
+      tags$p("Here, plots are only working on cells that are selection in the Selection of input Cells"),
+      tags$p("Projections will be not be effected by this sub selection."),
       br(),
-      cellSelectionUI("DE_Exp_dataInput"),
+      fluidRow(
+        column( offset = 3,
+                width = 12, 
+                cellSelectionUI("DE_Exp_dataInput")
+        )),
       br(),
-      box(width = 12,
-          fluidRow(
-            column(
-              width = 6,
-              fluidRow(
-                column(
-                  width = 12,
-                  textInput("DE_gene_id", "Enter gene", value = defaultValue("DE_gene_id", defaultValueSingleGene)),
-                  jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
-                )
-              ),
-            ),
-            column(
-              width = 6,
-              clusterUI("DE_expclusters")
-            )
-          )),
+      fluidRow(
+        column(
+          width = 12,
+          clusterUI("DE_expclusters")
+        )
+      ),
+      br(),
+      fluidRow(
+        column(
+          width = 12,textInput("DE_gene_id", "Enter gene", value = defaultValue("DE_gene_id", defaultValueSingleGene)),
+          jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
+        )
+      ),
       br(),
       fluidRow(
         column(

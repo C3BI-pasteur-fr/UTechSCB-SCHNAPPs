@@ -589,7 +589,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExp
   }
   
   expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minExpr)
-  ylabText <- "number genes from list"
+  ylabText <- "number of genes from list"
   
   # coExpVal = number of cells with exprssion over minExpr
   projections <- cbind(projections, coExpVal = expression * 1.0)
@@ -812,7 +812,7 @@ coE_updateInputXviolinPlot <- observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_updateInputXviolinPlot", id = "coE_updateInputXviolinPlot", duration = NULL)
   }
-  
+ 
   tsneData <- projections()
   projFactors <- projFactors()
   # Can use character(0) to remove all choices

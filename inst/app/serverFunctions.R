@@ -152,11 +152,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # validate(need(is.na(sum(expression)) != TRUE, ""))
   
   # geneid <- geneName2Index(geneNames, featureData)
+  # 
+  # In the module the input table is coming from the projections (tData) that is a parameter
+  # to the module. Since this can be a subset we need to subset the scEx as well.
   projections <- updateProjectionsWithUmiCount(
     dimX = dimX, dimY = dimY,
     geneNames = geneNames,
     geneNames2 = geneNames2,
-    scEx = scEx_log, projections = projections
+    scEx = scEx_log[, rownames(projections)], projections = projections
   )
   
   # histogram as y and cellDensity as color is not allowed

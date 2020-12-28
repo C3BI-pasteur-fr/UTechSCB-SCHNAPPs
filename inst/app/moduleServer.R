@@ -258,7 +258,7 @@ clusterServer <- function(input, output, session,
       dimX = dimX, dimY = dimY,
       geneNames = geneNames,
       geneNames2 = geneNames2,
-      scEx = scEx_log, projections = projections
+      scEx = scEx_log[, rownames(projections)], projections = projections
     )
     
     if (!is.null(namedGroup)) {
@@ -370,7 +370,7 @@ clusterServer <- function(input, output, session,
           dimX = dimX, dimY = dimY,
           geneNames = geneNames,
           geneNames2 = geneNames2,
-          scEx = scEx_log, projections = projections
+          scEx = scEx_log[, rownames(projections)], projections = projections
         )
         
         subsetData <- subset(projections, dbCluster %in% inpClusters)
@@ -496,7 +496,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
     
-    # cp = load("/Users/bernd/SCHNAPPsDebug/clusterPlot-coE_selected--.RData");.schnappsEnv$DEBUGSAVE=FALSE
+    # cp = load("~/SCHNAPPsDebug/clusterPlot-DE_expclusters--.RData");.schnappsEnv$DEBUGSAVE=FALSE
     if (is.null(g_id) || nchar(g_id) == 0) {
       g_id <- featureData$symbol
     }
@@ -509,7 +509,7 @@ clusterServer <- function(input, output, session,
     #   dimX = dimX, dimY = dimY,
     #   geneNames = geneNames,
     #   geneNames2 = geneNames2,
-    #   scEx = scEx_log, projections = tdata
+    #   scEx = scEx_log[, rownames(projections)], projections = tdata
     # )
     if (dimCol == "sampleNames") {
       myColors <- scols
@@ -905,7 +905,7 @@ clusterServer <- function(input, output, session,
     #   dimX = dimX, dimY = dimY,
     #   geneNames = geneNames,
     #   geneNames2 = geneNames2,
-    #   scEx = scEx_log, projections = projections
+    #   scEx = scEx_log[, rownames(projections)], projections = projections
     # )
     #
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]

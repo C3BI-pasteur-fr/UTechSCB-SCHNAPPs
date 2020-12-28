@@ -248,73 +248,8 @@ inputDataFunc <- function(inFile) {
       }
       stats[fpIdx, "nFeatures"] <- nrow(scEx)
       stats[fpIdx, "nCells"] <- ncol(scEx)
-      
-      #
-      # # rListAll <- rownames(fdAll)[!rownames(fdAll) %in% rownames(rowData(scEx))]
-      # rListNew <- rownames(rowData(scEx))[!rownames(rowData(scEx)) %in% rownames(fdAll)]
-      #
-      # # fdIdx <- intersect(rownames(fdAll), rownames(rowData(scEx)))
-      # # if (length(fdIdx) != nrow(fd)) {
-      # #   cat(file = stderr(), "Houston, there is a problem with the features\n")
-      # # }
-      # # fd <- featuredata[fdIdx, ]
-      # rowdataNew <- rowData(scEx)[rListNew, ]
-      # fdAll[rListNew, ] <- NA
-      # for (cIdx in colnames(rowdataNew)) {
-      #   if (!cIdx %in% colnames(fdAll)) {
-      #     fdAll <- cbind(fdAll, data.frame(row.names = rownames(fdAll), rep(NA, nrow(fdAll))))
-      #     colnames(fdAll)[length(colnames(fdAll))] <- cIdx
-      #   }
-      #   fdAll[rListNew, cIdx] <- rowdataNew[, cIdx]
-      # }
-      # # fdAll[rListNew,"id"] = rListNew
-      #
-      # # append new genes
-      # tmpMat <- matrix(nrow = length(rListNew), ncol = ncol(exAll), data = 0)
-      # rownames(tmpMat) <- rListNew
-      # exAll <- rbind(exAll, tmpMat)
-      #
-      #
-      #
-      # # fdAll <- fdAll[fdIdx, ]
-      # pd1 <- colData(scEx)
-      # rownames(pd1) <- paste0(rownames(pd1), "-", fpIdx)
-      # if (!"counts" %in% names(assays(scEx))) {
-      #   cat(file = stderr(), paste("file ", inFile$datapath[fpIdx], "with variable", varName, "didn't contain counts slot\n"))
-      #   next()
-      # }
-      # ex1 <- assays(scEx)[["counts"]]
-      # pdAllCols2add <- colnames(pdAll)[!colnames(pdAll) %in% colnames(pd1)]
-      # pd1Cols2add <- colnames(pd1)[!colnames(pd1) %in% colnames(pdAll)]
-      # for (pd1C in pd1Cols2add) {
-      #   pdAll[, pd1C] <- NA
-      # }
-      # for (pd1C in pdAllCols2add) {
-      #   pd1[, pd1C] <- NA
-      # }
-      # if (sum(rownames(pdAll) %in% rownames(pd1)) > 0) {
-      #   cat(green("Houston, there are cells with the same name\n"))
-      #   save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats"))
-      #   # load("~/SCHNAPPsDebug/inputProblem.RData")
-      #   cat(file = stderr(), "Houston, there are cells with the same name\n")
-      #   rownames(pd1) <- paste0(rownames(pd1), "_", fpIdx)
-      #   pdAll <- rbind(pdAll, pd1)
-      #   colnames(ex1) <- rownames(pd1)
-      # } else {
-      #   pdAll <- rbind(pdAll, pd1)
-      # }
-      
-      # nrow(ex1)
-      # nrow(exAll)
-      # # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("pdAll", "pd1", "exAll", "ex1", "fpIdx", "scEx", "stats", "fdAll"))
-      # exAll <- Matrix::cbind2(exAll[which(rownames(exAll) %in% rownames(ex1)), ], ex1[which(rownames(ex1) %in% rownames(exAll)), ])
     }
   }
-  # rn <- rownames(exAll)
-  # cn <- colnames(exAll)
-  # exAll <- as(exAll, "dgTMatrix")
-  # rownames(exAll) <- rn
-  # colnames(exAll) <- cn
   # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("allScEx", "allScEx_log", "sampleCols"))
   # load(file = "~/SCHNAPPsDebug/inputProblem.RData")
   if ("sampleNames" %in% colnames(colData(allScEx))) {
@@ -341,16 +276,6 @@ inputDataFunc <- function(inFile) {
   }
   # load(file='~/SCHNAPPsDebug/readInp.RData')
   
-  # newNames <- colnames(exAll)
-  # pdAll <- pdAll[newNames, ]
-  # colnames(exAll) <- make.unique(newNames)
-  # rownames(pdAll) <- make.unique(newNames)
-  #
-  # scEx <- SingleCellExperiment(
-  #   assay = list(counts = exAll),
-  #   colData = pdAll,
-  #   rowData = fdAll[rownames(exAll), ]
-  # )
   
   #' save orginial data
   dataTables <- list()
@@ -661,6 +586,7 @@ inputData <- reactive({
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
   inputFile$annFile <- paste(annFile$name, collapse = ", ")
+  
   
   # subsample this number of cells per sample
   # no replacement. it is possible that one sample is more represented if the required number of cells is larger than there are cells for this sample.
@@ -1356,6 +1282,14 @@ scExFunc <-
         pD[, colN] <- factor(as.character(pD[, colN]))
       }
     }
+    
+    # remove potentially existing projections (PC, tTSNE, ...)
+    knownProj = c("UMI.count", "before.filter", "tsne1", "tsne2", "tsne3", "dbCluster", "all", "none" )
+    rmCols = which(colnames(pD) %in% knownProj)
+    rmCols = c(rmCols, which(base::grepl("^PC_", colnames(retVal$data))))
+    if(length(rmCols) > 0) {
+      pD = pD[,-rmCols]
+    }
     colData(scExNew) <- pD
     
     return(scExNew)
@@ -1373,6 +1307,7 @@ scEx <- reactive({
     printTimeEnd(start.time, "scEx")
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "scEx")
+      # removeNotification(id = "scExError")
     }
   })
   if (!is.null(getDefaultReactiveDomain())) {
@@ -1413,6 +1348,20 @@ scEx <- reactive({
     maxG = maxG
   )
   scEx = retVal
+  # ensure that we take the counts slot
+  # when reloading additional slots might be loaded as well.
+  # browser()
+  if(!is.null(scEx)){
+    assays(scEx) = list(counts = assays(scEx)[["counts"]])
+  }
+  
+  if (min(dim(scEx)) <100) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Less than 100 cells or genes", id = "scExError",type = "error", duration = NULL)
+    }
+    return(NULL)
+  }
+  
   add2history(type = "save", input = isolate( reactiveValuesToList(input)), comment = "scEx", scEx = retVal)
   exportTestValues(scEx = {
     list(rowData(retVal), colData(retVal))
@@ -1820,7 +1769,7 @@ pcaReact <- reactive({
     }
     return(NULL)
   }
-  
+  # browser()
   if (is.null(rank)) rank <- 10
   if (is.null(center)) centr <- TRUE
   if (is.null(scale)) scale <- FALSE
@@ -2429,6 +2378,7 @@ projections <- reactive({
   # scEx is the fundamental variable with the raw data, which is available after loading
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
+  
   scEx <- scEx()
   pca <- pcaReact()
   # manually specified groups of cells (see 2D plot in moduleServer.R)
