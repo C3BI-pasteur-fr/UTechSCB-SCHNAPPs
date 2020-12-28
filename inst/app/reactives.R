@@ -1286,7 +1286,7 @@ scExFunc <-
     # remove potentially existing projections (PC, tTSNE, ...)
     knownProj = c("UMI.count", "before.filter", "tsne1", "tsne2", "tsne3", "dbCluster", "all", "none" )
     rmCols = which(colnames(pD) %in% knownProj)
-    rmCols = c(rmCols, which(base::grepl("^PC_", colnames(retVal$data))))
+    rmCols = c(rmCols, which(base::grepl("^PC_[[:digit:]]+$", colnames(pD))))
     if(length(rmCols) > 0) {
       pD = pD[,-rmCols]
     }
