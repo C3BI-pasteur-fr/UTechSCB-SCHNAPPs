@@ -420,7 +420,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
             color = col
           )
         # p1
-      
+        
       }
       p1 = p1 %>% layout(
         xaxis = xAxis,
@@ -429,7 +429,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         dragmode = "select",
         violinmode = 'group'
       ) 
-       # p1
+      # p1
       return (p1)
     }
     # ignore color
@@ -1509,15 +1509,21 @@ consolidateScEx <-
   function(scEx, projections, scEx_log, pca, tsne) {
     # save(file = "~/SCHNAPPsDebug/consolidate.RData", list = c(ls(), "myProjections"))
     # load(file = "~/SCHNAPPsDebug/consolidate.RData")
-    commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
-    commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
-    scEx <- scEx[commGenes, commCells]
+    commCells <- colnames(scEx)
+    if(!is.null(scEx_log)){
+      commCells <- base::intersect(colnames(scEx), colnames(scEx_log))
+      commGenes <- base::intersect(rownames(scEx), rownames(scEx_log))
+      scEx <- scEx[commGenes, commCells]
+      assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
+    }
     # what about UMAP??? others? => they are considered as projections not as reducedDims
-    reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
-    assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]][commGenes, commCells]
-    
-    for (name in colnames(projections)) {
-      colData(scEx)[[name]] <- projections[commCells, name]
+    if(!is.null(pca)){
+      reducedDims(scEx) <- SimpleList(PCA = pca$x[commCells, ], TSNE = tsne[commCells, ])
+    }
+    if(!is.null(projections)){
+      for (name in colnames(projections)) {
+        colData(scEx)[[name]] <- projections[commCells, name]
+      }
     }
     # colData(scEx)[["before.Filter"]] <- projections[commCells, "before.filter"]
     # colData(scEx)[["dbCluster"]] <- projections[commCells, "dbCluster"]

@@ -128,13 +128,14 @@ inputTab <- function() {
                        label = "Compute normalizations?",
                        choices = c(
                          "disable log" = "disablescEx_log",
-                         "use scEx from loaded data" = "useLog",
-                         "calculate normalization here" = "calcLog"
+                         "use logcounts assay from loaded data" = "useLog",
+                         "calculate logcounts using SCHNAPPs" = "calcLog"
                        ),
                        selected = defaultValue("whichscLog", "disablescEx_log")
           )
           # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
         ),
+        checkbsTT("whichscLog"),
         checkbsTT("disablescEx_log")
       )
     ),

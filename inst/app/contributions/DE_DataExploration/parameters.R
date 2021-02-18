@@ -344,7 +344,7 @@ DE_seuratSCtransform <- reactive({
 
 
 # DE_seuratStandardfunc ----
-DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.weight = 100) {
+DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.weight = 100, splitByFactor = "sampleNames") {
   require(Seurat)
   cellMeta <- colData(scEx)
   # split in different samples
@@ -357,7 +357,7 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
         counts = assays(scEx)[[1]],
         meta.data = meta.data
       )
-      seur.list <- SplitObject(seurDat, split.by = "sampleNames")
+      seur.list <- SplitObject(seurDat, split.by = splitByFactor)
       for (i in 1:length(seur.list)) {
         seur.list[[i]] <- NormalizeData(seur.list[[i]], verbose = FALSE)
         seur.list[[i]] <- FindVariableFeatures(seur.list[[i]],
@@ -375,8 +375,6 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
       # Run the standard workflow for visualization and clustering
       integrated <- ScaleData(integrated, verbose = TRUE)
       # integrated@assays
-
-
       # NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
     },
     error = function(e) {

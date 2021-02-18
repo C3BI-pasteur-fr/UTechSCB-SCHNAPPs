@@ -829,7 +829,6 @@ output$RDSsave <- downloadHandler(
       removeNotification(id = "RDSsave")
     }
     
-    # TODO Warning if scEx_log is not set
     
     # umaps???
     scEx <- scEx()
@@ -855,14 +854,19 @@ output$RDSsave <- downloadHandler(
     # we save the pca separately because I don't know how to store the rotation  otherwise.
     # mostly done to make the lite version work.
     
-    saveList =  c("scEx" , "pca", "scol" , "ccol" , "namesDF")
+    saveList =  c("scEx" ,  "scol" , "ccol" , "namesDF")
+    if(!is.null(pca)){
+      saveList = c(saveList, "pca")
+    }
     # browser()
     # save projections that shouldn't be recalculated in lite version
-    for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
-      assign(.schnappsEnv$projectionFunctions[[idx]][2], eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
-      saveList = c(saveList, .schnappsEnv$projectionFunctions[[idx]][2])
+    if (length(.schnappsEnv$projectionFunctions) > 0){
+      for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
+        assign(.schnappsEnv$projectionFunctions[[idx]][2],
+               eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
+        saveList = c(saveList, .schnappsEnv$projectionFunctions[[idx]][2])
+      }
     }
-    
     
     save(file = file, list = saveList)
     
