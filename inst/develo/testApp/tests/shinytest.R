@@ -1,3 +1,3 @@
 library(shinytest)
-shinytest::testApp("../")
+shinytest::testApp("inst/develo/testApp/tests/")
 
