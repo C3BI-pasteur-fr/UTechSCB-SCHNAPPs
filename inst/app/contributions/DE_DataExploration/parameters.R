@@ -506,7 +506,7 @@ DE_seuratLogNorm <- reactive({
   return(retVal)
 })
 
-DE_seuratLogNormfunc <- function(scEx) {
+DE_seuratLogNormfunc <- function(scEx, nHVG, var2reg) {
   require(Seurat)
   cellMeta <- colData(scEx)
   # split in different samples
