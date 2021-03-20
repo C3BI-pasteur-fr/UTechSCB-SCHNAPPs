@@ -1569,7 +1569,8 @@ loadLiteData <- function(fileName = NULL) {
   return(returnList)
 }
 
-
+# defaultValue
+# get a value that has been supplied as a parameter or return the default value val.
 defaultValue <- function(param = "coEtgMinExpr", val ) {
   if (DEBUG) cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
   # browser()

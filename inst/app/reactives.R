@@ -999,6 +999,40 @@ useGenesFunc <-
     return(keepIDs)
   }
 
+# HVAinfoTable ----
+HVAinfoTable <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "output$HVAinfoTable\n")
+  }
+  scEx_log <- scEx_log()
+  
+  if (is.null(scEx_log)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(
+      file = "~/SCHNAPPsDebug/HVAinfoTable.RData",
+      list = c( ls())
+    )
+  }
+  # cp = load("~/SCHNAPPsDebug/HVAinfoTable.RData")
+  seurDat <- tryCatch( 
+    {
+      seurDat <- CreateAssayObject(
+        data = as.matrix(assays(scEx_log)[[1]])
+      )
+      # seurDat[["SCT"]] = 
+      vf = FindVariableFeatures(seurDat)
+      return(vf@meta.features[order(vf@meta.features$vst.variance.standardized),])
+    },
+    error = function(e) {
+      cat(file = stderr(), paste("\n\n!!!Error during HVAinfoTable:\n", e, "\n\n"))
+      return(NULL)
+    }
+  )
+})
+
+
 # PCAloadingsTable ----
 PCAloadingsTable <- reactive({
   if (DEBUG) {
@@ -1018,6 +1052,8 @@ PCAloadingsTable <- reactive({
   # load("~/SCHNAPPsDebug/PCAloadingsTable.RData")
   as.data.frame(pca$rotation)
 })
+
+
 
 # selected genes table ----
 gsSelectedGenesTable <- reactive({
@@ -1284,7 +1320,7 @@ scExFunc <-
     }
     
     # remove potentially existing projections (PC, tTSNE, ...)
-    knownProj = c("UMI.count", "before.filter", "tsne1", "tsne2", "tsne3", "dbCluster", "all", "none" )
+    knownProj = c("UMI.count", "Feature.count", "before.filter", "tsne1", "tsne2", "tsne3", "dbCluster", "all", "none" )
     rmCols = which(colnames(pD) %in% knownProj)
     rmCols = c(rmCols, which(base::grepl("^PC_[[:digit:]]+$", colnames(pD))))
     if(length(rmCols) > 0) {
@@ -1526,7 +1562,7 @@ scExLogMatrixDisplay <- reactive({
 })
 
 # pcaFunc ----
-pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, featureData, pcaN, maxGenes = 1000, hvgSelection) {
+pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, featureData, pcaN, maxGenes = 1000, hvgSelection, inputNormalization="DE_something") {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1557,44 +1593,51 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   #   genesin <- rownames(scEx_log)
   # }
   geneshvg = c()
-  tryCatch({
-    
-    switch(hvgSelection,
-           "vst" = {
-             pbmc <-
-               FindVariableFeatures(assays(scEx)[[1]], selection.method = "vst", nfeatures = pcaN)
-             
-             geneshvg = rownames(scEx_log)[order(pbmc$vst.variance.standardized, decreasing = T)[1:pcaN]]
-           },
-           "mvp" = {
-             pbmc <-
-               FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot", nfeatures = pcaN)
-             pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
-             geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
-           },
-           "disp" = {
-             pbmc <-
-               FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "dispersion", nfeatures = pcaN)
-             # NA values seem to have the highest variance. so we make sure to include them
-             pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
-             geneshvg = rownames(scEx_log)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
-           },
-           "getTopHVGs" = {
-             dec <- modelGeneVar(scEx_log)
-             geneshvg <- getTopHVGs(dec, prop=0.1)
-           }
-    )
-  }, error = function(e){
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification(
-        paste("Problem with PCA: Find variables not working ", e),
-        type = "error",
-        id = "pcawarning",
-        duration = NULL
+  if (inputNormalization == "DE_seuratSCTnorm") {
+    geneshvg = rownames(assays(scEx_log)[[1]])
+  } else {
+    tryCatch({
+      
+      switch(hvgSelection,
+             "vst" = {
+               pbmc <-
+                 FindVariableFeatures(assays(scEx)[[1]], selection.method = "vst")
+               
+               geneshvg = rownames(pbmc)[order(pbmc$vst.variance.standardized, decreasing = T)[1:pcaN]]
+             },
+             "mvp" = {
+               pbmc <-
+                 FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot", )
+               pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
+               geneshvg = rownames(pbmc)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
+             },
+             "disp" = {
+               pbmc <-
+                 FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "dispersion", nfeatures = pcaN)
+               # NA values seem to have the highest variance. so we make sure to include them
+               pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
+               geneshvg = rownames(pbmc)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
+             },
+             "getTopHVGs" = {
+               apply(as.matrix(assays(scEx_log)[[1]]), 1, max)
+               scEx = logNormCounts(scEx)
+               dec <- scran::modelGeneVar(scEx, assay.type = "logcounts")
+               geneshvg <- getTopHVGs(dec, prop=0.1)
+             }
       )
-    }
-  })
+    }, error = function(e){
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          paste("Problem with PCA: Find variables not working ", e),
+          type = "error",
+          id = "pcawarning",
+          duration = NULL
+        )
+      }
+    })
+  }
   # We insist that the genes we select manually are included and then take 
+  
   genesin = c(genesin, geneshvg, rownames(scEx_log))[1:pcaN]
   
   if (length(genesin) < rank) {
@@ -1762,6 +1805,7 @@ pcaReact <- reactive({
   pcaGenes <- isolate(input$genes4PCA)
   hvgSelection <- isolate(input$hvgSelection)
   useSeuratPCA <- isolate(input$useSeuratPCA)
+  inputNormalization <- isolate(input$normalizationRadioButton)
   
   if (is.null(scEx_log)) {
     if (DEBUG) {
@@ -1779,7 +1823,8 @@ pcaReact <- reactive({
                     scale = scale, useSeuratPCA = useSeuratPCA, 
                     pcaGenes = pcaGenes, featureData = featureData,
                     pcaN =  pcaN, 
-                    hvgSelection = hvgSelection)
+                    hvgSelection = hvgSelection,
+                    inputNormalization = inputNormalization)
   
   setRedGreenButton(
     vars = list(
@@ -2413,9 +2458,19 @@ projections <- reactive({
   projections <- pd
   
   if (!is.null(pca)) {
-    comColNames = colnames(projections) %in% colnames(pca$x)
+    pcax = pca$x
+    comColNames = colnames(projections) %in% colnames(pcax)
     colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
-    projections <- cbind(projections, pca$x[rownames(projections),])
+    
+    if (!all(c(rownames(pcax) %in% rownames(projections) , 
+               rownames(projections) %in% rownames(pcax)))){
+      save(file = "~/SCHNAPPsDebug/projectionsError.RData", list = c(ls()))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("projFactors", id = "projFactors", duration = NULL, type = "error")
+      }
+      return(NULL)
+    }
+    projections <- cbind(projections, pcax)
   }
   
   withProgress(message = "Performing projections", value = 0, {
@@ -2792,6 +2847,42 @@ beforeFilterPrj <- reactive({
   })
   return(retVal)
 })
+
+
+# featureCount ----
+featureCount <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "featureCount started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "featureCount")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "featureCount")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("featureCount", id = "featureCount", duration = NULL)
+  }
+  
+  scEx <- scEx()
+  
+  if (is.null(scEx)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/featureCount.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/featureCount.RData")
+  
+  retVal <- Matrix::colSums(assays(scEx)[["counts"]]>0)
+  
+  exportTestValues(featureCount = {
+    retVal
+  })
+  return(retVal)
+})
+
 
 # umiCount ----
 umiCount <- reactive({

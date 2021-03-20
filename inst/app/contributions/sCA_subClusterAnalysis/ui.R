@@ -41,7 +41,7 @@ tabList <- list(
                  )}
                ,
                cellSelectionUI("sCA_dataInput"),
-               box(width = 6,
+               shinydashboard::box(width = 6,
                    title = "Dimensions for plot",
                    fluidRow(
                      column(width = 6,
@@ -82,7 +82,7 @@ tabList <- list(
                
                
                br(),
-               box(width = 12,
+               shinydashboard::box(width = 12,
                    fluidRow(
                      column(width = 6,
                             # plotly::plotlyOutput("sCA_dge_plot1")
@@ -101,14 +101,14 @@ tabList <- list(
                ),
       ),
       # ,
-      # box(
+      # shinydashboard::box(
       #   title = "DGE method", solidHeader = TRUE, width = 12, status = "primary",
       #   collapsible = TRUE, collapsed = FALSE,
       #   
       # )
       
       br(),
-      # box(width = 12,
+      # shinydashboard::box(width = 12,
       #     ),
       # br(),
       

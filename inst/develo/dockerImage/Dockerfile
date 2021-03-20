@@ -8,7 +8,7 @@
 
 
 # load R image
-FROM r-base:3.6.3
+FROM r-base:4.0.4
 
 # set working directory
 WORKDIR /root
@@ -27,9 +27,10 @@ RUN apt-get install -y \
     pandoc \
     pandoc-citeproc \
     libcurl4-gnutls-dev \
-    libcairo2-dev \
     libxt-dev \
     xtail \
+    libgsl-dev \
+    libhdf5-serial-dev \
     wget
 
 # Download and install shiny server
@@ -44,6 +45,9 @@ RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION 
     R -e "devtools::install_github('mul118/shinyMCE')" && \
     R -e "install.packages(c('BiocManager', 'pdftools'))" && \
     R -e "BiocManager::install(c('BiocSingular', 'SingleR'))" && \
+    R -e "BiocManager::install(c('multtest', 'limma', 'Biobase', 'monocle', 'rtracklayer', 'IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics', 'DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment', 'S4Vectors'))" && \
+    R -e "devtools::install_version('spatstat', version = '1.64-1', repos = 'http://cran.us.r-project.org')" && \
+    R -e "devtools::install_github(repo = 'satijalab/seurat', dependencies = TRUE, ref = 'develop', upgrade='never')" && \
     R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)" && \
     R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN', dependencies = TRUE)" && \
     cp -R /usr/local/lib/R/site-library/shiny/examples/* /srv/shiny-server/ && \

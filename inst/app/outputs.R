@@ -513,6 +513,12 @@ callModule(
   PCAloadingsTable, caption = "Tables with PCA loadings"
 )
 
+callModule(
+  tableSelectionServer,
+  "HVAinfoMod",
+  HVAinfoTable, caption = "Tables with variable feature info"
+)
+
 
 # DEBUGSAVEstring ----
 output$DEBUGSAVEstring <- renderText({

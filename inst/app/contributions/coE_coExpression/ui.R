@@ -24,7 +24,7 @@ tabList <- list(
   # coexpressionAll ----
   coexpressionAllTab = shinydashboard::tabItem(
     "coexpressionAll",
-    box(
+    shinydashboard::box(
       title = "Heat map of all cells", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -195,10 +195,17 @@ tabList <- list(
                ),
                column(
                  width = 4,
-                 numericInput("coEminExpr", "min expression of genes:",
-                              value = defaultValue("coEminExpr", 1),
-                              min = -1000, max = 100000
+                 sliderInput(
+                   "coEminMaxExpr",
+                   label = "min/max value for heatmap",
+                   min = -10000000,
+                   max = 100000000,
+                   value = defaultValue("coEminMaxExprValue", c(-1,1))
                  )
+                 # numericInput("coEminExpr", "min expression of genes:",
+                 #              value = defaultValue("coEminExpr", 1),
+                 #              min = -1000, max = 100000
+                 # )
                )
              ),
              br(),
@@ -229,10 +236,16 @@ tabList <- list(
                ),
                column(
                  width = 4,
-                 numericInput("coEminExpr2", "min expression of genes:",
-                              defaultValue("coEminExpr2", 1),
-                              min = -1000, max = 100000
-                 )
+                 sliderInput(
+                   "coEminMaxExpr2",
+                   label = "min/max value for heatmap",
+                   min = -10000000,
+                   max = 100000000,
+                   value = defaultValue("coEminMaxExpr2", c(-1,1))
+                 )# numericInput("coEminExpr2", "min expression of genes:",
+                 #              defaultValue("coEminExpr2", 1),
+                 #              min = -1000, max = 100000
+                 # )
                ),
              ),
              br(),
@@ -247,7 +260,7 @@ tabList <- list(
     )
   ),
   tabItem("alluvialTab",
-          box(
+          shinydashboard::box(
             title = "alluvial plot", solidHeader = TRUE, width = 12, status = 'primary', 
             fluidRow(
               column(width = 6, 

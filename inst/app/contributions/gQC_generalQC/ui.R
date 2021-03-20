@@ -188,7 +188,7 @@ tabList <- list(
     shinyjs::useShinyjs(),
     fluidRow(div(h3("TSNE Plot"), align = "center")),
     br(),
-    box(
+    shinydashboard::box(
       title = "tSNE  parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -200,7 +200,7 @@ tabList <- list(
           numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 30), min = 1, max = 100)
         )
       ),
-      box(
+      shinydashboard::box(
         title = "tSNE additional parameters", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
         column(
@@ -222,7 +222,7 @@ tabList <- list(
         )
       )
     ),
-    box(
+    shinydashboard::box(
       title = "3D plot", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = FALSE,
       fluidRow(
@@ -265,7 +265,7 @@ tabList <- list(
       ))
     ),
     br(),
-    box(
+    shinydashboard::box(
       title = "Table with all projections", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = FALSE, collapsed = FALSE,
       fluidRow(column(
@@ -276,7 +276,7 @@ tabList <- list(
   ),
   umapTab <- shinydashboard::tabItem(
     tabName = "gQC_umapPlot",
-    box(
+    shinydashboard::box(
       title = "UMAP parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -315,7 +315,7 @@ tabList <- list(
           )
         )
       ),
-      box(
+      shinydashboard::box(
         title = "Addition UMAP options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
@@ -369,7 +369,7 @@ tabList <- list(
         )
       ), # additional options box
     ),
-    box(
+    shinydashboard::box(
       width = 12,
       fluidRow(column(
         width = 12,

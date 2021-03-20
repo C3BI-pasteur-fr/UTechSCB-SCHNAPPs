@@ -60,7 +60,7 @@ clusterUI <- function(id) {
         )
       )
     ),
-    box(
+    shinydashboard::box(
       title = "plot", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -68,7 +68,7 @@ clusterUI <- function(id) {
           jqui_resizable(plotly::plotlyOutput(ns("clusterPlot")))
         )
       ),
-      boxPlus(
+      shinydashboard::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
         # helpID = "twoDselectedAddOpt",
         dropdown_icon = NULL,
@@ -136,8 +136,8 @@ clusterUI <- function(id) {
 tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
-   jqui_resizable
-    (box(
+   jqui_resizable(
+     shinydashboard::box(
       width = 12, height = 700,
       fluidRow(
         column(
@@ -193,7 +193,7 @@ tableSelectionUi <- function(id) {
 pHeatMapUI <- function(id) {
   ns <- NS(id)
   tagList(
-    box(
+    shinydashboard::box(
       width = 12,
       fluidRow(
         column(
@@ -204,7 +204,7 @@ pHeatMapUI <- function(id) {
           ), options = list(width = "99%"))
         )
       ),
-      box(
+      shinydashboard::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
         fluidRow(
@@ -300,7 +300,7 @@ pHeatMapUI <- function(id) {
 # cellSelectionUI --------------
 cellSelectionUI <- function(id) {
   ns <- NS(id)
-  box(
+  shinydashboard::box(
     width = 6, title = "Selection of input cells",
     fluidRow(
       column(

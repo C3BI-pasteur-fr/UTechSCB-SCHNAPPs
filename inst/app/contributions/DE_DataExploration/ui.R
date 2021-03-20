@@ -17,7 +17,7 @@ tabList <- list(
   # DE_expression ----
   expressionTab = shinydashboard::tabItem(
     "DE_expression",
-    box(
+    shinydashboard::box(
       title = "Expression overview", solidHeader = TRUE, width = 12, status = "primary",
       footer = div(
         htmltools::p(strong("\tInformation:")),
@@ -75,7 +75,7 @@ tabList <- list(
   # DE_panelPlot ----
   DE_panelPlotTab = shinydashboard::tabItem(
     "DE_panelPlot",
-    box(
+    shinydashboard::box(
       title = "Panel Plot", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -114,7 +114,7 @@ tabList <- list(
       #          selectInput(inputId = "DE_PPGrp", label = "Values to use",
       #                      choices = c("1","2"), selected = "1", multiple = TRUE)
       #   )),
-      box(width = 6, 
+      shinydashboard::box(width = 6, 
           fluidRow(
             column(
               width = 6,
@@ -165,7 +165,7 @@ tabList <- list(
   # DE_scaterQC ----
   DE_scaterQCTab = shinydashboard::tabItem(
     "DE_scaterQC",
-    box(
+    shinydashboard::box(
       title = "Quality control plot from the scater package", solidHeader = TRUE, 
       width = 12, status = "primary", height = "1627px",
       fluidRow(
