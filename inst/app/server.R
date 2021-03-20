@@ -116,7 +116,6 @@ scShinyServer <- function(input, output, session) {
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   session$onSessionEnded(stopApp)
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
-  
   # seed ----
   # TODO needs to be an option
   seed <- 2
@@ -250,6 +249,7 @@ DEBUG=FALSE
     # c("sampleNames", "sample"),
     c("Gene count", "geneCount"),
     c("UMI count", "umiCount"),
+    c("Feature count", "featureCount"),
     c("before filter", "beforeFilterPrj")
   )
   .schnappsEnv$projectionFunctions <- projectionFunctions

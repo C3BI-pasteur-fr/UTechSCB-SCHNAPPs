@@ -18,7 +18,7 @@ source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 inputTab <- function() {
   shinydashboard::tabItem(
     tabName = "input",
-    box(
+    shinydashboard::box(
       width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
       fluidRow(
         div(h3("SCHNAPPs Input"), align = "center")
@@ -30,7 +30,7 @@ inputTab <- function() {
         ),
         align = "center"
       )),
-      box(
+      shinydashboard::box(
         width = 12, solidHeader = FALSE, collapsible = FALSE, collapsed = FALSE,
         fluidRow(
           column(
@@ -46,7 +46,7 @@ inputTab <- function() {
       )
     ),
     br(),
-    boxPlus(
+    shinydashboardPlus::box(
       title = "Input files",
       # helpID = ,
       dropdown_icon = NULL,
@@ -76,7 +76,7 @@ inputTab <- function() {
             multiple = TRUE,
           ) %>% setId(id="fileInput"), checkbsTT("fileInput")
         ),
-        boxPlus(
+        shinydashboardPlus::box(
           title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
           # helpID = "inputHelpAdd",
           closable = FALSE,
@@ -106,7 +106,7 @@ inputTab <- function() {
     ),
     
     br(),
-    box(
+    shinydashboard::box(
       title = "input options", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -141,7 +141,7 @@ inputTab <- function() {
     ),
     
     br(),
-    box(
+    shinydashboard::box(
       title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
       footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
       fluidRow(column(
@@ -166,7 +166,7 @@ geneSelectionTab <- function() {
     ), checkbsTT("minGenesGS"),
     checkbsTT("updateGeneSelectionParameters"),
     br(),
-    box(
+    shinydashboard::box(
       title = "Gene selection parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -198,7 +198,7 @@ geneSelectionTab <- function() {
         title = "Gene selection tables", width = 12, id = "geneselectiontb",
         tabPanel("Genes kept",
                  height = "250px", width = 12, value = "Genes kept",
-                 # box(
+                 # shinydashboard::box(
                  #   title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
                  #   collapsible = FALSE, collapsed = TRUE,
                  fluidRow(
@@ -211,7 +211,7 @@ geneSelectionTab <- function() {
         ),
         tabPanel("genes removed",
                  height = "250px", value = "genes removed",
-                 # box(
+                 # shinydashboard::box(
                  #   title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
                  #   collapsible = FALSE, collapsed = TRUE,
                  fluidRow(
@@ -241,7 +241,7 @@ cellSelectionTab <- function() {
     ),
     checkbsTT("updateCellSelectionParameters"),
     br(),
-    box(
+    shinydashboard::box(
       title = "Cell selection parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -256,7 +256,7 @@ cellSelectionTab <- function() {
         )
       )
     ),
-    box(
+    shinydashboard::box(
       title = "addition parameters", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = TRUE,
       fluidRow(
@@ -280,7 +280,7 @@ cellSelectionTab <- function() {
     checkbsTT("cellKeepOnly"),
     checkbsTT("cellsFiltersOut"),
     br(),
-    box(
+    shinydashboard::box(
       title = "cell table", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = FALSE, collapsed = TRUE,
       tableSelectionUi("cellSelectionMod")
@@ -314,22 +314,105 @@ getparameterContributions <- function() {
 
 parameterItems <- function() {
   list(
-    shinydashboard::menuSubItem("Normalization", tabName = "normalizations"),
+    shinydashboard::menuSubItem("General Parameters", tabName = "genParams"),
     getparameterContributions(),
-    shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters"),
+    shinydashboard::menuSubItem("Cluster Parameters", tabName = "clusterParameters"),
     shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
     shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot"),
     shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
   )
 }
 
-# generalParametersTab ----
-generalParametersTab <- function() {
+# clusterParametersTab ----
+clusterParametersTab <- function() {
+  normaliztionChoices <- list(rawNormalization = "rawNormalization")
+  # parameterContributions = list()
+  # localContributionDir <- .SCHNAPPs_locContributionDir
+  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  for (fp in parFiles) {
+    if (DEBUG) {
+      cat(file = stderr(), paste(fp, "\n"))
+    }
+    
+    myNormalizationChoices <- c()
+    source(fp, local = TRUE)
+    if (length(myNormalizationChoices) > 0) {
+      for (li in 1:length(myNormalizationChoices)) {
+        liVal <- myNormalizationChoices[[li]]
+        if (length(liVal) > 0) {
+          # if (DEBUG) cat(file = stderr(), paste("normalization Choice: ", liVal, "\n"))
+          oldNames <- names(normaliztionChoices)
+          normaliztionChoices[[length(normaliztionChoices) + 1]] <- liVal
+          names(normaliztionChoices) <- c(oldNames, names(myNormalizationChoices)[li])
+        }
+      }
+    }
+    if (DEBUG) {
+      cat(file = stderr(), paste("end:", fp, "\n"))
+      cat(file = stderr(), paste("end:", normaliztionChoices, "\n"))
+    }
+  }
+  
   shinydashboard::tabItem(
-    "generalParameters",
-    fluidRow(div(h2("General parameters"), align = "center")),
+    "clusterParameters",
+    fluidRow(div(h2("Clustering parameters"), align = "center")),
     br(),
     fluidRow(
+      tabBox(title = "Transformations for PCA", width = 12, id = "transPCA",
+             tabPanel(
+               title = "Transformation for input of PCA", solidHeader = TRUE, width = 12, value = "prePCAtransform",
+               id = "prePCAtransform",
+               
+               list(
+                 tags$p("SCHNAPPs uses normalized/transformed data to calculate the PCA, which in turn is used for the clustering process. Here, the specific method can be set. rawNormalization means that no normalization will be performed."),
+                 fluidRow(
+                   column(
+                     width = 12,
+                     radioButtons(
+                       inputId = "normalizationRadioButton",
+                       label = "choose a normalization method",
+                       choices = normaliztionChoices,
+                       selected = defaultValue("normalizationRadioButton", "DE_logNormalization"),
+                       width = "100%"
+                     )
+                   )
+                 ),
+                 fluidRow(column(
+                   width = 10,
+                   verbatimTextOutput("normalizationRadioButtonValue")
+                 )),
+                 fluidRow(column(
+                   width = 12,
+                   wellPanel(
+                     # This outputs the dynamic UI component
+                     uiOutput("normalizationsParametersDynamic")
+                   )
+                 )),
+                 fluidRow(column(
+                   width = 12, offset = 1,
+                   # uiOutput("updateNormalizationButton")
+                   actionButton("updateNormalization", "apply changes", width = "80%")
+                   # ,
+                   #              style = "color: #fff; background-color: #A00272; border-color: #2e6da4")
+                 ))
+               ),
+               checkbsTT("normalizationRadioButton"),
+               checkbsTT("normalizationRadioButtonValue"),
+               checkbsTT("updateNormalization")
+               
+               
+               
+             ),
+             tabPanel(
+               title = "Transformed data", solidHeader = TRUE, width = 12, value = "prePCAtransData",
+               id = "prePCAtransData",
+               fluidRow(
+                 column(
+                   width = 12,
+                   tableSelectionUi("normalizationResult")
+                 )
+               )
+             )),
       tabBox(title = "PCA", width = 12, id = "modPCA",
              tabPanel(
                title = "Parameters for PCA", solidHeader = TRUE, width = 12, value = "PCAparameters",
@@ -406,6 +489,14 @@ generalParametersTab <- function() {
                         tableSelectionUi("PCAloadingsMod")
                  )
                )
+             ),
+             tabPanel(
+               title = "Variable feature info", solidHeader = TRUE, width = 12, value = "HVAinfo",
+               fluidRow(
+                 column(12,
+                        tableSelectionUi("HVAinfoMod")
+                 )
+               )
              )
       ),
     ),
@@ -474,27 +565,27 @@ generalParametersTab <- function() {
                    )
                  )),
         if ("SIMLR" %in% rownames(installed.packages()))
-        tabPanel("SIMLR",
-                 value = "simlrFunc",
-                 width = 12,
-                 fluidRow(
-                   # column(
-                   #   width = 4,
-                   #   selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
-                   # ),
-                   column(
-                     width = 4,
-                     numericInput("simlr_nClust", "number of clusters (0 = estimate)", 
-                                  value = defaultValue("simlr_nClust", 10),
-                                  min = 0, max = 1000)
-                   ),
-                   column(
-                     width = 4,
-                     numericInput("simlr_maxClust", "max number of clusters when estimating)", 
-                                  value = defaultValue("simlr_maxClust", 20),
-                                  min = 2, max = 1000)
-                   )
-                 )),
+          tabPanel("SIMLR",
+                   value = "simlrFunc",
+                   width = 12,
+                   fluidRow(
+                     # column(
+                     #   width = 4,
+                     #   selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
+                     # ),
+                     column(
+                       width = 4,
+                       numericInput("simlr_nClust", "number of clusters (0 = estimate)", 
+                                    value = defaultValue("simlr_nClust", 10),
+                                    min = 0, max = 1000)
+                     ),
+                     column(
+                       width = 4,
+                       numericInput("simlr_maxClust", "max number of clusters when estimating)", 
+                                    value = defaultValue("simlr_maxClust", 20),
+                                    min = 2, max = 1000)
+                     )
+                   )),
         fluidRow(
           column(12, offset = 0, textOutput("Nclusters"))
         ),
@@ -509,104 +600,11 @@ generalParametersTab <- function() {
     ),
     # fluidRow(div(h3("Parameters for clustering"), align = "left")),
     
-    br(),
-    # box(
-    #   title = "Comments", solidHeader = TRUE, width = 12, status = "primary",
-    #   collapsible = TRUE, collapsed = TRUE,
-    #   if ("shinyMCE" %in% rownames(installed.packages())) {
-    #     shinyMCE::tinyMCE(
-    #       "descriptionOfWork",
-    #       "Please describe your work. This will be included in the report."
-    #     )
-    #   } else {
-    #     textInput("descriptionOfWork", "Please describe your work. This will be included in the report.")
-    #   }
-    # ),
-    # checkbsTT(item = "descriptionOfWork"),
-    # br(),
-    box(
-      title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
-      collapsible = TRUE, collapsed = TRUE,
-      fluidRow(column(
-        width = 12, offset = 1,
-        actionButton("updateColors", "apply changes", width = "80%")
-      )),
-      br(),
-      fluidRow(
-        column(
-          width = 6,
-          uiOutput("sampleColorSelection")
-        ),
-        column(
-          width = 6,
-          uiOutput("clusterColorSelection")
-        )
-      )
-    ),
-    checkbsTT(item = "updateColors"),
-    checkbsTT(item = "sampleColorSelection"),
-    checkbsTT(item = "clusterColorSelection")
+    br()
+    
   )
 }
 
-# # renameTab
-# renameTab <- function() {
-#   shinydashboard::tabItem(
-#     tabName = "renameProj",
-#     fluidRow(div(h3("rename projections"), align = "center")),
-#     br(),
-#     box(
-#       title = "Rename projections", solidHeader = TRUE, width = 12, status = "primary",
-#       fluidRow(
-#         column(
-#           width = 6,
-#           selectInput("oldPrj", "projections to copy + rename", choices = c("notyet"), selected = "notyet")
-#         ),
-#         column(
-#           width = 6,
-#           fluidRow(
-#             column(
-#               width = 8,
-#               textInput("newPrj", "new name of Projection", value = "")
-#             ),
-#             column(
-#               width = 4,
-#               actionButton("updatePrjsButton", "rename")
-#             )
-#           ),
-#           fluidRow(
-#             column(
-#               width = 8,
-#               selectInput("delPrj", "projections to delete", choices = c("notyet"), selected = "notyet")
-#             ),
-#             column(
-#               width = 4,
-#               actionButton("delPrjsButton", "delete")
-#             ),
-#             tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}"),
-#             tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
-#           )
-#         )
-#       ),
-#       checkbsTT(item = "oldPrj"),
-#       checkbsTT(item = "newPrj"),
-#       checkbsTT(item = "updatePrjsButton"),
-#       checkbsTT(item = "delPrj"),
-#       checkbsTT(item = "delPrjsButton")
-#     ),
-# 
-# 
-#     checkbsTT(item = "updateColors"),
-#     checkbsTT(item = "sampleColorSelection"),
-#     checkbsTT(item = "clusterColorSelection")
-#   )
-# }
-
-# # link to the content of the
-# parametersTab  = tabItem(tabName = "normalizations",
-#                             fluidRow(div(h3('Cell selection'), align = 'center')),
-#                             br()
-# )
 if (DEBUG) {
   cat(file = stderr(), paste("end: tabs.R\n"))
 }

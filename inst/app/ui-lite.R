@@ -40,12 +40,12 @@ if (!exists('AllowClustering')) {
 }
 
 if (!AllowClustering){
-  generalParametersTab <<- function(){
+  clusterParametersTab <<- function(){
     shinydashboard::tabItem(
-      "generalParameters",
+      "clusterParameters",
       fluidRow(div(h2("General parameters"), align = "center")),
       br(),
-      box(
+      shinydashboard::box(
         title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = F, collapsed = F,
         fluidRow(column(
@@ -113,7 +113,7 @@ scShinyUI <- function(request) {
   }
   parameterItems <- list(
     
-    shinydashboard::menuSubItem("General Parameters", tabName = "generalParameters"),
+    shinydashboard::menuSubItem("General Parameters", tabName = "clusterParameters"),
     shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
   )
   
@@ -122,7 +122,7 @@ scShinyUI <- function(request) {
   # general tabs
   allTabs <- list(
     introTab(),
-    generalParametersTab()
+    clusterParametersTab()
     # ,
     # modTab
   )

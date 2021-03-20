@@ -72,7 +72,7 @@ observe(label = "ob_updatetopCCGenesSelectedParams", {
   
   updateButtonColor(buttonName = "updatetopCCGenesSelectedParameters", parameters = c(
     "coE_heatmapselected_geneids", "coE_heatmapselected_cells"
-    ))
+  ))
 })
 
 # observe: updateMinExprSelectedParameters ----
@@ -95,6 +95,63 @@ observe(label = "ob_MinExprParams", {
 
 # EXPLORE TAB VIOLIN PLOT ------------------------------------------------------------------
 # output$coE_geneGrp_vio_plot <- plotly::renderPlotly({
+
+observe({
+  if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioOBS started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_geneGrp_vioOBS")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_geneGrp_vioOBS")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_geneGrp_vioOBS", id = "coE_geneGrp_vioOBS", duration = NULL)
+  }
+  scEx_log <- scEx_log()
+  # genesin <- input$coE_geneGrpVioIds
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioOBS.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vioOBS.RData")
+  if(is.null(scEx_log)) return(NULL)
+
+  # genesin <- toupper(genesin)
+  # genesin <- gsub(" ", "", genesin, fixed = TRUE)
+  # genesin <- strsplit(genesin, ",")[[1]]
+  featureData <- rowData(scEx_log)
+  
+  # map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
+  # minExp <- min(assays(scEx_log)[[1]][map, , drop = F])
+  minExp <- min(assays(scEx_log)[[1]])
+  maxExp <- max(assays(scEx_log)[[1]])
+  step = (maxExp - minExp) / 1000000
+  updateSliderInput(session,
+                    inputId = "coEminMaxExpr",
+                    step = step,
+                    min = signif(minExp + step, digits = 4),
+                    max = signif(maxExp, digits = 4)
+  )
+  updateSliderInput(session,
+                    inputId = "coEminMaxExpr2",
+                    step = (maxExp - minExp) / 1000000,
+                    min = signif(minExp + step, digits = 4),
+                    max = signif(maxExp, digits = 4)
+  )
+  
+  
+})
+
+
+
+coeMinMax = reactive({
+  if (is.null(input$coEminMaxExpr))
+    list(x = NA, y = NA)
+  else
+    input$coEminMaxExpr
+}) %>% debounce(1000)
+
 output$coE_geneGrp_vio_plot <- renderPlot({
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot started.\n")
   start.time <- base::Sys.time()
@@ -107,17 +164,17 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_geneGrp_vio_plot", id = "coE_geneGrp_vio_plot", duration = NULL)
   }
-
+  
   projections <- projections()
   scEx_log <- scEx_log()
   geneListStr <- input$coE_geneGrpVioIds
   projectionVar <- input$coE_dimension_xVioiGrp
-  minExpr <- input$coEminExpr
+  minMaxExpr <- coeMinMax()
   coE_showPermutations <- input$coE_showPermutations
   # colPal = coE_geneGrp_vioFunc # TODO must be wrong
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
-
+  
   # upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
   if (is.null(projections) | is.null(scEx_log)) {
     if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot:NULL\n")
@@ -127,19 +184,22 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
-
+  
   featureData <- rowData(scEx_log)
   retVal <- coE_geneGrp_vioFunc(
     genesin = geneListStr,
     projections = projections,
     scEx = scEx_log,
     featureData = featureData,
-    minExpr = minExpr,
+    minMaxExpr = minMaxExpr,
     dbCluster = projectionVar,
     coE_showPermutations = coE_showPermutations,
     sampCol = sampCol,
     ccols = ccols
   )
+  
+  if(is.null(retVal)) return(NULL)
+  
   # serializePlots <- function(data) {
   #   lapply(data, function(plot) {
   #     rawToChar(serialize(plot, NULL, ascii = TRUE))
@@ -161,7 +221,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
                                                  projections = projections,
                                                  scEx = scEx_log,
                                                  featureData = featureData,
-                                                 minExpr = minExpr,
+                                                 minMaxExpr = minMaxExpr,
                                                  dbCluster = projectionVar,
                                                  coE_showPermutations = coE_showPermutations,
                                                  sampCol = sampCol,
@@ -175,8 +235,15 @@ output$coE_geneGrp_vio_plot <- renderPlot({
 })
 
 # EXPLORE GROUPEDB VIOLIN PLOT ------------------------------------------------------------------
+coeMinMax2 = reactive({
+  if (is.null(input$coEminMaxExpr2))
+    list(x = NA, y = NA)
+  else
+    input$coEminMaxExpr2 
+})%>% debounce(1000)
+
 output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
-# output$coE_geneGrp_vio_plot2 <- renderPlot({
+  # output$coE_geneGrp_vio_plot2 <- renderPlot({
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot2 started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -193,7 +260,7 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
   scEx_log <- scEx_log()
   geneListStr <- input$coE_geneGrpVioIds2
   projectionVar <- input$coE_dimension_xVioiGrp2
-  minExpr <- input$coEminExpr2
+  minMaxExpr <- coeMinMax2()
   # colPal = coE_geneGrp_vioFunc # TODO must be wrong
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
@@ -211,31 +278,34 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData", list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData")
-  
+
   featureData <- rowData(scEx_log)
   retVal <- coE_geneGrp_vioFunc2(
     genesin = geneListStr,
     projections = projections,
     scEx = scEx_log,
     featureData = featureData,
-    minExpr = minExpr,
+    minMaxExpr = minMaxExpr,
     dbCluster = projectionVar,
     sampCol = sampCol,
     ccols = ccols
   )
+  
+  if(is.null(retVal)) return(NULL)
+  
   af = coE_geneGrp_vioFunc2
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
   .schnappsEnv[["coE_geneGrp_vio_plot"]] <- list(plotFunc = af,
-                                                       genesin = geneListStr,
-                                                       projections = projections,
-                                                       scEx = scEx_log,
-                                                       featureData = featureData,
-                                                       minExpr = minExpr,
-                                                       dbCluster = projectionVar,
-                                                       sampCol = sampCol,
-                                                       ccols = ccols)
-                                                       
+                                                 genesin = geneListStr,
+                                                 projections = projections,
+                                                 scEx = scEx_log,
+                                                 featureData = featureData,
+                                                 minMaxExpr = minMaxExpr,
+                                                 dbCluster = projectionVar,
+                                                 sampCol = sampCol,
+                                                 ccols = ccols)
+  
   # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
   exportTestValues(coE_geneGrp_vio_plot = {
     retVal
@@ -293,9 +363,9 @@ output$alluvial_plot <- renderPlot({
   environment(af) = new.env(parent = emptyenv())
   # for saving to history
   .schnappsEnv[["coE_alluvialPlot"]] <- list(plotFunc = af,
-                                         dat = dat, 
-                                         alluiv1=alluiv1, 
-                                         alluiv2=alluiv2)
+                                             dat = dat, 
+                                             alluiv1=alluiv1, 
+                                             alluiv2=alluiv2)
   
   return(gg)
 })

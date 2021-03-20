@@ -377,7 +377,7 @@ coE_topExpCCTable <- reactive({
 #' coE_geneGrp_vioFunc
 #' generates a ggplot object with a violin plot
 #' optionally creates all permutations.
-coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr = 1,
+coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
                                 dbCluster, coE_showPermutations = FALSE, sampCol, ccols) {
   
   
@@ -420,7 +420,8 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
     return(NULL)
   }
   
-  expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minExpr)
+  expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minMaxExpr[1] & 
+                                  assays(scEx)[[1]][map, , drop = F] <= minMaxExpr[2])
   ylabText <- "number genes from list"
   
   if (coE_showPermutations) {
@@ -548,7 +549,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minExpr
 #' coE_geneGrp_vioFunc
 #' generates a ggplot object with a violin plot
 #' optionally creates all permutations.
-coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExpr = 1,
+coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
                                  dbCluster, sampCol, ccols) {
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc2 started.\n")
   start.time <- base::Sys.time()
@@ -588,7 +589,9 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minExp
     return(NULL)
   }
   
-  expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minExpr)
+  # expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minExpr)
+  expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minMaxExpr[1] & 
+                                  assays(scEx)[[1]][map, , drop = F] <= minMaxExpr[2])
   ylabText <- "number of genes from list"
   
   # coExpVal = number of cells with exprssion over minExpr

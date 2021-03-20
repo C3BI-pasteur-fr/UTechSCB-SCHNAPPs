@@ -76,6 +76,88 @@ observe({
 })
 
 
+observe(label = "DE_seuratLogNorm_var2regOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratLogNorm_var2regOBSinp\n"))
+  .schnappsEnv$DE_seuratLogNorm_var2reg <- input$DE_seuratLogNorm_var2reg
+})
+observe(label = "DE_seuratSCtransform_vars2regressOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_vars2regress\n"))
+  .schnappsEnv$DE_seuratSCtransform_vars2regress <- input$DE_seuratSCtransform_vars2regress
+})
+observe(label = "DE_seuratSCtransformm_split.byOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransformm_split.by\n"))
+  .schnappsEnv$DE_seuratSCtransformm_split.by <- input$DE_seuratSCtransformm_split.by
+})
+observe(label = "DE_seuratStandard_splitbyOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratStandard_splitby\n"))
+  .schnappsEnv$DE_seuratStandard_splitby <- input$DE_seuratStandard_splitby
+})
+
+
+observe(label = "DE_seuratLogNorm_var2regOBS", {
+  scEx <- scEx()
+  tmp <- input$normalizationRadioButton
+  if (DEBUG) cat(file = stderr(), "observe: DE_seuratLogNorm_var2regOBS\n")
+  # Can use character(0) to remove all choices
+  if (is.null(scEx)) {
+    return(NULL)
+  }
+  choicesVal = names(Filter(is.factor, colData(scEx)))
+  cdat =  colData(scEx)
+  choicesVal = choicesVal[unlist(lapply(choicesVal, FUN = function(x) {length(levels(cdat[,x]))>1}))]
+  choicesVal = c("", choicesVal)
+  # save(file = "~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS.RData", list = c(ls(), ".schnappsEnv"))
+  # cp = load(file="~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS.RData")
+  # browser()
+  updateSelectInput(
+    session,
+    "DE_seuratLogNorm_var2reg",
+    choices = choicesVal
+    ,
+    selected = .schnappsEnv$DE_seuratLogNorm_var2reg
+  )
+  updateSelectInput(
+    session,
+    "DE_seuratSCtransform_vars2regress",
+    choices = choicesVal
+    ,
+    selected = .schnappsEnv$DE_seuratSCtransform_vars2regress
+  )
+  updateSelectInput(
+    session,
+    "DE_seuratSCtransformm_split.by",
+    choices = choicesVal
+    ,
+    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+  )
+  updateSelectInput(
+    session,
+    "DE_seuratSCTnorm_var2reg",
+    choices = choicesVal
+    ,
+    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+  )
+  updateSelectInput(
+    session,
+    "DE_seuratStandard_splitby",
+    choices = choicesVal
+    ,
+    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+  )
+  updateSelectInput(
+    session,
+    "DE_seuratRefBased_splitby",
+    choices = choicesVal
+    ,
+    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+  )
+  # save(file = "~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS2.RData", list = c(ls(), ".schnappsEnv"))
+  # cp = load(file="~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS2.RData")
+  
+})
+
+
+
 # EXPLORE TAB VIOLIN PLOT ----
 # TODO module for violin plot  ??
 output$DE_gene_vio_plot <- renderPlot({
@@ -521,6 +603,32 @@ observe(label = "obs.updateNormalization", {
     .schnappsEnv$DE_seuratRefBasedButtonOldVal <- buttonPressed
   }
 })
+
+
+# obs.updateNormalization DE_seuratSCTnormButton ----
+observe(label = "ob DE_seuratSCTnormButtonOldVal", {
+  buttonPressed <- input$updateNormalization
+  radioButtonVal <- isolate(input$normalizationRadioButton)
+  if (!exists("DE_seuratSCTnormButtonOldVal", envir = .schnappsEnv)) {
+    .schnappsEnv$DE_seuratSCTnormButtonOldVal <- 0
+  }
+  if (is.null(radioButtonVal)) {
+    radioButtonVal <- ""
+  }
+  if (is.null(buttonPressed)) {
+    buttonPressed <- 0
+  }
+  
+  # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
+  if (radioButtonVal == "DE_seuratSCTnorm" &
+      !.schnappsEnv$DE_seuratSCTnormButtonOldVal == buttonPressed) {
+    cat(file = stderr(), green(paste("\n=====changing value\n")))
+    DE_seuratSCTnormButton(buttonPressed)
+    .schnappsEnv$DE_seuratSCTnormButtonOldVal <- buttonPressed
+  }
+})
+
+
 
 # obs.updateNormalization DE_seuratSCtransformButton ----
 observe(label = "ob DE_seuratSCtransformButtonOldVal", {
