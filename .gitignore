@@ -58,4 +58,8 @@ scaterPlot.png
 
 # specific files
 vignettes/pkdown/scran.grunPancreas.RData
+inst/develo/testApp
+vignettes/pkdown/scranWorkflow_cache
+
+
 

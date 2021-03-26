@@ -1907,17 +1907,17 @@ scranCluster <- function(pca,
          #   params$assay.type <- "counts"
          # },
          "logcounts" = {
-           params$x <- scEx_log
-           reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
-           params$assay.type <- "logcounts"
+            reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
+            params$x <- scEx_log
+            params$assay.type <- "logcounts"
            if (length(geneid) > 0) {
              params$subset.row <- geneid
            }
            use.ranks <- NA
          },
          "counts" = {
-           params$x <- scEx
            reducedDims(scEx) <- SimpleList(PCA = pca$x)
+           params$x <- scEx
            params$assay.type <- "counts"
            if (length(geneid) > 0) {
              params$subset.row <- geneid
@@ -1928,7 +1928,7 @@ scranCluster <- function(pca,
   require(scran)
   retVal <- tryCatch(
     {
-      suppressMessages(do.call("quickCluster", params))
+      suppressMessages(BiocGenerics::do.call("quickCluster", params))
     },
     error = function(e) {
       cat(file = stderr(), paste("\nProblem with clustering:\n\n", as.character(e), "\n\n"))
@@ -2040,7 +2040,9 @@ scran_Cluster <- function(){
       id = "dbClusterError",
       duration = NULL
     )
-    stop("error: clustering didn't produce a result")
+    save(file = "~/SCHNAPPsDebug/scran_ClusterError.RData", list = c(ls()))
+    return(NULL)
+    # stop("error: clustering didn't produce a result")
   }
   setRedGreenButton(
     vars = list(

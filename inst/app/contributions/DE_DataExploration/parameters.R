@@ -1180,7 +1180,7 @@ DE_scaterNormalizationfunc <- function(scEx) {
   clusters <- quickCluster(scEx)
   scEx <- computeSumFactors(scEx, clusters=clusters)
   
-  sce <- logNormCounts(scEx)
+  sce <- scuttle::logNormCounts(scEx)
   assays(sce)['counts'] = NULL
   return(sce)
 }
