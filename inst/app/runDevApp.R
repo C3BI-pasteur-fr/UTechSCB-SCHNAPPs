@@ -5,6 +5,9 @@ library(reactlog)
 # if (!exists(".schnappsEnv")) {
 .schnappsEnv <- new.env(parent=emptyenv())
 # }
+# 
+library(future)
+plan("multiprocess", workers = 6)
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
 localContributionDir = ""
