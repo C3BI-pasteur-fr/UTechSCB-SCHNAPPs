@@ -137,8 +137,10 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
   seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
   
+  # not sure we need the normalization factor
+  # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
   markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
-                                 cells.1 = cells.1,
+                                                                cells.1 = cells.1,
                                  cells.2 = cells.2,
                                  min.pct = 0,
                                  test.use = test,
@@ -376,7 +378,7 @@ sCA_dge <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
-  # load(file='~/SCHNAPPsDebug/sCA_dge.RData')
+  # cp = load(file='~/SCHNAPPsDebug/sCA_dge.RData')
   # require(archivist)
   # library(tools)
   # lazyLoad = local({load("~/SCHNAPPsDebug/sCA_dge.RData"); environment()})
@@ -398,10 +400,10 @@ sCA_dge <- reactive({
   ))
 
   if(is.null(retVal)) {
-    return(NULL)
-    if (!is.null(getDefaultReactiveDomain())) {
+     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("dge: NULL,did you install everything?", id = "dgewarning", duration = 10, type = "warning")
     }
+    return(NULL)
   }
   
   if (nrow(retVal) == 0) {

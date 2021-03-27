@@ -1041,6 +1041,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
   # turn normalization button green
   addClass("updateNormalization", "green")
   
+  #used for DGE for some of the methods
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logGeneNormalization = {
     assays(retVal)[["logcounts"]]
