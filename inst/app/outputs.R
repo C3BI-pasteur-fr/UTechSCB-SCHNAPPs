@@ -382,8 +382,8 @@ output$summaryStatsSideBar <- renderUI({
     "<br/>",
     line5,
     "<br/>",
-    line6,
-    "<br/>",
+    # line6,
+    # "<br/>",
     line7,
     "<br/>",
     "<br/>"

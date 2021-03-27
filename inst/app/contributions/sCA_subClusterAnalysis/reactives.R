@@ -123,7 +123,7 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData')
+  #cp = load(file='~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData')
 
   cellMeta <- colData(scEx)
   rData <- rowData(scEx)
@@ -153,6 +153,9 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
                                  # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
                                  # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
   )
+  if(is.null(markers)) {
+    return(NULL)
+  }
   if (nrow(markers) > 0) {
     markers$symbol <- rData[rownames(markers), "symbol"]
   }
