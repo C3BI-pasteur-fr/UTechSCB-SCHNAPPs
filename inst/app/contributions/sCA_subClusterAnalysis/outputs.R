@@ -29,10 +29,10 @@ sCA_dgeTableReac <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_dgeTableReac", id = "sCA_dgeTableReac", duration = NULL)
   }
-
+  
   scEx <- scEx()
   top.genes <- sCA_dge()
-
+  
   if (is.null(scEx) || is.null(top.genes)) {
     return(NULL)
   }
@@ -41,7 +41,7 @@ sCA_dgeTableReac <- reactive({
   }
   # cp = load(file="~/SCHNAPPsDebug/output_dge.RData")
   featureData <- rowData(scEx)
-
+  
   top.genes$symbol <-
     featureData[rownames(top.genes), "symbol"]
   if ("Description" %in% colnames(featureData)) {
@@ -158,10 +158,10 @@ output$sCA_volc_selected <- renderText({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_volc_selected", id = "sCA_volc_selected", duration = NULL)
   }
-
+  
   brushedPs <- plotly::event_data("plotly_selected")
   DGEdata <- sCA_dgeTableReac()
-
+  
   if (is.null(brushedPs)) {
     if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: brush null\n")
     return(NULL)
@@ -180,6 +180,7 @@ output$sCA_volc_selected <- renderText({
 })
 
 output$sCA_volcanoPlot <- plotly::renderPlotly({
+  require(manhattanly)
   if (DEBUG) cat(file = stderr(), "sCA_volcanoPlot started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -191,11 +192,11 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_volcanoPlot", id = "sCA_volcanoPlot", duration = NULL)
   }
-
+  
   DGEdata <- sCA_dgeTableReac()
   pvalT <- input$sCA_volc_pval
   effT <- input$sCA_volc_effectLimit
-
+  
   if (is.null(DGEdata)) {
     if (DEBUG) cat(file = stderr(), "output$sCA_volcanoPlot:NULL\n")
     return(NULL)
@@ -203,43 +204,47 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/sCA_volcanoPlot.RData")
+  # cp = load(file="~/SCHNAPPsDebug/sCA_volcanoPlot.RData")
   if ("p_val_adj" %in% colnames(DGEdata)) {
     pval <- "p_val_adj"
   } else
-  if ("p_val" %in% colnames(DGEdata)) {
-    pval <- "p_val"
-  }
-  if ("avg_logFC" %in% colnames(DGEdata)) {
-    effect_size <- "avg_logFC"
+    if ("p_val" %in% colnames(DGEdata)) {
+      pval <- "p_val"
+    }
+  effect_size = NULL
+  if ("avg_log2FC" %in% colnames(DGEdata)) {
+    effect_size <- "avg_log2FC"
   }
   if ("avg_diff" %in% colnames(DGEdata)) {
     effect_size <- "avg_diff"
   }
   DGEdata[is.na(DGEdata[, pval]), pval] <- 1
-  DGEdata[is.na(DGEdata[, effect_size]), effect_size] <- 0
-  require(manhattanly)
-  DGEdata$EFFECTSIZE <- DGEdata[, effect_size]
+  if (!is.null(effect_size)){
+    DGEdata[is.na(DGEdata[, effect_size]), effect_size] <- 0
+    DGEdata$EFFECTSIZE <- DGEdata[, effect_size]
+  }
   DGEdata$P <- DGEdata[, pval]
   TEXT <- paste(paste("symbol: ", DGEdata$symbol), sep = "<br>")
-
+  
   retVal <- volcanoly(DGEdata, snp = "symbol", genomewideline = pvalT, effect_size_line = c(-effT, effT)) %>%
     layout(
       dragmode = "select"
     )
-
-  # magrittr::%<>%
-  retVal %<>% plotly::add_trace(
-    x = DGEdata$EFFECTSIZE, y = -log10(DGEdata[, pval]),
-    type = "scatter",
-    mode = "markers",
-    text = TEXT,
-    opacity = 0,
-    marker = list(size = 5),
-    name = ""
-  )
-  # retVal
-
+  
+  if (!is.null(effect_size)){
+    # magrittr::%<>%
+    retVal %<>% plotly::add_trace(
+      x = DGEdata$EFFECTSIZE, y = -log10(DGEdata[, pval]),
+      type = "scatter",
+      mode = "markers",
+      text = TEXT,
+      opacity = 0,
+      marker = list(size = 5),
+      name = ""
+    )
+    # retVal
+  }
+  
   .schnappsEnv[["sCA_volcanoPlot"]] <- retVal
   
   exportTestValues(dgeVolcanoPlot = {
