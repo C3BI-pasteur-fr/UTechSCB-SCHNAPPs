@@ -216,9 +216,15 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
+  # cp = load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
 
-
+  dups = c(cells.1, cells.2)[duplicated(c(cells.1, cells.2))]
+  if(length(dups) > 0){
+    cells.1 = cells.1[!cells.1 %in% dups]
+    cells.2 = cells.2[!cells.2 %in% dups]
+    warning("Duplicated cells, using only unique ones")
+    showNotification("Duplicated cells, using only unique ones", id = "sCA_dge_deseq2NOTUnique", duration = NULL, type = "warning")
+  }
   group.info <- data.frame(row.names = c(cells.1, cells.2))
   group.info[cells.1, "group"] <- "Group1"
   group.info[cells.2, "group"] <- "Group2"
