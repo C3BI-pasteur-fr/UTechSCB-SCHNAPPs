@@ -136,13 +136,14 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
   useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
   seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  seurDat@assays$RNA@scale.data = as.matrix(seurDat@assays$RNA@data)
   
   # not sure we need the normalization factor
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
-  markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
-                                                                cells.1 = cells.1,
-                                 cells.2 = cells.2,
-                                 min.pct = 0,
+  markers <- Seurat::FindMarkers(seurDat, 
+                                 ident.1 = cells.1,
+                                 ident.2 = cells.2,
+                                 min.pct = 0.0000001,
                                  test.use = test,
                                  logfc.threshold = 0.001
                                  # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
