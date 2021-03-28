@@ -283,7 +283,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
+  # cp =load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
 
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
@@ -301,6 +301,8 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
 
   retVal <-
     DiffExpTest(subsetExpression, cells.1, cells.2, genes.use = genes.use)
+  if(is.null(retVal)) return(NULL)
+  if(nrow(retVal)==0) return(NULL)
   retVal[is.na(retVal[, "p_val"]), ] <- 1
   retVal[, "avg_diff"] <- total.diff[rownames(retVal)]
   retVal$symbol <-

@@ -101,6 +101,7 @@ observe(label = "ob_DGEParams", {
     "db1", "db2", "sCA_dgeRadioButton", 
     "sCA_dataInput-Mod_PPGrp", "sCA_dataInput-Mod_clusterPP"
   ))
+  
 })
 
 
@@ -169,7 +170,7 @@ output$sCA_volc_selected <- renderText({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_volc_selected.RData", list = ls())
   }
-  # load(file=paste0("~/SCHNAPPsDebug/sCA_volc_selected.RData"))
+  # cp =load(file=paste0("~/SCHNAPPsDebug/sCA_volc_selected.RData"))
   # cells.names <- brushedPs$key
   # cells.names <- unique(cells.names[!is.na(cells.names)])
   # if (DEBUG) {
@@ -201,6 +202,8 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
     if (DEBUG) cat(file = stderr(), "output$sCA_volcanoPlot:NULL\n")
     return(NULL)
   }
+  # reset selection
+  js$sCA_volcanoPlot_resetClick()
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls()))
   }
