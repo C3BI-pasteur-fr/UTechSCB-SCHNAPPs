@@ -1726,7 +1726,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     }
     if (useSeuratPCA){
       # Seurat:
-      reductObj = RunPCA(x, rank = rank, verbose = FALSE, assay = "RNA")
+      reductObj = RunPCA(x, npcs = rank, verbose = FALSE, assay = "RNA")
       pca = list()
       pca$rotation = Loadings(reductObj)
       pca$x = Embeddings(reductObj)
@@ -1734,7 +1734,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     } else {
       # # scran:
       x <- t(x)
-      pca <- runPCA(x, rank=rank, get.rotation=TRUE, BPPARAM = BiocParallel::SerialParam())
+      pca <- runPCA(x, rank=rank, get.rotation=TRUE)
     }
     
     # pca$x[1:3,1:3]
