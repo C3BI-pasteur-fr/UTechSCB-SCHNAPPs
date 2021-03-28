@@ -643,6 +643,12 @@ output$gQC_renameLev <- renderText({"text"})
 
 output$gQC_windHC <- renderPlot({
   require(Wind)
+  # remotes::install_github("renozao/xbioc")
+  # library(xbioc)
+  if ("xbioc" %in% rownames(installed.packages())){
+    require(xbioc)}  else {
+      is_logscale <- function(x) {return(T)}
+    }
   if (DEBUG) cat(file = stderr(), "gQC_windHC started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -657,10 +663,10 @@ output$gQC_windHC <- renderPlot({
   
   scEx_log <- scEx_log()
   projections <- projections()
+  pca = pca()
   gQC_windProj <- input$gQC_windProj
   
-  if (is.null(projections) | is.null(scEx_log)
-  ) {
+  if (is.null(projections) | is.null(scEx_log)) {
     return(NULL)
   }
   if (length(levels(projections[,gQC_windProj]))<3) {
@@ -672,8 +678,11 @@ output$gQC_windHC <- renderPlot({
     save(file = "~/SCHNAPPsDebug/gQC_windHC.RData", list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/gQC_windHC.RData")
-  
   Y <- as.matrix(assays(scEx_log)[[1]])
+  if(is_logscale(Y)) {
+    Y = exp(Y)
+  }
+  
   trueclass <- projections[,gQC_windProj]
   ctStruct = createRef(Y, trueclass)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
