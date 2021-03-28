@@ -441,7 +441,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
           duration = NULL
         )
       }
-      x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData, scEx, perms, minExpr))
+      x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData, scEx, perms, minMaxExpr))
       
       for (idx in 1:length(x)) {
         perms <- combinePermutations(perms, x[[idx]])

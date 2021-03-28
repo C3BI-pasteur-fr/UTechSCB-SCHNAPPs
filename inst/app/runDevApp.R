@@ -9,6 +9,9 @@ library(reactlog)
 library(future)
 plan("multiprocess", workers = 6)
 
+library("BiocParallel")
+register(MulticoreParam(6))
+
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
 localContributionDir = ""
 defaultValueSingleGene = "CDH2" # CD52

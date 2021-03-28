@@ -1690,16 +1690,20 @@ combinePermutations <- function(perm1, perm2) {
   }
   perms
 }
+expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minMaxExpr[1] & 
+                                assays(scEx)[[1]][map, , drop = F] <= minMaxExpr[2])
 
 # finner
-finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minExpr) {
+finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minMaxExpr) {
   comb <- gtools::combinations(xPerm, r, genesin)
   for (cIdx in 1:nrow(comb)) {
     map <-
       rownames(featureData[which(toupper(featureData$symbol) %in% comb[cIdx, ]), ])
     # permIdx <- Matrix::colSums(exprs(gbm[map, ]) >= minExpr) == length(comb[cIdx, ])
     
-    permIdx <- Matrix::colSums(SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >= minExpr) == length(comb[cIdx, 1:ncol(comb)])
+    permIdx <- Matrix::colSums(
+      SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] >=  minMaxExpr[1] &
+        SummarizedExperiment::assays(scEx_log)[[1]][map, , drop = FALSE] <=  minMaxExpr[2]) == length(comb[cIdx, 1:ncol(comb)])
     perms[permIdx] <- paste0(comb[cIdx, 1:ncol(comb)], collapse = "+")
   }
   perms
