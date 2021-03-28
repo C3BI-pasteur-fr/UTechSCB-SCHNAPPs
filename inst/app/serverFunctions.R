@@ -13,9 +13,11 @@ suppressMessages(require(psychTools))
 suppressMessages(require(tidyr))
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
+  require(hms)
   end.time <- base::Sys.time()
   if (DEBUG) {
-    cat(file = stderr(), paste("---", messtr, ":done", difftime(end.time, start.time, units = "min"), " min\n"))
+    duration = difftime(end.time, start.time, units = "min")
+    cat(file = stderr(), paste("---", round_hms(as_hms(duration),0.25), "--- done:", messtr, "\n"))
   }
 }
 
