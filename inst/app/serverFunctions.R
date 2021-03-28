@@ -1690,8 +1690,6 @@ combinePermutations <- function(perm1, perm2) {
   }
   perms
 }
-expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minMaxExpr[1] & 
-                                assays(scEx)[[1]][map, , drop = F] <= minMaxExpr[2])
 
 # finner
 finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minMaxExpr) {
