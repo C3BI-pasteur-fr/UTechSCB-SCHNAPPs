@@ -137,7 +137,7 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 12,
-               plotOutput("gQC_windHC")
+               jqui_resizable(plotOutput("gQC_windHC"))
              )
            )
          )

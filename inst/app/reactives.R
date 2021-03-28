@@ -1939,6 +1939,8 @@ scranCluster <- function(pca,
         }
         cat(file = stderr(), paste("\nNot using ranks due to identical ranks\n", e))
         params$use.ranks <- F
+        save(file = "~/SCHNAPPsDebug/scranClusterError1.RData", list = c(ls()))
+        # cp = load(file="~/SCHNAPPsDebug/scranClusterError1.RData")
         return(do.call("quickCluster", params))
       }
       cat(file = stderr(), "\nRemove duplicated cells\n")
@@ -1947,6 +1949,8 @@ scranCluster <- function(pca,
     },
     warning = function(e) {
       if (DEBUG) cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
+      save(file = "~/SCHNAPPsDebug/scranClusterError.RData", list = c(ls()))
+    # cp = load(file="~/SCHNAPPsDebug/scranClusterError.RData")
       return(suppressMessages(do.call("quickCluster", params)))
     }
   )
