@@ -663,7 +663,7 @@ output$gQC_windHC <- renderPlot({
   
   scEx_log <- scEx_log()
   projections <- projections()
-  pca = pca()
+  pca = pcaReact()
   gQC_windProj <- input$gQC_windProj
   
   if (is.null(projections) | is.null(scEx_log)) {
