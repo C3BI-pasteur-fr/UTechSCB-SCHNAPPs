@@ -17,7 +17,12 @@ myNormalizationChoices <- list(
 # value should be of class shiny.tag
 # will be displayed via renderUI
 myNormalizationParameters <- list(
-  DE_logNormalization = h5("no Parameters implemented"),
+  DE_logNormalization = tagList(
+    numericInput("DE_logNormalization_sf",
+                 label = "scale by (0 => minvalue)",
+                 min = 0, max = 200000, step = 1, value = 0
+    )
+    ),
   DE_scaterNormalization = h5("no Parameters implemented"),
   DE_seuratSCTnorm = tagList(
     numericInput("DE_seuratSCTnorm_nHVG",
@@ -1203,7 +1208,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   
   scEx <- scEx()
   DE_logNormalizationButton()
-  
+  sfactor = isolate(input$DE_logNormalization_sf)
   if (is.null(scEx)) {
     if (DEBUG) {
       cat(file = stderr(), "DE_logNormalization:NULL\n")
@@ -1213,11 +1218,11 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
+  # cp = load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
   
   # TODO ?? define scaling factor somewhere else???
-  sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
-  retVal <- DE_logNormalizationfunc(scEx)
+  # sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
+  retVal <- DE_logNormalizationfunc(scEx, sfactor)
   
   # turn normalization button green
   addClass("updateNormalization", "green")
@@ -1231,7 +1236,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
 
 #' DE_logNormalizationfunc
 #' actual computation of the normalization as it is done in seurat
-DE_logNormalizationfunc <- function(scEx) {
+DE_logNormalizationfunc <- function(scEx, sfactor) {
   if (DEBUG) cat(file = stderr(), "DE_logNormalizationfunc started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -1252,6 +1257,10 @@ DE_logNormalizationfunc <- function(scEx) {
   A <- as(assays(scEx)[[1]], "dgCMatrix")
   assays(scEx)[[1]] <- as(assays(scEx)[[1]], "dgTMatrix")
   A@x <- A@x / Matrix::colSums(A)[assays(scEx)[[1]]@j + 1L]
+  if (sfactor <=0){
+    sfactor = min(A@x[A@x>0])
+  }
+  A@x = A@x / sfactor
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "dgTMatrix")),
     colData = colData(scEx),
