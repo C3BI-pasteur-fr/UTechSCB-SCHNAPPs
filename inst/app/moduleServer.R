@@ -208,6 +208,10 @@ clusterServer <- function(input, output, session,
     )
   })
   
+  grpNameDebounced <- reactive({
+    make.names(input$groupName, unique = TRUE)
+  }) %>% debounce(1000)
+  
   # clusterServer - selectedCellNames ----
   selectedCellNames <- reactive({
     start.time <- base::Sys.time()
@@ -231,7 +235,7 @@ clusterServer <- function(input, output, session,
     scEx_log <- scEx_log()
     scEx <- scEx()
     namedGroup <- input$groupNames
-    grpN <- make.names(input$groupName, unique = TRUE)
+    grpN <- grpNameDebounced()
     grpNs <- groupNames$namesDF
     
     if (is.null(projections) | is.null(brushedPs)) {
@@ -337,7 +341,7 @@ clusterServer <- function(input, output, session,
         if (DEBUG) cat(file = stderr(), paste("selectedCellNames is null\n"))
         retVal <- NULL
       }
-      grpN <- make.names(input$groupName, unique = TRUE)
+      grpN <-grpNameDebounced()
       grpSelected <- make.names(input$groupNames, unique = TRUE)
       grpNs <- groupNames$namesDF
       if (length(grpN) == 0 | length(grpNs) == 0) {
@@ -453,7 +457,7 @@ clusterServer <- function(input, output, session,
     tdata <- tData()
     projections <- projections()
     grpNs <- groupNames$namesDF
-    grpN <- make.names(input$groupName, unique = TRUE)
+    grpN <- grpNameDebounced()
     
     # returnValues$cluster <- input$clusters
     dimY <- input$dimension_y
@@ -749,7 +753,7 @@ clusterServer <- function(input, output, session,
       showNotification("nCellsVisibleSelected", id = "nCellsVisibleSelected", duration = NULL)
     }
     
-    grpN <- make.names(input$groupName, unique = TRUE)
+    grpN <- grpNameDebounced()
     grpNs <- groupNames$namesDF
     # inpClusters <- input$clusters
     projections <- projections()
@@ -879,7 +883,7 @@ clusterServer <- function(input, output, session,
     scEx_log <- scEx_log()
     # moreOptions <- input$moreOptions
     retVal <- selectedCellNames()
-    grpN <- make.names(input$groupName, unique = TRUE)
+    grpN <- grpNameDebounced()
     grpSelected <- make.names(input$groupNames, unique = TRUE)
     grpNs <- groupNames$namesDF
     myns <- ns("cellSelection")
