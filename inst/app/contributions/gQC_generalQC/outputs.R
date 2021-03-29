@@ -661,12 +661,12 @@ output$gQC_windHC <- renderPlot({
     showNotification("gQC_windHC", id = "gQC_windHC", duration = NULL)
   }
   
-  scEx_log <- scEx_log()
+  scEx <- scEx()
   projections <- projections()
   pca = pcaReact()
   gQC_windProj <- input$gQC_windProj
   
-  if (is.null(projections) | is.null(scEx_log)) {
+  if (is.null(projections) | is.null(scEx)) {
     return(NULL)
   }
   if (length(levels(projections[,gQC_windProj]))<3) {
@@ -678,11 +678,11 @@ output$gQC_windHC <- renderPlot({
     save(file = "~/SCHNAPPsDebug/gQC_windHC.RData", list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/gQC_windHC.RData")
-  Y <- as.matrix(assays(scEx_log)[[1]])
-  if(is_logscale(Y)) {
-    Y = exp(Y)
-  }
-  
+  Y <- as.matrix(assays(scEx)[[1]])
+  # if(is_logscale(Y)) {
+  #   Y = exp(Y)
+  # }
+
   trueclass <- projections[,gQC_windProj]
   ctStruct = createRef(Y, trueclass)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
