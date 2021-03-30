@@ -1248,7 +1248,7 @@ DE_logNormalizationfunc <- function(scEx, sfactor) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("DE_logNormalizationfunc", id = "DE_logNormalizationfunc", duration = NULL)
   }
-  
+  if(is.null(sfactor)) return(NULL)
   # use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "dgTMatrix"),
   #                                   "i")))
   #
