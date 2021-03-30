@@ -662,6 +662,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "done save: changeGroups\n")
       # browser()
     }
+    grpN =  make.names(grpN, unique = TRUE)
     # cp = load(file="~/SCHNAPPsDebug/changeGroups.RData")
     # in case the cell selection has changed
     grpNs <- grpNs[colnames(scEx), ]
