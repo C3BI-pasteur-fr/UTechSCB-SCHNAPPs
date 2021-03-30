@@ -662,6 +662,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), "done save: changeGroups\n")
       # browser()
     }
+    grpN =  make.names(grpN, unique = TRUE)
     # cp = load(file="~/SCHNAPPsDebug/changeGroups.RData")
     # in case the cell selection has changed
     grpNs <- grpNs[colnames(scEx), ]
@@ -671,6 +672,9 @@ clusterServer <- function(input, output, session,
     grpNs[, grpN] = as.logical(grpNs[, grpN])
     if (!addToSelection) {
       grpNs[rownames(visibleCells), grpN] <- FALSE
+    }
+    if (class(cells.names) == "list") {
+      cells.names = unlist(cells.names)
     }
     grpNs[cells.names, grpN] <- TRUE
     # grpNs[, grpN] <- as.factor(grpNs[, grpN])
