@@ -687,12 +687,12 @@ knitr::include_graphics('images/coexpressionSelected3.png')
 knitr::include_graphics('images/coexpressionViolin1.png')
 ```
 
-```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - Violin plot with permutations', echo=FALSE}
+```{r, out.width='90%', fig.align='center', fig.cap='Co-expression - Violin plot with combinations', echo=FALSE}
 knitr::include_graphics('images/coexpressionViolin2.png')
 ```
 
 
-* show Permutations
+* show combinations
 
     Selecting this can cause substantial calculations if the number of genes is large and make the display very ugly. On the othe hand, it will show which combination of genes are co-expressed to which extend.
 
