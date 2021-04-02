@@ -379,7 +379,7 @@ coE_topExpCCTable <- reactive({
 
 #' coE_geneGrp_vioFunc
 #' generates a ggplot object with a violin plot
-#' optionally creates all permutations.
+#' optionally creates all combinations
 coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
                                 dbCluster, coE_showPermutations = FALSE, sampCol, ccols) {
   
@@ -434,11 +434,11 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
       xPerm <- length(genesin)
       if (xPerm > 5) {
         xPerm <- 5
-        warning("reducing number of permutations to 5")
+        warning("reducing number of combinations to 5")
       }
       if (!is.null(getDefaultReactiveDomain())) {
         showNotification(
-          "reducing number of permutations to 5",
+          "reducing number of combinations to 5",
           id = "heatmapWarning",
           type = "warning",
           duration = NULL
@@ -551,7 +551,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
 
 #' coE_geneGrp_vioFunc
 #' generates a ggplot object with a violin plot
-#' optionally creates all permutations.
+#' optionally creates all combinations
 coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
                                  dbCluster, sampCol, ccols) {
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc2 started.\n")

@@ -1677,7 +1677,7 @@ dheader <- function() {
 # to be able to use %>%
 setId = function(inp, id) {return(tags$div(id=id, inp))}
 
-### used in coE - violin plot - permutations
+### used in coE - violin plot - combinations
 # combinePermutations ----
 combinePermutations <- function(perm1, perm2) {
   perms <- rep("", length(perm1))

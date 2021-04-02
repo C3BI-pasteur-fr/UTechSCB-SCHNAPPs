@@ -170,13 +170,13 @@ tabList <- list(
     "CoExpressionViolin",
     tabBox(title = "Violin plots", width = 12, id = "violinPlots",
            tabPanel(
-             title = "permutated", value = "permViol",
+             title = "combinations", value = "permViol",
              footer = "for each cell we count how many of the genes specified have an expression larger or equal than the minimum exprssion.\nThese counts are then divided up for any variable that can be used as a factor (has less than 20 levels).",
              
              fluidRow(
                column(
                  width = 12,
-                 checkboxInput("coE_showPermutations", "show Permutations", value = defaultValue("coE_showPermutations",FALSE))
+                 checkboxInput("coE_showPermutations", "show combinations", value = defaultValue("coE_showPermutations",FALSE))
                )
              ),
              fluidRow(
