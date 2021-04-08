@@ -1,5 +1,7 @@
 #' checkbsTT
 #' all variables have to be stored in .schnappsEnv and have to be called with "sbTT_" + variable names (see function definition at the end of this file.)
+#' no "." in variable name
+#' 
 if ("shinyBS" %in% rownames(installed.packages())) {
   suppressMessages(require(shinyBS))
 
@@ -50,9 +52,20 @@ if ("shinyBS" %in% rownames(installed.packages())) {
   .schnappsEnv$sbTT_oldPrj <- bsPopover("oldPrj", title = "", "projections to copy + rename")
   .schnappsEnv$sbTT_newPrj <- bsPopover("newPrj", title = "", "new name of Projection")
   .schnappsEnv$sbTT_delPrj <- bsPopover("delPrj", title = "", "projections to delete")
-
   .schnappsEnv$sbTT_tabsetPCA <- bsPopover("tabsetPCA", title = "PCA", "performs principle component analysis using BiocSingular::runPCA", placement = "left")
 
+  # should be read from contribution directory
+  .schnappsEnv$sbTT_temporaCluster <-  bsPopover("temporaCluster", title = "", "name of cluster centroids.")
+  .schnappsEnv$sbTT_temporaFactor <-  bsPopover("temporaFactor", title = "", "Factor used as time variable")
+  .schnappsEnv$sbTT_temporaLevels <-  bsPopover("temporaLevels", title = "", "Ordered list of levels for time variable")
+  .schnappsEnv$sbTT_temporaGMTFile <-  bsPopover("temporaGMTFile", title = "", "File with annotation, see http://download.baderlab.org/EM_Genesets/current_release/")
+  .schnappsEnv$sbTT_temporaMinSz <-  bsPopover("temporaMinSz", title = "", "Minimum size of the genesets used in enrichment estimation, set to 5 genes by default.")
+  .schnappsEnv$sbTT_temporaMaxSz <-  bsPopover("temporaMaxSz", title = "", "Maximum size of the genesets used in enrichment estimation, set to 200 genes by default.")
+  .schnappsEnv$sbTT_temporaNPCs  <-  bsPopover("temporaNPCs", title = "", "Number of principal components to be used in building the network.")
+  .schnappsEnv$sbTT_temporaDiff_thresh  <-  bsPopover("temporaDiff_thresh", title = "", "Percent of permissible difference between the temporal scores of two clusters to determine the direction of their connections. The temporal scores are calculated based on based on the clusters composition of cells from each timepoint. The directions of edges connecting pairs of clusters will only be determined for cluster pairs with difference in their time scores higher than the threshold. Other edges will remain undirected. Default at 0.01")
+  .schnappsEnv$sbTT_temporaPval_thresh  <-  bsPopover("temporaPval_thresh", title = "", "P-value threshold to determine the significance of pathway enrichment over time. Set rel. high because filtering is done later. Default to 0.5.")
+  
+  
   checkbsTT <- function(item) {
     if (exists(".schnappsEnv")) 
       if (is.environment(.schnappsEnv)) {

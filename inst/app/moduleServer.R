@@ -1039,7 +1039,7 @@ tableSelectionServer <- function(input, output, session,
     } else {
       retVal <- NULL
     }
-    
+    assign(ns("modSelectedRows"), retVal, envir = .schnappsEnv)
     printTimeEnd(start.time, "tableSelectionServer-rowSelection")
     exportTestValues(tableSelectionServercellSelection = {
       retVal
@@ -1216,6 +1216,79 @@ tableSelectionServer <- function(input, output, session,
       write.csv(dataTables, file)
     }
   )
+  
+  return(reactive({
+    if (DEBUG) cat(file = stderr(), "rowSelection.return\n")
+    start.time <- Sys.time()
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        printTimeEnd(start.time, "rowSelection.return")
+        removeNotification(id = "rowSelection.return")
+      }
+    )
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("rowSelection.return", id = "rowSelection.return", duration = NULL)
+    }
+
+    ns <- session$ns
+    nsStr <- ns("-")
+    dataTables <- dataTab()
+    selectedRows <- input$cellNameTable_rows_selected
+    inputData = inputData()
+
+    # update if expanded and not showing
+    # input$refreshtable
+
+    # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
+    # inputData <- NULL
+    # if (nsStr == "gsRMGenesMod--") {
+    #   inputData <- rowData(inputData()$scEx)
+    # } else {
+    #   inputData <- dataTables
+    # }
+
+    if (is.null(inputData)) {
+      return(NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("rowSelection.return", id = "rowSelection.return", duration = NULL)
+    }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".return.RData", collapse = "."),
+        list = c(ls())
+      )
+    }
+    # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
+    # browser()
+    # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
+    # remove this here
+    if (length(selectedRows) > 0) {
+      retVal <- rownames(dataTables[selectedRows, ])
+      retVal <- retVal[!is.na(retVal)]
+      retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
+      retVal <- unlist(strsplit(retVal, ","))
+      retVal <- sub("(.*)___.*", "\\1", retVal)
+      retVal <- unique(retVal)
+      # this removes everything other than row or col names
+      # with just scEx we will cannot display the genes in the removed table
+      # TODO need to check what we are comparing here. Just added "rowData(scEx)$symbol" because genes were not showing in some tables
+      # also check that removed genes / cells table are working
+      # retVal <- retVal[retVal %in% c(rowData(scEx)$symbol, inputData$symbol, colnames(scEx))]
+      retVal <- paste0(retVal, collapse = ", ")
+    } else {
+      retVal <- NULL
+    }
+
+    printTimeEnd(start.time, "tableSelectionServer-rowSelection.return")
+    exportTestValues(tableSelectionServercellSelection = {
+      retVal
+    })
+    if (DEBUG) cat(file = stderr(), paste("rowSelection retval: ",retVal, "\n"))
+    return(retVal)
+
+  }))
+
 }
 
 
