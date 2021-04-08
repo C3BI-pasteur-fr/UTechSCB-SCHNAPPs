@@ -1208,7 +1208,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   arg <- list(...)
   if(is.null(arg[[1]])) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls()), compress = F)
+    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls(), ".schnappsEnv"), compress = F)
   }
   # cp =load(file='~/SCHNAPPsDebug/add2history.RData')
   if (type == "text") {
