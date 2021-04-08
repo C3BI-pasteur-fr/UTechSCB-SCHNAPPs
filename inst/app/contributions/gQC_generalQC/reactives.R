@@ -1,6 +1,7 @@
 suppressMessages(require(uwot))
 # suppressMessages(require(tidyverse))
 suppressMessages(require(SingleCellExperiment))
+require(plotly)
 
 # here we define reactive values/variables
 
