@@ -13,14 +13,14 @@ library("BiocParallel")
 register(MulticoreParam(6))
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
-localContributionDir = ""
+# localContributionDir = ""
 defaultValueSingleGene = "CDH2" # CD52
 defaultValueMultiGenes = "CAV1, MIR205HG, KCNE1B, ANKRD66, SCGB3A2, SCGB3A1, CDH2" # itgae, cd69, itga1" # CD52, S100A9, S100A4
 # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
-historyPath = "/Volumes/Oct2020/RStudio/history/scCourse2020/"
+historyPath = "/Volumes/Oct2020/RStudio_history/"
 historyPath = NULL
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
@@ -81,7 +81,7 @@ source(paste0(packagePath,  "/server.R"))
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=TRUE)
-runApp(app)
+runApp(app, host = "0.0.0.0", port = 6149)
 # 
 # schnapps(Ï
 # defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP",
