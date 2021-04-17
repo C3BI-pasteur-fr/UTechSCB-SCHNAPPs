@@ -152,13 +152,19 @@ inputDataFunc <- function(inFile) {
         break()
       } else{
         ## list as from history file
-        if(is(get(varName)[[1]], "SingleCellExperiment")) {
+        weiter = tryCatch({
+          is(get(varName)[[1]], "SingleCellExperiment")} , error = function(e) {
+            return(FALSE)
+          })
+        if (weiter) {
           scEx <- get(varName)[[1]]
           if (!"counts" == names(assays(scEx))[1]) {
             assays(scEx)["counts"] = assays(scEx)[1]
           }
           scExFound <- TRUE
           break()
+          
+          
         }
       }
     }
@@ -560,9 +566,12 @@ inputData <- reactive({
   # TODO either multiple files with rdata/rds or single file of csv/other
   fpExtension <- tools::file_ext(inFile$datapath[1])
   if (toupper(fpExtension) %in% c("RDATA", "RDS")) {
-    retVal <- inputDataFunc(inFile)
+    retVal <- tryCatch({inputDataFunc(inFile)}, 
+                       error = function(e) {return(NULL)})
   } else {
-    retVal <- readCSV(inFile)
+    retVal <- tryCatch({readCSV(inFile)},
+                       error = function(e){return(NULL)}
+                       )
   }
   
   if (is.null(retVal)) {
@@ -1375,14 +1384,14 @@ scEx <- reactive({
   
   # TODO:??? should be keep the cell names from the projections?
   # here we are just reinitializing.
-  retVal <- scExFunc(
+  retVal <- tryCatch({scExFunc(
     scExOrg = dataTables$scEx,
     useCells = useCells,
     useGenes = useGenes,
     minGene = minGene,
     minG = minG,
     maxG = maxG
-  )
+  )}, error = function(e) {return(NULL)})
   scEx = retVal
   # ensure that we take the counts slot
   # when reloading additional slots might be loaded as well.
@@ -1907,9 +1916,9 @@ scranCluster <- function(pca,
          #   params$assay.type <- "counts"
          # },
          "logcounts" = {
-            reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
-            params$x <- scEx_log
-            params$assay.type <- "logcounts"
+           reducedDims(scEx_log) <- SimpleList(PCA = pca$x)
+           params$x <- scEx_log
+           params$assay.type <- "logcounts"
            if (length(geneid) > 0) {
              params$subset.row <- geneid
            }
@@ -1950,7 +1959,7 @@ scranCluster <- function(pca,
     warning = function(e) {
       if (DEBUG) cat(file = stderr(), paste("\nclustering produced Warning:\n", e, "\n"))
       save(file = "~/SCHNAPPsDebug/scranClusterError.RData", list = c(ls()))
-    # cp = load(file="~/SCHNAPPsDebug/scranClusterError.RData")
+      # cp = load(file="~/SCHNAPPsDebug/scranClusterError.RData")
       return(suppressMessages(do.call("quickCluster", params)))
     }
   )

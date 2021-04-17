@@ -347,6 +347,7 @@ output$summaryStatsSideBar <- renderUI({
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
   line0 <- paste(infile, " _ ", annFile)
+  line0a <- paste("Number of samples: ", length(levels(scEx$sampleNames)), sep = "\t")
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
   line2 <- paste("No. of genes: ", dim(scEx)[1], sep = "\t")
   line1a <- paste("No. of cells (log): ", dim(scEx_log)[2], sep = "\t")
@@ -367,6 +368,8 @@ output$summaryStatsSideBar <- renderUI({
     "<br/>",
     "<br/>",
     line0,
+    "<br/>",
+    line0a,
     "<br/>",
     line1,
     "<br/>",
