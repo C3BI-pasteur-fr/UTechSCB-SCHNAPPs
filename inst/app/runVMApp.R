@@ -8,7 +8,7 @@ library(reactlog)
 # 
 library(future)
 
-if(!exists("WORKERS")) WORKERS = 6
+if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
 plan("multiprocess", workers = WORKERS)
