@@ -2622,7 +2622,7 @@ projFactors <- reactive({
   coln <- colnames(projections)
   choices <- c()
   for (cn in coln) {
-    if (length(levels(as.factor(projections[, cn]))) < 50) {
+    if (length(unique(projections[, cn])) < 50) {
       choices <- c(choices, cn)
     }
   }
