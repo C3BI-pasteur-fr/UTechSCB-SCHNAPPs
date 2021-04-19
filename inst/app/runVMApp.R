@@ -87,7 +87,7 @@ source(paste0(packagePath,  "/server.R"))
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=FALSE)
 
-
+options(keep.source=TRUE)
 p <- profvis::profvis({
   runApp(app, host = "0.0.0.0", port = 6149, launch.browser = FALSE)
 })
