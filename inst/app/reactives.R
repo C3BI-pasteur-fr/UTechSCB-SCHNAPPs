@@ -71,6 +71,10 @@ commentModal <- function(failed = FALSE) {
 observeEvent(input$comment2History, {
   showModal(commentModal())
 })
+# Show modal when button is clicked.
+observeEvent(input$Quit, {
+ exit()
+})
 
 observeEvent(input$openBrowser, {
   browser()
