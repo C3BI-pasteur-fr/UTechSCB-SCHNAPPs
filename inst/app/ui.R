@@ -211,7 +211,8 @@ scShinyUI <- function(request) {
           if (DEBUG) {
             # actionButton("openBrowser", "open Browser")
           },
-          bookmarkButton()
+          bookmarkButton(),
+          actionButton("Quit", "quit")
         )
         # ,
         # verbatimTextOutput("save2Historystring")
