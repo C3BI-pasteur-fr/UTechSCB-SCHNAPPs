@@ -7,11 +7,11 @@
   # }
   # 
   library(future)
-  # plan("multiprocess", workers = 6)
-  plan(sequential)
+  plan("multiprocess", workers = 6)
+  # plan(sequential)
   library("BiocParallel")
-  # register(MulticoreParam(6))
-  register(SerialParam())
+  register(MulticoreParam(6))
+  # register(SerialParam())
   
   localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
   # localContributionDir = ""
@@ -86,10 +86,10 @@
   # 
   # 
   options(keep.source=TRUE)
-  p <- profvis::profvis({
+  # p <- profvis::profvis({
     runApp(app)
-  })
-  htmlwidgets::saveWidget(p, '~/profvis1.html')
+  # })
+  # htmlwidgets::saveWidget(p, '~/profvis1.html')
   
   # schnapps(Ï
   # defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP",
