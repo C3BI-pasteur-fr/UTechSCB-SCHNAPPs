@@ -73,7 +73,7 @@ observeEvent(input$comment2History, {
 })
 # Show modal when button is clicked.
 observeEvent(input$Quit, {
- exit()
+ stopApp()
 })
 
 observeEvent(input$openBrowser, {
