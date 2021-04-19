@@ -11,11 +11,12 @@ library(future)
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
-plan("multiprocess", workers = WORKERS)
+# plan("multiprocess", workers = WORKERS)
+plan(sequential)
 
 
 library("BiocParallel")
-register(MulticoreParam(WORKERS))
+register(SerialParam())
 
 localContributionDir = "/home/schnapps/SCHNAPPsContributions/"
 # localContributionDir = ""
@@ -87,11 +88,11 @@ source(paste0(packagePath,  "/server.R"))
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=FALSE)
 
-options(keep.source=TRUE)
-p <- profvis::profvis({
+# options(keep.source=TRUE)
+# p <- profvis::profvis({
   runApp(app, host = "0.0.0.0", port = 6149, launch.browser = FALSE)
-})
-htmlwidgets::saveWidget(p, '~/profvis1.html')
+# })
+# htmlwidgets::saveWidget(p, '~/profvis1.html')
 
 # 
 # schnapps(Ï
