@@ -84,6 +84,7 @@
   
   # 
   # 
+  options(keep.source=TRUE)
   p <- profvis::profvis({
     runApp(app)
   })
