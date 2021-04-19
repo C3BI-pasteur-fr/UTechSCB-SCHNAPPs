@@ -73,7 +73,8 @@ observeEvent(input$comment2History, {
 })
 # Show modal when button is clicked.
 observeEvent(input$Quit, {
- stopApp()
+  if(DEBUG) {cat(file = stderr(), "\nquit the app\n\n")}
+ exit()
 })
 
 observeEvent(input$openBrowser, {
