@@ -8,6 +8,9 @@ library(reactlog)
 # 
 library(future)
 
+# devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
+
+
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
