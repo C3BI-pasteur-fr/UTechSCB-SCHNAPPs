@@ -505,7 +505,7 @@ verifyLevelModal <- function(NLevel, failed = FALSE) {
 
 # gQC_renameLevButton ----
 observeEvent(eventExpr = input$gQC_renameLevButton,
-             label = "rnBtn",
+             label = "rnLevBtn",
              handlerExpr = {
                newLables = input$gQC_renameLev
                rnProj = input$gQC_rnProj
@@ -531,8 +531,8 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                    newLbVec = str_split(newLables, ",")[[1]]
                    if (ncol(newPrjs) == 0) {
                      newPrjs = data.frame(row.names = acn)
-                     newPrjs[,newPrj] = NA
-                     newPrjs[rownames(projections),newPrj] <- projections[, rnProj, drop = FALSE]
+                     newPrjs[,newProjName] = NA
+                     newPrjs[rownames(projections),newProjName] <- projections[, rnProj, drop = FALSE]
                    } else {
                      # browser()
                      newPrjs <- dplyr::left_join(
@@ -548,7 +548,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                  }, error=function(w){
                    # browser()
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
-                   showNotification("problem with names", id = "renameProbl", duration = NULL)
+                   showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
                    return(NULL)
                  }))) return(NULL)
                newProjName = make.unique(c(colnames(projections),newProjName))[length(c(colnames(projections),newProjName))]
