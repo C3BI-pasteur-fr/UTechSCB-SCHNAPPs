@@ -209,7 +209,7 @@ scShinyUI <- function(request) {
             }
           },
           if (DEBUG) {
-            # actionButton("openBrowser", "open Browser")
+            actionButton("openBrowser", "open Browser")
           },
           bookmarkButton(),
           actionButton("Quit", "quit")
@@ -224,6 +224,11 @@ scShinyUI <- function(request) {
         inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
         inlineCSS(list(.green = "background-color: lightgreen")),
         getallTabs(),
+        if(DEBUG){
+          library(profvis)
+          library(shiny)
+          profvis_ui("profiler")
+        },
         tags$head(tags$style(HTML("div.box-header {display: block;}"))),
         tags$head(tags$style(HTML("h3.box-title {display: block;}")))
         # tags$div(list(inputTab(),

@@ -12,6 +12,9 @@ output$normalizationRadioButtonValue <- renderPrint({
   input$normalizationRadioButton
 })
 
+library(profvis)
+callModule(profvis_server, "profiler")
+
 normaliztionParameters <- list(raw = "no Parameters needed")
 # localContributionDir <- .SCHNAPPs_locContributionDir
 parFiles <-
