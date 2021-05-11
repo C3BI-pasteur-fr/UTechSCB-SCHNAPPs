@@ -7,11 +7,11 @@
   # }
   # 
   library(future)
-  plan("multiprocess", workers = 6)
-  # plan(sequential)
+  # plan("multiprocess", workers = 6)
+  plan(sequential)
   library("BiocParallel")
-  register(MulticoreParam(6))
-  # register(SerialParam())
+  # register(MulticoreParam(6))
+  register(SerialParam())
   
   localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
   # localContributionDir = ""
@@ -22,7 +22,7 @@
   DEBUG = T
   DEBUGSAVE = F
   historyPath = "/Volumes/Oct2020/RStudio_history/"
-  historyPath = NULL
+  # historyPath = NULL
   
   assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -37,6 +37,7 @@
   assign("DEBUG", DEBUG, envir = .schnappsEnv)
   assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
   assign("historyPath", historyPath, envir = .schnappsEnv)
+  assign("allowFunctionality--shiny-tab-clusterParameters", T, envir = .schnappsEnv)
   ls(.schnappsEnv)
   
   
