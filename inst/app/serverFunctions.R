@@ -1709,6 +1709,21 @@ finner <- function(xPerm, r, genesin, featureData, scEx_log, perms, minMaxExpr) 
 
 
 
+# only return if there is no variable in env.
+checkAllowed <- function(x, env=.schnappsEnv) {
+  if(!is(x, "shiny.tag")) {
+    return(x)
+  }
+  id = paste0("allowFunctionality--", x$attribs$id)
+  if (exists(id, envir = env)) {
+    if (!get(id, envir = env)) {
+      return("")
+    }
+  }
+  return(x)
+}
+
+
 
 
 

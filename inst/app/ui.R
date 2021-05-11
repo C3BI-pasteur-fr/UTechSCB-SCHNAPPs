@@ -62,7 +62,7 @@ scShinyUI <- function(request) {
     inputTab(),
     geneSelectionTab(),
     cellSelectionTab(),
-    clusterParametersTab()
+    clusterParametersTab() %>% checkAllowed(env = .schnappsEnv)
     # ,
     # renameTab()
   )

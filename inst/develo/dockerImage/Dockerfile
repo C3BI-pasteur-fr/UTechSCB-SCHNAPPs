@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y \
     libpoppler-cpp-dev
 RUN apt-get update && apt-get install -y \
     orca \
+    pandoc \
     sudo \
     gdebi-core 
 RUN apt-get update && apt-get install -y \
@@ -63,7 +64,7 @@ RUN     R -e "update.packages()" && \
     R -e "BiocManager::install(c('DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment', 'S4Vectors'))" && \
     R -e "devtools::install_version('spatstat', version = '1.64-1', repos = 'http://cran.us.r-project.org')" && \
     R -e "devtools::install_github(repo = 'satijalab/seurat', dependencies = TRUE, ref = 'develop', upgrade='never')" && \
-    R -e "remotes::install_github('BaderLab/Tempora')" && \
+    R -e "remotes::install_github('C3BI-pasteur-fr/TemporaFork')" && \
     R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
 RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN', dependencies = TRUE)" && \
     R -e "install.packages(c('shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r'))" && \

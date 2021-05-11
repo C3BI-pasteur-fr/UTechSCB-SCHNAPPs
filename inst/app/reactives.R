@@ -2570,7 +2570,7 @@ projections <- reactive({
   }
   
   if (ncol(prjs) > 0 ) {
-    projections <- cbind(projections, prjs[rownames(projections),])
+    projections <- cbind(projections, prjs[rownames(projections),,drop=FALSE])
   }
   # # remove columns with only one unique value
   # rmC <- c()
@@ -2626,6 +2626,11 @@ projFactors <- reactive({
     choices <- c("no valid columns")
     return(choices)
   }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/projFactors.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/projFactors.RData")
+  
   coln <- colnames(projections)
   choices <- c()
   for (cn in coln) {
