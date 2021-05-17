@@ -1229,16 +1229,16 @@ tableSelectionServer <- function(input, output, session,
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("rowSelection.return", id = "rowSelection.return", duration = NULL)
     }
-
+    
     ns <- session$ns
     nsStr <- ns("-")
     dataTables <- dataTab()
     selectedRows <- input$cellNameTable_rows_selected
     inputData = inputData()
-
+    
     # update if expanded and not showing
     # input$refreshtable
-
+    
     # we only need this for the removed genes table, so to not use too much memory we introduce this if statement
     # inputData <- NULL
     # if (nsStr == "gsRMGenesMod--") {
@@ -1246,7 +1246,7 @@ tableSelectionServer <- function(input, output, session,
     # } else {
     #   inputData <- dataTables
     # }
-
+    
     if (is.null(inputData)) {
       return(NULL)
     }
@@ -1279,16 +1279,16 @@ tableSelectionServer <- function(input, output, session,
     } else {
       retVal <- NULL
     }
-
+    
     printTimeEnd(start.time, "tableSelectionServer-rowSelection.return")
     exportTestValues(tableSelectionServercellSelection = {
       retVal
     })
     if (DEBUG) cat(file = stderr(), paste("rowSelection retval: ",retVal, "\n"))
     return(retVal)
-
+    
   }))
-
+  
 }
 
 
@@ -1659,26 +1659,25 @@ cellSelectionModule <- function(input, output, session) {
             )
           })
   
-  observeEvent(input$Mod_clusterPP, 
-               {
-                 projections <- projections()
-                 
-                 if (DEBUG) cat(file = stderr(), "observeEvent: input$Mod_clusterPP\n")
-                 # Can use character(0) to remove all choices
-                 if (is.null(projections)) {
-                   return(NULL)
-                 }
-                 if (!input$Mod_clusterPP %in% colnames(projections)) {
-                   return(NULL)
-                 }
-                 choicesVal <- levels(projections[, input$Mod_clusterPP])
-                 updateSelectInput(
-                   session,
-                   "Mod_PPGrp",
-                   choices = choicesVal,
-                   selected = get(ns("Mod_PPGrp"), envir = .schnappsEnv)
-                 )
-               })
+  observe({
+    projections <- projections()
+    
+    if (DEBUG) cat(file = stderr(), "observeEvent: input$Mod_clusterPP\n")
+    # Can use character(0) to remove all choices
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (!input$Mod_clusterPP %in% colnames(projections)) {
+      return(NULL)
+    }
+    choicesVal <- levels(projections[, input$Mod_clusterPP])
+    updateSelectInput(
+      session,
+      "Mod_PPGrp",
+      choices = choicesVal,
+      selected = get(ns("Mod_PPGrp"), envir = .schnappsEnv)
+    )
+  })
   
   
   returnValues <- reactiveValues(

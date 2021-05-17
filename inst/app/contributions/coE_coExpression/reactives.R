@@ -645,7 +645,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
     }
   }
   
-  p1 <- projections %>% plotly::plot_ly(type = 'violin')
+  p1 <- projections %>% plotly::plot_ly(type = 'violin', colors=mycolPal2)
   for (lv in levels(prj2)) {
     p1 <- p1 %>% plotly::add_trace(
       x = prj[prj2 == lv],
@@ -659,8 +659,9 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
       meanline = list(
         visible = T
       )
-      # , 
-      # color=mycolPal2[[lv]]
+      ,
+      line = list(color=mycolPal2[[lv]]), 
+      fillcolor = mycolPal2[[lv]]
     )
     # print(p1)
   }

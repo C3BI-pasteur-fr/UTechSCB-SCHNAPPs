@@ -2455,7 +2455,7 @@ projections <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projections.bf.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/projections.bf.RData"); DEBUGSAVE=FALSE
+  # cp = load(file="~/SCHNAPPsDebug/projections.bf.RData"); DEBUGSAVE=FALSE
   if (!exists("scEx") |
       is.null(scEx)) {
     if (DEBUG) {
