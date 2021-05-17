@@ -5,6 +5,7 @@ if (DEBUG) {
 # source(paste0(packagePath, "/reactives.R"), local = TRUE)
 suppressMessages(library(psychTools))
 suppressMessages(library(magrittr))
+suppressMessages(library(plyr))
 suppressMessages(library(dplyr))
 require(psychTools)
 
