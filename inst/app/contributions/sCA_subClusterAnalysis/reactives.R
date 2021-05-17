@@ -551,6 +551,9 @@ subCluster2Dplot <- function() {
     cellNs <- selectedCells$cellNames()
     sampdesc <- selectedCells$selectionDescription()
     prjs <- selectedCells$ProjectionUsed()
+    sampCol <- sampleCols$colPal
+    ccols <- clusterCols$colPal
+    
     if (is.null(projections)) {
       return(NULL)
     }
@@ -591,16 +594,29 @@ subCluster2Dplot <- function() {
 #         dragmode = "select"
 #       )
 # p1
+    prj = subsetData[,prjs]
+    mycolPal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(
+      n = 12, name =
+        "Paired"
+    ))(length(levels(prj)))
+    
+    if (prjs == "sampleNames") {
+      mycolPal <- sampCol
+    }
+    if (prjs == "dbCluster") {
+      mycolPal <- ccols
+    }
+    
     p1 <-
       ggplot(subsetData,
              aes_string(x = x1, y = y1),
-             color = prjs
+             colour = mycolPal[subsetData[,prjs]]
       ) +
-      geom_point(aes(colour = get(prjs))) +
+      geom_point(colour = mycolPal[subsetData[,prjs]]) +
       geom_point(
         shape = 1,
         size = 4,
-        aes(colour = get(prjs))
+        colour = mycolPal[subsetData[,prjs]]
       ) +
       theme_bw() +
       theme(

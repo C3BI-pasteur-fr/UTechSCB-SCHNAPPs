@@ -1,0 +1,17 @@
+---
+title: "Readme.Rmd"
+author: "Bernd Jagla"
+date: "3/25/2021"
+output: html_document
+---
+
+# Readme
+
+List of files and short description
+
+## startSchnapps.R
+update and start SCHNAPPs, the single cell data analysis platform developed at Pasteur.
+
+## preSCHNAPPsInput.R
+script to prepare the data for SCHNAPPs starting from an h5 file.
+
