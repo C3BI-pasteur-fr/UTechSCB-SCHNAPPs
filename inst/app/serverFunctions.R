@@ -189,7 +189,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     )
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
   }
-  # load(file="~/SCHNAPPsDebug/clusterPlot.RData")
+  # cp = load(file="~/SCHNAPPsDebug/clusterPlot.RData")
   if (DEBUG) {
     cat(file = stderr(), paste("output$sCA_dge_plot1:---", clId[1], "---\n"))
   }
@@ -469,8 +469,20 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # dimCol = "Gene.count"
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
+  markerInfo = NULL
+  if (dimxFact & dimyFact) {
+    tb = as.data.frame(table(subsetData[,c(dimX, dimY)]))
+    subsetData$rownames = rownames(subsetData)
+    subsetData = merge(y=tb, x= subsetData, by=c(dimX, dimY))
+    rownames(subsetData) =  subsetData$rownames
+    # subsetData$dotSize = subsetData[,dimX] == tb[,dimX] & subsetData[,dimY] == tb[,dimY]
+    # marker = list(size = ~Gap, opacity = 0.5))
+    markerInfo = list(size=~Freq)
+  }
   
-  p1 <- plotly::plot_ly(
+  
+  p1 <-
+    plotly::plot_ly(
     data = subsetData, source = "subset",
     key = rownames(subsetData)
   ) %>%
@@ -482,6 +494,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData)),
       color = ~ get(dimCol),
       colors = colors,
+      marker = markerInfo,
       showlegend = TRUE
     ) %>%
     layout(

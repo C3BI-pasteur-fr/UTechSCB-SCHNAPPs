@@ -34,7 +34,7 @@ This workflow uses a dataset of Peripheral Blood Mononuclear Cells (PBMC) freely
 
 
 ```{r}
-library(dplyr)
+library(plyr); library(dplyr)
 library(Seurat)
 library(patchwork)
 library(SCHNAPPs)
