@@ -57,7 +57,7 @@ RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION 
 RUN     R -e "update.packages()" && \
     R -e "install.packages('devtools')" && \
     R -e "devtools::install_github('mul118/shinyMCE')" && \
-    R -e "install.packages(c('BiocManager', 'pdftools'))" && \
+    R -e "install.packages(c('BiocManager', 'pdftools', 'ggplotify'))" && \
     R -e "BiocManager::install(c('BiocSingular', 'SingleR'))" && \
     R -e "BiocManager::install(c('multtest', 'limma', 'Biobase', 'monocle', 'rtracklayer'))" && \
     R -e "BiocManager::install(c('IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics'))" && \

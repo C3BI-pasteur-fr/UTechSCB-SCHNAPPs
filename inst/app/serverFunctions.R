@@ -470,6 +470,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # dimCol = "sampleNames"
   # subsetData$"__key__" = rownames(subsetData)
   markerInfo = NULL
+  
+  maxPointSize = 10
   if (dimxFact & dimyFact) {
     tb = as.data.frame(table(subsetData[,c(dimX, dimY)]))
     subsetData$rownames = rownames(subsetData)
@@ -477,7 +479,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     rownames(subsetData) =  subsetData$rownames
     # subsetData$dotSize = subsetData[,dimX] == tb[,dimX] & subsetData[,dimY] == tb[,dimY]
     # marker = list(size = ~Gap, opacity = 0.5))
-    markerInfo = list(size=~Freq)
+    markerInfo = list(size=~Freq, sizes = c(100, 500))
+    maxPointSize = 50
+    textDisp = apply(subsetData[,c(dimX, dimY, "Freq")], 1, FUN = function(x) glue::glue("({x[1]}, {x[2]}): {x[3]}"))
+  } else {
+    subsetData$Freq = 1
+    textDisp = paste(1:nrow(subsetData), " ", rownames(subsetData))
   }
   
   
@@ -491,10 +498,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       y = ~ get(dimY),
       type = "scatter", mode = "markers",
       # text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
-      text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData)),
+      text = ~ textDisp,
       color = ~ get(dimCol),
       colors = colors,
-      marker = markerInfo,
+      size = ~ Freq,
+      sizes = c(1,maxPointSize),
+      marker = list(sizemod = 'diameter'),
       showlegend = TRUE
     ) %>%
     layout(
