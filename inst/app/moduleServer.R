@@ -1444,6 +1444,8 @@ pHeatMapModule <- function(input, output, session,
                                        colPal <- input$colPal
                                        minMaxVal <- input$heatmapMinMaxValue
                                        # maxVal <- input$heatmapMaxValue
+                                       sampCol <- sampleCols$colPal
+                                       ccols <- clusterCols$colPal
                                        
                                        proje <- projections()
                                        if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
@@ -1453,10 +1455,19 @@ pHeatMapModule <- function(input, output, session,
                                               list = c(ls(), "heatmapData", "input", "output",  "pheatmapList"))
                                          cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
                                        }
-                                       # load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
+                                       # cp = load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
                                        outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
                                        outfile <- normalizePath(outfile, mustWork = FALSE)
                                        
+                                       if (!"annotation_colors" %in% names(heatmapData)) {
+                                         heatmapData$annotation_colors = list()
+                                       }
+                                       if (!"sampleNames" %in% names(heatmapData$annotation_colors)) {
+                                         heatmapData$annotation_colors$sampleNames = sampCol
+                                       }
+                                       if (!"dbCluster" %in% names(heatmapData$annotation_colors)) {
+                                         heatmapData$annotation_colors$dbCluster = ccols
+                                       }
                                        
                                        
                                        retVal <- heatmapModuleFunction(

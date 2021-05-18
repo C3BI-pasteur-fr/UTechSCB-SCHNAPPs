@@ -567,10 +567,47 @@ output$descriptOfWorkOutput <- renderPrint({
   input$descriptionOfWork
 })
 
+# # sampleColorSelection ----
+# output$sampleColorSelection <- renderUI({
+#   scEx <- scEx()
+#   sampCol <- sampleCols$colPal
+#   prFct = projFactors()
+#   projections = projections()
+#   
+#   if (is.null(scEx)) {
+#     return(NULL)
+#   }
+#   if (.schnappsEnv$DEBUGSAVE) {
+#     save(
+#       file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
+#       list = c("normaliztionParameters", ls())
+#     )
+#   }
+#   # cp = load("~/SCHNAPPsDebug/sampleColorSelection.RData")
+#   
+#   lev <- levels(colData(scEx)$sampleNames)
+#   # cols <- gg_fill_hue(length(lev))
+#   
+#   # New IDs "colX1" so that it partly coincide with input$select...
+#   lapply(seq_along(lev), function(i) {
+#     colourpicker::colourInput(
+#       inputId = paste0("sampleNamecol", lev[i]),
+#       label = paste0("Choose colour for sample ", "\"", lev[i], "\""),
+#       # value = "#762A83"
+#       # ,
+#       value = sampCol[i],
+#       allowedCols = allowedColors,
+#       palette = "limited"
+#     )
+#   })
+# })
 # sampleColorSelection ----
-output$sampleColorSelection <- renderUI({
+output$ColorSelection <- renderUI({
   scEx <- scEx()
   sampCol <- sampleCols$colPal
+  prFct = projFactors()
+  projections = projections()
+  clusterCol <- clusterCols$colPal
   
   if (is.null(scEx)) {
     return(NULL)
@@ -581,58 +618,73 @@ output$sampleColorSelection <- renderUI({
       list = c("normaliztionParameters", ls())
     )
   }
-  # load("~/SCHNAPPsDebug/sampleColorSelection.RData")
+  # cp = load("~/SCHNAPPsDebug/sampleColorSelection.RData")
   
   lev <- levels(colData(scEx)$sampleNames)
   # cols <- gg_fill_hue(length(lev))
+  lev1 <- levels(projections$dbCluster)
+  lev2 <- levels(colData(scEx)$sampleNames)
+  # browser()
+  tmpFun <- function(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors){
+    tabPanel(
+      name, value = value,
+      fluidRow(
+        column(
+          width = 6,
+          lapply(seq_along(lev), function(i) {
+            colourpicker::colourInput(
+              inputId = paste0(idStr, lev[i]),
+              label = paste0("Choose color for ",name,  "\"", lev[i], "\""),
+              # value = "#762A83"
+              # ,
+              value = sampCol[i],
+              allowedCols = allowedColors,
+              palette = "limited"
+            )
+          })
+        )))
+  }
   
-  # New IDs "colX1" so that it partly coincide with input$select...
-  lapply(seq_along(lev), function(i) {
-    colourpicker::colourInput(
-      inputId = paste0("sampleNamecol", lev[i]),
-      label = paste0("Choose colour for sample ", "\"", lev[i], "\""),
-      # value = "#762A83"
-      # ,
-      value = sampCol[i],
-      allowedCols = allowedColors,
-      palette = "limited"
-    )
-  })
+  tabs = list( 
+    tmpFun(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors),
+    tmpFun(name = "Cluster", value = "ClusterColorPanel", lev = lev1, idStr = "clusterNamecol", clusterCol, allowedColors)
+  )
+  do.call(tabsetPanel, tabs)
 })
 
-# clusterColorSelection ----
-output$clusterColorSelection <- renderUI({
-  scEx <- scEx()
-  projections <- projections()
-  clusterCol <- clusterCols$colPal
-  
-  if (is.null(scEx) || is.null(projections)) {
-    return(NULL)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
-      list = c("normaliztionParameters", ls())
-    )
-  }
-  # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
-  
-  lev <- levels(projections$dbCluster)
-  # cols <- gg_fill_hue(length(lev))
-  
-  # New IDs "colX1" so that it partly coincide with input$select...
-  lapply(seq_along(lev), function(i) {
-    colourpicker::colourInput(
-      inputId = paste0("clusterNamecol", lev[i]),
-      label = paste0("Choose colour for cluster ", "\"", lev[i], "\""),
-      # value = "#762A83"
-      # ,
-      value = clusterCol[i],
-      allowedCols = allowedColors,
-      palette = "limited"
-    )
-  })
-})
+# # clusterColorSelection ----
+# output$clusterColorSelection <- renderUI({
+#   scEx <- scEx()
+#   projections <- projections()
+#   clusterCol <- clusterCols$colPal
+#   
+#   if (is.null(scEx) || is.null(projections)) {
+#     return(NULL)
+#   }
+#   if (.schnappsEnv$DEBUGSAVE) {
+#     save(
+#       file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
+#       list = c("normaliztionParameters", ls())
+#     )
+#   }
+#   # load("~/SCHNAPPsDebug/clusterColorSelection.RData")
+#   
+#   lev <- levels(projections$dbCluster)
+#   # cols <- gg_fill_hue(length(lev))
+#   
+#   # New IDs "colX1" so that it partly coincide with input$select...
+#   lapply(seq_along(lev), function(i) {
+#     colourpicker::colourInput(
+#       inputId = paste0("clusterNamecol", lev[i]),
+#       label = paste0("Choose colour for cluster ", "\"", lev[i], "\""),
+#       # value = "#762A83"
+#       # ,
+#       value = clusterCol[i],
+#       allowedCols = allowedColors,
+#       palette = "limited"
+#     )
+#   })
+# })
 
 # history store to file ----
 #' 
