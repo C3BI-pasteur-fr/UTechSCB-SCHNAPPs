@@ -1,6 +1,10 @@
 <img src="inst/www/images/schnappsLogo.png" align="right" alt="" width="120" />
 
+
+
 # SCHNAPPs - Single Cell sHiNy APP(s)
+
+![](https://travis-ci.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs.svg?branch=master)
 
 ## Overview
 
