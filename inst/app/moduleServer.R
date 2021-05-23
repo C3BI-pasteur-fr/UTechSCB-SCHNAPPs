@@ -1025,7 +1025,7 @@ tableSelectionServer <- function(input, output, session,
     # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
     # remove this here
     if (length(selectedRows) > 0) {
-      retVal <- rownames(dataTables[selectedRows, ])
+      retVal <- rownames(dataTables[selectedRows, ,drop=F])
       retVal <- retVal[!is.na(retVal)]
       retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
       retVal <- unlist(strsplit(retVal, ","))
@@ -1140,14 +1140,14 @@ tableSelectionServer <- function(input, output, session,
       nonNumericCols <- which(!colnames(dataTables) %in% numericCols) # to keep non numeric columns...
       numericCols <- which(colnames(dataTables) %in% numericCols)
       if (reorderCells && length(selectedRows) > 0) {
-        csums <- colSums(dataTables[selectedRows, numericCols])
+        csums <- colSums(dataTables[selectedRows, numericCols,drop=F])
         cols2disp <- numericCols[order(csums, decreasing = TRUE)]
       } else {
         cols2disp <- numericCols
       }
       cols2disp <- c(nonNumericCols, cols2disp)[1:maxCol]
       if (showAllCells) cols2disp <- colnames(dataTables)
-      dataTables <- as.data.frame(dataTables[, cols2disp])
+      dataTables <- as.data.frame(dataTables[, cols2disp,drop=F])
       colState <- get(ns("colState"), envir = .schnappsEnv)
       if (length(colState) == 0) {
         colState <- list(
@@ -1265,7 +1265,7 @@ tableSelectionServer <- function(input, output, session,
     # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
     # remove this here
     if (length(selectedRows) > 0) {
-      retVal <- rownames(dataTables[selectedRows, ])
+      retVal <- rownames(dataTables[selectedRows, ,drop=F])
       retVal <- retVal[!is.na(retVal)]
       retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
       retVal <- unlist(strsplit(retVal, ","))

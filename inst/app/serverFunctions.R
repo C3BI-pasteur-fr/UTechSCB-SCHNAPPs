@@ -21,7 +21,8 @@ printTimeEnd <- function(start.time, messtr) {
   }
 }
 
-pltHighExp <- function(plotHighestExprs, scaterReads, n, scols) {
+pltHighExp <- function( scaterReads, n, scols) {
+  # since we are saving without the environment, we need are storing
   require(scater)
   p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n) + scale_color_manual(values= scols)
 }

@@ -218,7 +218,7 @@ DE_scaterPNG <- reactive({
   n <- min(nrow(scaterReads), 50)
   
   rownames(scaterReads) <- rowData(scaterReads)$symbol
-  p1 = pltHighExp(plotHighestExprs, scaterReads, n, scols) 
+  p1 = pltHighExp( scaterReads, n, scols) 
   
   tryCatch(
     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
@@ -242,7 +242,7 @@ DE_scaterPNG <- reactive({
   environment(af) = new.env(parent = emptyenv())
   
   .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
-                                         plotHighestExprs = plotHighestExprs,
+                                         # plotHighestExprs = plotHighestExprs,
                                          scaterReads = scaterReads, 
                                          n = n,
                                          scols = scols
