@@ -11,6 +11,9 @@ suppressMessages(library(magrittr))
 suppressMessages(require(digest))
 suppressMessages(require(psychTools))
 suppressMessages(require(tidyr))
+suppressMessages(library(ComplexHeatmap))
+suppressMessages(library(InteractiveComplexHeatmap))
+
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   require(hms)
@@ -158,8 +161,8 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # 
   # In the module the input table is coming from the projections (tData) that is a parameter
   # to the module. Since this can be a subset we need to subset the scEx as well.
- if (is.null(projections)) return(NULL)
-   projections <- updateProjectionsWithUmiCount(
+  if (is.null(projections)) return(NULL)
+  projections <- updateProjectionsWithUmiCount(
     dimX = dimX, dimY = dimY,
     geneNames = geneNames,
     geneNames2 = geneNames2,
@@ -491,9 +494,9 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   
   p1 <-
     plotly::plot_ly(
-    data = subsetData, source = "subset",
-    key = rownames(subsetData)
-  ) %>%
+      data = subsetData, source = "subset",
+      key = rownames(subsetData)
+    ) %>%
     add_trace(
       x = ~ get(dimX),
       y = ~ get(dimY),
@@ -646,7 +649,9 @@ heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   addColNames <- input[[paste0(moduleName, "-ColNames")]]
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
   # moreOptions <- input[[paste0(moduleName, "-moreOptions")]]
-  colTree <- input[[paste0(moduleName, "-showColTree")]]
+  colTree <- FALSE
+  if (input[[paste0(moduleName, "-sortingCols")]] == "dendrogram")
+    colTree <- TRUE
   
   if (is.null(heatmapData) | is.null(projections) | is.null(heatmapData$mat)) {
     return(NULL)
@@ -1363,44 +1368,47 @@ get_density <- function(x, y, ...) {
 # 
 # proje <- projections()
 
-
+# heatmapModuleFunction =====
 
 heatmapModuleFunction <- function(
   heatmapData = NULL,
   addColNames = "sampleNames",
   orderColNames = c(), 
-  colTree = FALSE,
+  sortingCols = "dendrogram",
   scale = "none",
-  pWidth = 300, 
-  pHeight = 900,
+  pWidth = 300, # no longer used
+  pHeight = 900, # no longer used
   colPal= "none",
   minMaxVal = NULL,
   proje = NULL,
-  outfile = NULL
+  outfile = NULL,
+  heatmapCellGrp = 5
 ) {
   
-  
+  colTree = FALSE
+  if (is.null(sortingCols)) return(NULL)
+  if (sortingCols == "dendrogram") colTree = TRUE
   
   if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
-    
-    return(list(
-      src = "empty.png",
-      contentType = "image/png",
-      width = 96,
-      height = 96,
-      alt = "pHeatMapPlot should be here (null)"
-    ))
+    return(NULL)
+    # return(list(
+    #   src = "empty.png",
+    #   contentType = "image/png",
+    #   width = 96,
+    #   height = 96,
+    #   alt = "pHeatMapPlot should be here (null)"
+    # ))
   }
   if(is.null(minMaxVal)) minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat))
-  if (.schnappsEnv$DEBUGSAVE) {
+  # if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
-  }
+  # }
   # cp =load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
-  
-  if (is.null(pWidth)) {
-    pWidth <- 800
-    pHeight <- 300
-  }
+  # require(heatmaply)
+  # if (is.null(pWidth)) {
+  #   pWidth <- 800
+  #   pHeight <- 300
+  # }
   if (!is(heatmapData$mat, "matrix") & !is(heatmapData$mat, "Matrix")) {
     cat(file = stderr(), "!!!!! output$pHeatMapModule:mat is not a matrix\n")
     heatmapData$mat <- as.matrix(t(heatmapData$mat))
@@ -1408,10 +1416,13 @@ heatmapModuleFunction <- function(
   if (is(heatmapData$mat, "sparseMatrix")) {
     heatmapData$mat = as.matrix(heatmapData$mat)
   }
-  heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
+  # should be handled by plotly
+  # heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
+  # 
+  # to check if this is handled better in plotly
   if (is.null(scale)) {
     heatmapData$scale <- "none"
-  } else {
+  }   else {
     heatmapData$scale <- scale
     if (scale == "row") {
       rmRows = -which(apply(heatmapData$mat, 1, sd) == 0)
@@ -1424,17 +1435,24 @@ heatmapModuleFunction <- function(
         heatmapData$mat <- heatmapData$mat[, rmCols]
     }
   }
-  
-  heatmapData$filename <- outfile
+  heatmapData$annotation_col = data.frame(row.names = colnames(heatmapData$mat))
+  # heatmapData$filename <- outfile
   # heatmapData$filename = NULL
   # if (length(addColNames) > 0 & moreOptions) {
+  addColNames = addColNames[addColNames %in% colnames(proje)]
   if (length(addColNames) > 0) {
     heatmapData$annotation_col <- proje[rownames(heatmapData$annotation_col), addColNames, drop = FALSE]
   }
   # if (sum(orderColNames %in% colnames(proje)) > 0 & moreOptions) {
+  orderColNames = orderColNames[orderColNames %in% colnames(proje)]
   if (sum(orderColNames %in% colnames(proje)) > 0) {
     heatmapData$cluster_cols <- FALSE
-    colN <- rownames(psychTools::dfOrder(proje, orderColNames))
+    proje2 = proje[,orderColNames,drop = F]
+    to.replace <- sapply(proje2, is.logical)
+    proje2[,to.replace] <- lapply(proje2[,to.replace,drop = F], as.numeric)
+    proje[,names(to.replace)[to.replace]] <- proje2[,names(to.replace)[to.replace],drop = F]
+    if(ncol(proje)<2) return(NULL) # this cannot happen, but is a requirement fo dfOrder to work properly
+    colN <- rownames(psychTools::dfOrder(proje[,,drop=F], orderColNames))
     matN <- colnames(heatmapData$mat)
     if (is.null(matN)) {
       matN <- names(heatmapData$mat)
@@ -1483,8 +1501,8 @@ heatmapModuleFunction <- function(
       alt = "pHeatMapPlot should be here (no rows)"
     ))
   }
-  heatmapData$width <- pWidth / 72
-  heatmapData$height <- pHeight / 72
+  # heatmapData$width <- pWidth / 72
+  # heatmapData$height <- pHeight / 72
   
   if (colPal == "none") {
     # use the supplied colors
@@ -1498,36 +1516,78 @@ heatmapModuleFunction <- function(
   heatmapData$mat[heatmapData$mat <= minMaxVal[1]] = minMaxVal[1]
   heatmapData$mat[heatmapData$mat >= minMaxVal[2]] = minMaxVal[2]
   
-  if (!"TRONCO" %in% rownames(installed.packages())) {
-    return(list(
-      src = "empty.png",
-      contentType = "image/png",
-      width = 96,
-      height = 96,
-      alt = "pHeatMapPlot should be here (no rows)"
-    ))
+  # working with large trees is not working
+  # cluster_within_group and other dendextend function are recursive and crash
+  # thus we only provide the cut 
+
+  if (colTree) {
+    # retVal = do.call(pheatmap::pheatmap, heatmapData)
+    # retVal$tree_col
+    library(dendsort)
+    callback = function(hc, ...){dendsort(hc)}
+    heatmapData$clustering_callback = callback
+    require(ComplexHeatmap)
+    my_hclust <- hclust(dist(t(heatmapData$mat)), method = "complete")
+    
+    my_gene_col <- cutree(tree =  my_hclust, k = heatmapCellGrp)
+     # while(max(table(my_gene_col)) > 1000){
+    #   heatmapCellGrp = heatmapCellGrp + 10
+    #   my_gene_col <- cutree(tree =  my_hclust, k = heatmapCellGrp)
+    # }
+    heatmapData$annotation_col[names(my_gene_col), "DendrogramCluster"] = factor(my_gene_col)
+    heatmapData$mat = heatmapData$mat[,rownames(heatmapData$annotation_col)]
+    heatmapData$cutree_cols = heatmapCellGrp
+    if (ncol(heatmapData$mat)>2000){
+      sortedCells = names(sort(my_gene_col))
+      heatmapData$mat = heatmapData$mat[,sortedCells, drop = FALSE]
+      heatmapData$annotation_col = heatmapData$annotation_col[sortedCells,,drop = FALSE]
+      heatmapData$cluster_cols = F
+      heatmapData$col_split = NULL
+      heatmapData$border = NULL
+      heatmapData$border_color = NA
+      heatmapData$clustering_callback = NA
+      my_gene_col = my_gene_col[sortedCells]
+      heatmapData$gaps_col = which(my_gene_col[-1] != my_gene_col[-length(my_gene_col)])
+    }
+      
   }
-  do.call(TRONCO::pheatmap, heatmapData)
+
   
   
-  # pixelratio <- session$clientData$pixelratio
-  # if (is.null(pixelratio)) pixelratio <- 1
-  # width <- session$clientData$output_plot_width
-  # height <- session$clientData$output_plot_height
-  # if (is.null(width)) {
-  #   width <- 96 * 7
-  # } # 7x7 inch output
-  # if (is.null(height)) {
-  #   height <- 96 * 7
+  
+  # if (!"TRONCO" %in% rownames(installed.packages())) {
+  #   return(list(
+  #     src = "empty.png",
+  #     contentType = "image/png",
+  #     width = 96,
+  #     height = 96,
+  #     alt = "pHeatMapPlot should be here (no rows)"
+  #   ))
   # }
-  outfilePH <- outfile
-  return(list(
-    src = outfilePH,
-    contentType = "image/png",
-    width = paste0(pWidth, "px"),
-    height = paste0(pHeight, "px"),
-    alt = "heatmap should be here"
-  ))
+  # heatmapData$plot_method = "plotly"
+  # heatmapData$x = heatmapData$mat # heatmaply
+  # heatmapData$matrix = heatmapData$mat # Heatmap
+  # heatmapData$showticklabels = c(FALSE, TRUE)
+  # heatmapData$col_side_colors = NULL [heatmapData$annotation_col[,1]]
+  # heatmapData$col_side_colors = heatmapData$annotation_col[,,drop=FALSE]
+  # heatmapData$return_ppxpy = FALSE
+  # heatmaply specific, cannot handle muliple color pallets
+  # combColors = c()
+  # for (cIdx in 1:length(heatmapData$annotation_colors)) combColors = c(combColors, heatmapData$annotation_colors[[cIdx]])
+  # heatmapData$col_side_palette = NULL#combColors
+  # heatmapData$side_color_colorbar_len = NULL
+  # any(is.na(heatmapData$mat))
+  set.seed(1) # to make clustering reproducible
+  
+  retVal = tryCatch(
+    do.call(ComplexHeatmap::pheatmap, heatmapData),
+    # do.call(TRONCO::pheatmap, heatmapData),
+    error = function(e){
+      cat (file = stderr(), paste(e))
+      return(NULL)
+    }
+  )
+  # return(retVal)
 }
 
 # consolidateScEx ----
