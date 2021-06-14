@@ -15,8 +15,8 @@
   
   localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
   # localContributionDir = ""
-  defaultValueSingleGene = "CDH2" # CD52
-  defaultValueMultiGenes = "CAV1, MIR205HG, KCNE1B, ANKRD66, SCGB3A2, SCGB3A1, CDH2" # itgae, cd69, itga1" # CD52, S100A9, S100A4
+  defaultValueSingleGene = "igkc" # CD52
+  defaultValueMultiGenes = "IGHA2, JCHAIN, IGHA1,IGKV1-39, IGKC, IGHA1" # itgae, cd69, itga1" # CD52, S100A9, S100A4
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
   DEBUG = T
@@ -88,7 +88,6 @@
   # 
   options(keep.source=TRUE)
   # p <- profvis::profvis({
-    runApp(app)
   # })
   # htmlwidgets::saveWidget(p, '~/profvis1.html')
   
@@ -109,3 +108,6 @@
   # library(SCHNAPPs)
   # schnapps(DEBUG = T, historyPath = "/Volumes/Oct2020/RStudio/history/celia/")
   # 
+  # 
+  runApp(app)
+  

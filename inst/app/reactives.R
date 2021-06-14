@@ -28,9 +28,9 @@ allCellNames <- reactiveVal(
   label = "CellNames",
   value = ""
 )
-
-DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
-
+if (exists(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)) {
+  DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
+}
 # Input file either rdata file or csv file
 
 inputFile <- reactiveValues(
@@ -1578,7 +1578,7 @@ scExLogMatrixDisplay <- reactive({
 })
 
 # pcaFunc ----
-pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, featureData, pcaN, maxGenes = 1000, hvgSelection, inputNormalization="DE_something") {
+pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, rmGenes=c(), featureData, pcaN, maxGenes = 1000, hvgSelection, inputNormalization="DE_something") {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1605,12 +1605,14 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   
   # if there are no genes provided take all genes
   genesin <- geneName2Index(pcaGenes, featureData)
+  genesout <- geneName2Index(rmGenes, featureData)
   # if (is.null(genesin) || length(genesin) == 0) {
   #   genesin <- rownames(scEx_log)
   # }
   geneshvg = c()
   if (inputNormalization == "DE_seuratSCTnorm") {
     geneshvg = rownames(assays(scEx_log)[[1]])
+    
   } else {
     tryCatch({
       
@@ -1819,6 +1821,7 @@ pcaReact <- reactive({
   center <- isolate(input$pcaCenter)
   scale <- isolate(input$pcaScale)
   pcaGenes <- isolate(input$genes4PCA)
+  rmGenes <- isolate(input$genesRMPCA)
   hvgSelection <- isolate(input$hvgSelection)
   useSeuratPCA <- isolate(input$useSeuratPCA)
   inputNormalization <- isolate(input$normalizationRadioButton)
@@ -1837,7 +1840,7 @@ pcaReact <- reactive({
   retVal <- pcaFunc(scEx = scEx, scEx_log = scEx_log, 
                     rank = rank, center = center, 
                     scale = scale, useSeuratPCA = useSeuratPCA, 
-                    pcaGenes = pcaGenes, featureData = featureData,
+                    pcaGenes = pcaGenes, rmGenes = rmGenes, featureData = featureData,
                     pcaN =  pcaN, 
                     hvgSelection = hvgSelection,
                     inputNormalization = inputNormalization)

@@ -73,7 +73,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     cluster_cols = FALSE,
     # scale = "row",
     fontsize_row = 14,
-    labels_col = colnames(expression),
+    # labels_col = colnames(expression),
     labels_row = featureData[rownames(expression), "symbol"],
     show_rownames = TRUE,
     annotation_col = annotation,

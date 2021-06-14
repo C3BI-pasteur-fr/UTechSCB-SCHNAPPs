@@ -27,13 +27,18 @@ Imports:
     shinyjs,
     shinyWidgets,
     ggplotify,
+    dendsort,
     reactlog,
     ggpubr,
     dplyr,
+    glue,
+    evaluate,
+    InteractiveComplexHeatmap,
     shinydashboard,
     shinydashboardPlus
 Suggests:
     tidyverse,
+    ComplexHeatmap,
     reactlog,
     shinythemes,
     manhattanly,
