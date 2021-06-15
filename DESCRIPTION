@@ -37,7 +37,7 @@ Imports:
     shinydashboard,
     shinydashboardPlus
 Remotes: 
-    jokergoo/ComplexHeatmap
+    jokergoo/ComplexHeatmap,
     jokergoo/InteractiveComplexHeatmap
 Suggests:
     tidyverse,
