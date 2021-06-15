@@ -860,12 +860,12 @@ coE_heatmapReactive <- reactive({
   scEx_log <- scEx_log()
   projections <- projections()
   genesin <- input$coE_heatmap_geneids
-  nFindCluster <- input$coE_nFindMarker
+  nFindCluster <- isolate(input$coE_nFindMarker)
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
   projections <- projections()
-  direction <- input$coE_direction
-  lfc <- input$coE_lfc
+  direction <- isolate(input$coE_direction)
+  lfc <- isolate(input$coE_lfc)
   
   if (is.null(scEx_log) | is.null(projections)) {
     return(list(

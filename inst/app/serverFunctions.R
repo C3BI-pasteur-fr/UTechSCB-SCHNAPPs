@@ -1376,8 +1376,6 @@ heatmapModuleFunction <- function(
   orderColNames = c(), 
   sortingCols = "dendrogram",
   scale = "none",
-  pWidth = 300, # no longer used
-  pHeight = 900, # no longer used
   colPal= "none",
   minMaxVal = NULL,
   proje = NULL,

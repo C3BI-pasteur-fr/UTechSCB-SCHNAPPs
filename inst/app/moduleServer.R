@@ -1313,6 +1313,14 @@ pHeatMapModule <- function(input, output, session,
   ht_pos_obj = reactiveVal(NULL)
   myretVal = reactiveVal(NULL)
   
+  heatmapMinMaxValueDeb <- reactive(
+    input$heatmapMinMaxValue
+  ) %>% debounce(1000)
+  
+  heatmapCellGrpDeb <- reactive(
+    input$heatmapCellGrp
+  ) %>% debounce(1000)
+  
   # pHeatMapModule - pHeatMapPlot ----
   # output$pHeatMapPlot <- renderImage(deleteFile = T,
   observe({
@@ -1340,11 +1348,11 @@ pHeatMapModule <- function(input, output, session,
     scale <- input$normRow
     myns <- ns("pHeatMap")
     save2History <- input$save2History
-    pWidth <- input$heatmapWidth
-    heatmapCellGrp <- input$heatmapCellGrp
-    pHeight <- input$heatmapHeight
+    # pWidth <- input$heatmapWidth
+    heatmapCellGrp <- heatmapCellGrpDeb()
+    # pHeight <- input$heatmapHeight
     colPal <- input$colPal
-    minMaxVal <- input$heatmapMinMaxValue
+    minMaxVal <- heatmapMinMaxValueDeb()
     # maxVal <- input$heatmapMaxValue
     sampCol <- sampleCols$colPal
     ccols <- clusterCols$colPal
@@ -1380,8 +1388,6 @@ pHeatMapModule <- function(input, output, session,
       orderColNames = orderColNames,
       sortingCols = sortingCols,
       scale = scale,
-      pWidth = pWidth,
-      pHeight = pHeight,
       colPal = colPal,
       minMaxVal = minMaxVal,
       proje = proje,
@@ -1401,12 +1407,12 @@ pHeatMapModule <- function(input, output, session,
                                                          orderColNames = orderColNames,
                                                          sortingCols = sortingCols,
                                                          scale = scale,
-                                                         pWidth = pWidth,
-                                                         pHeight = pHeight,
                                                          colPal = colPal,
                                                          minMaxVal = minMaxVal,
                                                          proje = proje,
+                                                         heatmapCellGrp = heatmapCellGrp,
                                                          outfile = outfile
+                                                         
     )
     # }
     # return(retVal)
@@ -1425,7 +1431,7 @@ pHeatMapModule <- function(input, output, session,
       ht_obj(ht)
       ht_pos_obj(ht_pos)
     })
-  }) %>% debounce(1000)
+  }) 
   
   observeEvent(label = "ob54",
                eventExpr = input$heatMapGrpNameButton,{
@@ -1487,7 +1493,7 @@ pHeatMapModule <- function(input, output, session,
                  }
                  # browser()
                  newPrj = make.names(newPrj)
-                 pos = getPositionFromBrush(brush = input$heatmap_brush, 
+                 pos = getPositionFromBrush(brush = isolate(input$heatmap_brush), 
                                             ratio = 1)
                  selection = selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
                                         mark = T, ht_pos = htpos_obj, 
@@ -1513,7 +1519,7 @@ pHeatMapModule <- function(input, output, session,
                  # }
                  # colnames(newPrjs)[ncol(newPrjs)] <- newPrj
                  projectionsTable$newProjections <- newPrjs
-               }) %>% debounce(1000)
+               }) 
   
   # observer click ----
   observe( {
@@ -1575,7 +1581,7 @@ pHeatMapModule <- function(input, output, session,
     
     updateSelectInput(inputId = "orderNames", 
                       selected = c(newPrj, orderNames))
-  }) %>% debounce(1000)
+  }) 
   
   # observe brush -----
   observe( {
@@ -1597,7 +1603,7 @@ pHeatMapModule <- function(input, output, session,
     output$pHeatMapPlotSelection = renderPrint({
       print(selection)
     })
-  }) %>% debounce(1000)
+  }) 
   
   
   
@@ -1605,11 +1611,11 @@ pHeatMapModule <- function(input, output, session,
   observe(label = "ColNames", {
     if (DEBUG) cat(file = stderr(), paste0("observe: ColNames\n"))
     .schnappsEnv[[ns('ColNames')]] <- input$ColNames
-  }) %>% debounce(1000)
+  })
   observe(label = "orderNames", {
     if (DEBUG) cat(file = stderr(), paste0("observe: orderNames\n"))
     .schnappsEnv[[ns('orderNames')]] <- input$orderNames
-  }) %>% debounce(1000)
+  }) 
   
   
   # observe save 2 history ----
@@ -1686,7 +1692,7 @@ pHeatMapModule <- function(input, output, session,
     #                   choices = colnames(proje),
     #                   selected = colnames(proje)[2]
     # )
-  }) %>% debounce(1000)
+  }) 
   
   observe(label = "ob46a", {
     if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
@@ -1711,7 +1717,7 @@ pHeatMapModule <- function(input, output, session,
     #                    min = min(heatmapData$mat),
     #                    max = max(heatmapData$mat)
     # )
-  }) %>% debounce(1000)
+  }) 
   
   
   
