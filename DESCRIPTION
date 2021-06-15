@@ -36,6 +36,9 @@ Imports:
     InteractiveComplexHeatmap,
     shinydashboard,
     shinydashboardPlus
+Remotes: 
+    jokergoo/ComplexHeatmap
+    jokergoo/InteractiveComplexHeatmap
 Suggests:
     tidyverse,
     ComplexHeatmap,
