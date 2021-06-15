@@ -627,6 +627,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
       n = 6, name =
         "RdYlBu"
     ))(length(levels(prj2)))
+    names(mycolPal2) = levels(prj2)
     
     if (dbCluster[2] == "sampleNames") {
       mycolPal2 <- sampCol
@@ -659,13 +660,12 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
       meanline = list(
         visible = T
       )
-      ,
-      line = list(color=mycolPal2[[lv]]), 
-      fillcolor = mycolPal2[[lv]]
+      ,line = list(color=mycolPal2[[lv]])
+      , fillcolor = mycolPal2[[lv]]
     )
     # print(p1)
   }
-  
+ 
   p1 <- p1  %>%
     plotly::layout(
       xaxis = list(
