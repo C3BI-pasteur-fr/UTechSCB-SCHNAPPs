@@ -9,7 +9,7 @@ suppressMessages(require(BiocSingular))
 inputFileStats <- reactiveValues(stats = NULL)
 
 # store groups of cells that are defined on the fly using the modular 2D plot
-groupNames <- reactiveValues(namesDF = data.frame())
+groupNames <- reactiveValues(namesDF = data.frame()) 
 
 # colors for samples
 sampleCols <- reactiveValues(colPal = allowedColors)
