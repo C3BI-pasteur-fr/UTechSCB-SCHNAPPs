@@ -382,7 +382,7 @@ coE_topExpCCTable <- reactive({
 #' optionally creates all combinations
 coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
                                 dbCluster, coE_showPermutations = FALSE, 
-                                sampCol, ccols, showExpression = FALSE) {
+                                sampCol, ccols, showExpression = FALSE, coE_scale = "count") {
   
   
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc started.\n")
@@ -541,7 +541,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
     ggplot(projections, aes_string(prj, "coExpVal",
                                    fill = factor(projections[, dbCluster])
     )) +
-    geom_violin(scale = "count") +
+    geom_violin(scale = coE_scale) +
     scale_fill_manual(values = mycolPal, aesthetics = "fill") +
     stat_summary( # plot the centered dots
       fun = median,

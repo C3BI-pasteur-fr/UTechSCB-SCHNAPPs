@@ -187,12 +187,21 @@ tabList <- list(
              ),
              fluidRow(
                column(
-                 width = 6,
+                 width = 4,
                  checkboxInput("coE_showPermutations", "show combinations", value = defaultValue("coE_showPermutations",FALSE))
                ),
                column(
-                 width = 6,
+                 width = 4,
                  checkboxInput("coE_showExpression", "show expression values rather than count cells", value = defaultValue("coE_showExpression",FALSE))
+               ),
+               column(
+                 width = 4,
+                 selectInput(
+                 "coE_scale",
+                 label = "Scale",
+                 choices = c("area", "count", "width"),
+                 selected = defaultValue("coE_scale", "count")
+               )
                )
              ),
              fluidRow(
