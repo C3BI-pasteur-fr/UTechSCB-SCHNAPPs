@@ -169,6 +169,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   scEx_log <- scEx_log()
   geneListStr <- input$coE_geneGrpVioIds
   projectionVar <- input$coE_dimension_xVioiGrp
+  showExpression <- input$coE_showExpression
   minMaxExpr <- coeMinMax()
   coE_showPermutations <- input$coE_showPermutations
   # colPal = coE_geneGrp_vioFunc # TODO must be wrong
@@ -195,7 +196,8 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     dbCluster = projectionVar,
     coE_showPermutations = coE_showPermutations,
     sampCol = sampCol,
-    ccols = ccols
+    ccols = ccols,
+    showExpression = showExpression
   )
   
   if(is.null(retVal)) return(NULL)
@@ -225,7 +227,8 @@ output$coE_geneGrp_vio_plot <- renderPlot({
                                                  dbCluster = projectionVar,
                                                  coE_showPermutations = coE_showPermutations,
                                                  sampCol = sampCol,
-                                                 ccols = ccols
+                                                 ccols = ccols,
+                                                 showExpression = showExpression
   )
   # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
   #  exportTestValues(coE_geneGrp_vio_plot = {

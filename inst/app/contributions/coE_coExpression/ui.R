@@ -172,11 +172,27 @@ tabList <- list(
            tabPanel(
              title = "combinations", value = "permViol",
              footer = "for each cell we count how many of the genes specified have an expression larger or equal than the minimum exprssion.\nThese counts are then divided up for any variable that can be used as a factor (has less than 20 levels).",
-             
              fluidRow(
                column(
                  width = 12,
+                 div(
+                   p(
+                     "For each cell we count how many of the genes specified have an expression within the specified range.\nThese counts are then divided up for any variable that can be used as a factor (has less than 20 levels)."
+                   ),p(
+                     "show expression values allows showing a regular violin plot."
+                   ),
+                   align = "left"
+                 )
+               )
+             ),
+             fluidRow(
+               column(
+                 width = 6,
                  checkboxInput("coE_showPermutations", "show combinations", value = defaultValue("coE_showPermutations",FALSE))
+               ),
+               column(
+                 width = 6,
+                 checkboxInput("coE_showExpression", "show expression values rather than count cells", value = defaultValue("coE_showExpression",FALSE))
                )
              ),
              fluidRow(

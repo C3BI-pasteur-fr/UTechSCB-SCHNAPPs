@@ -381,7 +381,8 @@ coE_topExpCCTable <- reactive({
 #' generates a ggplot object with a violin plot
 #' optionally creates all combinations
 coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
-                                dbCluster, coE_showPermutations = FALSE, sampCol, ccols) {
+                                dbCluster, coE_showPermutations = FALSE, 
+                                sampCol, ccols, showExpression = FALSE) {
   
   
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc started.\n")
@@ -410,7 +411,18 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
-  
+ 
+   if (coE_showPermutations & showExpression) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "Please use only one of show expression and permuationas",
+        id = "nogtools",
+        type = "error",
+        duration = NULL
+      )
+    }
+    return(NULL)
+  }
   if (length(map) == 0) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
@@ -423,10 +435,23 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
     return(NULL)
   }
   
-  expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minMaxExpr[1] & 
-                                  assays(scEx)[[1]][map, , drop = F] <= minMaxExpr[2])
-  ylabText <- "number genes from list"
   
+  if(showExpression) {
+    expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F])
+    ylabText <- "sum of normalized read counts"
+    
+  } else {
+    expression <- Matrix::colSums(assays(scEx)[[1]][map, , drop = F] >= minMaxExpr[1] & 
+                                    assays(scEx)[[1]][map, , drop = F] <= minMaxExpr[2])
+    ylabText <- "number genes from list"
+  }
+  projections <- cbind(projections, coExpVal = expression)
+  permsNames <- as.character(1:max(expression))
+  
+  
+  
+  
+  # only meaningful if not showing expression values
   if (coE_showPermutations) {
     if ("gtools" %in% rownames(installed.packages())) {
       perms <- rep("", length(expression))
@@ -455,7 +480,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
       perms <- factor(as.character(perms), levels = permsNames[order(permsNum)])
       permsNames <- str_wrap(levels(perms))
       perms <- as.integer(perms)
-      projections <- cbind(projections, coExpVal = perms)
+      projections[,'coExpVal'] <- perms
     } else {
       if (!"gtools" %in% rownames(installed.packages())) {
         showNotification(
@@ -467,10 +492,9 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
       }
       return(NULL)
     }
-  } else {
-    projections <- cbind(projections, coExpVal = expression)
-    permsNames <- as.character(1:max(expression))
   }
+  
+  
   prj <- factor(projections[, dbCluster])
   mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
     n = 6, name =
@@ -544,6 +568,10 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
     scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames))
   
   # p1 <- ggplotly(p1)
+  p1
+  
+  
+  
   return(p1)
 }
 
@@ -665,7 +693,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
     )
     # print(p1)
   }
- 
+  
   p1 <- p1  %>%
     plotly::layout(
       xaxis = list(
@@ -819,7 +847,7 @@ coE_updateInputXviolinPlot <- observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_updateInputXviolinPlot", id = "coE_updateInputXviolinPlot", duration = NULL)
   }
- 
+  
   tsneData <- projections()
   projFactors <- projFactors()
   # Can use character(0) to remove all choices
