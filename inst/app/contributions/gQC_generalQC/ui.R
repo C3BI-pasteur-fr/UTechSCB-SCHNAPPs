@@ -126,7 +126,8 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "WIND", width = 12, value = "gQC_wind",
-           tags$p("from WIND package compute hierachy of projection"),
+           tags$p("from WIND package compute hierachy of projection (https://github.com/haowulab/Wind)"),
+           tags$p("to compute weighted normalized mutual information (wNMI) and weighted Rand index (wRI) to evaluate the clustering results by comparing a clustering output with a reference which has a hierarchical structure."),
            br(),
            fluidRow(
              column(
