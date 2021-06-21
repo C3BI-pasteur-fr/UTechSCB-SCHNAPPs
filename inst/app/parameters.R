@@ -21,21 +21,21 @@ allTabs[[length(allTabs) + 1]] <- list(
       )),
       br(),
       # tabBox(title = "modify colors", width = 12, id = "modCols",
-             uiOutput("ColorSelection")
-             # tabPanel(
-             #   title = "Sample", solidHeader = TRUE, width = 12, value = "SampleColorPanel",
-             #   fluidRow(
-             #     column(
-             #       width = 6,
-             #       uiOutput("sampleColorSelection")
-             #     ))),
-             # tabPanel(
-             #   title = "Cluster", solidHeader = TRUE, width = 12, value = "ClusterColorPanel",
-             #   fluidRow(
-             #     column(
-             #       width = 6,
-             #       uiOutput("clusterColorSelection")
-             #     )))
+      uiOutput("ColorSelection")
+      # tabPanel(
+      #   title = "Sample", solidHeader = TRUE, width = 12, value = "SampleColorPanel",
+      #   fluidRow(
+      #     column(
+      #       width = 6,
+      #       uiOutput("sampleColorSelection")
+      #     ))),
+      # tabPanel(
+      #   title = "Cluster", solidHeader = TRUE, width = 12, value = "ClusterColorPanel",
+      #   fluidRow(
+      #     column(
+      #       width = 6,
+      #       uiOutput("clusterColorSelection")
+      #     )))
       # )
     ),
     checkbsTT(item = "updateColors"),

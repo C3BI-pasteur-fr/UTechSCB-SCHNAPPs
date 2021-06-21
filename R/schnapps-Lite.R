@@ -92,7 +92,7 @@ schnappsLite <- function(data="RdataFile",
   
   nCells = length(colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx))
   if (nCells > maxCells){
-    cellIdx = unique(sort(sample(nCells, maxCells)))
+    cellIdx = unique(sort(base::sample(nCells, maxCells)))
     cells2keep = colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx)[cellIdx]
     for (na in names(.schnappsEnv$.SCHNAPPs_LiteData)){
       if (na == "pca") {

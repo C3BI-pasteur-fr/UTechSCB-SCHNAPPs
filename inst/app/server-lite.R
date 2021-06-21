@@ -1,5 +1,6 @@
 
 scShinyServer <- shinyServer(function(input, output, session) {
+  base::cat(file = stderr(), "------ ShinyServer LITE running\n")
   session$onSessionEnded(function () {
     if (!is.null(x = .schnappsEnv$historyPath)) {
       cat(file = stderr(), paste("removing: ", .schnappsEnv$historyPath ))
@@ -37,7 +38,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   )
   
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
-  
+  cat(file = stderr(), "HALL============================\n")
   ### history setup
   if (exists("historyPath", envir = .schnappsEnv)) {
     if (!is.null(x = .schnappsEnv$historyPath)) {
@@ -214,8 +215,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
   
   # overwrite all reactives not needed or modified
   base::source(paste0(packagePath, "/reactives-lite.R"), local = TRUE)
-  
-  
+  cat(file = stderr(), "HALL============================\n")
+  # browser()
   .schnappsEnv$projectionFunctions <- projectionFunctions
   
   # overwrite reactives that should not be calculatated anymore
@@ -224,6 +225,48 @@ scShinyServer <- shinyServer(function(input, output, session) {
       assign(.schnappsEnv$projectionFunctions[[idx]][2],  as.function(alist(.schnappsEnv$.SCHNAPPs_LiteData[[projectionFunctions[[idx]][2]]])))
     }
   }
+  
+  # Scater QC ----
+  output$DE_scaterQC <- renderImage(deleteFile = F, {
+    start.time <- base::Sys.time()
+    on.exit(
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "DE_scaterQC")
+      }
+    )
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("DE_scaterQC", id = "DE_scaterQC", duration = NULL)
+    }
+    if (DEBUG) cat(file = stderr(), "output$DE_scaterQC\n")
+    scaterReads <- scaterReads()
+    if (is.null(scaterReads)) {
+      return(list(
+        src = "",
+        contentType = "image/png",
+        width = 10,
+        height = 10,
+        alt = "Scater plot will be here when 'run scater' is checked"
+      ))
+    }
+    
+    DE_scaterPNG()
+  })
+  
+  # introRMD ----
+  output$introRMD <- renderUI({
+    cat(file = stderr(), paste("wd:", getwd(), "\n"))
+    introFile = 'intro.Rmd'
+    if (!file.exists(introFile)) return(HTML("introduction file intro.Rmd is missing"))
+    HTML(markdown::markdownToHTML(knit(introFile, quiet = TRUE), fragment.only = T))
+    # includeHTML("intro.html")
+  })
+  
+  # colors for samples ----
+  sampleCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$sampleCol)
+  
+  # colors for clusters ----
+  clusterCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$clusterCol)
+  
   
 }) # END SERVER
 

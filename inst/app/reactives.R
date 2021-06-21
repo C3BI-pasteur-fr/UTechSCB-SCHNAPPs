@@ -2681,7 +2681,7 @@ initializeGroupNames <- reactive({
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/initializeGroupNames.RData", list = c(ls()))
     }
-    # load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
+    # cp = load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
     # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
     # this will invalidate all previous selections.
     if (rlang::is_empty(grpNs) | !all(colnames(scEx) %in% rownames(grpNs))) {
@@ -2951,7 +2951,7 @@ umiCount <- reactive({
 # sampleInfoFunc ----
 sampleInfoFunc <- function(scEx) {
   # gsub(".*-(.*)", "\\1", scEx$barcode)
-  colData(scEx)$sampleNames
+  factor(colData(scEx)$sampleNames)
 }
 
 

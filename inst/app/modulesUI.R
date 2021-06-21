@@ -288,7 +288,7 @@ pHeatMapUI <- function(id) {
               label = "number of cell groups",
               min = 2,
               max = 1000,
-              value = defaultValue(ns("heatmapMinMaxValue"), 2)
+              value = defaultValue(ns("heatmapCellGrp"), 2)
             )
           )
         ),

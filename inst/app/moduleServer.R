@@ -1364,7 +1364,7 @@ pHeatMapModule <- function(input, output, session,
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
       save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", 
-           list = c(ls(), "heatmapData", "input", "output",  "pheatmapList"))
+           list = c(ls()))
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
     }
     # cp = load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
