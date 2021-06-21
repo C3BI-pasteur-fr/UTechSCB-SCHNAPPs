@@ -1398,9 +1398,9 @@ heatmapModuleFunction <- function(
     # ))
   }
   if(is.null(minMaxVal)) minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat))
-  # if (.schnappsEnv$DEBUGSAVE) {
+  if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
-  # }
+  }
   # cp =load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
   # require(heatmaply)
   # if (is.null(pWidth)) {
@@ -1642,6 +1642,20 @@ loadLiteData <- function(fileName = NULL) {
   assays(counts)[["logcounts"]] = NULL
   logcounts = scEx
   assays(logcounts)[["counts"]] = NULL
+  if (!exists("ccol")){
+    # cluster colors
+    inCols <- list()
+    lev <- levels(dbCluster)
+    inCols <- allowedColors[1:length(lev)]
+    names(inCols) <- lev
+    ccol <- unlist(inCols)
+  }
+  projections$sampleNames = factor(projections$sampleNames)
+  if (!exists("scol")) {
+    sampNames = levels(projections$sampleNames)
+    scol <- rev(allowedColors)[seq_along(sampNames)]
+    names(scol) <- sampNames
+  }
   # pcaReact = reducedDims(scEx)[["PCA"]] # now stored separately
   returnList = list(scEx = counts, scEx_log = logcounts, pcaReact = pcaReact, projections = projections, dbCluster = dbCluster, clusterCol = ccol, sampleCol = scol)
   for (va in cp[!cp %in% c("scEx", "pcaReact", "ccol", "scol")]) {
@@ -1657,12 +1671,12 @@ loadLiteData <- function(fileName = NULL) {
 # defaultValue
 # get a value that has been supplied as a parameter or return the default value val.
 defaultValue <- function(param = "coEtgMinExpr", val ) {
-  if (DEBUG) cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
+  # if (DEBUG) cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
   # browser()
   if (!exists(".schnappsEnv")) return (val)
   if (exists(envir = .schnappsEnv, x = "defaultValues")) {
     if ( param %in% names(.schnappsEnv$defaultValues)) {
-      if (.schnappsEnv$DEBUG) cat(file = stderr(), paste( "value: ", str(.schnappsEnv$defaultValues[[param]]), "\n"))
+      # if (.schnappsEnv$DEBUG) cat(file = stderr(), paste( "value: ", str(.schnappsEnv$defaultValues[[param]]), "\n"))
       return(.schnappsEnv$defaultValues[[param]])
     }
   } 

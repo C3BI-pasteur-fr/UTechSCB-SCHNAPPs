@@ -62,17 +62,14 @@ if (!AllowClustering)
     # data. Here we ensure that everything is loaded and all varialbles are set by waiting
     # input data being loaded
     scEx <- scEx()
+    
     # pca is already fixed in the calculation so we don't need to recalculate it.
-    pcaReact <- NULL
+    # pcaReact <- NULL
     
     # in schnapps-lite we are only interested in adding the sessionProjections
     # to the already calculated other projections
     prjs <- sessionProjections$prjs
     newPrjs <- projectionsTable$newProjections
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls()))
-    }
-    # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
     if (!exists("scEx") |
         is.null(scEx)) {
       if (DEBUG) {
@@ -83,7 +80,7 @@ if (!AllowClustering)
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls()))
     }
-    # load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
+    # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
     
     
     # browser()
@@ -200,11 +197,6 @@ if (!AllowClustering)
     return(projections)
   })
 
-# colors for samples ----
-sampleCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$sampleCol)
-
-# colors for clusters ----
-clusterCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$clusterCol)
 
 # DE_scaterPNG ----
 #' DE_scaterPNG
@@ -328,39 +320,6 @@ DE_scaterPNG <- reactive({
     retVal
   })
   return(retVal)
-})
-
-# Scater QC ----
-output$DE_scaterQC <- renderImage(deleteFile = F, {
-  start.time <- base::Sys.time()
-  on.exit(
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "DE_scaterQC")
-    }
-  )
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("DE_scaterQC", id = "DE_scaterQC", duration = NULL)
-  }
-  if (DEBUG) cat(file = stderr(), "output$DE_scaterQC\n")
-  scaterReads <- scaterReads()
-  if (is.null(scaterReads)) {
-    return(list(
-      src = "",
-      contentType = "image/png",
-      width = 10,
-      height = 10,
-      alt = "Scater plot will be here when 'run scater' is checked"
-    ))
-  }
-  
-  DE_scaterPNG()
-})
-
-# introRMD ----
-output$introRMD <- renderUI({
-  cat(file = stderr(), paste("wd:", getwd(), "\n"))
-  HTML(markdown::markdownToHTML(knit('intro.Rmd', quiet = TRUE), fragment.only = T))
-  # includeHTML("intro.html")
 })
 
 # groupNames ----
