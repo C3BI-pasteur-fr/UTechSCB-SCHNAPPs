@@ -39,7 +39,8 @@ Imports:
 Remotes: 
     jokergoo/ComplexHeatmap,
     jokergoo/InteractiveComplexHeatmap,
-    haowulab/Wind
+    haowulab/Wind,
+    renozao/xbioc
 Suggests:
     tidyverse,
     ComplexHeatmap,
@@ -61,7 +62,6 @@ Suggests:
     Hmisc,
     orca,
     debugme,
-    xbioc,
     shinyBS,
     testthat (>= 3.0.0)
 RoxygenNote: 7.1.1
