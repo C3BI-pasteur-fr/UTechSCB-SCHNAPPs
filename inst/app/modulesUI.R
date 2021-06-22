@@ -198,11 +198,17 @@ pHeatMapUI <- function(id) {
       fluidRow(
         column(
           width = 12,
-          jqui_resizable(plotOutput(ns("pHeatMapPlot"),
-                                    # height = "auto",
-                                    brush = brushOpts(id = "crh1")
-          ), options = list(width = "99%"))
-        )
+          # jqui_resizable(plotOutput(ns("pHeatMapPlot"),
+          #                           # height = "auto",
+          #                           brush = brushOpts(id = "crh1")
+          # ), options = list(width = "99%"))
+          # originalHeatmapOutput(heatmap_id = ns("pHeatMapPlot"), title = NULL) %>% jqui_resizable()
+          plotOutput(ns("pHeatMapPlot"), click = ns("heatmap_click"), 
+                     brush = ns("heatmap_brush")) %>% jqui_resizable()
+        )),
+      fluidRow(
+        column(width = 12,
+               verbatimTextOutput(ns("pHeatMapPlotSelection")))
       ),
       shinydashboard::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
@@ -211,7 +217,14 @@ pHeatMapUI <- function(id) {
           column(
             width = 12,
             # checkboxInput(ns("moreOptions"), "show more options", FALSE),
-            checkboxInput(ns("showColTree"), label = "Show tree for cells", value = defaultValue(ns("showColTree"),FALSE)),
+            # checkboxInput(ns("showColTree"), label = "Show tree for cells", value = defaultValue(ns("showColTree"),FALSE)),
+            selectInput(
+              ns("sortingCols"),
+              label = "order columns by",
+              choices = c("dendrogram", "list", "gene (click)"),
+              selected = defaultValue(ns("sortingCols"), "dendrogram"),
+              multiple = FALSE
+            )
           )
         ),
         fluidRow(
@@ -247,18 +260,20 @@ pHeatMapUI <- function(id) {
           ),
           column(
             width = 6,
-            numericInput(
-              ns("heatmapWidth"),
-              label = "width of image in pixel",
-              min = 100, max = 20000, step = 10,
-              value = defaultValue(ns("heatmapWidth"),800)
-            ),
-            numericInput(
-              ns("heatmapHeight"),
-              label = "height of image in pixel",
-              min = 200, max = 20000, step = 10,
-              value = defaultValue(ns("heatmapHeight"), 300)
-            ),
+            # numericInput(
+            #   ns("heatmapWidth"),
+            #   label = "width of image in pixel",
+            #   min = 100, max = 20000, step = 10,
+            #   value = defaultValue(ns("heatmapWidth"),800)
+            # ),
+            # numericInput(
+            #   ns("heatmapHeight"),
+            #   label = "height of image in pixel",
+            #   min = 200, max = 20000, step = 10,
+            #   value = defaultValue(ns("heatmapHeight"), 300)
+            # ),
+            textInput(ns("heatMapGrpName"),"name of selected cells"),
+            actionButton(ns("heatMapGrpNameButton"),"create projection"),
             selectInput(
               ns("colPal"),
               label = "color palette to choose from",
@@ -267,15 +282,14 @@ pHeatMapUI <- function(id) {
                           "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
               selected = defaultValue(ns("colPal"), "none"),
               multiple = FALSE
+            ),
+            sliderInput(
+              ns("heatmapCellGrp"),
+              label = "number of cell groups",
+              min = 2,
+              max = 1000,
+              value = defaultValue(ns("heatmapCellGrp"), 2)
             )
-            # ,
-            # numericInput(
-            #   ns("heatmapMaxValue"),
-            #   label = "max value for heatmap",
-            #   min = -1,
-            #   max = 1,
-            #   value = 0
-            # )
           )
         ),
         

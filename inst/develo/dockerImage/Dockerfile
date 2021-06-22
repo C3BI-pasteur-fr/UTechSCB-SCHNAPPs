@@ -45,7 +45,8 @@ RUN apt-get update && apt-get install -y \
     xtail \
     libgsl-dev \
     libhdf5-serial-dev \
-    wget
+    wget \
+    libcairo2-dev
 
 # # Download and install shiny server
 RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION -O "version.txt" && \
@@ -72,6 +73,7 @@ RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN', dependencies 
     R -e "install.packages(c('forcats', 'kohonen', 'SCORPIUS', 'shinyBS', 'threejs', 'DT', 'shinythemes'))"
 RUN R -e "devtools::install_github('Albluca/distutils') " && \
     R -e "devtools::install_github('Albluca/ElPiGraph.R')" && \
+    R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))" && \
     R -e "BiocManager::install('BiocParallel')" && \
     R -e "remotes::install_github('briatte/ggnetwork')"
  

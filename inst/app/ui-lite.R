@@ -39,37 +39,40 @@ if (!exists('AllowClustering')) {
   if (DEBUG) cat(file = stderr(), "ui-lite: AllowClustering not defined\n")
 }
 
-if (!AllowClustering){
-  clusterParametersTab <<- function(){
-    shinydashboard::tabItem(
-      "clusterParameters",
-      fluidRow(div(h2("General parameters"), align = "center")),
-      br(),
-      shinydashboard::box(
-        title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
-        collapsible = F, collapsed = F,
-        fluidRow(column(
-          width = 12, offset = 1,
-          actionButton("updateColors", "apply changes", width = "80%")
-        )),
-        br(),
-        fluidRow(
-          column(
-            width = 6,
-            uiOutput("sampleColorSelection")
-          ),
-          column(
-            width = 6,
-            uiOutput("clusterColorSelection")
-          )
-        )
-      ),
-      checkbsTT(item = "updateColors"),
-      checkbsTT(item = "sampleColorSelection"),
-      checkbsTT(item = "clusterColorSelection")
-    )
-  }
-}
+# if (!AllowClustering){
+#   # clusterParametersTab <<- function(){
+#     shinydashboard::tabItem(
+#       "clusterParameters",
+#       fluidRow(div(h2("General parameters"), align = "center")),
+#       br(),
+#       shinydashboard::box(
+#         title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
+#         collapsible = F, collapsed = F,
+#         fluidRow(column(
+#           width = 12, offset = 1,
+#           actionButton("updateColors", "apply changes", width = "80%")
+#         )),
+#         br(),
+#         fluidRow(
+#           column(
+#             width = 6,
+#             uiOutput("sampleColorSelection")
+#           ),
+#           column(
+#             width = 6,
+#             uiOutput("clusterColorSelection")
+#           )
+#         ),
+#         br(),
+#         # tabBox(title = "modify colors", width = 12, id = "modCols",
+#         # uiOutput("ColorSelection")
+#       ),
+#       checkbsTT(item = "updateColors"),
+#       checkbsTT(item = "sampleColorSelection"),
+#       checkbsTT(item = "clusterColorSelection")
+#     )
+#   }
+# }
 
 base::source(paste0(packagePath, "/serverFunctions.R"))
 
@@ -113,11 +116,11 @@ scShinyUI <- function(request) {
   }
   parameterItems <- list(
     
-    shinydashboard::menuSubItem("General Parameters", tabName = "clusterParameters"),
+    shinydashboard::menuSubItem("General Parameters", tabName = "genParams"),
     shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
   )
   
-  
+
   
   # general tabs
   allTabs <- list(
@@ -136,8 +139,9 @@ scShinyUI <- function(request) {
                              tabName = "Intro", icon = icon("dashboard")
     ),
     shinydashboard::menuItem("Parameters",
-                             # id="parametersID",
                              tabName = "parameters", icon = icon("gopuram")
+                             ,
+                             parameterItems
     )
     # ,
     # shinydashboard::menuItem("rename projections",
@@ -230,7 +234,7 @@ scShinyUI <- function(request) {
         downloadButton("RDSsave", "Download RData", class = "butt"),
         br(),
         downloadButton("RmdSave", "Download History", class = "butt"),
-        if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
+        if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
         if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
         if (exists("historyPath", envir = .schnappsEnv)){
           br()

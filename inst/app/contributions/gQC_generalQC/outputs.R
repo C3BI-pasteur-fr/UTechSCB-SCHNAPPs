@@ -484,7 +484,7 @@ output$gQC_orgLevels = renderText({
   shiny::req(projections)
   if (! rnProj %in% colnames(projections)) return(NULL)
   # browser()
-  paste(levels(projections[,rnProj]), collapse = ", ")
+  paste(levels(factor(projections[,rnProj])), collapse = ", ")
 })
 
 # rename projection levels ----
@@ -566,8 +566,10 @@ observeEvent(eventExpr = input$gQC_rnProj,
                shiny::req(rnProj)
                shiny::req(projections)
                if (! rnProj %in% colnames(projections)) return(NULL)
+
                # browser()
-               updateTextAreaInput(session, inputId = "gQC_renameLev", value = paste(levels(projections[,rnProj]), collapse = ", "))
+               updateTextAreaInput(session, inputId = "gQC_renameLev", value = paste(as.character(levels(factor(projections[,rnProj]))), 
+                                                                                     collapse = ", "))
              })
 
 

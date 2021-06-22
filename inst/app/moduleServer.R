@@ -7,6 +7,8 @@ suppressMessages(library(psychTools))
 suppressMessages(library(magrittr))
 suppressMessages(library(plyr))
 suppressMessages(library(dplyr))
+suppressMessages(library(ComplexHeatmap))
+suppressMessages(library(InteractiveComplexHeatmap))
 require(psychTools)
 
 #' clusterServer
@@ -697,7 +699,7 @@ clusterServer <- function(input, output, session,
         comColPrjs = which(colnames(prjs) %in% colnames(grpNs) )
         # didn't find a way to easily overwrite columns
         # we need to add 1 to comColPrjs because tibble added rownames column 
-        prjs[rownames(grpNs), comColPrjs] = grpNs[, comColPrjs]
+        prjs[rownames(grpNs), comColPrjs] = grpNs[, colnames(prjs)[comColPrjs]]
         
         newColsGrpns = which(!colnames(grpNs) %in% colnames(prjs))
         if(length(newColsGrpns) > 0) {
@@ -1293,13 +1295,318 @@ tableSelectionServer <- function(input, output, session,
 }
 
 
+
+
 pHeatMapModule <- function(input, output, session,
                            pheatmapList # list with arguments for pheatmap
 ) {
+  require(glue)
+  require(evaluate)
   if (DEBUG) cat(file = stderr(), paste("pHeatMapModule", session$ns("test"), "\n"))
   ns <- session$ns
-  
+  # browser()
   outfilePH <- NULL
+  
+  
+  
+  ht_obj = reactiveVal(NULL)
+  ht_pos_obj = reactiveVal(NULL)
+  myretVal = reactiveVal(NULL)
+  
+  heatmapMinMaxValueDeb <- reactive(
+    input$heatmapMinMaxValue
+  ) %>% debounce(1000)
+  
+  heatmapCellGrpDeb <- reactive(
+    input$heatmapCellGrp
+  ) %>% debounce(1000)
+  
+  # pHeatMapModule - pHeatMapPlot ----
+  # output$pHeatMapPlot <- renderImage(deleteFile = T,
+  observe({
+    if (DEBUG) cat(file = stderr(), "pHeatMapPlot started.\n")
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "pHeatMapPlot")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "pHeatMapPlot")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("pHeatMapPlot", id = "pHeatMapPlot", duration = NULL)
+    }
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "pHeatMapPlotWARNING")
+    }
+    
+    ns <- session$ns
+    heatmapData <- pheatmapList()
+    addColNames <- input$ColNames
+    orderColNames <- input$orderNames
+    # moreOptions <- input$moreOptions
+    sortingCols <- input$sortingCols
+    scale <- input$normRow
+    myns <- ns("pHeatMap")
+    save2History <- input$save2History
+    # pWidth <- input$heatmapWidth
+    heatmapCellGrp <- heatmapCellGrpDeb()
+    # pHeight <- input$heatmapHeight
+    colPal <- input$colPal
+    minMaxVal <- heatmapMinMaxValueDeb()
+    # maxVal <- input$heatmapMaxValue
+    sampCol <- sampleCols$colPal
+    ccols <- clusterCols$colPal
+    # force redraw
+    input$pHeatMapPlot__shinyjquiBookmarkState__resizable$width
+    input$pHeatMapPlot__shinyjquiBookmarkState__resizable$height
+    proje <- projections()
+    if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
+    if (.schnappsEnv$DEBUGSAVE) {
+      cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
+      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", 
+           list = c(ls()))
+      cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
+    }
+    # cp = load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
+    outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
+    outfile <- normalizePath(outfile, mustWork = FALSE)
+    if (!"annotation_colors" %in% names(heatmapData)) {
+      heatmapData$annotation_colors = list()
+    }
+    if (!"sampleNames" %in% names(heatmapData$annotation_colors)) {
+      heatmapData$annotation_colors$sampleNames = sampCol
+    }
+    if (!"dbCluster" %in% names(heatmapData$annotation_colors)) {
+      heatmapData$annotation_colors$dbCluster = ccols
+    }
+    updateSliderInput(session = session, inputId = "heatmapCellGrp",
+                      max = min(200,ncol(heatmapData$mat)-1))
+    
+    retVal <- heatmapModuleFunction(
+      heatmapData = heatmapData,
+      addColNames = addColNames,
+      orderColNames = orderColNames,
+      sortingCols = sortingCols,
+      scale = scale,
+      colPal = colPal,
+      minMaxVal = minMaxVal,
+      proje = proje,
+      heatmapCellGrp = heatmapCellGrp,
+      outfile = outfile
+    )
+    myretVal(retVal)
+    # if (retVal[["src"]] == "empty.png") {
+    #   .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
+    # } else {
+    af = heatmapModuleFunction
+    # remove env because it is too big
+    environment(af) = new.env(parent = emptyenv())
+    .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
+                                                         heatmapData = heatmapData,
+                                                         addColNames = addColNames,
+                                                         orderColNames = orderColNames,
+                                                         sortingCols = sortingCols,
+                                                         scale = scale,
+                                                         colPal = colPal,
+                                                         minMaxVal = minMaxVal,
+                                                         proje = proje,
+                                                         heatmapCellGrp = heatmapCellGrp,
+                                                         outfile = outfile
+                                                         
+    )
+    # }
+    # return(retVal)
+    # browser()
+    
+    output$pHeatMapPlot = renderPlot({
+      cat(file = stderr(), "output$pHeatMapModule:rendering\n")
+      if (is.null(retVal)){
+        cat(file = stderr(), "output$pHeatMapModule:renderingNULL\n")
+        return(NULL)
+      }
+      # browser()
+      ht = ComplexHeatmap::draw(retVal)
+      ht_pos = htPositionsOnDevice(ht, include_annotation = FALSE, calibrate = FALSE)
+      cat(file = stderr(), glue_collapse(list_components(), sep="\n"))
+      ht_obj(ht)
+      ht_pos_obj(ht_pos)
+    })
+  }) 
+  
+  observeEvent(label = "ob54",
+               eventExpr = input$heatMapGrpNameButton,{
+                 if (DEBUG) cat(file = stderr(), "observe input$heatMapGrpNameButton \n")
+                 start.time <- base::Sys.time()
+                 on.exit({
+                   printTimeEnd(start.time, "observe input$heatMapGrpNameButton")
+                   if (!is.null(getDefaultReactiveDomain())) {
+                     removeNotification(id = "input-heatMapGrpNameButton")
+                   }
+                 })
+                 if (!is.null(getDefaultReactiveDomain())) {
+                   showNotification("observe: heatMapGrpNameButton", 
+                                    id = "input-heatMapGrpNameButton", duration = NULL)
+                 }
+                 
+                 heatmap_brush =  isolate(input$heatmap_brush)
+                 newPrj = isolate(input$heatMapGrpName)
+                 htobj = ht_obj()
+                 htpos_obj = ht_pos_obj()
+                 projections <- projections()
+                 newPrjs <- projectionsTable$newProjections
+                 acn = allCellNames()
+                 htDat = myretVal()
+                 
+                 if (is.null(projections)) return(NULL)
+                 if (is.null(htDat)) return(NULL)
+                 
+                 if (.schnappsEnv$DEBUGSAVE) {
+                   save(
+                     file = "~/SCHNAPPsDebug/heatMapGrpNameButton.RData",
+                     list = ls()
+                   )
+                 }
+                 # cp = load(file="~/SCHNAPPsDebug/heatMapGrpNameButton.RData")
+                 if (is.null(heatmap_brush)) {
+                   showNotification(
+                     "No cells selected",
+                     type = "error",
+                     duration = NULL
+                   )
+                   return(NULL)
+                 }
+                 if (str_length(newPrj)<1) {
+                   showNotification(
+                     "New column name not set",
+                     type = "error",
+                     duration = NULL
+                   )
+                   return(NULL)
+                 }
+                 if (newPrj %in% colnames(projections)) {
+                   showNotification(
+                     "New column name already used",
+                     type = "error",
+                     duration = NULL
+                   )
+                   return(NULL)
+                 }
+                 # browser()
+                 newPrj = make.names(newPrj)
+                 pos = getPositionFromBrush(brush = isolate(input$heatmap_brush), 
+                                            ratio = 1)
+                 selection = selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
+                                        mark = T, ht_pos = htpos_obj, 
+                                        verbose = T, calibrate = FALSE)
+                 addPrj = rep(FALSE, nrow(projections))
+                 names(addPrj) = rownames(projections)
+                 addPrj[colnames(htDat@ht_list[[1]]@matrix)[unlist(selection$column_index)]] = TRUE
+                 # 
+                 if (ncol(newPrjs) == 0) {
+                   newPrjs = data.frame(row.names = acn)
+                 }
+                 newPrjs[,newPrj] = FALSE
+                 newPrjs[names(addPrj),newPrj] <- addPrj
+                 # } else {
+                 #   # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, addPrj, drop = FALSE])
+                 #   # browser()
+                 #   newPrjs <- dplyr::left_join(
+                 #     tibble::rownames_to_column(newPrjs),
+                 #     tibble::rownames_to_column(projections[, addPrj, drop = FALSE]),
+                 #     by='rowname')
+                 #   rownames(newPrjs) = newPrjs[,1]
+                 #   newPrjs = newPrjs[,-1]
+                 # }
+                 # colnames(newPrjs)[ncol(newPrjs)] <- newPrj
+                 projectionsTable$newProjections <- newPrjs
+               }) 
+  
+  # observer click ----
+  observe( {
+    heatmap_click = input$heatmap_click
+    htobj = ht_obj()
+    htpos_obj = ht_pos_obj()
+    projections <- projections()
+    newPrjs <- isolate(projectionsTable$newProjections)
+    acn = allCellNames()
+    htDat = myretVal()
+    scEx_log = scEx_log()
+    orderNames = isolate(input$orderNames)
+    if(is.null(input$heatmap_click)) return(NULL)
+    if(is.null(scEx_log)) return(NULL)
+    pos = getPositionFromClick(click = input$heatmap_click, 
+                               ratio = 1)
+    if(is.null(pos)) return(NULL)
+    # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
+    # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
+    
+    selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
+                               verbose = T, calibrate = FALSE)
+    
+    if (is.null(projections)) return(NULL)
+    if (is.null(htDat)) return(NULL)
+    
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(
+        file = "~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData",
+        list = ls()
+      )
+    }
+    # cp = load(file="~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData")
+    output$pHeatMapPlotSelection = renderPrint({
+      print(selection)
+    })
+    
+    if (!input$sortingCols == "gene (click)") return(NULL)
+    
+    if (is.null(heatmap_click)) {
+      showNotification(
+        "No cells selected",
+        type = "error",
+        duration = NULL
+      )
+      return(NULL)
+    }
+    
+    # browser()
+    
+    if (ncol(newPrjs) == 0) {
+      newPrjs = data.frame(row.names = acn)
+    }
+    # unlist(selection$row_index)
+    geneName = rowData(scEx_log)[rownames(htDat@ht_list[[1]]@matrix)[selection$row_index],"symbol"]
+    newPrj = make.names(geneName)
+    newPrjs[colnames(htDat@ht_list[[1]]@matrix),newPrj] <- htDat@ht_list[[1]]@matrix[selection$row_index,]
+    projectionsTable$newProjections <- newPrjs
+    
+    updateSelectInput(inputId = "orderNames", 
+                      selected = c(newPrj, orderNames))
+  }) 
+  
+  # observe brush -----
+  observe( {
+    heatmap_brush = input$heatmap_brush
+    htobj = ht_obj()
+    htpos_obj = ht_pos_obj()
+    
+    if(is.null(input$heatmap_brush)) return(NULL)
+    pos = getPositionFromBrush(brush = input$heatmap_brush, 
+                               ratio = 1)
+    if(is.null(pos)) return(NULL)
+    # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
+    # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
+    
+    selection = selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
+                           mark = T, ht_pos = htpos_obj, 
+                           verbose = T, calibrate = FALSE)
+    
+    output$pHeatMapPlotSelection = renderPrint({
+      print(selection)
+    })
+  }) 
+  
+  
+  
   
   observe(label = "ColNames", {
     if (DEBUG) cat(file = stderr(), paste0("observe: ColNames\n"))
@@ -1308,7 +1615,7 @@ pHeatMapModule <- function(input, output, session,
   observe(label = "orderNames", {
     if (DEBUG) cat(file = stderr(), paste0("observe: orderNames\n"))
     .schnappsEnv[[ns('orderNames')]] <- input$orderNames
-  })
+  }) 
   
   
   # observe save 2 history ----
@@ -1385,7 +1692,7 @@ pHeatMapModule <- function(input, output, session,
     #                   choices = colnames(proje),
     #                   selected = colnames(proje)[2]
     # )
-  })
+  }) 
   
   observe(label = "ob46a", {
     if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
@@ -1410,102 +1717,10 @@ pHeatMapModule <- function(input, output, session,
     #                    min = min(heatmapData$mat),
     #                    max = max(heatmapData$mat)
     # )
-  })
+  }) 
   
-  # pHeatMapModule - pHeatMapPlot ----
-  output$pHeatMapPlot <- renderImage(deleteFile = T,
-                                     {
-                                       if (DEBUG) cat(file = stderr(), "pHeatMapPlot started.\n")
-                                       start.time <- base::Sys.time()
-                                       on.exit({
-                                         printTimeEnd(start.time, "pHeatMapPlot")
-                                         if (!is.null(getDefaultReactiveDomain())) {
-                                           removeNotification(id = "pHeatMapPlot")
-                                         }
-                                       })
-                                       if (!is.null(getDefaultReactiveDomain())) {
-                                         showNotification("pHeatMapPlot", id = "pHeatMapPlot", duration = NULL)
-                                       }
-                                       if (!is.null(getDefaultReactiveDomain())) {
-                                         removeNotification(id = "pHeatMapPlotWARNING")
-                                       }
-                                       
-                                       ns <- session$ns
-                                       heatmapData <- pheatmapList()
-                                       addColNames <- input$ColNames
-                                       orderColNames <- input$orderNames
-                                       # moreOptions <- input$moreOptions
-                                       colTree <- input$showColTree
-                                       scale <- input$normRow
-                                       myns <- ns("pHeatMap")
-                                       save2History <- input$save2History
-                                       pWidth <- input$heatmapWidth
-                                       pHeight <- input$heatmapHeight
-                                       colPal <- input$colPal
-                                       minMaxVal <- input$heatmapMinMaxValue
-                                       # maxVal <- input$heatmapMaxValue
-                                       sampCol <- sampleCols$colPal
-                                       ccols <- clusterCols$colPal
-                                       
-                                       proje <- projections()
-                                       if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
-                                       if (.schnappsEnv$DEBUGSAVE) {
-                                         cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
-                                         save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", 
-                                              list = c(ls(), "heatmapData", "input", "output",  "pheatmapList"))
-                                         cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
-                                       }
-                                       # cp = load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
-                                       outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
-                                       outfile <- normalizePath(outfile, mustWork = FALSE)
-                                       
-                                       if (!"annotation_colors" %in% names(heatmapData)) {
-                                         heatmapData$annotation_colors = list()
-                                       }
-                                       if (!"sampleNames" %in% names(heatmapData$annotation_colors)) {
-                                         heatmapData$annotation_colors$sampleNames = sampCol
-                                       }
-                                       if (!"dbCluster" %in% names(heatmapData$annotation_colors)) {
-                                         heatmapData$annotation_colors$dbCluster = ccols
-                                       }
-                                       
-                                       
-                                       retVal <- heatmapModuleFunction(
-                                         heatmapData = heatmapData,
-                                         addColNames = addColNames,
-                                         orderColNames = orderColNames,
-                                         colTree = colTree,
-                                         scale = scale,
-                                         pWidth = pWidth,
-                                         pHeight = pHeight,
-                                         colPal = colPal,
-                                         minMaxVal = minMaxVal,
-                                         proje = proje,
-                                         outfile = outfile
-                                       )
-                                       
-                                       if (retVal[["src"]] == "empty.png") {
-                                         .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
-                                       } else {
-                                         af = heatmapModuleFunction
-                                         # remove env because it is too big
-                                         environment(af) = new.env(parent = emptyenv())
-                                         .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
-                                                                                              heatmapData = heatmapData,
-                                                                                              addColNames = addColNames,
-                                                                                              orderColNames = orderColNames,
-                                                                                              colTree = colTree,
-                                                                                              scale = scale,
-                                                                                              pWidth = pWidth,
-                                                                                              pHeight = pHeight,
-                                                                                              colPal = colPal,
-                                                                                              minMaxVal = minMaxVal,
-                                                                                              proje = proje,
-                                                                                              outfile = outfile
-                                         )
-                                       }
-                                       return(retVal)
-                                     })
+  
+  
   
   # pHeatMapModule - additionalOptions ----
   # output$additionalOptions <- renderUI({
