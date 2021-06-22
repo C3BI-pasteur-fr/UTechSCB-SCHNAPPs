@@ -38,7 +38,8 @@ Imports:
     shinydashboardPlus
 Remotes: 
     jokergoo/ComplexHeatmap,
-    jokergoo/InteractiveComplexHeatmap
+    jokergoo/InteractiveComplexHeatmap,
+    haowulab/Wind
 Suggests:
     tidyverse,
     ComplexHeatmap,
