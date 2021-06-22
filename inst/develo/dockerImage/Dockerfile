@@ -43,6 +43,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libxt-dev \
     xtail \
+    libxt-dev \
     libgsl-dev \
     libhdf5-serial-dev \
     wget \
