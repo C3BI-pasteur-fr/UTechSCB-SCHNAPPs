@@ -35,6 +35,7 @@ Imports:
     evaluate,
     InteractiveComplexHeatmap,
     shinydashboard,
+    profvis,
     shinydashboardPlus
 Remotes: 
     jokergoo/ComplexHeatmap,
