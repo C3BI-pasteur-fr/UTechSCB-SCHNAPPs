@@ -45,6 +45,7 @@ Suggests:
     ComplexHeatmap,
     reactlog,
     shinythemes,
+    pdftools,
     manhattanly,
     ggalluvial,
     pheatmap,
