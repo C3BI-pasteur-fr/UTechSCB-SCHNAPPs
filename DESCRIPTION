@@ -1,7 +1,7 @@
 Package: SCHNAPPs
 Type: Package
 Title: Single Cell Shiny Application for Analysing Single Cell Transcriptomics Data
-Version: 1.6.45
+Version: 1.6.51
 Authors@R: c(person("Bernd", "Jagla", role = c("aut", "cre"), email = "bernd.jagla@pasteur.fr", comment = c(ORCID = "0000-0002-7696-0484")))
 Maintainer: Bernd Jagla <bernd.jagla@pasteur.fr>
 Description: Single Cell sHiny APPlication (SCHNAPPs) is a R/Shiny based application to interact, manipulate, explore, and analyze single cell RNA-seq experiments, including MARS-seq and others.
@@ -27,15 +27,27 @@ Imports:
     shinyjs,
     shinyWidgets,
     ggplotify,
+    dendsort,
     reactlog,
     ggpubr,
     dplyr,
+    glue,
+    evaluate,
+    InteractiveComplexHeatmap,
     shinydashboard,
+    profvis,
     shinydashboardPlus
+Remotes: 
+    jokergoo/ComplexHeatmap,
+    jokergoo/InteractiveComplexHeatmap,
+    haowulab/Wind,
+    renozao/xbioc
 Suggests:
     tidyverse,
+    ComplexHeatmap,
     reactlog,
     shinythemes,
+    pdftools,
     manhattanly,
     ggalluvial,
     pheatmap,
@@ -51,7 +63,6 @@ Suggests:
     Hmisc,
     orca,
     debugme,
-    xbioc,
     shinyBS,
     testthat (>= 3.0.0)
 RoxygenNote: 7.1.1

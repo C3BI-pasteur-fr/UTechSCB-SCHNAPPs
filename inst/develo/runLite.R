@@ -56,6 +56,7 @@ defaultValues[["sCA_dataInput-Mod_clusterPP"]] = "seuratCluster"
 defaultValues[["sCA_dataInput-Mod_PPGrp"]] = as.character(c(0,1,2,3,4,5,6))
 defaultValues[["sCA_subscluster_x1"]] = "UMAP1"
 defaultValues[["sCA_subscluster_y1"]] = "UMAP2"
+defaultValues[["DEBUGSAVE"]] = DEBUGSAVE
 
 
 assign("defaultValues", defaultValues, envir = .schnappsEnv)
@@ -66,7 +67,7 @@ scShinyUI <- NULL
 scShinyServer <- NULL
 # packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 
-devscShinyApp = F
+devscShinyApp = T   # TRUE = look for local sources
 packagePath <- "inst/app"
 
 source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
@@ -77,14 +78,15 @@ source(paste0(packagePath, "/ui-lite.R"), local = T)
 
 # load data
 maxCells = 3000
-data = "inst/develo/testApp/HPVC.lite.RData"
+# file = "inst/develo/testApp/HPVC.lite.RData"
+file = "../scShinyHubData/mca_Seurat_afterClust_CtrMem.schnapps.RData"
 # data = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
-assign(".SCHNAPPs_LiteData", loadLiteData(file = data), envir = .schnappsEnv)
+assign(".SCHNAPPs_LiteData", loadLiteData(fileName = file), envir = .schnappsEnv)
 
 
 nCells = length(colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx))
 if (nCells > maxCells){
-  cellIdx = unique(sort(sample(nCells, maxCells)))
+  cellIdx = unique(sort(base::sample(nCells, maxCells)))
   cells2keep = colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx)[cellIdx]
   for (na in names(.schnappsEnv$.SCHNAPPs_LiteData)){
     if (na == "pca") {
@@ -121,5 +123,5 @@ if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
 # options(shiny.reactlog=TRUE) 
 runApp(app)
-
+# 
 
