@@ -565,10 +565,10 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
       legend.position = "right"
     ) +
     xlab(dbCluster) + ylab(ylabText) +
-    scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames))
+    ifelse(showExpression,NULL ,scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames)))
   
   # p1 <- ggplotly(p1)
-  p1
+  # p1 + NULL
   
   
   
