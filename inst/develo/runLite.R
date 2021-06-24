@@ -1,6 +1,6 @@
 .schnappsEnv <- new.env(parent=emptyenv())
-localContributionDir = "~/Rstudio/scShinyHub-github/bjContributions/"
-# localContributionDir = ""
+localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
+localContributionDir = ""
 defaultValueSingleGene = "itgae" # CD52
 defaultValueMultiGenes = "wt1,pdgfrb,agtr1a,col3a1,col1a1,postn,tbx18,scx,npr1,vegfa,npr2,notch2,tagln,acta2,ctgf, Rack1, Bmp4,  Eef2, col3a1,col1a1,tgfb3,postn"
 # defaultValueMultiGenes = "CD52, S100A9, S100A4" # itgae, cd69, itga1" # CD52, S100A9, S100A4
@@ -9,6 +9,7 @@ defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
 historyPath = "~/Rstudio/Schnapps/history"
+# historyPath = NULL
 AllowClustering = F
 
 .schnappsEnv 
@@ -77,7 +78,7 @@ source(paste0(packagePath, "/server-lite.R"), local = TRUE)
 source(paste0(packagePath, "/ui-lite.R"), local = T)
 
 # load data
-maxCells = 3000
+maxCells = 300000
 # file = "inst/develo/testApp/HPVC.lite.RData"
 file = "../scShinyHubData/mca_Seurat_afterClust_CtrMem.schnapps.RData"
 # data = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"

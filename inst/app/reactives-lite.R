@@ -249,6 +249,7 @@ DE_scaterPNG <- reactive({
       alt = "Scater plot will be here when 'apply changes' is clicked"
     ))
   }
+  scols <- isolate(sampleCols$colPal)
   
   
   width <- session$clientData$output_plot_width
@@ -271,7 +272,7 @@ DE_scaterPNG <- reactive({
   myPNGheight <- height / 96
   
   outfile <- paste0(getwd(), "/scaterPlot.png")
-  if (file.exists(normalizePath(outfile, mustWork = FALSE))){
+  if (file.exists(normalizePath(outfile, mustWork = FALSE)) & clicked == 0){
     return(list(
       src = normalizePath(outfile, mustWork = FALSE),
       contentType = "image/png",
@@ -287,7 +288,8 @@ DE_scaterPNG <- reactive({
   n <- min(nrow(scaterReads), 50)
   
   rownames(scaterReads) <- rowData(scaterReads)$symbol
-  p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n)
+  # p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n)
+  p1 = pltHighExp( scaterReads, n, scols) 
   tryCatch(
     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
     error = function(e) {
@@ -306,8 +308,16 @@ DE_scaterPNG <- reactive({
     alt = "Scater plot should be here"
   )
   # end calculation
-  .schnappsEnv[["DE_scaterPNG"]] <- p1
+  af = pltHighExp
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
   
+  .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
+                                         # plotHighestExprs = plotHighestExprs,
+                                         scaterReads = scaterReads, 
+                                         n = n,
+                                         scols = scols
+  )
   setRedGreenButton(
     vars = list(
       c("scaterRan", 1)
