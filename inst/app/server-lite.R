@@ -3,9 +3,9 @@ scShinyServer <- shinyServer(function(input, output, session) {
   base::cat(file = stderr(), "------ ShinyServer LITE running\n")
   session$onSessionEnded(function () {
     if (!is.null(x = .schnappsEnv$historyPath)) {
-      cat(file = stderr(), paste("removing: ", .schnappsEnv$historyPath ))
+      # cat(file = stderr(), paste("removing: ", .schnappsEnv$historyPath ))
       if (dir.exists(.schnappsEnv$historyPath)){
-        unlink(.schnappsEnv$historyPath, recursive = T)
+        # unlink(.schnappsEnv$historyPath, recursive = T) 
       }
     }
     stopApp()
@@ -76,6 +76,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
       suppressMessages(require(colourpicker))
       # suppressMessages(require(shinytest))
       suppressMessages(require(scran))
+      suppressMessages(require(ggalluvial))
       suppressMessages(require(BiocSingular))
 
       if (\"debugme\" %in% rownames(installed.packages())) {

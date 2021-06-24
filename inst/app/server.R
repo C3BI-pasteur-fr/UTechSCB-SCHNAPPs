@@ -22,6 +22,7 @@ suppressMessages(require(Matrix))
 suppressMessages(require(colourpicker))
 # suppressMessages(require(shinytest))
 suppressMessages(require(scran))
+suppressMessages(require(ggalluvial))
 suppressMessages(require(BiocSingular))
 
 if ("debugme" %in% rownames(installed.packages())) {
@@ -200,6 +201,7 @@ suppressMessages(require(SingleCellExperiment))
 suppressMessages(require(Matrix))
 suppressMessages(require(colourpicker))
 # suppressMessages(require(shinytest))
+suppressMessages(require(ggalluvial))
 suppressMessages(require(scran))
 suppressMessages(require(BiocSingular))
 

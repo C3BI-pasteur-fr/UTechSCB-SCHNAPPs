@@ -3,6 +3,7 @@ suppressMessages(require(Seurat))
 suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
+suppressMessages(require(ggalluvial))
 # base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
 
 # reactive values  ------------------------------------------------------------------
