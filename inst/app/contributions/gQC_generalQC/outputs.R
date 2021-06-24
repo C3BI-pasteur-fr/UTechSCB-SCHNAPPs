@@ -452,14 +452,15 @@ observeEvent(
     }
     # browser()
     combProjections = data.frame(row.names = rownames(projections), 
-                                 paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor())
-    if (length(levels(combProjections)) > 100) {
-      out = showModal(verifyLevelModal(NLevel = length(levels(combProjections))))
+                                 newPrj=  paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor())
+    if (length(levels(combProjections[,1])) > 100) {
+      out = showModal(verifyLevelModal(NLevel = length(levels(combProjections[,1]))))
+      if (DEBUG) cat(file = stderr(), paste("gQC_updateCombPrjsButton modal out:", out, "\n"))
       # browser()
     }
     if (ncol(newPrjs) == 0) {
       newPrjs <- data.frame(row.names = acn)
-      newPrjs[rownames(combProjections),newPrj] = combProjections
+      newPrjs[rownames(combProjections),newPrj] = combProjections[,1]
       # rownames(newPrjs) = rownames(projections)
     } else {
       # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], combProjections)

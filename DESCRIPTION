@@ -35,15 +35,19 @@ Imports:
     evaluate,
     InteractiveComplexHeatmap,
     shinydashboard,
+    profvis,
     shinydashboardPlus
 Remotes: 
     jokergoo/ComplexHeatmap,
-    jokergoo/InteractiveComplexHeatmap
+    jokergoo/InteractiveComplexHeatmap,
+    haowulab/Wind,
+    renozao/xbioc
 Suggests:
     tidyverse,
     ComplexHeatmap,
     reactlog,
     shinythemes,
+    pdftools,
     manhattanly,
     ggalluvial,
     pheatmap,
@@ -59,7 +63,6 @@ Suggests:
     Hmisc,
     orca,
     debugme,
-    xbioc,
     shinyBS,
     testthat (>= 3.0.0)
 RoxygenNote: 7.1.1
