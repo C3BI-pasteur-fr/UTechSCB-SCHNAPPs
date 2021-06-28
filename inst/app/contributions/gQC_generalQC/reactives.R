@@ -8,6 +8,7 @@ require(plotly)
 # save to history violoin observer ----
 observe(label = "save2histumi", {
   clicked  = input$save2Histumi
+  # browser()
   if (DEBUG) cat(file = stderr(), "observe input$save2histumi \n")
   start.time <- base::Sys.time()
   on.exit(

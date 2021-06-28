@@ -14,15 +14,15 @@
   register(SerialParam())
   
   localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
-  # localContributionDir = ""
+  localContributionDir = ""
   defaultValueSingleGene = "igkc" # CD52
   defaultValueMultiGenes = "IGHA2, JCHAIN, IGHA1,IGKV1-39, IGKC, IGHA1" # itgae, cd69, itga1" # CD52, S100A9, S100A4
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
   DEBUG = T
   DEBUGSAVE = F
-  # historyPath = "/Volumes/Oct2020/RStudio_history/"
-  historyPath = NULL
+  historyPath = "/Volumes/Oct2020/RStudio_history/"
+  # historyPath = NULL
   
   assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
