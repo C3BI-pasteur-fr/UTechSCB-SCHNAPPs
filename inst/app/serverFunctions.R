@@ -122,7 +122,7 @@ append2list <- function(myHeavyCalculations, heavyCalculations) {
   return(heavyCalculations)
 }
 
-#### plot2Dprojection ----------------
+# plot2Dprojection ----------------
 # used in moduleServer and reports
 plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
@@ -261,10 +261,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     subsetData[, dimX] <- subsetData[, dimX] / subsetData[, divXBy]
     subsetData = subsetData[!is.infinite(subsetData[, dimX]), ]
   }
-  if (divYBy != "None" & dimY != "histogram") {
+  if (divYBy != "None" & divYBy != "normByCol" & dimY != "histogram") {
     subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
     subsetData = subsetData[!is.infinite(subsetData[, dimY]), ]
   }
+  
   
   typeX <- typeY <- "linear"
   if (logx) {
@@ -329,14 +330,14 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     #
     
     if (is(subsetData[,dimCol], "factor")) {
-      # one_plot <- function(d) {
-      #   add_histogram(x = ~d[,dimX])  
-      #   # %>%
-      #   #   add_annotations(
-      #   #     ~unique(clarity), x = 0.5, y = 1, 
-      #   #     xref = "paper", yref = "paper", showarrow = FALSE
-      #   #   )
-      # }
+      # Special case: histogram with color as factor and divYBy == "normByCol"
+      histnorm = NULL
+      barmode = "stack"
+      if (divYBy == "normByCol" & dimY == "histogram"){
+        histnorm = "probability"
+        barmode = "group"
+      }
+      
       p1 <- subsetData %>% split(.[dimCol])
       
       # %>% lapply(one_plot)
@@ -349,11 +350,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
           }
           p = add_histogram(p, x = p1[[le]][,dimX], 
                             name = levels(subsetData[,dimCol])[le],
-                            marker = mcol)
+                            marker = mcol,
+                            histnorm = histnorm)
           print(le)
         }
       }
-      p = p %>% layout(barmode = "stack")
+      p = p %>% layout(barmode = barmode)
       # p
       return (p)
       # plot_ly(alpha = 0.6) %>% lapply(p1, one_plot) %>%
@@ -1517,7 +1519,7 @@ heatmapModuleFunction <- function(
   # working with large trees is not working
   # cluster_within_group and other dendextend function are recursive and crash
   # thus we only provide the cut 
-
+  
   if (colTree) {
     # retVal = do.call(pheatmap::pheatmap, heatmapData)
     # retVal$tree_col
@@ -1528,7 +1530,7 @@ heatmapModuleFunction <- function(
     my_hclust <- hclust(dist(t(heatmapData$mat)), method = "complete")
     
     my_gene_col <- cutree(tree =  my_hclust, k = heatmapCellGrp)
-     # while(max(table(my_gene_col)) > 1000){
+    # while(max(table(my_gene_col)) > 1000){
     #   heatmapCellGrp = heatmapCellGrp + 10
     #   my_gene_col <- cutree(tree =  my_hclust, k = heatmapCellGrp)
     # }
@@ -1547,9 +1549,9 @@ heatmapModuleFunction <- function(
       my_gene_col = my_gene_col[sortedCells]
       heatmapData$gaps_col = which(my_gene_col[-1] != my_gene_col[-length(my_gene_col)])
     }
-      
+    
   }
-
+  
   
   
   

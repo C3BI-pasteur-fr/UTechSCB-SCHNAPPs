@@ -99,7 +99,7 @@ clusterUI <- function(id) {
             selectInput(ns("divideYBy"),
                         label = "Divide Y by",
                         # choices = c("None", "Gene.count", "UMI.count"),
-                        choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2"),
+                        choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2", "normByCol"),
                         selected = defaultValue(ns("divideYBy"), "None")
             )
           )
