@@ -197,7 +197,7 @@ clusterServer <- function(input, output, session,
                       selected = .schnappsEnv$divXBy
     )
     updateSelectInput(session, "divideYBy",
-                      choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2"),
+                      choices = c("None", colnames(projections), "UmiCountPerGenes", "UmiCountPerGenes2", "normByCol"),
                       selected = .schnappsEnv$divYBy
     )
     updateCheckboxInput(session, "logX",
