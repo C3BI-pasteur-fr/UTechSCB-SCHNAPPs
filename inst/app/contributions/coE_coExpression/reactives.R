@@ -536,6 +536,11 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   # p1
   #
   
+  if(showExpression) {
+    scY = NULL
+  } else {
+    scY = scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames))
+  }
   
   p1 <-
     ggplot(projections, aes_string(prj, "coExpVal",
@@ -564,8 +569,8 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
       axis.title.y = element_text(face = "bold", size = 16),
       legend.position = "right"
     ) +
-    xlab(dbCluster) + ylab(ylabText) +
-    ifelse(showExpression,NULL ,scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames)))
+    xlab(dbCluster) + ylab(ylabText) + 
+    scY
   
   # p1 <- ggplotly(p1)
   # p1 + NULL
