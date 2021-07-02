@@ -2598,7 +2598,7 @@ projections <- reactive({
   # TODO
   # this takes too long
   # UNCOMMENT
-  # add2history(type = "save", input = input, comment = "projections", projections = projections)
+  add2history(type = "save", input=NULL, comment = "projections", projections = projections)
   
   # add2history(type = "save", comment = "projections", projections = projections)
   

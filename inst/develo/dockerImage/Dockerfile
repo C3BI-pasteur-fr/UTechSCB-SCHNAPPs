@@ -47,7 +47,8 @@ RUN apt-get update && apt-get install -y \
     libgsl-dev \
     libhdf5-serial-dev \
     wget \
-    libcairo2-dev
+    libcairo2-dev \
+    libcurl4-openssl-dev
 
 # # Download and install shiny server
 RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION -O "version.txt" && \
@@ -76,8 +77,9 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
     R -e "devtools::install_github('Albluca/ElPiGraph.R')" && \
     R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))" && \
     R -e "BiocManager::install('BiocParallel')" && \
-    R -e "remotes::install_github('briatte/ggnetwork')"
- 
+    R -e "remotes::install_github('briatte/ggnetwork')" \
+    R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
+    
 RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
     rm -r SCHNAPPsContributions/Dummy/  && \
     mkdir /data && \
