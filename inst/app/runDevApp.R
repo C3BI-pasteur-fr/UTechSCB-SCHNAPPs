@@ -15,8 +15,8 @@
   
   localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
   localContributionDir = ""
-  defaultValueSingleGene = "igkc" # CD52
-  defaultValueMultiGenes = "IGHA2, JCHAIN, IGHA1,IGKV1-39, IGKC, IGHA1" # itgae, cd69, itga1" # CD52, S100A9, S100A4
+  defaultValueSingleGene = "IL7R" # CD52
+  defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
   DEBUG = T

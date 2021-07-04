@@ -285,9 +285,11 @@ clusterServer <- function(input, output, session,
       }
     }
     
-    
-    
-    subsetData <- subset(projections, dbCluster %in% inpClusters)
+    if(!is.null(inpClusters)){
+      subsetData <- subset(projections, dbCluster %in% inpClusters)
+    }else{
+      subsetData = projections
+    }
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
     cells.names <- brushedPs$key
@@ -379,8 +381,11 @@ clusterServer <- function(input, output, session,
           geneNames2 = geneNames2,
           scEx = scEx_log[, rownames(projections)], projections = projections
         )
-        
-        subsetData <- subset(projections, dbCluster %in% inpClusters)
+        if (!is.null(inpClusters)) {
+          subsetData <- subset(projections, dbCluster %in% inpClusters)
+        }else{
+          subsetData = projections
+        }
         grpSubset <- grpNs[rownames(subsetData), ]
         if (!grpN %in% colnames(grpSubset)) {
           if (!is.null(getDefaultReactiveDomain())) {
@@ -597,8 +602,11 @@ clusterServer <- function(input, output, session,
     }
     # inpClusters <- input$clusters
     inpClusters <- levels(projections$dbCluster)
-    subsetData <- subset(projections, dbCluster %in% inpClusters)
-    
+    if(!is.null(inpClusters)){
+      subsetData <- subset(projections, dbCluster %in% inpClusters)
+    }else{
+      subsetData = projections
+    }
     printTimeEnd(start.time, "visibleCellNames")
     exportTestValues(visibleCellNames = {
       subsetData
@@ -762,6 +770,9 @@ clusterServer <- function(input, output, session,
     
     grpN <- grpNameDebounced()
     grpNs <- groupNames$namesDF
+    cells.names <- selectedCellNames()
+    visibleCells <- visibleCellNames()
+    
     # inpClusters <- input$clusters
     projections <- projections()
     if (is.null(projections)) {
@@ -770,11 +781,21 @@ clusterServer <- function(input, output, session,
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls()))
     }
-    # load(file="~/SCHNAPPsDebug/nCellsVisibleSelected.RData")
+    # cp = load(file="~/SCHNAPPsDebug/nCellsVisibleSelected.RData")
     inpClusters <- levels(projections$dbCluster)
-    
-    subsetData <- subset(projections, dbCluster %in% inpClusters)
-    retVal <- paste("Number of visible cells in section", sum(grpNs[rownames(subsetData), grpN] == "TRUE"))
+    if(!is.null(inpClusters)){
+      subsetData <- subset(projections, dbCluster %in% inpClusters)
+    }else{
+      subsetData = projections
+    }
+    # browser()
+    retVal <- paste("Number of visible cells in section ", 
+                    sum(grpNs[rownames(subsetData), grpN] == "TRUE"), 
+                    "\n",
+                    "selected cells ", length(cells.names), "\n",
+                    "selected & named: ",sum(grpNs[cells.names, grpN] == "TRUE"), "\n",
+                    "visible cells ", nrow(visibleCells))
+    if (DEBUG) cat(file = stderr(), retVal)
     
     exportTestValues(DummyReactive = {
       retVal
@@ -1313,6 +1334,19 @@ pHeatMapModule <- function(input, output, session,
   ht_pos_obj = reactiveVal(NULL)
   myretVal = reactiveVal(NULL)
   
+  addOptions <- reactive(list(
+    sortingCols = input$sortingCols,
+    normRow = input$normRow,
+    heatMapGrpName = input$heatMapGrpName,
+    ColNames = input$ColNames,
+    colPal = input$colPal,
+    orderColNames = input$orderNames,
+    heatmapCellGrp = input$heatmapCellGrp,
+    heatmapMinMaxValue = input$heatmapMinMaxValue
+   )) %>% debounce(1000)
+  
+ 
+  
   heatmapMinMaxValueDeb <- reactive(
     input$heatmapMinMaxValue
   ) %>% debounce(1000)
@@ -1341,17 +1375,17 @@ pHeatMapModule <- function(input, output, session,
     
     ns <- session$ns
     heatmapData <- pheatmapList()
-    addColNames <- input$ColNames
-    orderColNames <- input$orderNames
+    addColNames <- addOptions()$ColNames
+    orderColNames <- addOptions()$orderColNames
     # moreOptions <- input$moreOptions
-    sortingCols <- input$sortingCols
-    scale <- input$normRow
+    sortingCols <- addOptions()$sortingCols
+    scale <- addOptions()$normRow
     myns <- ns("pHeatMap")
     save2History <- input$save2History
     # pWidth <- input$heatmapWidth
     heatmapCellGrp <- heatmapCellGrpDeb()
     # pHeight <- input$heatmapHeight
-    colPal <- input$colPal
+    colPal <- addOptions()$colPal
     minMaxVal <- heatmapMinMaxValueDeb()
     # maxVal <- input$heatmapMaxValue
     sampCol <- sampleCols$colPal
@@ -1427,7 +1461,7 @@ pHeatMapModule <- function(input, output, session,
       # browser()
       ht = ComplexHeatmap::draw(retVal)
       ht_pos = htPositionsOnDevice(ht, include_annotation = FALSE, calibrate = FALSE)
-      cat(file = stderr(), glue_collapse(list_components(), sep="\n"))
+      # cat(file = stderr(), glue_collapse(list_components(), sep="\n"))
       ht_obj(ht)
       ht_pos_obj(ht_pos)
     })
@@ -1523,7 +1557,7 @@ pHeatMapModule <- function(input, output, session,
   
   # observer click ----
   observe( {
-    heatmap_click = input$heatmap_click
+    heatmap_click = addOptions()$heatmap_click
     htobj = ht_obj()
     htpos_obj = ht_pos_obj()
     projections <- projections()
@@ -1531,7 +1565,7 @@ pHeatMapModule <- function(input, output, session,
     acn = allCellNames()
     htDat = myretVal()
     scEx_log = scEx_log()
-    orderNames = isolate(input$orderNames)
+    orderNames = isolate(addOptions()$orderColNames)
     if(is.null(input$heatmap_click)) return(NULL)
     if(is.null(scEx_log)) return(NULL)
     pos = getPositionFromClick(click = input$heatmap_click, 
@@ -1557,7 +1591,7 @@ pHeatMapModule <- function(input, output, session,
       print(selection)
     })
     
-    if (!input$sortingCols == "gene (click)") return(NULL)
+    if (!addOptions()$sortingCols == "gene (click)") return(NULL)
     
     if (is.null(heatmap_click)) {
       showNotification(
@@ -1610,11 +1644,11 @@ pHeatMapModule <- function(input, output, session,
   
   observe(label = "ColNames", {
     if (DEBUG) cat(file = stderr(), paste0("observe: ColNames\n"))
-    .schnappsEnv[[ns('ColNames')]] <- input$ColNames
+    .schnappsEnv[[ns('ColNames')]] <- addOptions()$ColNames
   })
   observe(label = "orderNames", {
     if (DEBUG) cat(file = stderr(), paste0("observe: orderNames\n"))
-    .schnappsEnv[[ns('orderNames')]] <- input$orderNames
+    .schnappsEnv[[ns('orderNames')]] <- addOptions()$orderColNames
   }) 
   
   
@@ -1773,11 +1807,11 @@ pHeatMapModule <- function(input, output, session,
       }
       
       heatmapData <- pheatmapList()
-      addColNames <- input$ColNames
-      orderColNames <- input$orderNames
+      addColNames <- addOptions()$ColNames
+      orderColNames <- addOptions()$orderColNames
       # moreOptions <- input$moreOptions
       groupNs <- groupNames$namesDF
-      scale <- input$normRow
+      scale <- addOptions()$normRow
       proje <- projections()
       if (.schnappsEnv$DEBUGSAVE) {
         save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c(
