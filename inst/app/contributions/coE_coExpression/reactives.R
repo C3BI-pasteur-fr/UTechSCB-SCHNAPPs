@@ -212,7 +212,7 @@ coE_topExpGenesTable <- reactive({
   coEtgminExpr <- isolate(input$coEtgMinExpr)
   sc <- isolate(coE_selctedCluster())
   # scCL <- sc$cluster
-  scCL <- isolate(levels(projections$dbCluster))
+  # scCL <- isolate(levels(projections$dbCluster))
   scCells <- isolate(sc$selectedCells())
   # coEtgMinExprShow <- input$coEtgMinExprShow
   
@@ -310,7 +310,7 @@ coE_topExpCCTable <- reactive({
   # coEtgminExpr <- input$coEtgMinExpr
   sc <- isolate(coE_selctedCluster())
   # scCL <- sc$cluster
-  scCL <- levels(projections$dbCluster)
+  # scCL <- levels(projections$dbCluster)
   scCells <- isolate(sc$selectedCells())
   # coE_topCCGenesShow <- input$coE_topCCGenesShow
   
