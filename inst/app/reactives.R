@@ -268,7 +268,7 @@ inputDataFunc <- function(inFile) {
       stats[fpIdx, "nCells"] <- ncol(scEx)
     }
   }
-  save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("allScEx", "allScEx_log", "sampleCols"))
+  # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("allScEx", "allScEx_log", "sampleCols"))
   # load(file = "~/SCHNAPPsDebug/inputProblem.RData")
   if ("sampleNames" %in% colnames(colData(allScEx))) {
     if (!is(colData(allScEx)$sampleNames, "factor")) {
