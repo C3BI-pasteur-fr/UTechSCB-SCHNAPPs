@@ -244,6 +244,7 @@ inputDataFunc <- function(inFile) {
         cat(file = stderr(), (paste("!!!!!file ", inFile$datapath[fpIdx], "contains variable", varName, " but no counts assay!!!!\n")))
         next()
       }
+      cat(file = stderr(), paste("nCells: ", ncol(allScEx),"\n"))
       
       # In case we are loading precalculated normalizations we need to also keep the logcounts.
       if ("logcounts" %in% names(assays(scEx))) {
@@ -264,7 +265,7 @@ inputDataFunc <- function(inFile) {
       stats[fpIdx, "nCells"] <- ncol(scEx)
     }
   }
-  # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("allScEx", "allScEx_log", "sampleCols"))
+  save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = c("allScEx", "allScEx_log", "sampleCols"))
   # load(file = "~/SCHNAPPsDebug/inputProblem.RData")
   if ("sampleNames" %in% colnames(colData(allScEx))) {
     if (!is(colData(allScEx)$sampleNames, "factor")) {
