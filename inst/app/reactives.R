@@ -4,6 +4,8 @@ suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(ggalluvial))
+library(SingleCellExperiment)
+require(tidySingleCellExperiment)
 # base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
 
 # reactive values  ------------------------------------------------------------------
@@ -239,7 +241,7 @@ inputDataFunc <- function(inFile) {
           allScEx <- addColData(allScEx, scEx)
           if (!is.null(allScEx_log)) scEx <- addColData(scEx, allScEx_log)
           # colData(allScEx_log)
-          allScEx <- cbind(allScEx[genesUnion, ], scEx[genesUnion, ])
+          allScEx <- SingleCellExperiment::cbind(allScEx[genesUnion, ], scEx[genesUnion, ])
         }
       } else {
         cat(file = stderr(), (paste("!!!!!file ", inFile$datapath[fpIdx], "contains variable", varName, " but no counts assay!!!!\n")))
@@ -259,7 +261,7 @@ inputDataFunc <- function(inFile) {
           allScEx_log <- addColData(allScEx_log, scEx)
           scEx <- addColData(scEx, allScEx_log)
           # colData(allScEx_log)
-          allScEx_log <- cbind(allScEx_log[genesUnion, ], scEx[genesUnion, ])
+          allScEx_log <- SingleCellExperiment::cbind(allScEx_log[genesUnion, ], scEx[genesUnion, ])
         }
       }
       stats[fpIdx, "nFeatures"] <- nrow(scEx)

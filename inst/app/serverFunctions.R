@@ -13,6 +13,8 @@ suppressMessages(require(psychTools))
 suppressMessages(require(tidyr))
 suppressMessages(library(ComplexHeatmap))
 suppressMessages(library(InteractiveComplexHeatmap))
+library(dendsort)
+library(MASS)
 
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
@@ -569,7 +571,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       return(NULL)
     }
     density <- stats::density(subsetData[, dimY], na.rm = T)
-    library(MASS)
     fit <- fitdistr(subsetData[!is.na(subsetData[, dimY]), dimY], "normal", na.rm = T)
     hline <- function(y, dash) {
       list(type = "line", x0 = 0, x1 = 1, xref = "paper", y0 = y, y1 = y, line = list(dash = dash))
@@ -1523,7 +1524,6 @@ heatmapModuleFunction <- function(
   if (colTree) {
     # retVal = do.call(pheatmap::pheatmap, heatmapData)
     # retVal$tree_col
-    library(dendsort)
     callback = function(hc, ...){dendsort(hc)}
     heatmapData$clustering_callback = callback
     require(ComplexHeatmap)
