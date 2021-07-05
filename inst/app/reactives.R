@@ -209,6 +209,7 @@ inputDataFunc <- function(inFile) {
       fp <- inFile$datapath[fpIdx]
       fpLs <- load(fp)
       scExFound <- FALSE
+      varName = "not found"
       if ("scEx" %in% fpLs) {
         scExFound <- TRUE
         varName <- "scEx" # we don't have to set scEx
@@ -576,10 +577,14 @@ inputData <- reactive({
   fpExtension <- tools::file_ext(inFile$datapath[1])
   if (toupper(fpExtension) %in% c("RDATA", "RDS")) {
     retVal <- tryCatch({inputDataFunc(inFile)}, 
-                       error = function(e) {return(NULL)})
+                       error = function(e) {
+                         cat(file = stderr(), paste("inputData: NULL", e,"\n"))
+                         return(NULL)})
   } else {
     retVal <- tryCatch({readCSV(inFile)},
-                       error = function(e){return(NULL)}
+                       error = function(e){
+                         cat(file = stderr(), paste("inputData: NULL", e,"\n"))
+                         return(NULL)}
                        )
   }
   
