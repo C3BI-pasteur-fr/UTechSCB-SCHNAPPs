@@ -1575,7 +1575,7 @@ pHeatMapModule <- function(input, output, session,
     # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
     
     selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
-                               verbose = T, calibrate = FALSE)
+                               verbose = F, calibrate = FALSE)
     
     if (is.null(projections)) return(NULL)
     if (is.null(htDat)) return(NULL)
