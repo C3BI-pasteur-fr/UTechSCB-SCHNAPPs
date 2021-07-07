@@ -1557,7 +1557,7 @@ pHeatMapModule <- function(input, output, session,
   
   # observer click ----
   observe( {
-    heatmap_click = addOptions()$heatmap_click
+    heatmap_click = input$heatmap_click
     htobj = ht_obj()
     htpos_obj = ht_pos_obj()
     projections <- projections()
