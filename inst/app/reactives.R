@@ -204,6 +204,7 @@ inputDataFunc <- function(inFile) {
   # cp = load(file='~/SCHNAPPsDebug/readInp1.RData')
   
   # read multiple files [2:1] => c(2,1) and not empty list
+  # inFile$datapath[2] = "/Volumes/@Single_cell/SingleCellCourse_2021/schnapps/Tcells_d2_10X.schnapps.RData"
   if (length(inFile$datapath) > 1) {
     for (fpIdx in 2:length(inFile$datapath)) {
       # inFile$datapath[fpIdx] <- "~/Downloads/paper1.RData"
@@ -239,7 +240,8 @@ inputDataFunc <- function(inFile) {
           genesUnion <- intersect(rownames(scEx), rownames(allScEx))
           
           allScEx <- addColData(allScEx, scEx)
-          if (!is.null(allScEx_log)) scEx <- addColData(scEx, allScEx_log)
+          scEx <- addColData(scEx, allScEx)
+          # if (!is.null(allScEx_log)) scEx <- addColData(scEx, allScEx_log)
           # colData(allScEx_log)
           allScEx <- SingleCellExperiment::cbind(allScEx[genesUnion, ], scEx[genesUnion, ])
         }
