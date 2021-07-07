@@ -66,6 +66,10 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   assign("defaultValues", defaultValues, envir = .schnappsEnv)
   # assign("historyFile", historyFile, envir = .schnappsEnv)
 
+  if (! "Wind" %in% installed.packages()){
+    devtools::install_github("haowulab/Wind", build_opts = c("--no-resave-data"))
+  }
+  
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL
   scShinyServer <- NULL
