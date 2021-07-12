@@ -127,7 +127,7 @@ schnappsLite <- function(data="RdataFile",
   }
   # save(file = "global.RData", list = c(".schnappsEnv"))
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-  # runApp(app)
+  runApp(app)
   
   
 }
