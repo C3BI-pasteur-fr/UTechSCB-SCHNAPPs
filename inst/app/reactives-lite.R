@@ -68,7 +68,7 @@ if (!AllowClustering)
     
     # in schnapps-lite we are only interested in adding the sessionProjections
     # to the already calculated other projections
-    prjs <- sessionProjections$prjs
+    # prjs <- sessionProjections$prjs
     newPrjs <- projectionsTable$newProjections
     if (!exists("scEx") |
         is.null(scEx)) {
@@ -167,6 +167,13 @@ if (!AllowClustering)
     
     if (ncol(prjs) > 0 & nrow(prjs) == nrow(projections)) {
       projections <- cbind(projections, prjs)
+    } else if (ncol(prjs) > 0) {
+      commIds = intersect(rownames(prjs), rownames(projections))
+      missing = rownames(projections)[!rownames(projections) %in% rownames(prjs)]
+      if (length(missing)>0) {
+        prjs[missing,] = NA
+      }
+      projections <- cbind(projections, prjs[rownames(projections),])
     }
     # remove columns with only one unique value
     rmC <- c()
