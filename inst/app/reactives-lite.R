@@ -43,7 +43,7 @@ if (!AllowClustering)
   })
 
 # projections ----
-if (!AllowClustering)
+# if (!AllowClustering)
   projections <- reactive({
     if (DEBUG) {
       cat(file = stderr(), green("projections lite started.\n"))
