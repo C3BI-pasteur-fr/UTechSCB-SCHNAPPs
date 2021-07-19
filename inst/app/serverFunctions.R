@@ -1578,7 +1578,7 @@ heatmapModuleFunction <- function(
   # heatmapData$side_color_colorbar_len = NULL
   # any(is.na(heatmapData$mat))
   set.seed(1) # to make clustering reproducible
-  
+  heatmapData$run_draw = F
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
