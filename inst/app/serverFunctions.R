@@ -1644,7 +1644,7 @@ loadLiteData <- function(fileName = NULL) {
   assays(counts)[["logcounts"]] = NULL
   logcounts = scEx
   assays(logcounts)[["counts"]] = NULL
-  if (!exists("ccol")){
+  if (!exists("ccol", inherits = F)){
     # cluster colors
     inCols <- list()
     lev <- levels(dbCluster)
@@ -1653,7 +1653,7 @@ loadLiteData <- function(fileName = NULL) {
     ccol <- unlist(inCols)
   }
   projections$sampleNames = factor(projections$sampleNames)
-  if (!exists("scol")) {
+  if (!exists("scol", inherits = F)) {
     sampNames = levels(projections$sampleNames)
     scol <- rev(allowedColors)[seq_along(sampNames)]
     names(scol) <- sampNames
