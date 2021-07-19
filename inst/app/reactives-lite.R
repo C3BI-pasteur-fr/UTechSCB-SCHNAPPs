@@ -68,7 +68,7 @@ if (!AllowClustering)
     
     # in schnapps-lite we are only interested in adding the sessionProjections
     # to the already calculated other projections
-    # prjs <- sessionProjections$prjs
+    prjs <- sessionProjections$prjs
     newPrjs <- projectionsTable$newProjections
     if (!exists("scEx") |
         is.null(scEx)) {
