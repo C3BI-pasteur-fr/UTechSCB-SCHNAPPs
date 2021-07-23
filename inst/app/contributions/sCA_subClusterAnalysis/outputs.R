@@ -33,7 +33,7 @@ sCA_dgeTableReac <- reactive({
   scEx <- scEx()
   top.genes <- sCA_dge()
   
-  if (is.null(scEx) || is.null(top.genes)) {
+  if (is.null(scEx) | is.null(top.genes)) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
@@ -76,7 +76,9 @@ sCA_dataInp <- callModule(
 
 # observe button ----
 observeEvent(input$updateDGEParameters, handlerExpr = {
+  if (DEBUG) cat(file = stderr(), "observe updateDGEParameters\n")
   sCA_dge()
+  if (DEBUG) cat(file = stderr(), "observe updateDGEParameters end\n")
 })
 
 # observer for button ----
