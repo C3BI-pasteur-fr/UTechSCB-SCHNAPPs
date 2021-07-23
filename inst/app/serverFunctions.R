@@ -16,6 +16,21 @@ suppressMessages(library(InteractiveComplexHeatmap))
 library(dendsort)
 library(MASS)
 
+
+### Try catch from extended examples ----
+
+tryCatch.W.E <- function(expr){
+  W <- NULL
+  w.handler <- function(w){ # warning handler
+    W <<- w
+    invokeRestart("muffleWarning")
+  }
+  list(value = withCallingHandlers(tryCatch(expr, error = function(e) e),
+                                   warning = w.handler),
+       warning = W)
+}
+
+
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   require(hms)
@@ -1579,6 +1594,7 @@ heatmapModuleFunction <- function(
   # any(is.na(heatmapData$mat))
   set.seed(1) # to make clustering reproducible
   heatmapData$run_draw = F
+  if (sortingCols == "gene (click)") heatmapData$run_draw = T
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
