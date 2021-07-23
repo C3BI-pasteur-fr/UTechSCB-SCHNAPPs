@@ -19,20 +19,20 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_getCells", id = "sCA_getCells", duration = NULL)
   }
-
+  
   # save(file = "~/SCHNAPPsDebug/sCA_getCells.RData", list = c( ls()))
   # cp =load("~/SCHNAPPsDebug/sCA_getCells.RData")
   # dbCluster = projections$dbCluster
   subsetData <- projections[cl1,]
   
-    if (is(subsetData[,db1$mapping$x], "logical")) {
-      subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
-    }
-    if (is(subsetData[, db1$mapping$y], "logical")) {
-      subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
-    }
+  if (is(subsetData[,db1$mapping$x], "logical")) {
+    subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
+  }
+  if (is(subsetData[, db1$mapping$y], "logical")) {
+    subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
+  }
   
-
+  
   # factors and brushedPoints don't work together.
   # so we change a factor into a numeric
   # TODO WHY is discrete_limits set/misused?????
@@ -52,17 +52,17 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   cells.2 = c()
   if (!is.null(db2)) {
     db2$domain$discrete_limits <- NULL
-
-  # factors and brushedPoints don't work together.
-  # so we change a factor into a numeric
-  if (is(subsetData[, db2$mapping$x], "factor")) {
-    subsetData[, db2$mapping$x] <- as.numeric(subsetData[, db2$mapping$x])
-    db2$domain$discrete_limits <- NULL
-  }
-  if (is(subsetData[, db2$mapping$y], "factor")) {
-    subsetData[, db2$mapping$y] <- as.numeric(subsetData[, db2$mapping$y])
-    db2$domain$discrete_limits <- NULL
-  }
+    
+    # factors and brushedPoints don't work together.
+    # so we change a factor into a numeric
+    if (is(subsetData[, db2$mapping$x], "factor")) {
+      subsetData[, db2$mapping$x] <- as.numeric(subsetData[, db2$mapping$x])
+      db2$domain$discrete_limits <- NULL
+    }
+    if (is(subsetData[, db2$mapping$y], "factor")) {
+      subsetData[, db2$mapping$y] <- as.numeric(subsetData[, db2$mapping$y])
+      db2$domain$discrete_limits <- NULL
+    }
     cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
   } else {
     cells.2 <- rownames(subsetData)[!rownames(subsetData) %in% cells.1]
@@ -99,7 +99,6 @@ myDiffExpFunctions <- list(
 # this is hard-coded here, but should be a parameter somehow like myDiffExpFunctions
 # such it can be used by contributed functions
 
-
 #' Seurat FindMarkers
 #'
 #' cellMeta = colData(scEx)
@@ -124,15 +123,24 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
     save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls()))
   }
   #cp = load(file='~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData')
-
   cellMeta <- colData(scEx)
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
   # creates object @assays$RNA@data and @assays$RNA@counts
-  seurDat <- CreateSeuratObject(
+  seurDat <- tryCatch.W.E(Seurat::CreateSeuratObject(
     counts = assays(scEx)[[1]],
     meta.data = as.data.frame(meta.data)
-  )
+  ))
+  
+  if (is(seurDat$value, "Seurat")) {
+    seurDat = seurDat$value
+  } else {
+    cat(file = stderr(), "something went wrong with seurat CreateSeuratObject\n")
+    cat(file = stderr(), as.character(seurDat$value))
+    cat(file = stderr(), "\n")
+    return(NULL)
+  }
+  
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
   useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
   seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
@@ -140,25 +148,40 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   
   # not sure we need the normalization factor
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
-  markers <- Seurat::FindMarkers(seurDat, 
-                                 ident.1 = cells.1,
-                                 ident.2 = cells.2,
-                                 min.pct = 0.0000001,
-                                 test.use = test,
-                                 logfc.threshold = 0.001
-                                 # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
-                                 # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
-                                 # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
-                                 # test.use = "t"      # p_val avg_logFC pct.1 pct.2 p_val_adj
-                                 # test.use = "negbinom" # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
-                                 # test.use = "poisson"  # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
-                                 # test.use = "LR"     # p_val  avg_logFC pct.1 pct.2 p_val_adj
-                                 # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
-                                 # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
-  )
+  require(Seurat)
+  markers <- tryCatch.W.E(
+    Seurat::FindMarkers(seurDat, 
+                        ident.1 = cells.1,
+                        ident.2 = cells.2,
+                        min.pct = 0.0000001,
+                        test.use = test,
+                        logfc.threshold = 0.001
+                        # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
+                        # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
+                        # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
+                        # test.use = "t"      # p_val avg_logFC pct.1 pct.2 p_val_adj
+                        # test.use = "negbinom" # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
+                        # test.use = "poisson"  # needs UMI; p_val  avg_logFC pct.1 pct.2    p_val_adj
+                        # test.use = "LR"     # p_val  avg_logFC pct.1 pct.2 p_val_adj
+                        # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
+                        # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
+    ))
+  
+  if (is(markers$value , "data.frame")) {
+    markers = markers$value
+  }else {
+    cat(file = stderr(), "something went wrong with seurat find markers\n")
+    cat(file = stderr(), as.character(markers$value))
+    cat(file = stderr(), "\n")
+    return(NULL)
+  }
   if(is.null(markers)) {
     return(NULL)
   }
+  if(length(markers)<1) {
+    return(NULL)
+  }
+  
   if (nrow(markers) > 0) {
     markers$symbol <- rData[rownames(markers), "symbol"]
   }
@@ -217,7 +240,7 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
-
+  
   dups = c(cells.1, cells.2)[duplicated(c(cells.1, cells.2))]
   if(length(dups) > 0){
     cells.1 = cells.1[!cells.1 %in% dups]
@@ -254,13 +277,13 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   res$padj[is.na(res$padj)] <- 1
   res$pvalue[is.na(res$pvalue)] <- 1
   featureData <- rowData(scEx_log)
-
+  
   to.return <- data.frame(
     p_val = res$padj,
     avg_diff = res$log2FoldChange, row.names = rownames(res), symbol = rownames(res)
   )
-
-
+  
+  
   return(to.return)
 }
 
@@ -284,7 +307,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls()))
   }
   # cp =load(file='~/debug/sCA_dge_CellViewfunc.RData')
-
+  
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
@@ -295,10 +318,10 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   dat <- subsetExpression[genes.use, cells.2]
   data.2 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
   total.diff <- (data.1 - data.2)
-
+  
   genes.diff <- names(which(abs(total.diff) > .2))
   genes.use <- ainb(genes.use, genes.diff)
-
+  
   retVal <-
     DiffExpTest(subsetExpression, cells.1, cells.2, genes.use = genes.use)
   if(is.null(retVal)) return(NULL)
@@ -328,12 +351,12 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
-
+  
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
   genes.use <- rownames(subsetExpression)
-
+  
   p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
   p_val[is.na(p_val)] <- 1
   dat <- subsetExpression[genes.use, cells.1]
@@ -341,7 +364,7 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   dat <- subsetExpression[genes.use, cells.2]
   data.2 <- apply(dat, 1, function(x) expMean(x, normFactor = .schnappsEnv$normalizationFactor))
   avg_diff <- (data.1 - data.2)
-
+  
   retVal <- data.frame(p_val = p_val, avg_diff = avg_diff, symbol = featureData[names(p_val), "symbol"])
   return(retVal)
 }
@@ -361,7 +384,7 @@ sCA_dge <- reactive({
     showNotification("sCA_dge", id = "sCA_dge", duration = NULL)
     removeNotification(id = "dgewarning")
   }
-
+  
   scEx_log <- scEx_log()
   scEx <- scEx()
   projections <- projections()
@@ -380,7 +403,7 @@ sCA_dge <- reactive({
   db1 <- isolate(input$db1)
   db2 <- isolate(input$db2)
   method <- isolate(input$sCA_dgeRadioButton)
-
+  
   if (is.null(scEx_log) | is.null(projections)  || is.null(db1)) {
     return(NULL)
   }
@@ -403,13 +426,36 @@ sCA_dge <- reactive({
   if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson")) {
     scEx_log = scEx
   }
-  retVal <- do.call(dgeFunc, args = list(
-    scEx_log = scEx_log,
-    cells.1 = gCells$c1, cells.2 = gCells$c2
-  ))
-
+  # retVal <- do.call(dgeFunc, args = list(
+  #   scEx_log = scEx_log,
+  #   cells.1 = gCells$c1, cells.2 = gCells$c2
+  # ))
+  retVal <- tryCatch({
+    do.call(dgeFunc, args = list(
+      scEx_log = scEx_log,
+      cells.1 = gCells$c1, cells.2 = gCells$c2
+    ))}, error = function(e) {
+      require(Seurat)
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(e, id = "dgeFuncError", duration = NULL,type = "error")
+      }
+      cat(file = stderr(), "something went wrong with dge\n")
+      cat(file = stderr(), as.character(e))
+      cat(file = stderr(), "\n")
+      return(NULL)
+    },
+    warning = function(w){
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(w, id = "dgeFuncWarning", duration = NULL,type = "error")
+      }
+      cat(file = stderr(), "something went wrong with dge\n")
+      cat(file = stderr(), as.character(e))
+      cat(file = stderr(), "\n")
+      return(NULL)
+    }, finally = print("dgeFunc Hello"))
+  
   if(is.null(retVal)) {
-     if (!is.null(getDefaultReactiveDomain())) {
+    if (!is.null(getDefaultReactiveDomain())) {
       showNotification("dge: NULL,did you install everything?", id = "dgewarning", duration = 10, type = "warning")
     }
     return(NULL)
@@ -423,7 +469,7 @@ sCA_dge <- reactive({
   }
   # update reactiveValue
   sCA_selectedDge$sCA_dgeTable <- retVal
-
+  
   setRedGreenButton(
     vars = list(
       # c("sCA_dataInpSelected_cells", isolate(sCA_dataInp()$selectedCells())),
@@ -492,7 +538,7 @@ observeEvent(projections(), {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("updateInputSubclusterAxes", id = "updateInputSubclusterAxes", duration = NULL)
   }
-
+  
   projections <- projections()
   # we combine the group names with the projections to add ability to select groups
   # gn <- groupNames$namesDF
@@ -509,13 +555,13 @@ observeEvent(projections(), {
   # }
   # Can also set the label and select items
   updateSelectInput(session, "sCA_subscluster_x1",
-    choices = colnames(projections),
-    selected = .schnappsEnv$subClusterDim1
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$subClusterDim1
   )
-
+  
   updateSelectInput(session, "sCA_subscluster_y1",
-    choices = colnames(projections),
-    selected = .schnappsEnv$subClusterDim2
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$subClusterDim2
   )
 })
 
@@ -536,10 +582,10 @@ subCluster2Dplot <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("subCluster2Dplot", id = "subCluster2Dplot", duration = NULL)
   }
-
+  
   renderPlot({
     if (DEBUG) cat(file = stderr(), "output$sCA_dge_plot2\n")
-
+    
     projections <- projections()
     x1 <- input$sCA_subscluster_x1
     y1 <- input$sCA_subscluster_y1
@@ -561,39 +607,39 @@ subCluster2Dplot <- function() {
       save(file = "~/SCHNAPPsDebug/sCA_dge_plot2.RData", list = c(ls()))
     }
     # cp = load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")
-
+    
     subsetData <- projections[cellNs,]
-#     xAxis <- list(
-#       title = x1,
-#       titlefont = f
-#     )
-#     yAxis <- list(
-#       title = y1,
-#       titlefont = f
-#     )
-#     
-#     p1 <- plotly::plot_ly(
-#       data = subsetData, source = "subset",
-#       key = rownames(subsetData)
-#     ) %>%
-#       add_trace(
-#         x = ~ get(x1),
-#         # x = ~ get(dimX),
-#         # y = ~ get(dimY),
-#         y = ~ get(y1),
-#         type = "scatter", mode = "markers",
-#         text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
-#         # color = ~ get(dimCol),
-#         colors = colors,
-#         showlegend = TRUE
-#       ) %>%
-#       layout(
-#         xaxis = xAxis,
-#         yaxis = yAxis,
-#         # title = "gtitle",
-#         dragmode = "select"
-#       )
-# p1
+    #     xAxis <- list(
+    #       title = x1,
+    #       titlefont = f
+    #     )
+    #     yAxis <- list(
+    #       title = y1,
+    #       titlefont = f
+    #     )
+    #     
+    #     p1 <- plotly::plot_ly(
+    #       data = subsetData, source = "subset",
+    #       key = rownames(subsetData)
+    #     ) %>%
+    #       add_trace(
+    #         x = ~ get(x1),
+    #         # x = ~ get(dimX),
+    #         # y = ~ get(dimY),
+    #         y = ~ get(y1),
+    #         type = "scatter", mode = "markers",
+    #         text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
+    #         # color = ~ get(dimCol),
+    #         colors = colors,
+    #         showlegend = TRUE
+    #       ) %>%
+    #       layout(
+    #         xaxis = xAxis,
+    #         yaxis = yAxis,
+    #         # title = "gtitle",
+    #         dragmode = "select"
+    #       )
+    # p1
     prj = subsetData[,prjs]
     mycolPal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(
       n = 12, name =
