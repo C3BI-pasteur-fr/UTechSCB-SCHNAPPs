@@ -43,7 +43,7 @@ if (!AllowClustering)
   })
 
 # projections ----
-if (!AllowClustering)
+# if (!AllowClustering)
   projections <- reactive({
     if (DEBUG) {
       cat(file = stderr(), green("projections lite started.\n"))
@@ -77,11 +77,12 @@ if (!AllowClustering)
       }
       return(NULL)
     }
-    if (.schnappsEnv$DEBUGSAVE) {
+    # if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls()))
-    }
+    # }
     # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
     
+      
     
     # browser()
     
@@ -167,6 +168,13 @@ if (!AllowClustering)
     
     if (ncol(prjs) > 0 & nrow(prjs) == nrow(projections)) {
       projections <- cbind(projections, prjs)
+    } else if (ncol(prjs) > 0) {
+      commIds = intersect(rownames(prjs), rownames(projections))
+      missing = rownames(projections)[!rownames(projections) %in% rownames(prjs)]
+      if (length(missing)>0) {
+        prjs[missing,] = NA
+      }
+      projections <- cbind(projections, prjs[rownames(projections),])
     }
     # remove columns with only one unique value
     rmC <- c()

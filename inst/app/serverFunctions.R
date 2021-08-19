@@ -16,6 +16,21 @@ suppressMessages(library(InteractiveComplexHeatmap))
 library(dendsort)
 library(MASS)
 
+
+### Try catch from extended examples ----
+
+tryCatch.W.E <- function(expr){
+  W <- NULL
+  w.handler <- function(w){ # warning handler
+    W <<- w
+    invokeRestart("muffleWarning")
+  }
+  list(value = withCallingHandlers(tryCatch(expr, error = function(e) e),
+                                   warning = w.handler),
+       warning = W)
+}
+
+
 # printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   require(hms)
@@ -1578,7 +1593,8 @@ heatmapModuleFunction <- function(
   # heatmapData$side_color_colorbar_len = NULL
   # any(is.na(heatmapData$mat))
   set.seed(1) # to make clustering reproducible
-  
+  heatmapData$run_draw = F
+  if (sortingCols == "gene (click)") heatmapData$run_draw = T
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
@@ -1644,7 +1660,7 @@ loadLiteData <- function(fileName = NULL) {
   assays(counts)[["logcounts"]] = NULL
   logcounts = scEx
   assays(logcounts)[["counts"]] = NULL
-  if (!exists("ccol")){
+  if (!exists("ccol", inherits = F)){
     # cluster colors
     inCols <- list()
     lev <- levels(dbCluster)
@@ -1653,7 +1669,7 @@ loadLiteData <- function(fileName = NULL) {
     ccol <- unlist(inCols)
   }
   projections$sampleNames = factor(projections$sampleNames)
-  if (!exists("scol")) {
+  if (!exists("scol", inherits = F)) {
     sampNames = levels(projections$sampleNames)
     scol <- rev(allowedColors)[seq_along(sampNames)]
     names(scol) <- sampNames

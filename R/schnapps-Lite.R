@@ -121,13 +121,18 @@ schnappsLite <- function(data="RdataFile",
     
   }
   
+  if(!"sampleCol" %in% names(.schnappsEnv$.SCHNAPPs_LiteData) & "scol" %in% names(.schnappsEnv$.SCHNAPPs_LiteData))
+    .schnappsEnv$.SCHNAPPs_LiteData[["sampleCol"]] = .schnappsEnv$.SCHNAPPs_LiteData[["scol"]]
+  if(!"clusterCol" %in% names(.schnappsEnv$.SCHNAPPs_LiteData) & "ccol" %in% names(.schnappsEnv$.SCHNAPPs_LiteData))
+    .schnappsEnv$.SCHNAPPs_LiteData[["clusterCol"]] = .schnappsEnv$.SCHNAPPs_LiteData[["ccol"]]
+  
   if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
     # error loading
     return(NULL)
   }
   # save(file = "global.RData", list = c(".schnappsEnv"))
   app <- shinyApp(ui = scShinyUI, server = scShinyServer)
-  # runApp(app)
+  runApp(app)
   
   
 }
