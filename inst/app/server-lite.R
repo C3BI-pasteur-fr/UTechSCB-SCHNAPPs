@@ -147,6 +147,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
   base::source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
   base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
   
+  
+  
   # bookmarking ----
   # couldn't get bookmarking to work, esp. with the input file
   # setBookmarkExclude(c("bookmark1"))
@@ -261,6 +263,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
     HTML(markdown::markdownToHTML(knit(introFile, quiet = TRUE), fragment.only = T))
     # includeHTML("intro.html")
   })
+  
+   
   
   # colors for samples ----
   sampleCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$sampleCol)
