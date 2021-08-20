@@ -110,5 +110,5 @@
   # schnapps(DEBUG = T, historyPath = "/Volumes/Oct2020/RStudio/history/celia/")
   # 
   # 
-  runApp(app)
+  runApp(app, port=3838)
   
