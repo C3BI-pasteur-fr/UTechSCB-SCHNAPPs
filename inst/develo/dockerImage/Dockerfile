@@ -2,14 +2,14 @@
 # https://github.com/rocker-org/shiny
 
 ### usage:
-# cd ..../inst/develo/dockerImage
+# cd inst/develo/dockerImage
 # docker build -t pf2dock/schnapps:0.2  . 
 # docker push pf2dock/schnapps:0.1
 # docker run --rm -p 3838:3838 rocker/shiny
 # docker run --rm -p 3838:3838 rocker/shiny:3.4.4
 # local directory mapped to /data
 # docker run --user shiny --rm -p 3838:3838 -v ./:/data schnapps:1.6.28 
-
+# docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps:0.2
 
 # load R image
 FROM r-base:4.0.4
@@ -20,35 +20,29 @@ WORKDIR /root
 # install libraries needed
 #\
 #libssh2-1-dev \
-
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get update && apt-get -y --fix-missing install git 
-RUN apt-get update && apt-get install -y \
-    libxml2-dev
-RUN apt-get update && apt-get install -y \
-#    libgit2-dev  
+RUN apt-get update && apt-get install -y   libxml2-dev
+RUN apt-get update && apt-get install -y   libgit2-dev  
 RUN git --version
-RUN apt-get -y update && apt-get -y install libssl-dev  \
-    apt-utils \
-    ssh-client 
-RUN apt-get update && apt-get install -y \
-    libpoppler-cpp-dev
-RUN apt-get update && apt-get install -y \
-    orca \
-    pandoc \
-    sudo \
-    gdebi-core 
-RUN apt-get update && apt-get install -y \
-    pandoc \
-    pandoc-citeproc \
-    libcurl4-gnutls-dev \
-    libxt-dev \
-    xtail \
-    libxt-dev \
-    libgsl-dev \
-    libhdf5-serial-dev \
-    wget \
-    libcairo2-dev \
-    libcurl4-openssl-dev
+RUN apt-get -y update && apt-get -y install libssl-dev 
+RUN apt-get update && apt-get install -y apt-utils 
+RUN apt-get update && apt-get install -y ssh-client 
+RUN apt-get update && apt-get install -y libpoppler-cpp-dev
+RUN apt-get update && apt-get install -y  orca 
+RUN apt-get update && apt-get install -y    pandoc 
+RUN apt-get update && apt-get install -y    sudo 
+RUN apt-get update && apt-get install -y    gdebi-core 
+RUN apt-get update && apt-get install -y pandoc-citeproc 
+RUN apt-get update && apt-get install -y     libcurl4-gnutls-dev 
+RUN apt-get update && apt-get install -y     libxt-dev 
+RUN apt-get update && apt-get install -y     xtail 
+RUN apt-get update && apt-get install -y     libxt-dev 
+RUN apt-get update && apt-get install -y     libgsl-dev 
+RUN apt-get update && apt-get install -y     libhdf5-serial-dev 
+RUN apt-get update && apt-get install -y     wget 
+RUN apt-get update && apt-get install -y     libcairo2-dev 
+RUN apt-get update && apt-get install -y     libcurl4-openssl-dev
 
 # # Download and install shiny server
 RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION -O "version.txt" && \
@@ -103,7 +97,7 @@ COPY shiny-server.sh /usr/bin/shiny-server.sh
 
 RUN chown -R shiny.shiny /var/log/shiny-server
 RUN chown -R shiny.shiny /srv/shiny-server/schnapps
-
+RUN chown -R shiny:shiny /var/lib/shiny-server
 
 CMD ["/usr/bin/shiny-server.sh"]
 
