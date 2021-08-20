@@ -6,6 +6,8 @@ if (!"xbioc" %in% rownames(installed.packages())) {
 
 devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)
 
+BiocManager::valid()
+
 library(SCHNAPPs)
 
 library(future)
