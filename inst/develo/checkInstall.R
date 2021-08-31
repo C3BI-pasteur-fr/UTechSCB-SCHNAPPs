@@ -1,3 +1,7 @@
+# new R version:
+# 
+
+
 biocList = c('BiocSingular', 'SingleR', 
              'multtest', 'limma', 'Biobase', 'monocle', 'rtracklayer', 
              'IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics',
@@ -23,6 +27,8 @@ instList = c('BiocManager', 'pdftools',
 # setRepositories(ind = c(1,2,3))
 # 
 # devtools::install_version('spatstat', version = '1.64-1', repos = 'http://cran.us.r-project.org')
+# update / reinstall macports https://trac.macports.org/wiki/Migration
+
 
 devtools::install_github("briatte/ggnetwork", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 devtools::install_github("mul118/shinyMCE",  dependencies = TRUE, build = T,type = "source", upgrade = "always")
