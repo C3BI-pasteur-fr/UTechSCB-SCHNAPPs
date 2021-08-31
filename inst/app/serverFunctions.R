@@ -1475,6 +1475,8 @@ heatmapModuleFunction <- function(
     }
     colN <- colN[colN %in% matN]
     heatmapData$mat <- heatmapData$mat[, colN, drop = FALSE]
+    heatmapData$annotation_col = heatmapData$annotation_col[colN,,drop = FALSE]
+    
     # return()
   }
   # if (moreOptions) {

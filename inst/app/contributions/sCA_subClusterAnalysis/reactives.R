@@ -99,17 +99,6 @@ myDiffExpFunctions <- list(
 # this is hard-coded here, but should be a parameter somehow like myDiffExpFunctions
 # such it can be used by contributed functions
 
-tryCatch.W.E <- function(expr){
-  W <- NULL
-  w.handler <- function(w){ # warning handler
-    W <<- w
-    invokeRestart("muffleWarning")
-  }
-  list(value = withCallingHandlers(tryCatch(expr, error = function(e) e),
-                                   warning = w.handler),
-       warning = W)
-}
-
 #' Seurat FindMarkers
 #'
 #' cellMeta = colData(scEx)
