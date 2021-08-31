@@ -17,6 +17,7 @@
   localContributionDir = ""
   defaultValueSingleGene = "IL7R" # CD52
   defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
+  defaultValueMultiGenes = "IGHA1, IGKC, IGHA2, IGLC2, IGLL5, IGKV4-1, IGHM, IGLC3, PPIG, HIGD2A, IGKV1-39, IGBP1, INSIG1, IGHV4-59, IGKV3-20, GIGYF2, IGF1, PIGP, IGLV3-1, AIG1, PIGT, IGLV6-57, IGKV1D-8, IGHV3-7, INSIG2, IGKV1-5, GIGYF1, SIGIRR, IGHG1, IGHV3-30, IGHG3, PIGBOS1"
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
   DEBUG = T
@@ -57,14 +58,14 @@
   defaultValues[["alluiv2"]] = "dbCluster"
   # defaultValues[["tabsetCluster"]] = "seurat_Clustering"
   defaultValues[["minGenesGS"]] = 1
-  defaultValues[["minGenes"]] = 1
-  defaultValues[["maxGenes"]] = 50000
+  defaultValues[["minGenes"]] = 100
+  defaultValues[["maxGenes"]] = 15000
   defaultValues[["seurClustDims"]] = 15
   defaultValues[["seurClustk.param"]] = 15
-  defaultValues[["cellPatternRM"]] = "-s1|-s2"
+  defaultValues[["cellPatternRM"]] = ""
   defaultValues[["gQC_binSize"]] = 200
   defaultValues[["selectIds"]] = "^MT-|^RP|^MRP|MALAT1|B2M|EEF1A1"
-  defaultValues[["selectIds"]] = ""
+  # defaultValues[["selectIds"]] = ""
   defaultValues[["whichscLog"]] = "calcLog"
   defaultValues[["whichscLog"]] = "disablescEx_log"
   
@@ -109,5 +110,5 @@
   # schnapps(DEBUG = T, historyPath = "/Volumes/Oct2020/RStudio/history/celia/")
   # 
   # 
-  runApp(app)
+  runApp(app, port=3838)
   
