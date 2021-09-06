@@ -20,7 +20,7 @@ myNormalizationParameters <- list(
   DE_logNormalization = tagList(
     numericInput("DE_logNormalization_sf",
                  label = "scale by (0 => minvalue)",
-                 min = 0, max = 200000, step = 1, value = 0
+                 min = 0, max = 200000, step = 1, value = defaultValue("DE_logNormalization_sf", 0)
     )
     ),
   DE_scaterNormalization = h5("no Parameters implemented"),
@@ -1219,7 +1219,10 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
     save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
-  
+  if (is.null(sfactor)) {
+      sfactor = defaultValue("DE_logNormalization_sf", 0)
+  }
+ 
   # TODO ?? define scaling factor somewhere else???
   # sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
   retVal <- DE_logNormalizationfunc(scEx, sfactor)

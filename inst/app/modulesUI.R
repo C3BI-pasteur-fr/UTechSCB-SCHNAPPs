@@ -55,8 +55,8 @@ clusterUI <- function(id) {
         width = 4,
         selectInput(ns("dimension_col"),
                     label = "color",
-                    choices = c(defaultValue(ns("dimension_col"), "Gene.count")),
-                    selected = defaultValue(ns("dimension_col"), "Gene.count")
+                    choices = c(defaultValue(ns("dimension_col"), "sampleNames")),
+                    selected = defaultValue(ns("dimension_col"), "sampleNames")
         )
       )
     ),
@@ -222,7 +222,7 @@ pHeatMapUI <- function(id) {
               ns("sortingCols"),
               label = "order columns by",
               choices = c("dendrogram", "list", "gene (click)"),
-              selected = defaultValue(ns("sortingCols"), "dendrogram"),
+              selected = defaultValue(ns("sortingCols"), "list"),
               multiple = FALSE
             )
           )
