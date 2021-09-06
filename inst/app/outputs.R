@@ -1,4 +1,4 @@
-cat(file = stderr(), "outputs.R started.\n")
+if (DEBUG) cat(file = stderr(), "outputs.R started.\n")
 suppressMessages(require(shinyTree))
 suppressMessages(require(stringr))
 # require(rintrojs)
@@ -553,7 +553,7 @@ output$DEBUGSAVEstring <- renderText({
 # cellSelectionMod ----
 callModule(tableSelectionServer, 
            "cellSelectionMod", 
-           inputSample, caption = "Tables with input cells")
+           inputSample, caption = "Table with input cells")
 
 # normalizationResult ----
 callModule(
