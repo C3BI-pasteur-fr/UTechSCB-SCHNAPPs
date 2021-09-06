@@ -1562,17 +1562,17 @@ pHeatMapModule <- function(input, output, session,
     if(is.null(scEx_log)) return(NULL)
     pos = getPositionFromClick(click = input$heatmap_click, 
                                ratio = 1)
-    if(is.null(pos)) return(NULL)
-    
-    save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
+    # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
     # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
     
-    selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
-                               verbose = F, calibrate = FALSE)
-    
+    if(is.null(pos)) return(NULL)
+    if(is.null(htobj)) return(NULL)
     if (is.null(projections)) return(NULL)
     if (is.null(htDat)) return(NULL)
     
+    selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
+                               verbose = F, calibrate = FALSE)
+ 
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData",
