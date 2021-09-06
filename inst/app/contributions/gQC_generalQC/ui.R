@@ -357,10 +357,13 @@ tabList <- list(
           ),
           column(
             width = 3,
-            selectInput("gQC_um_n_epochs",
-                        label = "epochs",
-                        choices = c(1:1000), selected = defaultValue("gQC_um_n_epochs", "200")
-            ),
+            numericInput(inputId = "gQC_um_n_epochs", label = "epochs:", 
+                         value = as.numeric(defaultValue("gQC_um_n_epochs", 200)), min = 1, max = 1000),
+            
+            # selectizeInput("gQC_um_n_epochs",
+            #             label = "epochs",
+            #             choices = c(1:1000), selected = defaultValue("gQC_um_n_epochs", "200")
+            # ),
             selectInput(
               "gQC_um_bandwidth",
               label = "bandwidth",

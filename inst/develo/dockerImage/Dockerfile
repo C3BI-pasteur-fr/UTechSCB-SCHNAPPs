@@ -11,6 +11,9 @@
 # docker run --user shiny --rm -p 3838:3838 -v ./:/data schnapps:1.6.28 
 # docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps:0.2
 
+# docker build -f DockerfileUpdate.txt -t pf2dock/schnapps:0.31 .
+# docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps:0.31
+
 # load R image
 FROM r-base:4.0.4
 
@@ -43,6 +46,7 @@ RUN apt-get update && apt-get install -y     libhdf5-serial-dev
 RUN apt-get update && apt-get install -y     wget 
 RUN apt-get update && apt-get install -y     libcairo2-dev 
 RUN apt-get update && apt-get install -y     libcurl4-openssl-dev
+RUN apt-get update && apt-get install -y procps
 
 # # Download and install shiny server
 RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION -O "version.txt" && \
@@ -61,8 +65,7 @@ RUN     R -e "update.packages()" && \
     R -e "BiocManager::install(c('DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment', 'S4Vectors'))" && \
     R -e "devtools::install_version('spatstat', version = '1.64-1', repos = 'http://cran.us.r-project.org')" && \
     R -e "devtools::install_github(repo = 'satijalab/seurat', dependencies = TRUE, ref = 'develop', upgrade='never')" && \
-    R -e "remotes::install_github('C3BI-pasteur-fr/TemporaFork')" && \
-    R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
+    R -e "remotes::install_github('C3BI-pasteur-fr/TemporaFork')"
 RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN', dependencies = TRUE)" && \
     R -e "install.packages(c('shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r'))" && \
     R -e "setRepositories(ind = c(1,2,3));devtools::install_github('RausellLab/CelliD', ref = 'legacy')" && \
@@ -73,7 +76,8 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
     R -e "BiocManager::install('BiocParallel')" && \
     R -e "remotes::install_github('briatte/ggnetwork')" \
     R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
-    
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
+
 RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
     rm -r SCHNAPPsContributions/Dummy/  && \
     mkdir /data && \
