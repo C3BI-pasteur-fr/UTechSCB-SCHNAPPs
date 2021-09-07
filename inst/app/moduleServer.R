@@ -296,20 +296,8 @@ clusterServer <- function(input, output, session,
     if (is.null(cells.names) )
       if (length(brushedPs) >0)
         if (nrow(brushedPs) > 0) { 
-          # browser()
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
-          # cat(file = stderr(), "changeGroups\n")
           cells.names = tryCatch(
             {
-              
               rownames(projections[which(projections[,dimX] %in% brushedPs$x & 
                                            projections[,dimY] %in% brushedPs$y),])
             },
@@ -915,14 +903,20 @@ clusterServer <- function(input, output, session,
     grpSelected <- make.names(input$groupNames, unique = TRUE)
     grpNs <- groupNames$namesDF
     myns <- ns("cellSelection")
-    
+    inputGroupName = isolate(input$groupName)
+    # in case there is a name given for a group we only print the rownames belonging to this name
+    if (inputGroupName != ""){
+      if(grpN %in% names(grpNs) ){
+        retVal = rownames(grpNs)[grpNs[,grpN]]
+      } else {
+        return("")
+      }
+    }
     if (!myshowCells) {
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
       return("")
     }
     if (is.null(projections)) {
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
-      return("")
+       return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls()))
@@ -943,8 +937,7 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- cells.names[!is.na(cells.names)]
     retVal <- paste(retVal, collapse = ", ")
-    .schnappsEnv[[paste0("historyPlot-", myns)]] <- retVal
-    
+     
     exportTestValues(ClusterCellSelection = {
       retVal
     })
@@ -992,10 +985,10 @@ tableSelectionServer <- function(input, output, session,
     if (clicked < 1) {
       return()
     }
-    req(.schnappsEnv[[paste0("historyPlot-", myns)]])
+    req(.schnappsEnv[[paste0("historyTable-", myns)]])
     add2history(
       type = "renderDT", input = isolate( reactiveValuesToList(input)), comment = "Table",
-      tableData = .schnappsEnv[[paste0("historyPlot-", myns)]]
+      tableData = .schnappsEnv[[paste0("historyTable-", myns)]]
     )
   })
   
@@ -1138,7 +1131,7 @@ tableSelectionServer <- function(input, output, session,
     
     # searchStr <-
     if (is.null(dataTables)) {
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
+      .schnappsEnv[[paste0("historyTable-", myns)]] <- NULL
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
@@ -1210,7 +1203,7 @@ tableSelectionServer <- function(input, output, session,
                                order = get(ns("colOrder"), envir = .schnappsEnv)
                              )
       )
-      .schnappsEnv[[paste0("historyPlot-", myns)]] <- dtout
+      .schnappsEnv[[paste0("historyTable-", myns)]] <- dtout
       return(
         dtout
       )
@@ -1343,9 +1336,9 @@ pHeatMapModule <- function(input, output, session,
     orderColNames = input$orderNames,
     heatmapCellGrp = input$heatmapCellGrp,
     heatmapMinMaxValue = input$heatmapMinMaxValue
-   )) %>% debounce(1000)
+  )) %>% debounce(1000)
   
- 
+  
   
   heatmapMinMaxValueDeb <- reactive(
     input$heatmapMinMaxValue
@@ -1429,13 +1422,11 @@ pHeatMapModule <- function(input, output, session,
       outfile = outfile
     )
     myretVal(retVal)
-    # if (retVal[["src"]] == "empty.png") {
-    #   .schnappsEnv[[paste0("historyPlot-", myns)]] <- NULL
-    # } else {
+
     af = heatmapModuleFunction
     # remove env because it is too big
     environment(af) = new.env(parent = emptyenv())
-    .schnappsEnv[[paste0("historyPlot-", myns)]] <- list(plotFunc = af,
+    .schnappsEnv[[paste0("historyHeatmap-", myns)]] <- list(plotFunc = af,
                                                          heatmapData = heatmapData,
                                                          addColNames = addColNames,
                                                          orderColNames = orderColNames,
@@ -1557,6 +1548,7 @@ pHeatMapModule <- function(input, output, session,
   
   # observer click ----
   observe( {
+    if (DEBUG) cat(file = stderr(), "observe input$heatmap_click \n")
     heatmap_click = input$heatmap_click
     htobj = ht_obj()
     htpos_obj = ht_pos_obj()
@@ -1570,16 +1562,17 @@ pHeatMapModule <- function(input, output, session,
     if(is.null(scEx_log)) return(NULL)
     pos = getPositionFromClick(click = input$heatmap_click, 
                                ratio = 1)
-    if(is.null(pos)) return(NULL)
     # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
     # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
     
-    selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
-                               verbose = F, calibrate = FALSE)
-    
+    if(is.null(pos)) return(NULL)
+    if(is.null(htobj)) return(NULL)
     if (is.null(projections)) return(NULL)
     if (is.null(htDat)) return(NULL)
     
+    selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
+                               verbose = F, calibrate = FALSE)
+ 
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData",
@@ -1658,7 +1651,7 @@ pHeatMapModule <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), "observe input$save2HistHM \n")
     myns <- ns("pHeatMap")
     # browser()
-    req(.schnappsEnv[[paste0("historyPlot-", myns)]])
+    req(.schnappsEnv[[paste0("historyHeatmap-", myns)]])
     start.time <- base::Sys.time()
     if (DEBUG) cat(file = stderr(), "cluster: save2HistHM\n")
     on.exit(
@@ -1685,7 +1678,7 @@ pHeatMapModule <- function(input, output, session,
                       "plotData$plotData$outfile=NULL\n",
                       "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
       ),
-      plotData = .schnappsEnv[[paste0("historyPlot-", myns)]]
+      plotData = .schnappsEnv[[paste0("historyHeatmap-", myns)]]
     )
   })
   
@@ -1742,6 +1735,9 @@ pHeatMapModule <- function(input, output, session,
     }
     heatmapData <- pheatmapList()
     if(is.null(heatmapData)) return(NULL)
+    # to remove the warning message when nothing is loaded
+    if (!"mat" %in% names(heatmapData))
+      heatmapData$mat = 0
     updateSliderInput(session,
                       inputId = "heatmapMinMaxValue",
                       min = signif(min(heatmapData$mat), digits = 4),

@@ -112,7 +112,7 @@ inputTab <- function() {
         column(
           6,
           
-          checkboxInput("sampleInput", label = "sub sample", value = defaultValue("sampleInput", TRUE)),
+          checkboxInput("sampleInput", label = "sub sample", value = defaultValue("sampleInput", FALSE)),
           
           numericInput("subsampleNum",
                        label = "max number of cells per sample",
@@ -163,7 +163,7 @@ geneSelectionTab <- function() {
         width = 12, offset = 1,
         actionButton("updateGeneSelectionParameters", "apply changes", width = "80%")
       )
-    ), checkbsTT("minGenesGS"),
+    ),
     checkbsTT("updateGeneSelectionParameters"),
     br(),
     shinydashboard::box(
@@ -181,7 +181,7 @@ geneSelectionTab <- function() {
         column(
           width = 4,
           h4("Min expression over all cells"),
-          numericInput("minGenesGS", "Min # of UMIs over all cells", defaultValue("minGenesGS", 2), min = 1, max = 1000000)
+          numericInput("minGenesGS", "Min # of UMIs over all cells", defaultValue("minGenesGS", 100), min = 1, max = 1000000)
         )
       ), checkbsTT("minGenesGS"),
       fluidRow(

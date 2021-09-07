@@ -1022,7 +1022,7 @@ useGenesFunc <-
     }
     
     keepIDs[keepGeneIds] <- TRUE
-    cat(file = stderr(), paste("useGenesFunc sum ret", sum(keepIDs),"\n"))
+    if (DEBUG) cat(file = stderr(), paste("useGenesFunc sum ret", sum(keepIDs),"\n"))
     return(keepIDs)
   }
 
@@ -1328,7 +1328,7 @@ scExFunc <-
     # TODO something is fishy here
     scExNew <- scExOrg[keepGenes, keepCells]
     if (changed) {
-      cat(file = stderr(), "--- scExFunc changed\n")
+      if (DEBUG) cat(file = stderr(), "--- scExFunc changed\n")
       scExNew <-
         scExFunc(scExOrg[keepGenes, keepCells], useCells[keepCells], useGenes[keepGenes], minGene, minG, maxG)
       if (is.null(scExNew)) {
@@ -2684,7 +2684,7 @@ initializeGroupNames <- reactive({
   
   scEx <- scEx()
   if (is.null(scEx)) {
-    cat(file = stderr(), "     scEx NULL.\n")
+    if (DEBUG) cat(file = stderr(), "     scEx NULL.\n")
     return(NULL)
   }
   isolate({
@@ -3022,6 +3022,54 @@ inputSample <- reactive({
     showNotification("inputSample", id = "inputSample", duration = NULL)
   }
   
+  scEx <- scEx()
+  
+  if (is.null(scEx)) {
+    return(NULL)
+  }
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("inputSample", id = "inputSample", duration = NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/inputSample.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/inputSample.RData')
+  
+  # TODO should come from sampleInfo
+  sampInf <- gsub(".*-(.*)", "\\1", scEx$barcode)
+  cellIds <- data.frame(
+    cellName = colnames(scEx),
+    sample = sampInf,
+    # number of genes per cell
+    ngenes = Matrix::colSums(assays(scEx)[[1]]>0),
+    nUMI = Matrix::colSums(assays(scEx)[[1]])
+  )
+  
+  if (DEBUG) {
+    cat(file = stderr(), "inputSample: done\n")
+  }
+  if (dim(cellIds)[1] > 1) {
+    return(cellIds)
+  } else {
+    return(NULL)
+  }
+})
+
+inputSampleOrg <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "inputSample started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "inputSample")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "inputSample")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("inputSample", id = "inputSample", duration = NULL)
+  }
+  
   dataTables <- inputData()
   
   if (is.null(dataTables)) {
@@ -3054,7 +3102,6 @@ inputSample <- reactive({
     return(NULL)
   }
 })
-
 
 getMemoryUsed <- reactive({
   #
