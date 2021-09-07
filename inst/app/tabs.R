@@ -357,6 +357,11 @@ clusterParametersTab <- function() {
     "clusterParameters",
     fluidRow(div(h2("Clustering parameters"), align = "center")),
     br(),
+    fluidRow(column(
+      width = 10,
+      span(textOutput("noLogWarning"), style="color:red")
+    )),
+    br(),
     fluidRow(
       tabBox(title = "Transformations for PCA", width = 12, id = "transPCA",
              tabPanel(
