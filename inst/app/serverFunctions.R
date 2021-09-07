@@ -143,7 +143,7 @@ append2list <- function(myHeavyCalculations, heavyCalculations) {
 # used in moduleServer and reports
 plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
-                             logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "Gene.count",
+                             logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "sampleNames",
                              colors = NULL) {
   # in case it is called not from within schnapps
   if(!exists(".schnappsEnv")) {
@@ -188,7 +188,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   )
   
   # histogram as y and cellDensity as color is not allowed
-  
+  if (dimCol == "") return(NULL)
   if (dimY == "histogram") {
     if (!all(c(dimX, dimCol) %in% colnames(projections))) {
       return(NULL)
@@ -535,8 +535,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       title = gtitle,
       dragmode = "select"
     )
-  
-  
+
   if (is.factor(subsetData[, dimCol])) {
     
   } else {

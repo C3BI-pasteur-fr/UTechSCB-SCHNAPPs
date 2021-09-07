@@ -18,7 +18,7 @@ services:
     # environment:
     #   - APPLICATION_LOGS_TO_STDOUT=false
     ports:
-      - '80:3838'
+      - '3838:3838'
     volumes:
       - 'shiny_logs:/var/log/shiny-server'
       # Comment the line below out for initial testing. With it commented out,
