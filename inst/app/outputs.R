@@ -67,6 +67,11 @@ for (fp in parFiles) {
   }
 }
 
+output$noLogWarning <- renderText({
+  logCalc <- input$whichscLog
+  if(logCalc != "calcLog") return("Warning normalization not being calculated due to input page selection of Compute normalizations?")
+  return("")
+})
 
 # dimPlotPCA ----
 # <- reactive({
