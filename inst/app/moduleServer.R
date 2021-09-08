@@ -916,7 +916,7 @@ clusterServer <- function(input, output, session,
       return("")
     }
     if (is.null(projections)) {
-       return("")
+      return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls()))
@@ -937,7 +937,7 @@ clusterServer <- function(input, output, session,
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- cells.names[!is.na(cells.names)]
     retVal <- paste(retVal, collapse = ", ")
-     
+    
     exportTestValues(ClusterCellSelection = {
       retVal
     })
@@ -1422,22 +1422,22 @@ pHeatMapModule <- function(input, output, session,
       outfile = outfile
     )
     myretVal(retVal)
-
+    
     af = heatmapModuleFunction
     # remove env because it is too big
     environment(af) = new.env(parent = emptyenv())
     .schnappsEnv[[paste0("historyHeatmap-", myns)]] <- list(plotFunc = af,
-                                                         heatmapData = heatmapData,
-                                                         addColNames = addColNames,
-                                                         orderColNames = orderColNames,
-                                                         sortingCols = sortingCols,
-                                                         scale = scale,
-                                                         colPal = colPal,
-                                                         minMaxVal = minMaxVal,
-                                                         proje = proje,
-                                                         heatmapCellGrp = heatmapCellGrp,
-                                                         outfile = outfile
-                                                         
+                                                            heatmapData = heatmapData,
+                                                            addColNames = addColNames,
+                                                            orderColNames = orderColNames,
+                                                            sortingCols = sortingCols,
+                                                            scale = scale,
+                                                            colPal = colPal,
+                                                            minMaxVal = minMaxVal,
+                                                            proje = proje,
+                                                            heatmapCellGrp = heatmapCellGrp,
+                                                            outfile = outfile
+                                                            
     )
     # }
     # return(retVal)
@@ -1484,6 +1484,7 @@ pHeatMapModule <- function(input, output, session,
                  
                  if (is.null(projections)) return(NULL)
                  if (is.null(htDat)) return(NULL)
+                 if (is.null(htobj)) return(NULL)
                  
                  if (.schnappsEnv$DEBUGSAVE) {
                    save(
@@ -1570,9 +1571,17 @@ pHeatMapModule <- function(input, output, session,
     if (is.null(projections)) return(NULL)
     if (is.null(htDat)) return(NULL)
     
-    selection = selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
-                               verbose = F, calibrate = FALSE)
- 
+    selection = tryCatch(
+      selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
+                     verbose = F, calibrate = FALSE), 
+      error = function(e) {
+        cat(file = stderr(), paste("inputData: NULL", e,"\n"))
+        return(NULL)}
+    )
+    if (is.null(selection)) {
+      save(file = "~/SCHNAPPsDebug/pHeatMapClickNULL.RData", list = c( ls()  ))
+      return(NULL)
+    }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
         file = "~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData",
@@ -1620,6 +1629,8 @@ pHeatMapModule <- function(input, output, session,
     pos = getPositionFromBrush(brush = input$heatmap_brush, 
                                ratio = 1)
     if(is.null(pos)) return(NULL)
+    if(is.null(htobj)) return(NULL)
+    if(is.null(htpos_obj)) return(NULL)
     # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
     # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
     
