@@ -130,14 +130,16 @@ observe({
   updateSliderInput(session,
                     inputId = "coEminMaxExpr",
                     step = step,
-                    min = signif(minExp + step, digits = 4),
-                    max = signif(maxExp, digits = 4)
+                    min = signif(minExp, digits = 4),
+                    max = signif(maxExp, digits = 4),
+                    value = c(minExp + step, maxExp)
   )
   updateSliderInput(session,
                     inputId = "coEminMaxExpr2",
                     step = (maxExp - minExp) / 1000000,
-                    min = signif(minExp + step, digits = 4),
-                    max = signif(maxExp, digits = 4)
+                    min = signif(minExp , digits = 4),
+                    max = signif(maxExp, digits = 4), 
+                    value = c(minExp + step, maxExp)
   )
   
   
