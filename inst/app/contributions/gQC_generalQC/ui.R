@@ -198,7 +198,7 @@ tabList <- list(
         ),
         column(
           width = 6,
-          numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 30), min = 1, max = 100)
+          numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 60), min = 1, max = 100)
         )
       ),
       shinydashboard::box(
@@ -291,28 +291,28 @@ tabList <- list(
           width = 3,
             selectInput("gQC_um_n_neighbors",
                       label = "N Neighbors",
-                      choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "15")
+                      choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "60")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_n_components",
                       label = "N components",
-                      choices = c(2:20), selected = defaultValue("gQC_um_n_components", "2")
+                      choices = c(2:20), selected = defaultValue("gQC_um_n_components", "3")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_spread",
                       label = "spread",
-                      choices = c(1:10), selected = defaultValue("gQC_um_spread", "1")
+                      choices = c(1:10), selected = defaultValue("gQC_um_spread", "9")
           )
         ),
         column(
           width = 3,
           selectInput("gQC_um_local_connectivity",
                       label = "local connectivity",
-                      choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "1")
+                      choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "20")
           )
         )
       ),
