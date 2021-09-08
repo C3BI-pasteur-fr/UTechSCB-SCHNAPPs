@@ -1749,10 +1749,13 @@ pHeatMapModule <- function(input, output, session,
     # to remove the warning message when nothing is loaded
     if (!"mat" %in% names(heatmapData))
       heatmapData$mat = 0
+    min = signif(min(heatmapData$mat), digits = 4)
+    max = signif(max(heatmapData$mat), digits = 4)
     updateSliderInput(session,
                       inputId = "heatmapMinMaxValue",
-                      min = signif(min(heatmapData$mat), digits = 4),
-                      max = signif(max(heatmapData$mat), digits = 4)
+                      min = min,
+                      max = max,
+                      value = c(min, max)
     )
     # updateNumericInput(session, inputId = "heatmapMaxValue",
     #                    min = min(heatmapData$mat),
