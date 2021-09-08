@@ -255,7 +255,7 @@ pHeatMapUI <- function(id) {
               label = "min/max value for heatmap",
               min = -10000000,
               max = 100000000,
-              value = defaultValue(ns("heatmapMinMaxValue"), c(-1,1))
+              value = defaultValue(ns("heatmapMinMaxValue"), c(0,10))
             )
           ),
           column(
