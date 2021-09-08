@@ -426,7 +426,7 @@ clusterParametersTab <- function() {
                fluidRow(
                  column(4,
                         offset = 0,
-                        numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 50), min = 2),
+                        numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 15), min = 2),
                         checkboxInput("pcaCenter", "center data", TRUE)
                  ),
                  column(4,
@@ -517,7 +517,7 @@ clusterParametersTab <- function() {
                    column(
                      width = 6,
                      numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = defaultValue("seurClustDims", 15), width = "100%"),
-                     numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",15), width = "100%")
+                     numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",60), width = "100%")
                    ),
                    column(
                      width = 6,
