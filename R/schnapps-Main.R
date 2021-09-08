@@ -33,8 +33,8 @@
 #' save(file = "scEx.Rdata", list = "scEx")
 #' # use "scEx.Rdata" with load data functionality within the shiny app
 schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
-                     defaultValueSingleGene = "CD52",
-                     defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
+                     defaultValueSingleGene = "CD3g",
+                     defaultValueMultiGenes = "cd3g, cd4, cd8b, ighm, TCF4, LILRA2, LYZ, cd74, bcl11b, IL32",
                      defaultValueRegExGene = "", # tip: '^CD7$|^KIT$; genes with min expression
                      DEBUG = FALSE,
                      DEBUGSAVE = FALSE,

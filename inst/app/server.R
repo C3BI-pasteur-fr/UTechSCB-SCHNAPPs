@@ -58,12 +58,12 @@ if (exists(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)) {
 if (exists(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)) {
   defaultValueSingleGene <- get(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)
 } else {
-  defaultValueSingleGene <- "CD52"
+  defaultValueSingleGene <- "cd3g"
 }
 if (exists(".SCHNAPPs_defaultValueMultiGenes", envir = .schnappsEnv)) {
   defaultValueMultiGenes <- get(".SCHNAPPs_defaultValueMultiGenes", envir = .schnappsEnv)
 } else {
-  defaultValueMultiGenes <- "CD52, S100A4, S100A9, S100A8"
+  defaultValueMultiGenes <- "cd3g, cd4, cd8b, ighm, TCF4, LILRA2, LYZ, cd74, bcl11b, IL32,hbb"
 }
 if (exists(".SCHNAPPs_defaultValueRegExGene", envir = .schnappsEnv)) {
   defaultValueRegExGene <- get(".SCHNAPPs_defaultValueRegExGene", envir = .schnappsEnv)
