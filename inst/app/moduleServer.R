@@ -1634,9 +1634,19 @@ pHeatMapModule <- function(input, output, session,
     # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
     # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
     
-    selection = selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
-                           mark = T, ht_pos = htpos_obj, 
-                           verbose = T, calibrate = FALSE)
+    selection = tryCatch(
+      selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
+                 mark = T, ht_pos = htpos_obj, 
+                 verbose = T, calibrate = FALSE), 
+      error = function(e) {
+        cat(file = stderr(), paste("inputData: NULL", e,"\n"))
+        return(NULL)}
+    )
+    if (is.null(selection)) {
+      save(file = "~/SCHNAPPsDebug/pHeatMapAreaNULL.RData", list = c( ls()  ))
+      return(NULL)
+    }
+    
     
     output$pHeatMapPlotSelection = renderPrint({
       print(selection)
