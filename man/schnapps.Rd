@@ -12,7 +12,8 @@ schnapps(
   DEBUG = FALSE,
   DEBUGSAVE = FALSE,
   historyPath = NULL,
-  defaultValues = list()
+  defaultValues = list(),
+  port = NULL
 )
 }
 \arguments{
