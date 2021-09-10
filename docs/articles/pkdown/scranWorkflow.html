@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.18</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.113</span>
       </span>
     </div>
 
@@ -46,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -81,7 +81,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -95,8 +95,7 @@
 
       
 
-      </header><script src="scranWorkflow_files/header-attrs-2.5/header-attrs.js"></script><link href="scranWorkflow_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="scranWorkflow_files/anchor-sections-1.0/anchor-sections.js"></script><link href="scranWorkflow_files/vembedr-0.1.4/css/vembedr.css" rel="stylesheet">
+      </header><script src="scranWorkflow_files/header-attrs-2.10/header-attrs.js"></script><link href="scranWorkflow_files/vembedr-0.1.4/css/vembedr.css" rel="stylesheet">
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -132,8 +131,8 @@
 <p>We pre-compute the scran workflow and make its results available for comparison within SCHNAPPs.</p>
 <p>We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># BiocManager::install("scRNAseq")</span>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span> <span class="st">"scRNAseq"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+    <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"scRNAseq"</span><span class="op">)</span><span class="op">}</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">scRNAseq</span><span class="op">)</span>
 <span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scRNAseq/man/GrunPancreasData.html">GrunPancreasData</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">sce</span>
@@ -147,6 +146,7 @@
 <span class="co">## colnames(1728): D2ex_1 D2ex_2 ... D17TGFB_95 D17TGFB_96</span>
 <span class="co">## colData names(2): donor sample</span>
 <span class="co">## reducedDimNames(0):</span>
+<span class="co">## mainExpName: endogenous</span>
 <span class="co">## altExpNames(1): ERCC</span></code></pre></div>
 <p>We prepare the singleCellExperiment object to contain the col/row Data that is needed by SCHNAPPs. At this point, which is usually performed by the bioinformatician who is preparing the data, we can also add other information and documentation.</p>
 <p>colData has to contain the columns barcode = a unique identifier per experiment sampleNames = a name for a collection of cells.</p>
@@ -224,7 +224,7 @@
 
 
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pheatmap</span><span class="op">)</span>
-<span class="va">ass.prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/bootstrapCluster.html">bootstrapCluster</a></span><span class="op">(</span><span class="va">sce</span>, FUN<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
+<span class="va">ass.prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/defunct.html">bootstrapCluster</a></span><span class="op">(</span><span class="va">sce</span>, FUN<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
     <span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">x</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
     <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
 <span class="op">}</span>, clusters<span class="op">=</span><span class="va">sce</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span>
@@ -325,7 +325,7 @@ Filter based on ERCC percentage
 Filter based on ERCC percentage
 </p>
 </div>
-<p>The selected cell names can be copy/pasted to the “Cells to be removed” under Cell selection - additional parameters" as described above.</p>
+<p>The selected cell names can be copy/pasted to the “Cells to be removed” under Cell selection - additional parameters” as described above.</p>
 </div>
 <div id="filter-low-expressing-cells" class="section level3">
 <h3 class="hasAnchor">
@@ -344,7 +344,7 @@ Filter based on detected genes
 <div id="normalization-clustering" class="section level1">
 <h1 class="hasAnchor">
 <a href="#normalization-clustering" class="anchor"></a>Normalization / clustering</h1>
-<p>We use “scaterNorm”, which is applying exactly the same procedure that is used in the vignette. The user has several other options available that are better described in the online documentation.</p>
+<p>We use “scaterNorm,” which is applying exactly the same procedure that is used in the vignette. The user has several other options available that are better described in the online documentation.</p>
 <p>The snnGraph method is used for the clustering.</p>
 </div>
 <div id="results-are-the-same" class="section level1">
