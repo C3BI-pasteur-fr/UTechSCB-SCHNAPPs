@@ -431,14 +431,14 @@ clusterParametersTab <- function() {
                  ),
                  column(4,
                         offset = 0,
-                        numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 500), min = 50),
+                        numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 200), min = 50),
                         checkboxInput("pcaScale", "scale data", defaultValue("pcaScale", TRUE))
                  ),
                  column(4,
                         offset = 0,
                         selectInput("hvgSelection","How to select highly variable genes.", 
                                     choices = c("getTopHVGs","vst", "mvp", "disp"),
-                                    selected = defaultValue("hvgSelection", "vst")),
+                                    selected = defaultValue("hvgSelection", "getTopHVGs")),
                         checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", TRUE))
                  )
                ),
@@ -517,7 +517,7 @@ clusterParametersTab <- function() {
                    column(
                      width = 6,
                      numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = defaultValue("seurClustDims", 15), width = "100%"),
-                     numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",60), width = "100%")
+                     numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",10), width = "100%")
                    ),
                    column(
                      width = 6,
