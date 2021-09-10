@@ -45,7 +45,8 @@ We use the same data set. Here, we have to create a singleCellExperiment object 
 
 ```{r setupData, include=TRUE, collapse=TRUE}
 
-# BiocManager::install("scRNAseq")
+if (! "scRNAseq" %in% installed.packages()){
+    BiocManager::install("scRNAseq")}
 library(scRNAseq)
 sce <- GrunPancreasData()
 sce
