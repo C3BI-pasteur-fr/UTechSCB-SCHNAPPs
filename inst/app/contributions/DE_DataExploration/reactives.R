@@ -266,7 +266,8 @@ DE_scaterPNG <- reactive({
 #' plot 3D tSNE in DataExploration - Expression
 #' Here, only the expression of a gene or gene list is shown, compared to the other tSNE plot
 #' in General QC - tSNE
-DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
+#' DEPRICATED
+DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections,x,y,z) {
   if (is.null(scEx_log)) {
     return(NULL)
   }
@@ -298,7 +299,7 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections) {
   p <-
     plotly::plot_ly(
       projections,
-      x = ~tsne1,
+      x = ~get(x),
       y = ~tsne2,
       z = ~tsne3,
       type = "scatter3d",
@@ -536,9 +537,9 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
   #   scale_colour_gradient2()
   
   retVal =  retVal + scale_color_gradient2(low = lowCol, high = highCol, mid = midCol, midpoint = midFunc(colData))
-   
- 
- require(ggpubr)
+  
+  
+  require(ggpubr)
   # retVal <-
   #   ggarrange(
   #     plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),

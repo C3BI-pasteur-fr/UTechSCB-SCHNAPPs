@@ -289,9 +289,9 @@ tabList <- list(
             title = "alluvial plot", solidHeader = TRUE, width = 12, status = 'primary', 
             fluidRow(
               column(width = 6, 
-                     selectInput("alluiv1", "1st axsis", choices = defaultValue("alluiv1", "notyet"), selected = defaultValue("alluiv1", "notyet"))),
+                     selectInput("alluiv1", "1st axis", choices = defaultValue("alluiv1", "notyet"), selected = defaultValue("alluiv1", "notyet"))),
               column(width = 6, 
-                     selectInput("alluiv2", "2nd axsis", choices = defaultValue("alluiv2", "notyet"), selected = defaultValue("alluiv2", "notyet")))
+                     selectInput("alluiv2", "2nd axis", choices = defaultValue("alluiv2", "notyet"), selected = defaultValue("alluiv2", "notyet")))
             ),
             fluidRow(
               column(width = 12, 

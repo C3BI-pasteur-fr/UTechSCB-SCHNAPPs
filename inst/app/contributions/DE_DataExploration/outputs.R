@@ -17,6 +17,24 @@ callModule(
 #' update x/y coordinates that can be chosen based on available
 #' projections
 
+observe(label = "ob17x", {
+  if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_x\n")
+  .schnappsEnv$DE_expclusters_x <- input$DE_expclusters_x
+})
+observe(label = "ob17y", {
+  if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_y\n")
+  .schnappsEnv$DE_expclusters_y <- input$DE_expclusters_y
+})
+observe(label = "ob17z", {
+  if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_z\n")
+  .schnappsEnv$DE_expclusters_z <- input$DE_expclusters_z
+})
+observe(label = "ob17c", {
+  if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_col\n")
+  .schnappsEnv$DE_expclusters_col <- input$DE_expclusters_col
+})
+
+
 .schnappsEnv$DE_X1 <- "tsne1"
 .schnappsEnv$DE_Y1 <- "tsne1"
 observe(label = "ob17", {
@@ -49,11 +67,28 @@ observe({
   }
 
   # Can also set the label and select items
-  updateSelectInput(session, "DE_dim_x",
-    choices = colnames(projections),
-    selected = .schnappsEnv$DE_X1
+  updateSelectInput(session, "DE_expclusters_x",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_expclusters_x
   )
-
+  updateSelectInput(session, "DE_expclusters_y",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_expclusters_y
+  )
+  updateSelectInput(session, "DE_expclusters_z",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_expclusters_z
+  )
+  updateSelectInput(session, "DE_expclusters_col",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_expclusters_col
+  )
+  
+  updateSelectInput(session, "DE_dim_x",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_X1
+  )
+  
   # Can also set the label and select items
   updateSelectInput(session, "DE_dim_y",
     choices = colnames(projections),
@@ -408,6 +443,12 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   sampdesc <- selectedCells$selectionDescription()
   prj <- isolate(selectedCells$ProjectionUsed())
   prjVals <- isolate(selectedCells$ProjectionValsUsed())
+  x = input$DE_expclusters_x
+  y = input$DE_expclusters_y
+  z = input$DE_expclusters_z
+  # dimCol <- input$DE_expclusters_col
+  scols <- sampleCols$colPal
+  ccols <- clusterCols$colPal
   
   if (is.null(scEx_log) | is.null(projections) | is.null(cellNs) ) {
     return(NULL)
@@ -416,8 +457,23 @@ output$DE_tsne_plt <- plotly::renderPlotly({
     save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls()), compress = F)
   }
   # load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
-
-  retVal <- DE_dataExpltSNEPlot(scEx_log[,cellNs], g_id, projections[cellNs, ])
+  projections$ExpressionColor = 
+  dimCol = "ExpressionColor"
+  featureData <- rowData(scEx_log)
+  geneid <- geneName2Index(g_id, featureData)
+  if (length(geneid) == 0) {
+    return(NULL)
+  }
+  
+  if (length(geneid) == 1) {
+    ExpressionColor <- assays(scEx_log)[[1]][geneid, ]
+  } else {
+    ExpressionColor <- Matrix::colSums(assays(scEx_log)[[1]][geneid, ])
+  }
+  
+  retVal <- tsnePlot(projections, x,y,z, dimCol, scols, ccols) 
+    
+  # retVal <- DE_dataExpltSNEPlot(scEx_log[,cellNs], g_id, projections[cellNs, ], x,y,z)
 
   printTimeEnd(start.time, "DE_dataExpltSNEPlot")
   exportTestValues(DE_dataExpltSNEPlot = {

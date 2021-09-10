@@ -239,7 +239,7 @@ pHeatMapUI <- function(id) {
               ns("ColNames"),
               label = "group names",
               choices = defaultValue(ns("ColNames"), "sampleNames"),
-              selected = defaultValue(ns("ColNames"), "sampleNames"),
+              selected = defaultValue(ns("ColNames"), c("dbCluster", "sampleNames")),
               multiple = TRUE
             ),
             
@@ -247,7 +247,7 @@ pHeatMapUI <- function(id) {
               ns("orderNames"),
               label = "order of columns",
               choices = defaultValue(ns("orderNames"), "sampleNames"),
-              selected = defaultValue(ns("orderNames"), "sampleNames"),
+              selected = defaultValue(ns("orderNames"), c("dbCluster", "sampleNames")),
               multiple = TRUE
             ),
             sliderInput(
