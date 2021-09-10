@@ -41,7 +41,9 @@ tabList <- list(
         )
       ),
       fluidRow(div(tags$h3("Expression based on subset of cells"), align = "center")),
-      tags$p("Here, plots are only working on cells that are selection in the Selection of input Cells"),
+      tags$p("Similar to Co-expression - selection, but with a focus on subsets of cells and genes."),
+      tags$p("Limit the cells to visualize by cluster or any other factorial."),
+      tags$p("Visualize specific genes in 3D and over the current clustering (not changeable)."),
       tags$p("Projections will be not be effected by this sub selection."),
       br(),
       fluidRow(
@@ -49,6 +51,13 @@ tabList <- list(
                 width = 12, 
                 cellSelectionUI("DE_Exp_dataInput")
         )),
+      br(),
+      fluidRow(
+        column( offset = 3,
+                width = 12, 
+                textInput("DE_gene_id", "Enter gene(s) of interest", value = defaultValue("DE_gene_id", defaultValueSingleGene))
+        )),
+      
       br(),
       fluidRow(
         column(
@@ -59,7 +68,40 @@ tabList <- list(
       br(),
       fluidRow(
         column(
-          width = 12,textInput("DE_gene_id", "Enter gene", value = defaultValue("DE_gene_id", defaultValueSingleGene)),
+          width = 3,
+          selectInput("DE_expclusters_x",
+                      label = "X",
+                      choices = c(defaultValue("DE_expclusters_x", "tsne1"), "tsne2", "tsne3"),
+                      selected = defaultValue("DE_expclusters_x", "tsne1")
+          )),
+          column(
+            width = 3,
+            selectInput("DE_expclusters_y",
+                        label = "Y",
+                        choices = c(defaultValue("DE_expclusters_y", "tsne1"), "tsne2", "tsne3"),
+                        selected = defaultValue("DE_expclusters_y", "tsne2")
+            )),
+            column(
+              width = 3,
+              selectInput("DE_expclusters_z",
+                          label = "Z",
+                          choices = c(defaultValue("DE_expclusters_z", "tsne1"), "tsne2", "tsne3"),
+                          selected = defaultValue("DE_expclusters_z", "tsne3")
+              ))
+        # ,
+        # column(
+        #   width = 3,
+        #   selectInput("DE_expclusters_col",
+        #               label = "color",
+        #               choices = defaultValue("DE_expclusters_col", "sampleName"),
+        #               selected = defaultValue("DE_expclusters_col", "sampleName")
+        #   ))
+
+        )
+      ),
+      fluidRow(
+        column(
+          width = 12,
           jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
         )
       ),
@@ -69,7 +111,7 @@ tabList <- list(
           width = 12,
           jqui_resizable(plotOutput("DE_gene_vio_plot") %>% withSpinner())
         )
-      )
+      
     )
   ),
   # DE_panelPlot ----

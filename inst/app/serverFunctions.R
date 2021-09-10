@@ -227,7 +227,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     if (length(naRows) > 0) {
       if (is.factor(subsetData[,colNa])) {
         if (! "NA" %in% levels(subsetData[,colNa])){
-          warning("we found NA in a factor\n")
+          warning(paste("we found NA in factor", colNa,"\n"))
           levels(subsetData[,colNa]) = c(levels(subsetData[,colNa]), "NA")
           subsetData[naRows,colNa] = "NA"
         }
