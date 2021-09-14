@@ -781,7 +781,7 @@ observe(label = "save2histVio", {
                               "fun = plotData$plotData$plotFunc\n", 
                               "environment(fun) = environment()\n",
                               "plotData$plotData$outfile=NULL\n",
-                              "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot"]])
   
@@ -808,7 +808,7 @@ observe(label = "save2histVio2", {
                               "fun = plotData$plotData$plotFunc\n", 
                               "environment(fun) = environment()\n",
                               "plotData$plotData$outfile=NULL\n",
-                              "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),
               plotData = .schnappsEnv[["coE_geneGrp_vio_plot2"]])
   

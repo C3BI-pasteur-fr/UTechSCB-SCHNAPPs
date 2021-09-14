@@ -107,12 +107,12 @@ inputTab <- function() {
     
     br(),
     shinydashboard::box(
-      title = "input options", solidHeader = TRUE, width = 12, status = "primary",
+      title = "Input options", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
           6,
           
-          checkboxInput("sampleInput", label = "sub sample", value = defaultValue("sampleInput", FALSE)),
+          checkboxInput("sampleInput", label = "sub-sample", value = defaultValue("sampleInput", FALSE)),
           
           numericInput("subsampleNum",
                        label = "max number of cells per sample",
@@ -257,7 +257,7 @@ cellSelectionTab <- function() {
       )
     ),
     shinydashboard::box(
-      title = "addition parameters", solidHeader = TRUE, width = 12, status = "primary",
+      title = "Additional parameters", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = TRUE,
       fluidRow(
         column(
@@ -281,7 +281,7 @@ cellSelectionTab <- function() {
     checkbsTT("cellsFiltersOut"),
     br(),
     shinydashboard::box(
-      title = "cell table", solidHeader = TRUE, width = 12, status = "primary",
+      title = "Cell table", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = FALSE, collapsed = TRUE,
       tableSelectionUi("cellSelectionMod")
     ),

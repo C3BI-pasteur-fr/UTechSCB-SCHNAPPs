@@ -282,7 +282,7 @@ DEBUG=FALSE
     # TODO need to include here the color values and other reactive values
     # message
     # browser()
-    # if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
+    if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
     # if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
     # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
     state$values$schnappsEnv <- .schnappsEnv
@@ -291,7 +291,7 @@ DEBUG=FALSE
   # after bookmarking
   onBookmarked(fun = function(url) {
     # browser()
-    # if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
+    if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
     # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
     showBookmarkUrlModal(url)
   }
@@ -303,7 +303,7 @@ DEBUG=FALSE
     if (DEBUG) base::cat(file = stderr(), paste("onRestore\n"))
     .schnappsEnv <<-  state$values$schnappsEnv
   })
-  # 
+  #   
   onRestored(session = session, fun = function(state) {
     if (DEBUG) base::cat(file = stderr(), paste("onRestored\n"))
     # browser()

@@ -29,9 +29,13 @@ observe(label = "ob17z", {
   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_z\n")
   .schnappsEnv$DE_expclusters_z <- input$DE_expclusters_z
 })
-observe(label = "ob17c", {
-  if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_col\n")
-  .schnappsEnv$DE_expclusters_col <- input$DE_expclusters_col
+# observe(label = "ob17c", {
+#   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_col\n")
+#   .schnappsEnv$DE_expclusters_col <- input$DE_expclusters_col
+# })
+observe(label = "ob17d", {
+  if (DEBUG) cat(file = stderr(), "observe: DE_gene_vio_x\n")
+  .schnappsEnv$DE_gene_vio_x <- input$DE_gene_vio_x
 })
 
 
@@ -60,7 +64,8 @@ observe({
   }
 
   projections <- projections()
-
+  projFactors <- projFactors()
+  
   # Can use character(0) to remove all choices
   if (is.null(projections)) {
     return(NULL)
@@ -79,9 +84,13 @@ observe({
                     choices = colnames(projections),
                     selected = .schnappsEnv$DE_expclusters_z
   )
-  updateSelectInput(session, "DE_expclusters_col",
-                    choices = colnames(projections),
-                    selected = .schnappsEnv$DE_expclusters_col
+  # updateSelectInput(session, "DE_expclusters_col",
+  #                   choices = colnames(projections),
+  #                   selected = .schnappsEnv$DE_expclusters_col
+  # )
+  updateSelectInput(session, "DE_gene_vio_x",
+                    choices = projFactors,
+                    selected = .schnappsEnv$DE_gene_vio_x
   )
   
   updateSelectInput(session, "DE_dim_x",
@@ -212,7 +221,8 @@ output$DE_gene_vio_plot <- renderPlot({
   projections <- projections()
   g_id <- input$DE_gene_id
   ccols <- clusterCols$colPal
-
+  x = input$DE_gene_vio_x
+  
   selectedCells <- DE_Exp_dataInput()
   cellNs <- selectedCells$cellNames()
   sampdesc <- selectedCells$selectionDescription()
@@ -229,7 +239,7 @@ output$DE_gene_vio_plot <- renderPlot({
   # cp = load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
 
 
-  p1 <- DE_geneViolinFunc(scEx_log[, cellNs], g_id, projections[cellNs, ], ccols)
+  p1 <- DE_geneViolinFunc(scEx_log = scEx_log[, cellNs], g_id = g_id, projections = projections[cellNs, ], ccols = ccols, x)
 
   printTimeEnd(start.time, "DE_gene_vio_plot")
   exportTestValues(DE_gene_vio_plot = {

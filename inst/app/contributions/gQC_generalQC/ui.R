@@ -187,7 +187,7 @@ tabList <- list(
   tsnePlotTab = shinydashboard::tabItem(
     tabName = "gQC_tsnePlot",
     shinyjs::useShinyjs(),
-    fluidRow(div(h3("TSNE Plot"), align = "center")),
+    fluidRow(div(h3("tSNE Plot"), align = "center")),
     br(),
     shinydashboard::box(
       title = "tSNE  parameters", solidHeader = TRUE, width = 12, status = "primary",
@@ -254,7 +254,7 @@ tabList <- list(
         column(
           width = 3,
           selectInput("gQC_col3D",
-                      label = "colored by",
+                      label = "color",
                       choices = defaultValue("gQC_col3D", "sampleNames"),
                       selected = defaultValue("gQC_col3D", "sampleNames")
           )

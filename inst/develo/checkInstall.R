@@ -1,3 +1,33 @@
+# not sure this is needed
+# BiocManager::install("diffcyt")
+# 
+# BiocManager::install("HDCytoData")
+# BiocManager::install("CATALYST")
+# 
+# devtools::install_github("hrbrmstr/dtupdate")
+# library(dtupdate)
+# dtupdate::github_update()
+
+checkIfLibrariesInstalled <- function() {
+  pkgList = c('devtools', 'BiocManager', 'pdftools', 'ggplotify', 'BiocSingular', 'SingleR', 'GSVA', 'GSEABase',
+              'multtest', 'limma', 'Biobase', 'monocle', 'rtracklayer', 'IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics',
+              'DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment', 'S4Vectors', 'spatstat', 'Seurat',
+              'Tempora', 'SCHNAPPs', 'shiny', 'rmarkdown', 'shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 
+              'shinydashboard', 'hdf5r', 'CellID', 'Wind', 'BiocParallel', 'ggnetwork', 'destiny')
+  
+  missing = pkgList[!pkgList %in% installed.packages()]
+  if(length(missing) == 0) {
+    print("all should be good")
+  } else {
+    print(paste("The following packages are missin:" , missing))
+  }
+  for (pg in pkgList){
+    library(pg,character.only = TRUE)
+  }
+}
+
+
+
 # new R version:
 # 
 
