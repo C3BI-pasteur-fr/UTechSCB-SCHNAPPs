@@ -19,27 +19,27 @@ tabList <- list(
     "DE_expression",
     shinydashboard::box(
       title = "Expression overview", solidHeader = TRUE, width = 12, status = "primary",
-      footer = div(
-        htmltools::p(strong("\tInformation:")),
-        htmltools::tags$ul(
-          tags$li(
-            strong("Clustering"),
-            ":Clustering was performed with t-SNE followed by identification using DBSCAN"
-          ),
-          tags$li(
-            strong("Cluster 0"),
-            ":Cells that cannot be assigned to any cluster"
-          ),
-          tags$li(
-            strong("3D Plot"),
-            ":Enter gene name to visualize expression in a single cell"
-          ),
-          tags$li(
-            strong("2D Plot"),
-            ":Pick a cluster, highlight cells of interest to download gene expression matrix"
-          )
-        )
-      ),
+      # footer = div(
+      #   htmltools::p(strong("\tInformation:")),
+      #   htmltools::tags$ul(
+      #     tags$li(
+      #       strong("Clustering"),
+      #       ":Clustering was performed with t-SNE followed by identification using DBSCAN"
+      #     ),
+      #     tags$li(
+      #       strong("Cluster 0"),
+      #       ":Cells that cannot be assigned to any cluster"
+      #     ),
+      #     tags$li(
+      #       strong("3D Plot"),
+      #       ":Enter gene name to visualize expression in a single cell"
+      #     ),
+      #     tags$li(
+      #       strong("2D Plot"),
+      #       ":Pick a cluster, highlight cells of interest to download gene expression matrix"
+      #     )
+      #   )
+      # ),
       fluidRow(div(tags$h3("Expression based on subset of cells"), align = "center")),
       tags$p("Similar to Co-expression - selection, but with a focus on subsets of cells and genes."),
       tags$p("Limit the cells to visualize by cluster or any other factorial."),
@@ -53,18 +53,18 @@ tabList <- list(
         )),
       br(),
       fluidRow(
-        column( offset = 3,
-                width = 12, 
-                textInput("DE_gene_id", "Enter gene(s) of interest", value = defaultValue("DE_gene_id", defaultValueSingleGene))
-        )),
-      
-      br(),
-      fluidRow(
         column(
           width = 12,
           clusterUI("DE_expclusters")
         )
       ),
+      br(),
+      fluidRow(
+        column( offset = 1,
+                width = 10, 
+                textInput("DE_gene_id", "Enter gene(s) of interest", value = defaultValue("DE_gene_id", defaultValueSingleGene))
+        )),
+      
       br(),
       fluidRow(
         column(
@@ -98,7 +98,7 @@ tabList <- list(
         #   ))
 
         )
-      ),
+      ,
       fluidRow(
         column(
           width = 12,
@@ -106,12 +106,20 @@ tabList <- list(
         )
       ),
       br(),
+    fluidRow(column(
+      width = 3,
+      selectInput("DE_gene_vio_x",
+                  label = "Y",
+                  choices = defaultValue("DE_gene_vio_x", "sampleNames"),
+                  selected = defaultValue("DE_gene_vio_x", "sampleNames")
+      ))),
+    br(),
       fluidRow(
         column(
           width = 12,
           jqui_resizable(plotOutput("DE_gene_vio_plot") %>% withSpinner())
         )
-      
+      )
     )
   ),
   # DE_panelPlot ----

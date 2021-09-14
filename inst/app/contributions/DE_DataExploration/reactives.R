@@ -321,7 +321,7 @@ DE_dataExpltSNEPlot <- function(scEx_log, g_id, projections,x,y,z) {
   layout(p, title = paste(featureData[geneid, "symbol"], collapse = ", "))
 }
 
-DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
+DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols, x) {
   if (is.null(scEx_log)) {
     return(NULL)
   }
@@ -343,7 +343,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
   names(projections)[length(projections)] <- "values"
   
   p1 <-
-    ggplot(projections, aes(factor(dbCluster), values, fill = factor(dbCluster))) +
+    ggplot(projections, aes_string(x, "values", fill = x)) +
     geom_violin(scale = "width") +
     scale_color_manual(values = ccols) +
     scale_fill_manual(values = ccols, aesthetics = "fill") +
@@ -369,7 +369,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols) {
       axis.title.y = element_text(face = "bold", size = 16),
       legend.position = "none"
     ) +
-    xlab("Cluster") +
+    xlab(x) +
     ylab("Expression") +
     ggtitle(paste(featureData[geneid, "symbol"], collapse = ", "))
   

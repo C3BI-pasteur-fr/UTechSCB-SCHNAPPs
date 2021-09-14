@@ -156,7 +156,7 @@ clusterServer <- function(input, output, session,
       comment = paste("# ",myns, "\n",
                       "fun = plotData$plotData$plotFunc\n", 
                       "environment(fun) = environment()\n",
-                      "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+                      "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
       ),
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )
@@ -1697,7 +1697,7 @@ pHeatMapModule <- function(input, output, session,
                       "fun = plotData$plotData$plotFunc\n", 
                       "environment(fun) = environment()\n",
                       "plotData$plotData$outfile=NULL\n",
-                      "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
+                      "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
       ),
       plotData = .schnappsEnv[[paste0("historyHeatmap-", myns)]]
     )
