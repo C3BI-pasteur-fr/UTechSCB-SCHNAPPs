@@ -29,7 +29,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          textInput("coE_heatmap_geneids", "Comma seperated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
+          textInput("coE_heatmap_geneids", "Comma separated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
         )
       ),
       fluidRow(
@@ -75,7 +75,7 @@ tabList <- list(
                       column( width = 12,
                               fluidRow(column(
                                 width = 12,
-                                textInput("coE_heatmapselected_geneids", "Comma seperated gene names", value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
+                                textInput("coE_heatmapselected_geneids", "Comma separated gene names", value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
                               )),
                               br(),
                               # fluidRow(checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
@@ -207,7 +207,7 @@ tabList <- list(
              fluidRow(
                column(
                  width = 4,
-                 textInput("coE_geneGrpVioIds", "Comma seperated gene names", value = defaultValue("coE_geneGrpVioIds", defaultValueMultiGenes))
+                 textInput("coE_geneGrpVioIds", "Comma separated gene names", value = defaultValue("coE_geneGrpVioIds", defaultValueMultiGenes))
                ),
                column(
                  width = 4,
@@ -246,7 +246,7 @@ tabList <- list(
              fluidRow(
                column(
                  width = 4,
-                 textInput("coE_geneGrpVioIds2", "Comma seperated gene names", value = defaultValue("coE_geneGrpVioIds2", defaultValueMultiGenes))
+                 textInput("coE_geneGrpVioIds2", "Comma separated gene names", value = defaultValue("coE_geneGrpVioIds2", defaultValueMultiGenes))
                ),
                column(
                  width = 4,

@@ -201,7 +201,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          textInput("DE_panelplotids", "Comma seperated gene names", value = defaultValue("DE_panelplotids", defaultValueMultiGenes))
+          textInput("DE_panelplotids", "Comma separated gene names", value = defaultValue("DE_panelplotids", defaultValueMultiGenes))
         ),
       ),
       fluidRow(column(

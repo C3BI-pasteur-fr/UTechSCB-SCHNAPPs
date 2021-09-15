@@ -342,7 +342,7 @@ In SCHNAPPs there is only one normalization at a time. multiple normalization co
 * Cells table
 
     A table with the normalized values is shown below. Only 20 cells are shown (columns). Table shows the filtered cells/genes (after applying the filters from Cell selection and Gene selection). The rows can be sorted by clicking on the cell name. Individual genes can be selected by clicking in the row. Those genes are shown above the table (for copy/paste actions). The cells (all not only the 20 shown) can be sorted by the sum of the normalized gene expression when the corresponding check box is selected. The cellnames cannot be selected/copied.
-    The full table can also be downloaded as a CSV (comma seperated values) file.
+    The full table can also be downloaded as a CSV (comma separated values) file.
 
 
 ### General Parameters
@@ -632,7 +632,7 @@ knitr::include_graphics('images/geneSelection2.png')
 knitr::include_graphics('images/coexpressionAll.png')
 ```
 
-* Comma seperated gene names
+* Comma separated gene names
 
     Comma separated list of genes to be displayed in the heatmap for all cells.
     
@@ -696,7 +696,7 @@ knitr::include_graphics('images/coexpressionViolin2.png')
 
     Selecting this can cause substantial calculations if the number of genes is large and make the display very ugly. On the othe hand, it will show which combination of genes are co-expressed to which extend.
 
-* Comma seperated gene names
+* Comma separated gene names
 
     A comma separated list of genes to investigate using the violin plot. If a gene doesn’t show it is not expressed in any of the cells.
 
