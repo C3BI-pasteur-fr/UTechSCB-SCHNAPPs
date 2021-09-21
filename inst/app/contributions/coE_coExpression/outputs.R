@@ -2,7 +2,7 @@
 myZippedReportFiles <- c("output_coE_topExpGenes.csv")
 
 
-# All clusters heat map ------
+# All clusters heatmap ------
 callModule(
   pHeatMapModule,
   "coExpHeatmapModule",

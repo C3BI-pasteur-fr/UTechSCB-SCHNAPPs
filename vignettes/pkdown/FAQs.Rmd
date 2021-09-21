@@ -126,7 +126,7 @@ knitr::include_graphics('images/CellSelection2.png')
 ```
 
 <!----
-### What are the different heat maps that can be generated and how many genes could be listed  by cluster ?
+### What are the different heatmaps that can be generated and how many genes could be listed  by cluster ?
 
 Cells in the cluster can be selected on the 2D plot and cell names are shown after checking “show more options” followed by checking “show cell names”; 
 
