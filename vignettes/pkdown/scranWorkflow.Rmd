@@ -46,7 +46,7 @@ We use the same data set. Here, we have to create a singleCellExperiment object 
 ```{r setupData, include=TRUE, collapse=TRUE}
 
 if (! "scRNAseq" %in% installed.packages()){
-    BiocManager::install("scRNAseq")}
+  BiocManager::install("scRNAseq")}
 library(scRNAseq)
 sce <- GrunPancreasData()
 sce
@@ -146,8 +146,8 @@ sce <- runTSNE(sce, dimred="PCAsub")
 
 library(pheatmap)
 ass.prob <- bootstrapCluster(sce, FUN=function(x) {
-    g <- buildSNNGraph(x, use.dimred="PCAsub")
-    igraph::cluster_walktrap(g)$membership
+  g <- buildSNNGraph(x, use.dimred="PCAsub")
+  igraph::cluster_walktrap(g)$membership
 }, clusters=sce$cluster)
 
 sceOrg$cluster = 0

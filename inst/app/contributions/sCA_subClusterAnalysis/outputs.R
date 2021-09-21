@@ -149,7 +149,8 @@ observe(label = "ob_DGEParams", {
 
 
 output$sCA_volc_selected <- renderText({
-  if (DEBUG) cat(file = stderr(), "sCA_volc_selected started.\n")
+  if (DEBUG)
+    cat(file = stderr(), "sCA_volc_selected started.\n")
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "sCA_volc_selected")
@@ -161,9 +162,9 @@ output$sCA_volc_selected <- renderText({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("sCA_volc_selected", id = "sCA_volc_selected", duration = NULL)
   }
-  
-  brushedPs <- plotly::event_data("plotly_selected")
   DGEdata <- sCA_dgeTableReac()
+  req(DGEdata)
+  brushedPs <- plotly::event_data("plotly_selected")
   
   if (is.null(brushedPs)) {
     if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: brush null\n")

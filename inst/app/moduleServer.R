@@ -156,7 +156,7 @@ clusterServer <- function(input, output, session,
       comment = paste("# ",myns, "\n",
                       "fun = plotData$plotData$plotFunc\n", 
                       "environment(fun) = environment()\n",
-                      "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+                      "do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)])\n"
       ),
       plotData = .schnappsEnv[[paste0("historyPlot-", myns)]]
     )
@@ -218,18 +218,21 @@ clusterServer <- function(input, output, session,
   # clusterServer - selectedCellNames ----
   selectedCellNames <- reactive({
     start.time <- base::Sys.time()
-    if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames\n")
+    if (DEBUG)
+      cat(file = stderr(), "cluster: selectedCellNames\n")
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
         removeNotification(id = "selectedCellNames")
       }
     )
+    
     # show in the app that this is running
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("selectedCellNames", id = "selectedCellNames", duration = NULL)
     }
     projections <- projections()
     req(projections)
+    # browser()
     brushedPs <- plotly::event_data("plotly_selected", source = "subset")
     dimY <- input$dimension_y
     dimX <- input$dimension_x
@@ -874,7 +877,8 @@ clusterServer <- function(input, output, session,
   
   # clusterServer - output$cellSelection ----
   output$cellSelection <- renderText({
-    if (DEBUG) cat(file = stderr(), "cellSelection started.\n")
+    if (DEBUG)
+      cat(file = stderr(), "cellSelection started.\n")
     start.time <- base::Sys.time()
     on.exit({
       printTimeEnd(start.time, "cellSelection")
@@ -888,8 +892,9 @@ clusterServer <- function(input, output, session,
     }
     
     ns <- session$ns
-    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
     projections <- projections()
+    req(projections)
+    brushedPs <- suppressMessages(plotly::event_data("plotly_selected", source = "subset"))
     # inpClusters <- (input$clusters)
     myshowCells <- (input$showCells)
     geneNames <- input$geneIds

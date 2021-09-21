@@ -75,6 +75,7 @@ observeEvent(input$comment2History, {
   showModal(commentModal())
 })
 # Show modal when button is clicked.
+# # TODO modal to confirm
 observeEvent(input$Quit, {
   if(input$Quit <= 1) return(NULL)
   if(DEBUG) {cat(file = stderr(), "\nquit the app\n\n")}

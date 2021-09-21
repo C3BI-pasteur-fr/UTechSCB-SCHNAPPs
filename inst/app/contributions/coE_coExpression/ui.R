@@ -25,7 +25,7 @@ tabList <- list(
   coexpressionAllTab = shinydashboard::tabItem(
     "coexpressionAll",
     shinydashboard::box(
-      title = "Heat map of all cells", solidHeader = TRUE, width = 12, status = "primary",
+      title = "Heatmap of all cells", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
           width = 12,

@@ -461,9 +461,9 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
         xPerm <- 5
         warning("reducing number of combinations to 5")
       }
-      if (!is.null(getDefaultReactiveDomain())) {
+      if (is.null(getDefaultReactiveDomain())) {
         showNotification(
-          "reducing number of combinations to 5",
+          "show permutations Reactive domain null",
           id = "heatmapWarning",
           type = "warning",
           duration = NULL

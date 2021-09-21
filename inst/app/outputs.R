@@ -1262,7 +1262,7 @@ observeEvent(input$twoDselectedAddOpt, {
 })
 
 # Heatmap for scran clustering ----
-# All clusters heat map ------
+# All clusters heatmap ------
 callModule(
   pHeatMapModule,
   "clusterBootstrap",

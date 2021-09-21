@@ -667,7 +667,7 @@ knitr::include_graphics('images/coexpressionSelected3.png')
 
 * Heatmap
 
-    Uses the selected cells from the above 2D Plot and displays a heat map.
+    Uses the selected cells from the above 2D Plot and displays a heatmap.
 
 * min UMI count per gene:
 
@@ -730,7 +730,7 @@ A self organizing map is calculated of all the cells. The matrix of normalized c
 
 * Heatmap 
 
-    A heat map of the identied genes is displayed. Cluster are not the SOM cluster (since all the genes are from the same cluster).
+    A heatmap of the identied genes is displayed. Cluster are not the SOM cluster (since all the genes are from the same cluster).
 
 * Identified gene list
 
