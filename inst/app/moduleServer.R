@@ -1524,14 +1524,20 @@ pHeatMapModule <- function(input, output, session,
                  }
                  # browser()
                  newPrj = make.names(newPrj)
-                 pos = getPositionFromBrush(brush = isolate(input$heatmap_brush), 
+                 pos = getPositionFromBrush(brush = isolate(heatmap_brush), 
                                             ratio = 1)
                  selection = selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
                                         mark = T, ht_pos = htpos_obj, 
                                         verbose = T, calibrate = FALSE)
                  addPrj = rep(FALSE, nrow(projections))
                  names(addPrj) = rownames(projections)
-                 addPrj[colnames(htDat@ht_list[[1]]@matrix)[unlist(selection$column_index)]] = TRUE
+                 mat=NULL
+                 # the matrix can be in different places
+                 if ("ht_list" %in% slotNames(htDat)){ 
+                   mat = htDat@ht_list[[1]]@matrix
+                   } else{ 
+                   mat = htDat@matrix}
+                 addPrj[colnames(mat)[unlist(selection$column_index)]] = TRUE
                  # 
                  if (ncol(newPrjs) == 0) {
                    newPrjs = data.frame(row.names = acn)

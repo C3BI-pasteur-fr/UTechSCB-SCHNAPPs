@@ -57,8 +57,8 @@
   # defaultValues[["alluiv1"]] = "seurartCluster"
   defaultValues[["alluiv2"]] = "dbCluster"
   # defaultValues[["tabsetCluster"]] = "seurat_Clustering"
-  defaultValues[["minGenesGS"]] = 100
-  defaultValues[["minGenes"]] = 100
+  defaultValues[["minGenesGS"]] = 1
+  defaultValues[["minGenes"]] = 1
   defaultValues[["maxGenes"]] = 15000
   defaultValues[["seurClustDims"]] = 15
   defaultValues[["seurClustk.param"]] = 15

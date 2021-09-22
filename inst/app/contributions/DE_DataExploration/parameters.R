@@ -240,7 +240,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
       
       # take the sample with the highest number of cells as reference
       reference_dataset <- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]
-      
+      integrated = NULL
       if (length(seur.list) > 1) {
         anchors <- FindIntegrationAnchors(
           object.list = seur.list, 
@@ -260,7 +260,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
           verbose = DEBUG,
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
         )
-        integrated@assays$integrated@scale.data
+        # integrated@assays$integrated@scale.data
       } else {
         seur.list[[1]]@assays$SCT@scale.data 
       }
