@@ -1455,9 +1455,19 @@ pHeatMapModule <- function(input, output, session,
         return(NULL)
       }
       # browser()
+      if (.schnappsEnv$DEBUGSAVE) {
+        save(
+          file = "~/SCHNAPPsDebug/pHeatMapModule.RData",
+          list = ls()
+        )
+      }
+      # cp = load(file="~/SCHNAPPsDebug/pHeatMapModule.RData")
+      
       ht = ComplexHeatmap::draw(retVal)
       ht_pos = htPositionsOnDevice(ht, include_annotation = FALSE, calibrate = FALSE)
       # cat(file = stderr(), glue_collapse(list_components(), sep="\n"))
+      
+      # fill reactive values:
       ht_obj(ht)
       ht_pos_obj(ht_pos)
     })
@@ -1526,9 +1536,21 @@ pHeatMapModule <- function(input, output, session,
                  newPrj = make.names(newPrj)
                  pos = getPositionFromBrush(brush = isolate(heatmap_brush), 
                                             ratio = 1)
-                 selection = selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
-                                        mark = T, ht_pos = htpos_obj, 
-                                        verbose = T, calibrate = FALSE)
+                 
+                 selection = tryCatch(
+                   selectArea(ht_list = htobj, pos1 = pos[[1]], pos2 = pos[[2]], 
+                              mark = T, ht_pos = htpos_obj, 
+                              verbose = T, calibrate = FALSE), 
+                   error = function(e) {
+                     cat(file = stderr(), paste("inputData: NULL", e,"\n"))
+                     return(NULL)}
+                 )
+                 if (is.null(selection)) {
+                   save(file = "~/SCHNAPPsDebug/pHeatMapAreaNULL2.RData", list = c( ls()  ))
+                   return(NULL)
+                 }
+                 # cp = load("~/SCHNAPPsDebug/pHeatMapAreaNULL2.RData")
+                 
                  addPrj = rep(FALSE, nrow(projections))
                  names(addPrj) = rownames(projections)
                  mat=NULL
@@ -1657,6 +1679,7 @@ pHeatMapModule <- function(input, output, session,
       save(file = "~/SCHNAPPsDebug/pHeatMapAreaNULL.RData", list = c( ls()  ))
       return(NULL)
     }
+    # cp = load("~/SCHNAPPsDebug/pHeatMapAreaNULL.RData")
     
     
     output$pHeatMapPlotSelection = renderPrint({
