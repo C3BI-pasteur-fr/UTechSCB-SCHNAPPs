@@ -620,6 +620,9 @@ observe(label = "observe DE_seuratRefBased", {
   if (!input$normalizationRadioButton == "DE_seuratRefBased") {
     return(NULL)
   }
+  if (!input$whichscLog == "calcLog") {
+    return(NULL)
+  }
   out <- DE_seuratRefBased()
   if (is.null(out)) {
     # set one parameter to something not possible to deactivate button/or choose different
@@ -727,6 +730,9 @@ observe(label = "observe DE_seuratSCtransform", {
   if (!input$normalizationRadioButton == "DE_seuratSCtransform") {
     return(NULL)
   }
+  if (!input$whichscLog == "calcLog") {
+    return(NULL)
+  }
   out <- DE_seuratSCtransform()
   if (is.null(out)) {
     # set one parameter to something not possible to deactivate button/or choose different
@@ -801,6 +807,9 @@ observe(label = "observe DE_seuratStandard", {
     return(NULL)
   }
   if (!input$normalizationRadioButton == "DE_seuratStandard") {
+    return(NULL)
+  }
+  if (!input$whichscLog == "calcLog") {
     return(NULL)
   }
   out <- DE_seuratStandard()
@@ -890,6 +899,9 @@ observe(label = "oblogGene", {
         input$updateNormalization, "\n"
       ))
     }
+    return(NULL)
+  }
+  if (!input$whichscLog == "calcLog") {
     return(NULL)
   }
   out <- isolate(DE_logGeneNormalization())
