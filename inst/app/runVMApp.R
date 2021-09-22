@@ -14,7 +14,7 @@ library(future)
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
-plan("multiprocess", workers = WORKERS)
+plan("multicore", workers = WORKERS)
 # plan(sequential)
 
 
@@ -24,8 +24,8 @@ register(MulticoreParam(WORKERS))
 
 # localContributionDir = "/home/schnapps/SCHNAPPsContributions/"
 localContributionDir = ""
-defaultValueSingleGene = "PDCD1" # CD52
-defaultValueMultiGenes = "CD8A, CD4,PDCD1, CXCL13, CD3E, IL3RA, TCF4, LILRA " # itgae, cd69, itga1" # CD52, S100A9, S100A4
+defaultValueSingleGene = "CD3g" # CD52
+defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA" # itgae, cd69, itga1" # CD52, S100A9, S100A4
 # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
@@ -35,17 +35,17 @@ historyPath = "/home/schnapps/history"
 #historyPath = NULL
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
-# assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
-# assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
-# assign(".SCHNAPPs_defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
+assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
+assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
+assign(".SCHNAPPs_defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
 assign(".SCHNAPPs_DEBUG", DEBUG, envir = .schnappsEnv)
 assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("localContributionDir", localContributionDir, envir = .schnappsEnv)
-# assign("defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
-# assign("defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
-# assign("defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
-# assign("DEBUG", DEBUG, envir = .schnappsEnv)
-# assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
+assign("defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
+assign("defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
+assign("defaultValueRegExGene", defaultValueRegExGene, envir = .schnappsEnv)
+assign("DEBUG", DEBUG, envir = .schnappsEnv)
+assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
 ls(.schnappsEnv)
 
@@ -57,29 +57,29 @@ defaultValues = list()
 # Seurat parameters
 # defaultValues = list()
 
+# # defaultValues[["selectIds"]] = ""
+# defaultValues[["pcaN"]] = 500
+# defaultValues[["pcaScale"]] = TRUE
+# defaultValues[["sampleInput"]] =FALSE
+# defaultValues[["hvgSelection"]] = "vst"
+# # defaultValues[["alluiv1"]] = "seurartCluster"
+# defaultValues[["alluiv2"]] = "dbCluster"
+# # defaultValues[["tabsetCluster"]] = "seurat_Clustering"
+# defaultValues[["minGenesGS"]] = 100
+# defaultValues[["minGenes"]] = 1
+# defaultValues[["maxGenes"]] = 50000
+# defaultValues[["seurClustDims"]] = 15
+# defaultValues[["seurClustk.param"]] = 15
+# defaultValues[["cellPatternRM"]] = ""
+# defaultValues[["gQC_binSize"]] = 200
+# defaultValues[["selectIds"]] = "^MT-|^RP|^MRP" #"^MT-|^RP|^MRP|MALAT1|B2M|EEF1A1"
 # defaultValues[["selectIds"]] = ""
-defaultValues[["pcaN"]] = 500
-defaultValues[["pcaScale"]] = TRUE
-defaultValues[["sampleInput"]] =FALSE
-defaultValues[["hvgSelection"]] = "vst"
-# defaultValues[["alluiv1"]] = "seurartCluster"
-defaultValues[["alluiv2"]] = "dbCluster"
-# defaultValues[["tabsetCluster"]] = "seurat_Clustering"
-defaultValues[["minGenesGS"]] = 100
-defaultValues[["minGenes"]] = 1
-defaultValues[["maxGenes"]] = 50000
-defaultValues[["seurClustDims"]] = 15
-defaultValues[["seurClustk.param"]] = 15
-defaultValues[["cellPatternRM"]] = ""
-defaultValues[["gQC_binSize"]] = 200
-defaultValues[["selectIds"]] = "^MT-|^RP|^MRP" #"^MT-|^RP|^MRP|MALAT1|B2M|EEF1A1"
-defaultValues[["selectIds"]] = ""
-defaultValues[["whichscLog"]] = "calcLog"
+# defaultValues[["whichscLog"]] = "calcLog"
 # defaultValues[["whichscLog"]] = "disablescEx_log"
 
-defaultValues[["gQC_um_n_neighbors"]] = 20 
-defaultValues[["gQC_um_spread"]] = 6 
-defaultValues[["gQC_um_local_connectivity"]] = 2
+# defaultValues[["gQC_um_n_neighbors"]] = 20 
+# defaultValues[["gQC_um_spread"]] = 6 
+# defaultValues[["gQC_um_local_connectivity"]] = 2
 # defaultValues[["useSeuratPCA"]] = TRUE
 
 # commented out for paper
