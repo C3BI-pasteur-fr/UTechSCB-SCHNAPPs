@@ -455,7 +455,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   if (coE_showPermutations) {
     if ("gtools" %in% rownames(installed.packages())) {
       perms <- rep("", length(expression))
-      ylabText <- "Permutations"
+      ylabText <- "Combinations"
       xPerm <- length(genesin)
       if (xPerm > 5) {
         xPerm <- 5
