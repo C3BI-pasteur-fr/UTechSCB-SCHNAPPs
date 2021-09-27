@@ -289,6 +289,7 @@ inputDataFunc <- function(inFile) {
       type = "error"
     )
     colData(allScEx)$sampleNames <- 1
+    colData(allScEx)$sampleNames = as.factor(colData(allScEx)$sampleNames)
   }
   
   
@@ -611,6 +612,8 @@ inputData <- reactive({
   isolate({
     sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
     names(sampleCols$colPal) <- sampNames
+    add2history(type = "save", input=NULL, comment = "scol", scol = sampleCols$colPal)
+    
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
   inputFile$annFile <- paste(annFile$name, collapse = ", ")
@@ -2412,6 +2415,8 @@ dbCluster <- reactive({
   names(inCols) <- lev
   
   clusterCols$colPal <- unlist(inCols)
+  add2history(type = "save", input=NULL, comment = "ccol", ccol = clusterCols$colPal)
+  
   setRedGreenButton(
     vars = list(
       c("sampleNamecol", isolate(sampleCols$colPal)),

@@ -547,7 +547,7 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
   #     common.legend = T
   #   )
   retVal <-
-    annotate_figure(retVal,
+    ggpubr::annotate_figure(retVal,
                     top = text_grob(sampdesc)
     )
   return(retVal)
