@@ -89,12 +89,15 @@ packagePath <<- "/usr/local/lib/R/site-library/SCHNAPPs/app"
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
-app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+# app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+app <- shinyApp(ui = scShinyUI, server = scShinyServer)
 options(shiny.reactlog=FALSE)
+
+cat(file= stderr(), system("whoami"))
 
 # options(keep.source=TRUE)
 # p <- profvis::profvis({
-  runApp(app, host = "0.0.0.0", port = 6149, launch.browser = FALSE)
+  runApp(app, host = "0.0.0.0", port = 3838, launch.browser = FALSE)
 # })
 # htmlwidgets::saveWidget(p, '~/profvis1.html')
 

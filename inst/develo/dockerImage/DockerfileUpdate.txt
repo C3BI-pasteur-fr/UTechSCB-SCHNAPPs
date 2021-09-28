@@ -1,0 +1,36 @@
+# docker build - 
+
+# load R image
+FROM pf2dock/schnapps:1.6.133
+
+# set working directory
+WORKDIR /root
+
+RUN git --version
+
+
+
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
+
+
+EXPOSE 3838
+
+
+RUN mkdir -p /var/log/shiny-server
+RUN mkdir -p /srv/shiny-server/schnapps
+
+COPY app.R /srv/shiny-server/schnapps/
+
+COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
+
+COPY runDockerApp.R /root/runDockerApp.R
+RUN chown -R shiny.shiny /root
+# RUN chmod a+w /root/runDockerApp.R
+
+# rsomoclu is not supported anymore
+# RUN rm -r SCHNAPPsContributions/SOM
+
+CMD whoami >/dev/stderr
+CMD ls -ltra /root
+CMD /usr/bin/Rscript /root/runDockerApp.R
+

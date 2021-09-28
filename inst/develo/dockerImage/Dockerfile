@@ -101,7 +101,7 @@ COPY shiny-server.sh /usr/bin/shiny-server.sh
 
 RUN chown -R shiny.shiny /var/log/shiny-server
 RUN chown -R shiny.shiny /srv/shiny-server/schnapps
-RUN chown -R shiny:shiny /var/lib/shiny-server
+RUN chown -R shiny.shiny /var/lib/shiny-server
 
 CMD ["/usr/bin/shiny-server.sh"]
 
