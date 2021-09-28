@@ -40,5 +40,5 @@ defaultValues[["sCA_subscluster_y1"]] = "UMAP2"
 
 schnapps(defaultValues = defaultValues, 
          defaultValueMultiGenes = "wt1,pdgfrb,agtr1a,col3a1,col1a1,postn,tbx18,scx,npr1,vegfa,npr2,notch2,tagln,acta2,ctgf, Rack1, Bmp4,  Eef2, col3a1,col1a1,tgfb3,postn" , defaultValueSingleGene = "wt1", 
-         localContributionDir = "/SCHNAPPsContributions/", DEBUG = T, historyPath = "history", port = 3839)
+         localContributionDir = "/SCHNAPPsContributions/", DEBUG = T, historyPath = "history", port = 3838)
 
