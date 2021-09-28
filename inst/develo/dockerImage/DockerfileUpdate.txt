@@ -1,7 +1,7 @@
 # docker build - 
 
 # load R image
-FROM pf2dock/schnapps:1.6.133
+FROM pf2dock/schnapps:1.6.134
 
 # set working directory
 WORKDIR /root

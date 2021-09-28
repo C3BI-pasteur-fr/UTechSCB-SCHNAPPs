@@ -1,3 +1,9 @@
+# to start the latest:
+# docker pull pf2dock/schnapps
+# docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps
+# in e.g. chrom:
+# http://localhost:3838/
+
 # https://hub.docker.com/r/rocker/shiny
 # https://github.com/rocker-org/shiny
 
