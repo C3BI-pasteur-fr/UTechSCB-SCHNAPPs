@@ -1577,7 +1577,7 @@ pHeatMapModule <- function(input, output, session,
                  #   newPrjs = newPrjs[,-1]
                  # }
                  # colnames(newPrjs)[ncol(newPrjs)] <- newPrj
-                 projectionsTable$newProjections <- newPrjs
+                 projectionsTable$newProjections <- as.factor(newPrjs)
                }) 
   
   # observer click ----
