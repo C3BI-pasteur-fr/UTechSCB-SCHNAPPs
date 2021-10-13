@@ -365,7 +365,7 @@ observeEvent(
     } else {
       # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
       # browser()
-      newPrjs <- dplyr::left_join(
+      newPrjs <- dplyr::full_join(
         tibble::rownames_to_column(newPrjs), 
         tibble::rownames_to_column(projections[, oldPrj, drop = FALSE]), 
         by='rowname')
@@ -536,7 +536,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      newPrjs[rownames(projections),newProjName] <- projections[, rnProj, drop = FALSE]
                    } else {
                      # browser()
-                     newPrjs <- dplyr::left_join(
+                     newPrjs <- dplyr::full_join(
                        tibble::rownames_to_column(newPrjs), 
                        tibble::rownames_to_column(projections[, rnProj, drop = FALSE]), 
                        by='rowname')
