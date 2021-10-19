@@ -532,7 +532,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                    newLbVec = str_split(newLables, ",")[[1]]
                    if (ncol(newPrjs) == 0) {
                      newPrjs = data.frame(row.names = acn)
-                     newPrjs[,newProjName] = NA
+                     newPrjs[,newProjName] = "NA"
                      newPrjs[rownames(projections),newProjName] <- projections[, rnProj, drop = FALSE]
                    } else {
                      # browser()
@@ -544,7 +544,10 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      newPrjs = newPrjs[,-1]
                      # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,rnProj])
                    }
+                   
                    newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
+                   if ("NA" %in% levels(newPrjs[,ncol(newPrjs)]) & "NA" %in% stringr::str_trim(newLbVec) )
+                     newLbVec = c(newLbVec, "NA")
                    levels(newPrjs[,ncol(newPrjs)]) = stringr::str_trim(newLbVec)
                  }, error=function(w){
                    # browser()
