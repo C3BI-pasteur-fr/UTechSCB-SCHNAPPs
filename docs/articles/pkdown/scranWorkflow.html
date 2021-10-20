@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.113</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.136</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
 
       
 
-      </header><script src="scranWorkflow_files/header-attrs-2.10/header-attrs.js"></script><link href="scranWorkflow_files/vembedr-0.1.4/css/vembedr.css" rel="stylesheet">
+      </header><script src="scranWorkflow_files/header-attrs-2.11/header-attrs.js"></script><link href="scranWorkflow_files/vembedr-0.1.4/css/vembedr.css" rel="stylesheet">
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -131,8 +131,9 @@
 <p>We pre-compute the scran workflow and make its results available for comparison within SCHNAPPs.</p>
 <p>We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span> <span class="st">"scRNAseq"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-    <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"scRNAseq"</span><span class="op">)</span><span class="op">}</span>
+<code class="sourceCode R">
+<span class="kw">if</span> <span class="op">(</span><span class="op">!</span> <span class="st">"scRNAseq"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+  <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"scRNAseq"</span><span class="op">)</span><span class="op">}</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">scRNAseq</span><span class="op">)</span>
 <span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scRNAseq/man/GrunPancreasData.html">GrunPancreasData</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">sce</span>
@@ -225,8 +226,8 @@
 
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">pheatmap</span><span class="op">)</span>
 <span class="va">ass.prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/defunct.html">bootstrapCluster</a></span><span class="op">(</span><span class="va">sce</span>, FUN<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">x</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
-    <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
+  <span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/buildSNNGraph.html">buildSNNGraph</a></span><span class="op">(</span><span class="va">x</span>, use.dimred<span class="op">=</span><span class="st">"PCAsub"</span><span class="op">)</span>
+  <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/cluster_walktrap.html">cluster_walktrap</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">membership</span>
 <span class="op">}</span>, clusters<span class="op">=</span><span class="va">sce</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span>
 
 <span class="va">sceOrg</span><span class="op">$</span><span class="va">cluster</span> <span class="op">=</span> <span class="fl">0</span>

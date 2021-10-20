@@ -1,7 +1,12 @@
   #' this is used to run the app without installing it.
   #'
   #'
-  library(reactlog)
+  
+# git tag 1.6.134
+# git --tags
+
+
+library(reactlog)
   # if (!exists(".schnappsEnv")) {
   .schnappsEnv <- new.env(parent=emptyenv())
   # }
@@ -14,7 +19,7 @@
   register(SerialParam())
   
   localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
-  localContributionDir = ""
+  # localContributionDir = ""
   defaultValueSingleGene = "IL7R" # CD52
   defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
   defaultValueMultiGenes = "IGHA1, IGKC, IGHA2, IGLC2, IGLL5, IGKV4-1, IGHM, IGLC3, PPIG, HIGD2A, IGKV1-39, IGBP1, INSIG1, IGHV4-59, IGKV3-20, GIGYF2, IGF1, PIGP, IGLV3-1, AIG1, PIGT, IGLV6-57, IGKV1D-8, IGHV3-7, INSIG2, IGKV1-5, GIGYF1, SIGIRR, IGHG1, IGHV3-30, IGHG3, PIGBOS1"
@@ -22,8 +27,8 @@
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
   DEBUG = T
   DEBUGSAVE = F
-  # historyPath = "/Volumes/Oct2020/RStudio_history/"
-  historyPath = NULL
+  historyPath = "/Volumes/Oct2020/RStudio_history/katja"
+  # historyPath = NULL
   
   assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -50,10 +55,11 @@
   # defaultValues = list()
   
   # defaultValues[["selectIds"]] = ""
-  defaultValues[["pcaN"]] = 500
+  defaultValues[["pcaN"]] = 200
   defaultValues[["pcaScale"]] = TRUE
+  defaultValues[["pcaRank"]]  = 15
   defaultValues[["sampleInput"]] =FALSE
-  defaultValues[["hvgSelection"]] = "vst"
+  defaultValues[["hvgSelection"]] = "getTopHVGs"
   # defaultValues[["alluiv1"]] = "seurartCluster"
   defaultValues[["alluiv2"]] = "dbCluster"
   # defaultValues[["tabsetCluster"]] = "seurat_Clustering"
@@ -61,7 +67,7 @@
   defaultValues[["minGenes"]] = 1
   defaultValues[["maxGenes"]] = 15000
   defaultValues[["seurClustDims"]] = 15
-  defaultValues[["seurClustk.param"]] = 15
+  defaultValues[["seurClustk.param"]] = 10
   defaultValues[["cellPatternRM"]] = ""
   defaultValues[["gQC_binSize"]] = 200
   defaultValues[["selectIds"]] = "^MT-|^RP|^MRP|MALAT1|B2M|EEF1A1"

@@ -1,4 +1,6 @@
 # docker build - 
+# docker build -f DockerfileUpdate.txt  -t pf2dock/schnapps:1.6.134 -t pf2dock/schnapps:latest .
+
 
 # load R image
 FROM pf2dock/schnapps:1.6.134
