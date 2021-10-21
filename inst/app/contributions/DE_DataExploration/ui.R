@@ -109,7 +109,7 @@ tabList <- list(
     fluidRow(column(
       width = 3,
       selectInput("DE_gene_vio_x",
-                  label = "Y",
+                  label = "X",
                   choices = defaultValue("DE_gene_vio_x", "sampleNames"),
                   selected = defaultValue("DE_gene_vio_x", "sampleNames")
       ))),
