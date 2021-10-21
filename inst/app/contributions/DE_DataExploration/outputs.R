@@ -466,8 +466,8 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls()), compress = F)
   }
-  # load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
-  projections$ExpressionColor = 
+  # cp = load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
+  # projections$ExpressionColor = 
   dimCol = "ExpressionColor"
   featureData <- rowData(scEx_log)
   geneid <- geneName2Index(g_id, featureData)
