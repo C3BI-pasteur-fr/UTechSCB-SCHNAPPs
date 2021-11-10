@@ -405,10 +405,15 @@ readCSV <- function(inFile) {
   exAll <- as(as.matrix(data), "dgTMatrix")
   rownames(exAll) <- rownames(data)
   colnames(exAll) <- colnames(data)
+  if (all(stringr::str_detect(colnames(data),"-"))) {
+    sampleNames = unlist(lapply(colnames(data), function(x) stringr::str_split(x,"-")[[1]][2]))
+  } else {
+    sampleNames = as.factor(rep(tools::file_path_sans_ext(inFile$name), ncol(data)))
+  }
   scExnew <- SingleCellExperiment(
     assay = list(counts = exAll),
     colData = list(
-      sampleNames = as.factor(rep(tools::file_path_sans_ext(inFile$name), ncol(data))),
+      sampleNames = sampleNames,
       barcode = colnames(data)
     ),
     rowData = list(
@@ -2336,19 +2341,19 @@ simlrFunc  <- function(){
       cluster
     }
   )
-  if ("barcode" %in% colnames(colData(scEx_log))) {
-    barCode <- colData(scEx_log)$barcode
-  } else {
-    barCode <- rownames(colData(scEx_log))
-  }
+  # if ("barcode" %in% colnames(colData(scEx_log))) {
+  #   barCode <- colData(scEx_log)$barcode
+  # } else {
+    # barCode <- rownames(colData(scEx_log))
+  # }
   
   if (is.null(retVal)) {return(NULL)}
   
   
   retVal <- data.frame(
-    Barcode = barCode,
     Cluster = retVal
   )
+  # rownames(retVal) = barCode
   rownames(retVal) <- rownames(colData(scEx_log))
   
   setRedGreenButton(
