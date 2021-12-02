@@ -459,7 +459,7 @@ appendAnnotation <- function(scEx, annFile) {
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls()))
     }
-    # load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
+    # cp = load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
       rownames(data) <- data[, 1]
       data <- data[, -1]
@@ -580,7 +580,7 @@ inputData <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/inputData.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/inputData.RData')
+  # cp =load(file='~/SCHNAPPsDebug/inputData.RData')
   
   # inFile$datapath = "data/sessionData.RData"
   # annFile$datapath = "data/selectedCells.csv"

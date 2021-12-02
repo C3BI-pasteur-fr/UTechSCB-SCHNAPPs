@@ -529,7 +529,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                
                if(is.null(
                  tryCatch({
-                   newLbVec = str_split(newLables, ",")[[1]]
+                   newLbVec = str_trim(str_split(newLables, ",")[[1]])
                    if (ncol(newPrjs) == 0) {
                      newPrjs = data.frame(row.names = acn)
                      newPrjs[,newProjName] = "NA"
@@ -546,8 +546,29 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                    }
                    
                    newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
-                   if ("NA" %in% levels(newPrjs[,ncol(newPrjs)]) & "NA" %in% stringr::str_trim(newLbVec) )
-                     newLbVec = c(newLbVec, "NA")
+                   if ("NA" %in% levels(newPrjs[,ncol(newPrjs)]) & !"NA" %in% stringr::str_trim(newLbVec) ){
+                     naPos = which ("NA" == levels(newPrjs[,ncol(newPrjs)]))
+                     if ( naPos == length(levels(newPrjs[,ncol(newPrjs)]))){
+                       newLbVec = c(newLbVec, "NA")
+                     } else { 
+                       if (naPos == 1) {
+                         newLbVec = c("NA", newLbVec)
+                       } else {
+                         cat(file = stderr(), paste("NA is neither in front nor last \n"))
+                         showNotification("NA is neither in front nor last ", id = "renameProbl2", duration = NULL, type = "error")
+                         return(NULL)
+                       }
+                     }
+                   }
+                   if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(stringr::str_trim(newLbVec)) ){
+                     cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
+                     cat(file = stderr(), levels(newPrjs[,ncol(newPrjs)]))
+                     cat(file = stderr(), paste("\n\n\nnew levels:\n"))
+                     cat(file = stderr(), stringr::str_trim(newLbVec))
+                     cat(file = stderr(), paste("\n"))
+                     showNotification("number of levels not correct. See console", id = "renameProbl", duration = NULL, type = "error")
+                     return(NULL)
+                   }
                    levels(newPrjs[,ncol(newPrjs)]) = stringr::str_trim(newLbVec)
                  }, error=function(w){
                    # browser()
@@ -570,7 +591,7 @@ observeEvent(eventExpr = input$gQC_rnProj,
                shiny::req(rnProj)
                shiny::req(projections)
                if (! rnProj %in% colnames(projections)) return(NULL)
-
+               
                # browser()
                updateTextAreaInput(session, inputId = "gQC_renameLev", value = paste(as.character(levels(factor(projections[,rnProj]))), 
                                                                                      collapse = ", "))
@@ -688,7 +709,7 @@ output$gQC_windHC <- renderPlot({
   # if(is_logscale(Y)) {
   #   Y = exp(Y)
   # }
-
+  
   trueclass <- projections[,gQC_windProj]
   ctStruct = createRef(Y, trueclass)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
