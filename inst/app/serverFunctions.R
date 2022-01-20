@@ -535,7 +535,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       title = gtitle,
       dragmode = "select"
     )
-
+  
   if (is.factor(subsetData[, dimCol])) {
     
   } else {
@@ -1435,21 +1435,40 @@ heatmapModuleFunction <- function(
   # heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
   # 
   # to check if this is handled better in plotly
-  if (is.null(scale)) {
-    heatmapData$scale <- "none"
-  }   else {
-    heatmapData$scale <- scale
-    if (scale == "row") {
-      rmRows = -which(apply(heatmapData$mat, 1, sd) == 0)
-      if(length(rmRows) > 1)
-        heatmapData$mat <- heatmapData$mat[rmRows, ]
-    }
-    if (scale == "column") {
-      rmCols = -which(apply(heatmapData$mat, 2, sd) == 0)
-      if (length(rmCols) > 1)
-        heatmapData$mat <- heatmapData$mat[, rmCols]
-    }
-  }
+  switch(scale,
+         none = {heatmapData$scale <- "none"},
+         row = {
+           heatmapData$scale <- scale
+           rmRows = -which(apply(heatmapData$mat, 1, sd) == 0)
+           if(length(rmRows) > 1){
+             if (.schnappsEnv$DEBUG) {
+               cat(file = stderr(), "!!!!! output$pHeatMapModule:mat removing row due to sd = 0 for some genes\n")
+             }
+             heatmapData$mat <- heatmapData$mat[rmRows, ]
+           }
+         },
+         column = {
+           heatmapData$scale <- scale
+           rmCols = -which(apply(heatmapData$mat, 2, sd) == 0)
+           if (length(rmCols) > 1){
+             if (.schnappsEnv$DEBUG) {
+               cat(file = stderr(), "!!!!! output$pHeatMapModule:mat removing cols due to sd = 0 for some genes\n")
+             }
+             heatmapData$mat <- heatmapData$mat[, rmCols]
+           }
+         },
+         row_order = {
+           heatmapData$scale <- "none"
+           # the "[]" are needed to preserve the row/column names
+           heatmapData$mat[] <- t(apply(heatmapData$mat,1,order))
+         },
+         col_order = {
+           heatmapData$scale <- "none"
+           heatmapData$mat[] <- apply(heatmapData$mat,2,order)
+         }
+  )
+  
+  
   heatmapData$annotation_col = data.frame(row.names = colnames(heatmapData$mat))
   # heatmapData$filename <- outfile
   # heatmapData$filename = NULL
@@ -1596,6 +1615,10 @@ heatmapModuleFunction <- function(
   set.seed(1) # to make clustering reproducible
   heatmapData$run_draw = F
   if (sortingCols == "gene (click)") heatmapData$run_draw = T
+  
+  # make sure only values that are plotted are in the annotation
+  heatmapData$annotation_col = droplevels(droplevels(heatmapData$annotation_col))
+  
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),

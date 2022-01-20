@@ -232,7 +232,7 @@ pHeatMapUI <- function(id) {
             width = 6,
             selectInput(ns("normRow"),
                         label = "scale by row (for color)",
-                        choices = c("row", "column", defaultValue(ns("normRow"), "none")),
+                        choices = c("row", "column", "row_order", "col_order", defaultValue(ns("normRow"), "none")),
                         selected = defaultValue(ns("normRow"), "none")
             ),
             selectInput(
