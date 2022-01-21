@@ -1800,11 +1800,11 @@ pHeatMapModule <- function(input, output, session,
     max = signif(max(heatmapData$mat), digits = 4)
     if (input$normRow == "row_order"){
       min = 0
-      max = nrow(heatmapData$mat)
+      max = ncol(heatmapData$mat)
     }
     if (input$normRow == "col_order"){
       min = 0
-      max = ncol(heatmapData$mat)
+      max = nrow(heatmapData$mat)
     }
     updateSliderInput(session,
                       inputId = "heatmapMinMaxValue",
