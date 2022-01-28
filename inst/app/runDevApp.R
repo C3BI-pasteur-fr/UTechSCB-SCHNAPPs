@@ -22,13 +22,13 @@ library(reactlog)
   # localContributionDir = ""
   defaultValueSingleGene = "IL7R" # CD52
   defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
-  defaultValueMultiGenes = "IGHA1, IGKC, IGHA2, IGLC2, IGLL5, IGKV4-1, IGHM, IGLC3, PPIG, HIGD2A, IGKV1-39, IGBP1, INSIG1, IGHV4-59, IGKV3-20, GIGYF2, IGF1, PIGP, IGLV3-1, AIG1, PIGT, IGLV6-57, IGKV1D-8, IGHV3-7, INSIG2, IGKV1-5, GIGYF1, SIGIRR, IGHG1, IGHV3-30, IGHG3, PIGBOS1"
+  defaultValueMultiGenes = "LINC00115, NOC2L, HES4, ISG15, TNFRSF18, CD52, SH3BGRL3"
   # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
   defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
   DEBUG = T
   DEBUGSAVE = F
-  historyPath = "/Volumes/Oct2020/RStudio_history/katja"
-  # historyPath = NULL
+  # historyPath = "/Volumes/Oct2020/RStudio_history/katja"
+  historyPath = NULL
   
   assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
