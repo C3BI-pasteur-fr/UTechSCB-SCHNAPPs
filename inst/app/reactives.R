@@ -1501,7 +1501,7 @@ scEx_log <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/scEx_log.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/scEx_log.RData")
+  # cp = load(file="~/SCHNAPPsDebug/scEx_log.RData")
   
   if (whichscLog == "disablescEx_log") {
     return(NULL)
@@ -2709,8 +2709,8 @@ initializeGroupNames <- reactive({
     if (rlang::is_empty(grpNs) | !all(colnames(scEx) %in% rownames(grpNs))) {
       df <-
         data.frame(
-          all = rep(TRUE, dim(scEx)[2]),
-          none = rep(FALSE, dim(scEx)[2])
+          all = rep("TRUE", dim(scEx)[2]),
+          none = rep("FALSE", dim(scEx)[2])
         )
       rownames(df) <- colnames(scEx)
       groupNames$namesDF <- df

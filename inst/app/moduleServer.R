@@ -287,15 +287,15 @@ clusterServer <- function(input, output, session,
         }
       }
     }
-    
-    if(!is.null(inpClusters)){
-      subsetData <- subset(projections, dbCluster %in% inpClusters)
-    }else{
-      subsetData = projections
-    }
+    # browser()
+    # if(!is.null(inpClusters)){
+    #   subsetData <- subset(projections, dbCluster %in% inpClusters)
+    # }else{
+    #   subsetData = projections
+    # }
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
-    cells.names <- brushedPs$key
+    cells.names <- unlist(brushedPs$key)
     if (is.null(cells.names) )
       if (length(brushedPs) >0)
         if (nrow(brushedPs) > 0) { 
@@ -669,19 +669,21 @@ clusterServer <- function(input, output, session,
     # in case the cell selection has changed
     grpNs <- grpNs[colnames(scEx), ]
     if (!grpN %in% colnames(grpNs)) {
-      grpNs[, grpN] <- FALSE
+      grpNs[, grpN] <- "FALSE"
     }
     grpNs[, grpN] = as.logical(grpNs[, grpN])
     if (!addToSelection) {
-      grpNs[rownames(visibleCells), grpN] <- FALSE
+      grpNs[rownames(visibleCells), grpN] <- "FALSE"
     }
     if (class(cells.names) == "list") {
       cells.names = unlist(cells.names)
     }
-    grpNs[cells.names, grpN] <- TRUE
+    grpNs[cells.names, grpN] <- "TRUE"
+    grpNs[, grpN] = as.factor(as.character(grpNs[, grpN]))
     # grpNs[, grpN] <- as.factor(grpNs[, grpN])
     # Set  reactive value
     # cat(file = stderr(), paste("DEBUG: ",colnames(grpNs)," \n"))
+    # browser()
     groupNames$namesDF <- grpNs
     updateSelectInput(session, "groupNames",
                       choices = c("plot", colnames(grpNs)),
@@ -731,8 +733,8 @@ clusterServer <- function(input, output, session,
         rownames(prjs) = prjs[,1]
         prjs = prjs[,-1]
       }
-      prjs[is.na(prjs)] <- FALSE
-      prjs$all = TRUE
+      prjs[is.na(prjs)] <- "FALSE"
+      prjs$all = "TRUE"
       if ('rowname' %in% colnames(prjs)) prjs = prjs [,-which(colnames(prjs)=='rowname')]
     },
     error = function(e){
@@ -769,6 +771,7 @@ clusterServer <- function(input, output, session,
     if (is.null(projections)) {
       return(NULL)
     }
+    # browser()
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls()))
     }
@@ -1146,7 +1149,7 @@ tableSelectionServer <- function(input, output, session,
         list = c(ls())
       )
     }
-    # load(file=paste0("~/SCHNAPPsDebug/cellNameTable", "ns", ".RData", collapse = "."))
+    #cp =  load(file=paste0("~/SCHNAPPsDebug/cellNameTable-sCA_dgeTable--.RData", collapse = "."))
     
     
     maxCol <- min(20, ncol(dataTables))
@@ -1797,6 +1800,14 @@ pHeatMapModule <- function(input, output, session,
       heatmapData$mat = 0
     min = signif(min(heatmapData$mat), digits = 4)
     max = signif(max(heatmapData$mat), digits = 4)
+    if (input$normRow == "row_order"){
+      min = 0
+      max = ncol(heatmapData$mat)
+    }
+    if (input$normRow == "col_order"){
+      min = 0
+      max = nrow(heatmapData$mat)
+    }
     updateSliderInput(session,
                       inputId = "heatmapMinMaxValue",
                       min = min,
