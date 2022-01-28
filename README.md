@@ -15,6 +15,8 @@ Shiny app for the exploration and analysis of single cell RNAseq data as it come
 
 https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1
 
+ Journal of Immunological Methods doi: 10.1016/j.jim.2021.113176
+
 ## Installation
 
 Developper tools need to be installed please see for further information:

@@ -738,7 +738,7 @@ clusterServer <- function(input, output, session,
       if ('rowname' %in% colnames(prjs)) prjs = prjs [,-which(colnames(prjs)=='rowname')]
     },
     error = function(e){
-      browser()
+      # browser()
       cat(file = stderr(), paste("error in grp", e))
     })
     sessionProjections$prjs = prjs
@@ -1328,7 +1328,7 @@ pHeatMapModule <- function(input, output, session,
   ns <- session$ns
   # browser()
   outfilePH <- NULL
-  
+  heatmap_id = NULL
   
   
   ht_obj = reactiveVal(NULL)
@@ -1473,6 +1473,8 @@ pHeatMapModule <- function(input, output, session,
       # fill reactive values:
       ht_obj(ht)
       ht_pos_obj(ht_pos)
+      # browser()
+      # heatmap_id = shiny_env$current_heatmap_id
     })
   }) 
   
@@ -1499,7 +1501,7 @@ pHeatMapModule <- function(input, output, session,
                  newPrjs <- projectionsTable$newProjections
                  acn = allCellNames()
                  htDat = myretVal()
-                 
+                 heatmap_id2 = shiny_env$current_heatmap_id
                  if (is.null(projections)) return(NULL)
                  if (is.null(htDat)) return(NULL)
                  if (is.null(htobj)) return(NULL)
@@ -1606,7 +1608,7 @@ pHeatMapModule <- function(input, output, session,
     if(is.null(htobj)) return(NULL)
     if (is.null(projections)) return(NULL)
     if (is.null(htDat)) return(NULL)
-    
+    # browser()
     selection = tryCatch(
       selectPosition(ht_list = htobj, pos = pos, mark = T, ht_pos = htpos_obj, 
                      verbose = F, calibrate = FALSE), 
