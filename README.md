@@ -1,4 +1,4 @@
-<img src="inst/www/images/schnappsLogo.png" align="right" alt="" width="120" />
+<img src="logo.png" align="right" alt="" width="120" />
 
 
 
@@ -13,9 +13,10 @@ Shiny app for the exploration and analysis of single cell RNAseq data as it come
 
 ## Citation
 
+Journal of Immunological Methods doi: [10.1016/j.jim.2021.113176](https://doi.org/10.1016/j.jim.2021.113176)
+
 https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1
 
- Journal of Immunological Methods doi: 10.1016/j.jim.2021.113176
 
 ## Installation
 
@@ -40,6 +41,25 @@ devtools::install_github("haowulab/Wind")
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 ```
 
+
+
+## create sample data set
+
+Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.
+
+A SingleCellExperiment object is needed with the following 
+
+colData: sampleNames  <factor>, and barcode <factor>
+
+rowData: Description <character>, symbol<character>, id (unique)<character>
+
+
+```
+data("scEx", package = "SCHNAPPs")
+save(file = "scEx.Rdata", list = "scEx")
+```
+
+
 ### history functionality
 
 To take advantage of the history functionality orca needs to be installed:
@@ -59,15 +79,6 @@ Notes:
 3. The date of recording is added to the title.
 4. Creating of the history will take some time.
 5. once activated, any changes of parameters will trigger re-plot and also a save to the history. This "feature" can also be used to create of the current plot by adding a "," in one of the fields.
-
-## create sample data set
-
-Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.
-
-```
-data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")
-```
 
 
 ## Running schnapps
