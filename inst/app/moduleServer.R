@@ -1326,16 +1326,18 @@ pHeatMapModule <- function(input, output, session,
   require(evaluate)
   if (DEBUG) cat(file = stderr(), paste("pHeatMapModule", session$ns("test"), "\n"))
   ns <- session$ns
-  # browser()
-  outfilePH <- NULL
+   outfilePH <- NULL
   heatmap_id = NULL
   
+  # browser()
   
   ht_obj = reactiveVal(NULL)
   ht_pos_obj = reactiveVal(NULL)
   myretVal = reactiveVal(NULL)
   
-  addOptions <- reactive(list(
+  addOptions <- reactive(
+    {req(pheatmapList())
+    list(
     sortingCols = input$sortingCols,
     normRow = input$normRow,
     heatMapGrpName = input$heatMapGrpName,
@@ -1343,8 +1345,13 @@ pHeatMapModule <- function(input, output, session,
     colPal = input$colPal,
     orderColNames = input$orderNames,
     heatmapCellGrp = input$heatmapCellGrp,
-    heatmapMinMaxValue = input$heatmapMinMaxValue
-  )) %>% debounce(1000)
+    heatmapMinMaxValue = ifelse({
+      # browser();
+      "mat" %in% names(pheatmapList())},
+                                c(min(pheatmapList()$mat), max(pheatmapList()$mat)),
+                                c(0,1)
+    )
+  )}) %>% debounce(1000)
   
   
   
@@ -1501,11 +1508,11 @@ pHeatMapModule <- function(input, output, session,
                  newPrjs <- projectionsTable$newProjections
                  acn = allCellNames()
                  htDat = myretVal()
-                 heatmap_id2 = shiny_env$current_heatmap_id
+                 # heatmap_id2 = shiny_env$current_heatmap_id
                  if (is.null(projections)) return(NULL)
                  if (is.null(htDat)) return(NULL)
                  if (is.null(htobj)) return(NULL)
-                 
+                 # browser()
                  if (.schnappsEnv$DEBUGSAVE) {
                    save(
                      file = "~/SCHNAPPsDebug/heatMapGrpNameButton.RData",
@@ -1562,8 +1569,9 @@ pHeatMapModule <- function(input, output, session,
                  # the matrix can be in different places
                  if ("ht_list" %in% slotNames(htDat)){ 
                    mat = htDat@ht_list[[1]]@matrix
-                   } else{ 
-                   mat = htDat@matrix}
+                 } else{ 
+                   mat = htDat@matrix
+                 }
                  addPrj[colnames(mat)[unlist(selection$column_index)]] = TRUE
                  # 
                  if (ncol(newPrjs) == 0) {
@@ -1571,6 +1579,7 @@ pHeatMapModule <- function(input, output, session,
                  }
                  newPrjs[,newPrj] = FALSE
                  newPrjs[names(addPrj),newPrj] <- addPrj
+                 newPrjs[,newPrj] = as.factor(as.character(newPrjs[,newPrj]))
                  # } else {
                  #   # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, addPrj, drop = FALSE])
                  #   # browser()
@@ -1582,7 +1591,7 @@ pHeatMapModule <- function(input, output, session,
                  #   newPrjs = newPrjs[,-1]
                  # }
                  # colnames(newPrjs)[ncol(newPrjs)] <- newPrj
-                 projectionsTable$newProjections <- as.factor(newPrjs)
+                 projectionsTable$newProjections <- newPrjs
                }) 
   
   # observer click ----
@@ -1647,10 +1656,17 @@ pHeatMapModule <- function(input, output, session,
     if (ncol(newPrjs) == 0) {
       newPrjs = data.frame(row.names = acn)
     }
+    if ("ht_list" %in% slotNames(htDat)) {
+      htMat = htDat@ht_list[[1]]@matrix
+    } else if("matrix" %in% slotNames(htDat)) {
+      htMat = htDat@matrix
+    }
+    
+    
     # unlist(selection$row_index)
-    geneName = rowData(scEx_log)[rownames(htDat@ht_list[[1]]@matrix)[selection$row_index],"symbol"]
+    geneName = rowData(scEx_log)[rownames(htMat)[selection$row_index],"symbol"]
     newPrj = make.names(geneName)
-    newPrjs[colnames(htDat@ht_list[[1]]@matrix),newPrj] <- htDat@ht_list[[1]]@matrix[selection$row_index,]
+    newPrjs[colnames(htMat),newPrj] <- htMat[selection$row_index,]
     projectionsTable$newProjections <- newPrjs
     
     updateSelectInput(inputId = "orderNames", 
@@ -1782,7 +1798,7 @@ pHeatMapModule <- function(input, output, session,
   }) 
   
   observe(label = "ob46a", {
-    if (DEBUG) cat(file = stderr(), "observer: updateInput started.\n")
+    if (DEBUG) cat(file = stderr(), "observer: updateInput started 46a.\n")
     start.time <- base::Sys.time()
     on.exit({
       printTimeEnd(start.time, "updateInput")
@@ -1796,23 +1812,29 @@ pHeatMapModule <- function(input, output, session,
     heatmapData <- pheatmapList()
     if(is.null(heatmapData)) return(NULL)
     # to remove the warning message when nothing is loaded
-    if (!"mat" %in% names(heatmapData))
+    if (!"mat" %in% names(heatmapData)){
       heatmapData$mat = 0
-    min = signif(min(heatmapData$mat), digits = 4)
-    max = signif(max(heatmapData$mat), digits = 4)
-    if (input$normRow == "row_order"){
       min = 0
-      max = ncol(heatmapData$mat)
+      max = 200
+    }else{
+      min = signif(min(heatmapData$mat), digits = 4)
+      max = signif(max(heatmapData$mat), digits = 4)
+      if (input$normRow == "row_order"){
+        min = 0
+        max = ncol(heatmapData$mat)
+      }
+      if (input$normRow == "col_order"){
+        min = 0
+        max = nrow(heatmapData$mat)
+      }
     }
-    if (input$normRow == "col_order"){
-      min = 0
-      max = nrow(heatmapData$mat)
-    }
+    if (DEBUG) cat(file = stderr(), paste("minmax",min,max,"\n"))
     updateSliderInput(session,
                       inputId = "heatmapMinMaxValue",
                       min = min,
-                      max = max,
-                      value = c(min, max)
+                      max = max
+                      # ,
+                      # value = c(min, max)
     )
     # updateNumericInput(session, inputId = "heatmapMaxValue",
     #                    min = min(heatmapData$mat),
