@@ -29,7 +29,7 @@ library(reactlog)
   DEBUGSAVE = F
   # historyPath = "/Volumes/Oct2020/RStudio_history/katja"
   historyPath = NULL
-  
+   
   assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
@@ -74,6 +74,7 @@ library(reactlog)
   # defaultValues[["selectIds"]] = ""
   defaultValues[["whichscLog"]] = "calcLog"
   defaultValues[["whichscLog"]] = "disablescEx_log"
+  defaultValues[["normalizationRadioButton"]] = "rawNormalization"
   
   defaultValues[["gQC_um_n_neighbors"]] = 20 
   defaultValues[["gQC_um_spread"]] = 6 
