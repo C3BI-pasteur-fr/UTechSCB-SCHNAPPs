@@ -986,6 +986,10 @@ addColData <- function(allScEx_log, scEx) {
            "numeric" = {
              nCol <- data.frame(cc = rep(0, nrow(colData(allScEx_log))))
              colnames(nCol) <- cc
+           },
+           "integer" = {
+             nCol <- data.frame(cc = rep(0, nrow(colData(allScEx_log))))
+             colnames(nCol) <- cc
            }
     )
     colData(allScEx_log) <- cbind(colData(allScEx_log), nCol)
