@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.136</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.142</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../../reference/index.html">Reference</a>
 </li>
@@ -80,7 +76,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/">
+  <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -95,45 +91,49 @@
 
       
 
-      </header><script src="SeuratWorkflow_files/header-attrs-2.11/header-attrs.js"></script><script src="SeuratWorkflow_files/htmlwidgets-1.5.4/htmlwidgets.js"></script><link href="SeuratWorkflow_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
-<script src="SeuratWorkflow_files/datatables-binding-0.19/datatables.js"></script><script src="SeuratWorkflow_files/jquery-3.6.0/jquery-3.6.0.min.js"></script><link href="SeuratWorkflow_files/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet">
-<link href="SeuratWorkflow_files/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet">
-<script src="SeuratWorkflow_files/dt-core-1.10.20/js/jquery.dataTables.min.js"></script><link href="SeuratWorkflow_files/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet">
-<script src="SeuratWorkflow_files/crosstalk-1.1.1/js/crosstalk.min.js"></script><div class="row">
+      </header><script src="SeuratWorkflow_files/htmlwidgets-1.5.4/htmlwidgets.js"></script><link href="SeuratWorkflow_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="SeuratWorkflow_files/datatables-binding-0.20/datatables.js"></script><link href="SeuratWorkflow_files/dt-core-1.11.3/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="SeuratWorkflow_files/dt-core-1.11.3/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="SeuratWorkflow_files/dt-core-1.11.3/js/jquery.dataTables.min.js"></script><link href="SeuratWorkflow_files/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="SeuratWorkflow_files/crosstalk-1.2.0/js/crosstalk.min.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Seurat workflow</h1>
-                        <h4 class="author">Bernd Jagla</h4>
-                  <a class="author_email" href="mailto:#">bernd <dot> jagla <at> pasteur <dot> fr</dot></at></dot></a>
+                        <h4 data-toc-skip class="author">Bernd
+Jagla</h4>
+                  <a class="author_email" href="mailto:#">bernd <dot>
+jagla <at> pasteur <dot> fr</dot></at></dot></a>
       
                   
-            <h4 class="date">6/7/2020</h4>
+            <h4 data-toc-skip class="date">6/7/2020</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/blob/master/vignettes/pkdown/SeuratWorkflow.Rmd"><code>vignettes/pkdown/SeuratWorkflow.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/blob/HEAD/vignettes/pkdown/SeuratWorkflow.Rmd" class="external-link"><code>vignettes/pkdown/SeuratWorkflow.Rmd</code></a></small>
       <div class="hidden name"><code>SeuratWorkflow.Rmd</code></div>
 
     </div>
 
     
     
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>Please see the Seurat workflow for a more indepth workflow.</p>
-<p><a href="https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html" class="uri">https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html</a></p>
-<p>This workflow uses a dataset of Peripheral Blood Mononuclear Cells (PBMC) freely available from 10X Genomics. There are 2,700 single cells that were sequenced on the Illumina NextSeq 500.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>Please see the Seurat workflow for a more in-depth workflow.</p>
+<p><a href="https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html" class="external-link uri">https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html</a></p>
+<p>This workflow uses a dataset of Peripheral Blood Mononuclear Cells
+(PBMC) freely available from 10X Genomics. There are 2,700 single cells
+that were sequenced on the Illumina NextSeq 500.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://had.co.nz/plyr">plyr</a></span><span class="op">)</span>; <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat">Seurat</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">SCHNAPPs</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://had.co.nz/plyr" class="external-link">plyr</a></span><span class="op">)</span>; <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs" class="external-link">SCHNAPPs</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span>
 <span class="co"># Load the pbm dataset</span>
-<span class="va">pbm.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/Read10X.html">Read10X</a></span><span class="op">(</span>data.dir <span class="op">=</span> <span class="st">"~/Downloads/filtered_gene_bc_matrices/hg19/"</span><span class="op">)</span>
+<span class="va">pbm.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/Read10X.html" class="external-link">Read10X</a></span><span class="op">(</span>data.dir <span class="op">=</span> <span class="st">"~/Downloads/filtered_gene_bc_matrices/hg19/"</span><span class="op">)</span>
 <span class="co"># Initialize the Seurat object with the raw (non-normalized data).</span>
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">pbm.data</span>, project <span class="op">=</span> <span class="st">"pbm3k"</span>, min.cells <span class="op">=</span> <span class="fl">3</span>, min.features <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/CreateSeuratObject.html" class="external-link">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">pbm.data</span>, project <span class="op">=</span> <span class="st">"pbm3k"</span>, min.cells <span class="op">=</span> <span class="fl">3</span>, min.features <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>
 
-<span class="va">pbm</span><span class="op">[[</span><span class="st">"percent.mt"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/PercentageFeatureSet.html">PercentageFeatureSet</a></span><span class="op">(</span><span class="va">pbm</span>, pattern <span class="op">=</span> <span class="st">"^MT-"</span><span class="op">)</span>
+<span class="va">pbm</span><span class="op">[[</span><span class="st">"percent.mt"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/PercentageFeatureSet.html" class="external-link">PercentageFeatureSet</a></span><span class="op">(</span><span class="va">pbm</span>, pattern <span class="op">=</span> <span class="st">"^MT-"</span><span class="op">)</span>
 
 <span class="co">## in case of human samples:</span>
 <span class="co"># pbm &lt;- CellCycleScoring(</span>
@@ -144,47 +144,47 @@
 
 
 
-<span class="va">scEx</span> <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/as.SingleCellExperiment.html">as.SingleCellExperiment</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<span class="va">scEx</span> <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/as.SingleCellExperiment.html" class="external-link">as.SingleCellExperiment</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sampleNames"</span>,   <span class="st">"nCount_RNA"</span>,   <span class="st">"nFeature_RNA"</span>, <span class="st">"percent.mt"</span> , <span class="st">"ident"</span>       <span class="op">)</span>
-<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">barcode</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sampleNames"</span>,   <span class="st">"nCount_RNA"</span>,   <span class="st">"nFeature_RNA"</span>, <span class="st">"percent.mt"</span> , <span class="st">"ident"</span>       <span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">barcode</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">Description</span> <span class="op">=</span> <span class="st">""</span>
-<span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">id</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
-<span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">symbol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="fu">rowData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">Description</span> <span class="op">=</span> <span class="st">""</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">id</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">symbol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">pbm</span></code></pre></div>
-<pre><code>## An object of class Seurat 
-## 13714 features across 2700 samples within 1 assay 
-## Active assay: RNA (13714 features, 0 variable features)</code></pre>
+<pre><code><span class="co">## An object of class Seurat </span>
+<span class="co">## 13714 features across 2700 samples within 1 assay </span>
+<span class="co">## Active assay: RNA (13714 features, 0 variable features)</span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">pbm</span>, subset <span class="op">=</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;</span> <span class="fl">200</span> <span class="op">&amp;</span> <span class="va">nFeature_RNA</span> <span class="op">&lt;</span> <span class="fl">2500</span> <span class="op">&amp;</span> <span class="va">percent.mt</span> <span class="op">&lt;</span> <span class="fl">5</span><span class="op">)</span>
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="va">pbm</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span>,<span class="op">]</span>
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/NormalizeData.html">NormalizeData</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">pbm</span>, subset <span class="op">=</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;</span> <span class="fl">200</span> <span class="op">&amp;</span> <span class="va">nFeature_RNA</span> <span class="op">&lt;</span> <span class="fl">2500</span> <span class="op">&amp;</span> <span class="va">percent.mt</span> <span class="op">&lt;</span> <span class="fl">5</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="va">pbm</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span>,<span class="op">]</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/NormalizeData.html" class="external-link">NormalizeData</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
 
-<span class="va">pbm</span> <span class="op">&lt;-</span><span class="fu"><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span>, selection.method <span class="op">=</span> <span class="st">"vst"</span>, nfeatures <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span><span class="fu"><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html" class="external-link">FindVariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span>, selection.method <span class="op">=</span> <span class="st">"vst"</span>, nfeatures <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span>
 
-<span class="va">top10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://satijalab.org/seurat/reference/VariableFeatures.html">VariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span>
-<span class="va">all.VariableFeatures</span> <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/VariableFeatures.html">VariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
-<span class="va">all.genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<span class="va">top10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span>
+<span class="va">all.VariableFeatures</span> <span class="op">=</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<span class="va">all.genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
 <span class="co"># Why do they scale on all features???</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html">ScaleData</a></span><span class="op">(</span><span class="va">pbm</span>, features <span class="op">=</span> <span class="va">all.VariableFeatures</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html" class="external-link">ScaleData</a></span><span class="op">(</span><span class="va">pbm</span>, features <span class="op">=</span> <span class="va">all.VariableFeatures</span><span class="op">)</span>
 
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">pbm</span>, features <span class="op">=</span> <span class="va">all.VariableFeatures</span>, rank <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
-<span class="va">scranPCA</span> <span class="op">=</span> <span class="fu">BiocSingular</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html">runPCA</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/ObjectAccess.html">Assays</a></span><span class="op">(</span><span class="va">pbm</span>,slot <span class="op">=</span> <span class="st">"RNA"</span><span class="op">)</span><span class="op">@</span><span class="va">scale.data</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="va">all.VariableFeatures</span>,<span class="op">]</span><span class="op">)</span> , rank <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html" class="external-link">RunPCA</a></span><span class="op">(</span><span class="va">pbm</span>, features <span class="op">=</span> <span class="va">all.VariableFeatures</span>, rank <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+<span class="va">scranPCA</span> <span class="op">=</span> <span class="fu">BiocSingular</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">runPCA</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">(</span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/ObjectAccess.html" class="external-link">Assays</a></span><span class="op">(</span><span class="va">pbm</span>,slot <span class="op">=</span> <span class="st">"RNA"</span><span class="op">)</span><span class="op">@</span><span class="va">scale.data</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="va">all.VariableFeatures</span>,<span class="op">]</span><span class="op">)</span> , rank <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
 
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindNeighbors.html">FindNeighbors</a></span><span class="op">(</span><span class="va">pbm</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindClusters.html">FindClusters</a></span><span class="op">(</span><span class="va">pbm</span>, resolution <span class="op">=</span> <span class="fl">0.5</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindNeighbors.html" class="external-link">FindNeighbors</a></span><span class="op">(</span><span class="va">pbm</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindClusters.html" class="external-link">FindClusters</a></span><span class="op">(</span><span class="va">pbm</span>, resolution <span class="op">=</span> <span class="fl">0.5</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html">RunUMAP</a></span><span class="op">(</span><span class="va">pbm</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">pbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html" class="external-link">RunUMAP</a></span><span class="op">(</span><span class="va">pbm</span>, dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span> <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>
-<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="fu"><a href="https://satijalab.org/seurat/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span><span class="op">)</span>,<span class="st">"seurartCluster"</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
-<span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span><span class="op">)</span></code></pre></div>
-<div id="comparing-biocsingular-and-seurat-pca-calculations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#comparing-biocsingular-and-seurat-pca-calculations" class="anchor"></a>comparing BiocSingular and Seurat PCA calculations:</h2>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span> <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/Idents.html" class="external-link">Idents</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span><span class="op">)</span>,<span class="st">"seurartCluster"</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/Idents.html" class="external-link">Idents</a></span><span class="op">(</span><span class="va">pbm</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">scEx</span><span class="op">)</span><span class="op">$</span><span class="va">seurartCluster</span><span class="op">)</span></code></pre></div>
+<div class="section level3">
+<h3 id="comparing-biocsingular-and-seurat-pca-calculations">comparing BiocSingular and Seurat PCA calculations:<a class="anchor" aria-label="anchor" href="#comparing-biocsingular-and-seurat-pca-calculations"></a>
+</h3>
 <ul>
 <li>Seurat</li>
 </ul>
@@ -195,17 +195,21 @@
 <div id="htmlwidget-224a177bc8d0026d195b" style="width:100%;height:auto;" class="datatables html-widget"></div>
 <script type="application/json" data-for="htmlwidget-224a177bc8d0026d195b">{"x":{"filter":"none","vertical":false,"data":[["AAACATACAACCAC-1","AAACATTGAGCTAC-1","AAACATTGATCAGC-1"],[-4.71606885483824,-0.503934612562218,-3.17556831366895],[-0.526504991038634,4.58419850565029,-3.47741474467559],[-0.848004823269218,5.88435595219513,-0.912638100491362]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PC1<\/th>\n      <th>PC2<\/th>\n      <th>PC3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pbm</span></code></pre></div>
-<pre><code>## An object of class Seurat 
-## 13713 features across 2638 samples within 1 assay 
-## Active assay: RNA (13713 features, 2000 variable features)
-##  2 dimensional reductions calculated: pca, umap</code></pre>
+<pre><code><span class="co">## An object of class Seurat </span>
+<span class="co">## 13713 features across 2638 samples within 1 assay </span>
+<span class="co">## Active assay: RNA (13713 features, 2000 variable features)</span>
+<span class="co">##  2 dimensional reductions calculated: pca, umap</span></code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Assays(pbm)</span></code></pre></div>
-<p>We have now created a SingleCellExperiment object with all information from Seurat. We will now try to recreate these results with SCHNAPPs:</p>
-<p>We have to save the object in a file that can be opened with the “load” command.</p>
+<p>We have now created a SingleCellExperiment object with all
+information from Seurat. We will now try to recreate these results with
+SCHNAPPs:</p>
+<p>We have to save the object in a file that can be opened with the
+“load” command.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"seurat.pbm.RData"</span>, list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"scEx"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>To reproduce the results the following parameters have to be set in SCHNAPPs:</p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"seurat.pbm.RData"</span>, list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scEx"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>To reproduce the results the following parameters have to be set in
+SCHNAPPs:</p>
 <ul>
 <li>Cell selection: ** Min # of UMIs = 1</li>
 </ul>
@@ -214,15 +218,32 @@
 Cell selection parameters
 </p>
 </div>
-<p>Just to be complete (we will do this later) here is the list of cells that has to be removed:</p>
-<p>AAAGATCTGGGCAA-1, AAAGCAGAAGCCAT-1, AACGCCCTGCTTAG-1, AAGGTCTGGTATGC-1, AATGTAACGTTTGG-1, AATTACGAGTAGCT-1, ACACAGACACCTGA-1, ACATGGTGCGTTGA-1, ACCTGGCTGTCTTT-1, ACTTAAGACCACAA-1, ACTTGTACCCGAAT-1, ACTTTGTGCGATAC-1, AGAGGTCTACAGCT-1, ATCACGGATTGCTT-1, ATTACCTGGGCATT-1, CACGCTACTTGACG-1, CAGTGTGAACACGT-1, CCAATGGAACAGCT-1, CCAGTCTGCGGAGA-1, CGACCTTGGCAAGG-1, CGAGCCGACGACAT-1, CGGAATTGCACTAG-1, CGTAACGAATCAGC-1, CGTACCACGCTACA-1, CGTACCTGGACGAG-1, CTAGTTTGAGTACC-1, CTCAGCTGTTTCTG-1, CTCATTGATTGCTT-1, CTGGCACTGGACAG-1, CTTAACACGAGCTT-1, CTTAAGCTTCCTCG-1, GAAAGATGTTTGCT-1, GAACGTTGACGGAG-1, GAATGGCTAAGATG-1, GACCATGACTCTCG-1, GACTGAACAACCGT-1, GCCACTACCTACTT-1, GCGAAGGAGAGCTT-1, GCTACAGATCTTAC-1, GGCACGTGTGAGAA-1, GTCAACGATCAGGT-1, GTGAACACAGATCC-1, GTGTCAGAATGCTG-1, GTTAAAACTTCGCC-1, TAAGATACCCACAA-1, TACGCAGACGTCTC-1, TACGCGCTCTTCTA-1, TACGGCCTGTCCTC-1, TATCACTGACTGTG-1, TCCCGATGCTGTGA-1, TCGCACACCATCAG-1, TCGTGAGAACTGTG-1, TGAAGCTGAGACTC-1, TGAGACACTGTGCA-1, TGAGCTGAGCGAGA-1, TGGAGACTGAAACA-1, TGGATGTGATGTCG-1, TGGCAATGGAGGGT-1, TGGTCAGACCGTTC-1, TGTTAAGATTGGCA-1, TTACTCGAACGTTG-1, TTCAAGCTTCCAAG-1</p>
+<p>Just to be complete (we will do this later) here is the list of cells
+that has to be removed:</p>
+<p>AAAGATCTGGGCAA-1, AAAGCAGAAGCCAT-1, AACGCCCTGCTTAG-1,
+AAGGTCTGGTATGC-1, AATGTAACGTTTGG-1, AATTACGAGTAGCT-1, ACACAGACACCTGA-1,
+ACATGGTGCGTTGA-1, ACCTGGCTGTCTTT-1, ACTTAAGACCACAA-1, ACTTGTACCCGAAT-1,
+ACTTTGTGCGATAC-1, AGAGGTCTACAGCT-1, ATCACGGATTGCTT-1, ATTACCTGGGCATT-1,
+CACGCTACTTGACG-1, CAGTGTGAACACGT-1, CCAATGGAACAGCT-1, CCAGTCTGCGGAGA-1,
+CGACCTTGGCAAGG-1, CGAGCCGACGACAT-1, CGGAATTGCACTAG-1, CGTAACGAATCAGC-1,
+CGTACCACGCTACA-1, CGTACCTGGACGAG-1, CTAGTTTGAGTACC-1, CTCAGCTGTTTCTG-1,
+CTCATTGATTGCTT-1, CTGGCACTGGACAG-1, CTTAACACGAGCTT-1, CTTAAGCTTCCTCG-1,
+GAAAGATGTTTGCT-1, GAACGTTGACGGAG-1, GAATGGCTAAGATG-1, GACCATGACTCTCG-1,
+GACTGAACAACCGT-1, GCCACTACCTACTT-1, GCGAAGGAGAGCTT-1, GCTACAGATCTTAC-1,
+GGCACGTGTGAGAA-1, GTCAACGATCAGGT-1, GTGAACACAGATCC-1, GTGTCAGAATGCTG-1,
+GTTAAAACTTCGCC-1, TAAGATACCCACAA-1, TACGCAGACGTCTC-1, TACGCGCTCTTCTA-1,
+TACGGCCTGTCCTC-1, TATCACTGACTGTG-1, TCCCGATGCTGTGA-1, TCGCACACCATCAG-1,
+TCGTGAGAACTGTG-1, TGAAGCTGAGACTC-1, TGAGACACTGTGCA-1, TGAGCTGAGCGAGA-1,
+TGGAGACTGAAACA-1, TGGATGTGATGTCG-1, TGGCAATGGAGGGT-1, TGGTCAGACCGTTC-1,
+TGTTAAGATTGGCA-1, TTACTCGAACGTTG-1, TTCAAGCTTCCAAG-1</p>
 <div class="figure" style="text-align: center">
 <img src="images/cellAddParam.png" alt="Cell selection additional parameters" width="70%"><p class="caption">
 Cell selection additional parameters
 </p>
 </div>
 <ul>
-<li>Gene selection ** remove regular expression ** set min expression to 1</li>
+<li>Gene selection ** remove regular expression ** set min expression to
+1</li>
 </ul>
 <div class="figure" style="text-align: center">
 <img src="images/geneSelection.png" alt="Gene selection parameters" width="70%"><p class="caption">
@@ -232,7 +253,8 @@ Gene selection parameters
 <ul>
 <li>Parameters - Normalization</li>
 </ul>
-<p>** Select SeuratLogNorm, the standard Normalization function in Seurat.</p>
+<p>** Select SeuratLogNorm, the standard Normalization function in
+Seurat.</p>
 <div class="figure" style="text-align: center">
 <img src="images/SeuratNormalization.png" alt="Select normalization method" width="70%"><p class="caption">
 Select normalization method
@@ -242,9 +264,12 @@ Select normalization method
 <li><p>Parameters - General Parameters</p></li>
 <li><p>PCA parameters</p></li>
 </ul>
-<p>** center = true ** scate = true ** use Seurat::RunPCA = ture ** Number of variable genes to be used = 2000 ** select highly expressed using “vst”</p>
+<p>** center = true ** scate = true ** use Seurat::RunPCA = ture **
+Number of variable genes to be used = 2000 ** select highly expressed
+using “vst”</p>
 <ul>
-<li>Clustering parameters ** Seurat clustering tab. ** Dimensions from PCA to use: 10 ** k = 20</li>
+<li>Clustering parameters ** Seurat clustering tab. ** Dimensions from
+PCA to use: 10 ** k = 20</li>
 </ul>
 <div class="figure" style="text-align: center">
 <img src="images/seuratGeneralParemeters.png" alt="General parameters for PCA and clustering" width="70%"><p class="caption">
@@ -254,7 +279,8 @@ General parameters for PCA and clustering
 <ul>
 <li>load input file</li>
 </ul>
-<p>** unset sub sampling of data ** check “calculate normalization here”</p>
+<p>** unset sub sampling of data ** check “calculate normalization
+here”</p>
 <div class="figure" style="text-align: center">
 <img src="images/inputOptions.png" alt="Load data - parameters" width="70%"><p class="caption">
 Load data - parameters
@@ -266,21 +292,23 @@ Load data select file
 </p>
 </div>
 </div>
-<div id="set-color-for-sample" class="section level2">
-<h2 class="hasAnchor">
-<a href="#set-color-for-sample" class="anchor"></a>Set color for sample</h2>
+<div class="section level3">
+<h3 id="set-color-for-sample">Set color for sample<a class="anchor" aria-label="anchor" href="#set-color-for-sample"></a>
+</h3>
 <p>Just for estetics:</p>
-<p>Under Parameters - General Parameters set a nicer color for the samples other than black (which isn’t a color anyways.)</p>
+<p>Under Parameters - General Parameters set a nicer color for the
+samples other than black (which isn’t a color anyways.)</p>
 <div class="figure" style="text-align: center">
 <img src="images/setColor.png" alt="Set color for samples" width="70%"><p class="caption">
 Set color for samples
 </p>
 </div>
 </div>
-<div id="select-cells-to-be-removed" class="section level2">
-<h2 class="hasAnchor">
-<a href="#select-cells-to-be-removed" class="anchor"></a>select cells to be removed</h2>
-<p>Using the 2D plot the cells with more than 2500 nFeature_RNA and more than 5 percent.mt can be selected and removed from the data set:</p>
+<div class="section level3">
+<h3 id="select-cells-to-be-removed">select cells to be removed<a class="anchor" aria-label="anchor" href="#select-cells-to-be-removed"></a>
+</h3>
+<p>Using the 2D plot the cells with more than 2500 nFeature_RNA and more
+than 5 percent.mt can be selected and removed from the data set:</p>
 <p>We have to comply to three thresholds that are being used:</p>
 <ul>
 <li>nFeature_RNA &gt; 200</li>
@@ -305,7 +333,8 @@ Set color for samples
 zooming selector
 </p>
 </div>
-<p>Zooming into the low nFeatureRNA region reveals that no cells will be removed using the 200 threshold.</p>
+<p>Zooming into the low nFeatureRNA region reveals that no cells will be
+removed using the 200 threshold.</p>
 <div class="figure" style="text-align: center">
 <img src="images/2Dzoomed.png" alt="Filter based on detected genes" width="70%"><p class="caption">
 Filter based on detected genes
@@ -334,7 +363,8 @@ Selection tool (box)
 <ul>
 <li>set group names back to “plot”</li>
 </ul>
-<p>change the zoom to be able to select anything around 5 percent.mt and show additional options:</p>
+<p>change the zoom to be able to select anything around 5 percent.mt and
+show additional options:</p>
 <div class="figure" style="text-align: center">
 <img src="images/zoomedSelection.png" alt="2D plot, select cells to be removed 3" width="70%"><p class="caption">
 2D plot, select cells to be removed 3
@@ -342,7 +372,8 @@ Selection tool (box)
 </div>
 <ul>
 <li>select the remaining cells and add them to “rmCells” list.</li>
-<li>if you are not sure about a cell the values can be shown hovering over the points</li>
+<li>if you are not sure about a cell the values can be shown hovering
+over the points</li>
 </ul>
 <div class="figure" style="text-align: center">
 <img src="images/indivCells.png" alt="2D plot, select cells to be removed 4" width="70%"><p class="caption">
@@ -350,13 +381,15 @@ Selection tool (box)
 </p>
 </div>
 <ul>
-<li>proceed similarly to select the cells that have more than 2500 nFeature_RNA.</li>
+<li>proceed similarly to select the cells that have more than 2500
+nFeature_RNA.</li>
 </ul>
 <p>You should have 62 cells selected.</p>
 <ul>
 <li>check the “show cell names” check box.</li>
 <li>copy the cell names (tripple click on a cell name; Command-C)</li>
-<li>Paste the cell name under “Cells to be removed” (see above, cell selection)</li>
+<li>Paste the cell name under “Cells to be removed” (see above, cell
+selection)</li>
 <li>click “apply changes”</li>
 </ul>
 <div class="figure" style="text-align: center">
@@ -374,11 +407,12 @@ Summary statistics
 </p>
 </div>
 </div>
-<div id="clustering-comparison" class="section level2">
-<h2 class="hasAnchor">
-<a href="#clustering-comparison" class="anchor"></a>Clustering comparison</h2>
+<div class="section level3">
+<h3 id="clustering-comparison">Clustering comparison<a class="anchor" aria-label="anchor" href="#clustering-comparison"></a>
+</h3>
 <p>We can now compare the clustering results:</p>
-<p>Both graphs show the same thing: All cells have been assigned to the same cluster. (Just the numbering is different.)</p>
+<p>Both graphs show the same thing: All cells have been assigned to the
+same cluster. (Just the numbering is different.)</p>
 <div class="figure" style="text-align: center">
 <img src="images/alluvialSeurat.png" alt="Alluvial plot" width="90%"><p class="caption">
 Alluvial plot
@@ -405,11 +439,14 @@ Alluvial plot
 
 
       <footer><div class="copyright">
-  <p>Developed by Bernd Jagla.</p>
+  <p></p>
+<p>Developed by Bernd Jagla.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>
@@ -417,6 +454,8 @@ Alluvial plot
 
   
 
+
+  
 
   </body>
 </html>

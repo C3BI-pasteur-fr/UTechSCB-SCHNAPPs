@@ -1439,6 +1439,7 @@ heatmapModuleFunction <- function(
   # heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
   # 
   # to check if this is handled better in plotly
+  if (is.null(scale)) heatmapData$scale <- "none"
   switch(scale,
          none = {heatmapData$scale <- "none"},
          row = {
@@ -1591,31 +1592,6 @@ heatmapModuleFunction <- function(
     
   }
   
-  
-  
-  
-  # if (!"TRONCO" %in% rownames(installed.packages())) {
-  #   return(list(
-  #     src = "empty.png",
-  #     contentType = "image/png",
-  #     width = 96,
-  #     height = 96,
-  #     alt = "pHeatMapPlot should be here (no rows)"
-  #   ))
-  # }
-  # heatmapData$plot_method = "plotly"
-  # heatmapData$x = heatmapData$mat # heatmaply
-  # heatmapData$matrix = heatmapData$mat # Heatmap
-  # heatmapData$showticklabels = c(FALSE, TRUE)
-  # heatmapData$col_side_colors = NULL [heatmapData$annotation_col[,1]]
-  # heatmapData$col_side_colors = heatmapData$annotation_col[,,drop=FALSE]
-  # heatmapData$return_ppxpy = FALSE
-  # heatmaply specific, cannot handle muliple color pallets
-  # combColors = c()
-  # for (cIdx in 1:length(heatmapData$annotation_colors)) combColors = c(combColors, heatmapData$annotation_colors[[cIdx]])
-  # heatmapData$col_side_palette = NULL#combColors
-  # heatmapData$side_color_colorbar_len = NULL
-  # any(is.na(heatmapData$mat))
   set.seed(1) # to make clustering reproducible
   heatmapData$run_draw = F
   if (sortingCols == "gene (click)") heatmapData$run_draw = T
@@ -1623,6 +1599,24 @@ heatmapModuleFunction <- function(
   # make sure only values that are plotted are in the annotation
   heatmapData$annotation_col = droplevels(droplevels(heatmapData$annotation_col))
   
+  
+  # names(heatmapData)
+  # orgHeatmapData = heatmapData
+  # 
+  # heatmapData = orgHeatmapData
+  # heatmapData$scale = NULL
+  # heatmapData$legend = T
+  
+  # heatmapData$legend_breaks = c(1,2,3,5)
+  heatmapData$name = "Expression"
+  # heatmapData$run_draw = T
+  # heatmapData$heatmap_legend_param = list(title="foo")
+  # cutM =cut(heatmapData$mat,6)
+  # heatmapData$mat = as.numeric(cutM)
+  # heatmapData$legend_breaks = levels(cutM)
+  # heatmapData
+  # do.call(ComplexHeatmap::pheatmap, heatmapData)
+  # 
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
@@ -1631,7 +1625,8 @@ heatmapModuleFunction <- function(
       return(NULL)
     }
   )
-  # return(retVal)
+  
+  return(retVal)
 }
 
 # consolidateScEx ----

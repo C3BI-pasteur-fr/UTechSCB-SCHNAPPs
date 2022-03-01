@@ -29,6 +29,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -41,18 +43,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.136</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.142</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -83,7 +79,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/">
+  <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -101,93 +97,121 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<p><img src="inst/www/images/schnappsLogo.png" align="right" alt="" width="120"></p>
-<div id="schnapps---single-cell-shiny-apps" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#schnapps---single-cell-shiny-apps" class="anchor"></a>SCHNAPPs - Single Cell sHiNy APP(s)</h1></div>
+<p><img src="logo.png" align="right" alt="" width="120"></p>
+<div class="section level1">
+<div class="page-header"><h1 id="schnapps---single-cell-shiny-apps">SCHNAPPs - Single Cell sHiNy APP(s)<a class="anchor" aria-label="anchor" href="#schnapps---single-cell-shiny-apps"></a>
+</h1></div>
 <p><img src="https://travis-ci.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs.svg?branch=master"></p>
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
-<p>Shiny app for the exploration and analysis of single cell RNAseq data as it comes from 10X or MARSseq technologies. It is currently being developed based on user requests of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users of our platform to explore their data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Institut Pasteur.</p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>Shiny app for the exploration and analysis of single cell RNAseq data
+as it comes from 10X or MARSseq technologies. It is currently being
+developed based on user requests of the Cytometry and Biomarkers UTechS
+at the Institut Pasteur, Paris. The goal is to enable the users of our
+platform to explore their data, select cells they would like to work
+with and then perform the final analysis together with the
+bioinformatics support at Institut Pasteur.</p>
 </div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor"></a>Citation</h2>
-<p><a href="https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1" class="uri">https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1</a></p>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>Journal of Immunological Methods doi: <a href="https://doi.org/10.1016/j.jim.2021.113176" class="external-link">10.1016/j.jim.2021.113176</a></p>
+<p><a href="https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1" class="external-link uri">https://www.biorxiv.org/content/10.1101/2020.06.07.127274v1</a></p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>Developper tools need to be installed please see for further information:</p>
-<p>Windows: <a href="https://cran.r-project.org/bin/windows/" class="uri">https://cran.r-project.org/bin/windows/</a></p>
-<p>MAC: <a href="https://cran.r-project.org/bin/macosx/" class="uri">https://cran.r-project.org/bin/macosx/</a></p>
-<pre><code><a href="https://rdrr.io/r/utils/update.packages.html">update.packages()
-if (!require("devtools"))
-  install.packages("devtools")
-# devtools::install_github("mul118/shinyMCE")
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-# update bioconductor packages if required
-BiocManager::install()
-# BiocManager::install("BiocSingular")
-BiocManager::install("SingleR") # needed to prepare data.
-devtools::install_github("haowulab/Wind")
-devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)</a></code></pre>
-<div id="history-functionality" class="section level3">
-<h3 class="hasAnchor">
-<a href="#history-functionality" class="anchor"></a>history functionality</h3>
-<p>To take advantage of the history functionality orca needs to be installed: (<a href="https://github.com/plotly/orca#installation" class="uri">https://github.com/plotly/orca#installation</a>)</p>
-<p>orca is part of ploty so nothing to be done for R. But the pdftools are required:</p>
-<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("pdftools")
-</a></code></pre>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Developper tools need to be installed please see for further
+information:</p>
+<p>Windows: <a href="https://cran.r-project.org/bin/windows/" class="external-link uri">https://cran.r-project.org/bin/windows/</a></p>
+<p>MAC: <a href="https://cran.r-project.org/bin/macosx/" class="external-link uri">https://cran.r-project.org/bin/macosx/</a></p>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/utils/update.packages.html" class="external-link">update.packages</a></span><span class="op">(</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://devtools.r-lib.org/" class="external-link">"devtools"</a></span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<span class="co"># devtools::install_github("mul118/shinyMCE")</span>
+<span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+<span class="co"># update bioconductor packages if required</span>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co"># BiocManager::install("BiocSingular")</span>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"SingleR"</span><span class="op">)</span> <span class="co"># needed to prepare data.</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"haowulab/Wind"</span><span class="op">)</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"C3BI-pasteur-fr/UTechSCB-SCHNAPPs"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre>
+</div>
+<div class="section level2">
+<h2 id="create-sample-data-set">create sample data set<a class="anchor" aria-label="anchor" href="#create-sample-data-set"></a>
+</h2>
+<p>Load a small set of 200 PBMC cells and save to a file in the local
+directory. This file can be uploaded using the app.</p>
+<p>A SingleCellExperiment object is needed with the following</p>
+<p>colData: sampleNames <factor>, and barcode <factor></factor></factor></p>
+<p>rowData: Description <character>, symbol<character>, id
+(unique)<character></character></character></character></p>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"scEx"</span>, package <span class="op">=</span> <span class="st">"SCHNAPPs"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"scEx.Rdata"</span>, list <span class="op">=</span> <span class="st">"scEx"</span><span class="op">)</span></code></pre>
+<div class="section level3">
+<h3 id="history-functionality">history functionality<a class="anchor" aria-label="anchor" href="#history-functionality"></a>
+</h3>
+<p>To take advantage of the history functionality orca needs to be
+installed: (<a href="https://github.com/plotly/orca#installation" class="external-link uri">https://github.com/plotly/orca#installation</a>)</p>
+<p>orca is part of ploty so nothing to be done for R. But the pdftools
+are required:</p>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pdftools"</span><span class="op">)</span></code></pre>
 <p>Notes:</p>
-<ol>
-<li>once history check box is checked only the following plots will be recorded, the current plot will not be saved.</li>
-<li>any selection in the plot will not be visible. It is not a screen-shot.</li>
+<ol style="list-style-type: decimal">
+<li>once history check box is checked only the following plots will be
+recorded, the current plot will not be saved.</li>
+<li>any selection in the plot will not be visible. It is not a
+screen-shot.</li>
 <li>The date of recording is added to the title.</li>
 <li>Creating of the history will take some time.</li>
-<li>once activated, any changes of parameters will trigger re-plot and also a save to the history. This “feature” can also be used to create of the current plot by adding a “,” in one of the fields.</li>
+<li>once activated, any changes of parameters will trigger re-plot and
+also a save to the history. This “feature” can also be used to create of
+the current plot by adding a “,” in one of the fields.</li>
 </ol>
 </div>
 </div>
-<div id="create-sample-data-set" class="section level2">
-<h2 class="hasAnchor">
-<a href="#create-sample-data-set" class="anchor"></a>create sample data set</h2>
-<p>Load a small set of 200 PBMC cells and save to a file in the local directory. This file can be uploaded using the app.</p>
-<pre><code><a href="https://rdrr.io/r/utils/data.html">data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")</a></code></pre>
-</div>
-<div id="running-schnapps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#running-schnapps" class="anchor"></a>Running schnapps</h2>
+<div class="section level2">
+<h2 id="running-schnapps">Running schnapps<a class="anchor" aria-label="anchor" href="#running-schnapps"></a>
+</h2>
 <p>To start the app:</p>
-<pre><code><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">library(SCHNAPPs)
-schnapps()</a></code></pre>
-<div id="history-functionality-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#history-functionality-1" class="anchor"></a>history functionality</h3>
-<p>Plots can be automatically stored in a PDF file as they are created. This allows to somehow track what is being done. To enable this, the parameter historyFile has to be set to a file (probably non-existing, otherwise it will be appended to).</p>
+<pre><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs" class="external-link">SCHNAPPs</a></span><span class="op">)</span>
+<span class="fu"><a href="reference/schnapps.html">schnapps</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<div class="section level3">
+<h3 id="history-functionality-1">history functionality<a class="anchor" aria-label="anchor" href="#history-functionality-1"></a>
+</h3>
+<p>Plots can be automatically stored in a PDF file as they are created.
+This allows to somehow track what is being done. To enable this, the
+parameter historyFile has to be set to a file (probably non-existing,
+otherwise it will be appended to).</p>
 </div>
-<div id="generate-data-files" class="section level3">
-<h3 class="hasAnchor">
-<a href="#generate-data-files" class="anchor"></a>generate data files</h3>
-<p>A singleCellExperiment object is required, saved in a file RData object using</p>
-<pre><code><a href="https://rdrr.io/r/base/save.html">save(file = "filename.RData", "singleCellExperiementObject")</a></code></pre>
-<p>Please see <a href="https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/">GitHub</a> for further documentation on how to use schnapps.</p>
-<p>Please see <a href="https://github.com/baj12/SCHNAPPsContributions">GitHub Contributions</a> for additional tools, not directly part of the SCHNAPPs pacakage.</p>
+<div class="section level3">
+<h3 id="generate-data-files">generate data files<a class="anchor" aria-label="anchor" href="#generate-data-files"></a>
+</h3>
+<p>A singleCellExperiment object is required, saved in a file RData
+object using</p>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"filename.RData"</span>, <span class="st">"singleCellExperiementObject"</span><span class="op">)</span></code></pre>
+<p>Please see <a href="https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/" class="external-link">GitHub</a>
+for further documentation on how to use schnapps.</p>
+<p>Please see <a href="https://github.com/baj12/SCHNAPPsContributions" class="external-link">GitHub
+Contributions</a> for additional tools, not directly part of the
+SCHNAPPs pacakage.</p>
 </div>
 </div>
-<div id="extending-schapps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extending-schapps" class="anchor"></a>Extending SCHAPPs</h2>
-<p>See <a href="https://github.com/baj12/SCHNAPPsContributions">SCHNAPPsContribution</a> for examples and dummy contributions on how add functionality.</p>
+<div class="section level2">
+<h2 id="extending-schapps">Extending SCHAPPs<a class="anchor" aria-label="anchor" href="#extending-schapps"></a>
+</h2>
+<p>See <a href="https://github.com/baj12/SCHNAPPsContributions" class="external-link">SCHNAPPsContribution</a>
+for examples and dummy contributions on how add functionality.</p>
 </div>
-<div id="credits" class="section level2">
-<h2 class="hasAnchor">
-<a href="#credits" class="anchor"></a>Credits</h2>
-<p>The original version of this app is based on CellView (<a href="https://github.com/mohanbolisetty/CellView" class="uri">https://github.com/mohanbolisetty/CellView</a>), but it was substantially modified. It helped me get started.</p>
-<p>We are also greatful to all the members of the single cell working group at Pasteur Paris.</p>
+<div class="section level2">
+<h2 id="credits">Credits<a class="anchor" aria-label="anchor" href="#credits"></a>
+</h2>
+<p>The original version of this app is based on CellView (<a href="https://github.com/mohanbolisetty/CellView" class="external-link uri">https://github.com/mohanbolisetty/CellView</a>), but it was
+substantially modified. It helped me get started.</p>
+<p>We are also greatful to all the members of the single cell working
+group at Pasteur Paris.</p>
 </div>
 </div>
 
@@ -195,43 +219,56 @@ schnapps()</a></code></pre>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/">https://​github.com/​C3BI-pasteur-fr/​UTechSCB-SCHNAPPs/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues">https://​github.com/​C3BI-pasteur-fr/​UTechSCB-SCHNAPPs/​issues</a>
-</li>
+<li><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
+
 <div class="community">
-<h2>Community</h2>
+<h2 data-toc-skip>Community</h2>
 <ul class="list-unstyled">
 <li><a href="CONTRIBUTING.html">Contributing guide</a></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Bernd Jagla <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-7696-0484" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html#citation">Citing SCHNAPPs</a></li>
 </ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Bernd Jagla <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-7696-0484" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+</ul>
+</div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Bernd Jagla.</p>
+  <p></p>
+<p>Developed by Bernd Jagla.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>
@@ -239,6 +276,8 @@ schnapps()</a></code></pre>
 
   
 
+
+  
 
   </body>
 </html>

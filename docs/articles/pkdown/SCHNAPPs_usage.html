@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SCHNAPPs</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.6.136</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.6.142</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../../reference/index.html">Reference</a>
 </li>
@@ -80,7 +76,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/">
+  <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -95,119 +91,151 @@
 
       
 
-      </header><script src="SCHNAPPs_usage_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SCHNAPPs - Single Cell sHiNy APP(s)</h1>
             
-            <h4 class="date">2021-10-20</h4>
+            <h4 data-toc-skip class="date">2022-01-29</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/blob/master/vignettes/pkdown/SCHNAPPs_usage.Rmd"><code>vignettes/pkdown/SCHNAPPs_usage.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs/blob/HEAD/vignettes/pkdown/SCHNAPPs_usage.Rmd" class="external-link"><code>vignettes/pkdown/SCHNAPPs_usage.Rmd</code></a></small>
       <div class="hidden name"><code>SCHNAPPs_usage.Rmd</code></div>
 
     </div>
 
     
     
-<div id="overview" class="section level1">
-<h1 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h1>
-<p>Shiny app (referred to as “app” in this document) for the exploration and analysis of single cell RNA-Seq data as it comes from 10X or MARS-Seq technologies or other. It has been developed as a responds to user requests by the scientific community of the Cytometry and Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable the users (biologists, immunologists) of our platform to explore their single cell RNA-Seqe data, select cells they would like to work with and then perform the final analysis together with the bioinformatics support at Pasteur. We hope you might find it helpful as well.</p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>Shiny app (referred to as “app” in this document) for the exploration
+and analysis of single cell RNA-Seq data as it comes from 10X or
+MARS-Seq technologies or other. It has been developed as a responds to
+user requests by the scientific community of the Cytometry and
+Biomarkers UTechS at the Institut Pasteur, Paris. The goal is to enable
+the users (biologists, immunologists) of our platform to explore their
+single cell RNA-Seqe data, select cells they would like to work with and
+then perform the final analysis together with the bioinformatics support
+at Pasteur. We hope you might find it helpful as well.</p>
 </div>
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1>
-<pre><code>if (!require("devtools"))
-  install.packages("devtools")
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("BiocSingular")
-devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs")</code></pre>
-<div id="history-functionality" class="section level2">
-<h2 class="hasAnchor">
-<a href="#history-functionality" class="anchor"></a>history functionality</h2>
-<p>To take advantage of the history functionality orca needs to be installed: (<a href="https://github.com/plotly/orca#installation" class="uri">https://github.com/plotly/orca#installation</a>)</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<pre><code><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://devtools.r-lib.org/" class="external-link">"devtools"</a></span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"BiocSingular"</span><span class="op">)</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"C3BI-pasteur-fr/UTechSCB-SCHNAPPs"</span><span class="op">)</span></code></pre>
+<div class="section level3">
+<h3 id="history-functionality">history functionality<a class="anchor" aria-label="anchor" href="#history-functionality"></a>
+</h3>
+<p>To take advantage of the history functionality orca needs to be
+installed: (<a href="https://github.com/plotly/orca#installation" class="external-link uri">https://github.com/plotly/orca#installation</a>)</p>
 <p>orca is part of ploty so nothing to be done for R.</p>
 <p>Notes:</p>
 <ul>
-<li>If the historyPath variable is set to a valid directory, all major events are stored in an Rmd file and associated RData files that are all located in subdirectories of the historyPath.</li>
-<li>A time-stamp in the name of the subdirectory enables identifying and distinguishing different executions.</li>
-<li>It is recommended to rename these directories once the session is closed.</li>
+<li>If the historyPath variable is set to a valid directory, all major
+events are stored in an Rmd file and associated RData files that are all
+located in subdirectories of the historyPath.</li>
+<li>A time-stamp in the name of the subdirectory enables identifying and
+distinguishing different executions.</li>
+<li>It is recommended to rename these directories once the session is
+closed.</li>
 <li>Major events are: 1. loading of data, change of cells/genes.</li>
-<li>In addition to these events that are automatically stored, the user can save individual tables and graphs using the “add2history” buttons.</li>
-<li>During the execution of the app the Rmd file is only opened and appended to if an event is handled. Thus, using an editor that doesn’t loc the file, the Rmd can be modified at the same time the app is running. Just make sure you save the Rmd file each time a modification is done. A good editor is the RStudio editor.</li>
+<li>In addition to these events that are automatically stored, the user
+can save individual tables and graphs using the “add2history”
+buttons.</li>
+<li>During the execution of the app the Rmd file is only opened and
+appended to if an event is handled. Thus, using an editor that doesn’t
+loc the file, the Rmd can be modified at the same time the app is
+running. Just make sure you save the Rmd file each time a modification
+is done. A good editor is the RStudio editor.</li>
 </ul>
 </div>
 </div>
-<div id="running-schnapps" class="section level1">
-<h1 class="hasAnchor">
-<a href="#running-schnapps" class="anchor"></a>Running schnapps</h1>
-<p>The application is started from the command line in R using schnapps().</p>
-<pre><code><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs">library(SCHNAPPs)
-# create example data
-save(file = "filename.RData", "singleCellExperiementObject")
-# use "filename.RData" with load data functionality within the shiny app
-schnapps()</a></code></pre>
+<div class="section level2">
+<h2 id="running-schnapps">Running schnapps<a class="anchor" aria-label="anchor" href="#running-schnapps"></a>
+</h2>
+<p>The application is started from the command line in R using
+schnapps().</p>
+<pre><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs" class="external-link">SCHNAPPs</a></span><span class="op">)</span>
+<span class="co"># create example data</span>
+<span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"filename.RData"</span>, <span class="st">"singleCellExperiementObject"</span><span class="op">)</span>
+<span class="co"># use "filename.RData" with load data functionality within the shiny app</span>
+<span class="fu"><a href="../../reference/schnapps.html">schnapps</a></span><span class="op">(</span><span class="op">)</span></code></pre>
 <p>Optional parameters:</p>
 <ul>
 <li>
 <p>localContributionDir</p>
-<p>Additional functionally can be added using a vector with the paths to the contributions directories. See for example: (<a href="https://github.com/baj12/scShinyHubContributionsBJ" class="uri">https://github.com/baj12/scShinyHubContributionsBJ</a>)</p>
+<p>Additional functionally can be added using a vector with the paths to
+the contributions directories. See for example: (<a href="https://github.com/baj12/scShinyHubContributionsBJ" class="external-link uri">https://github.com/baj12/scShinyHubContributionsBJ</a>)</p>
 </li>
 <li>
 <p>defaultValueSingleGene</p>
-<p>Some of the UI elements expect a single gene as input. This parameter can be preset with this value.</p>
+<p>Some of the UI elements expect a single gene as input. This parameter
+can be preset with this value.</p>
 </li>
 <li>
 <p>defaultValueMultiGenes</p>
-<p>Some of the UI elements expect multiple genes as input. This parameter can be preset with this value.</p>
+<p>Some of the UI elements expect multiple genes as input. This
+parameter can be preset with this value.</p>
 </li>
 <li>
 <p>defaultValueRegExGene</p>
-<p>Default parameters for the regular expression used in the Gene selection tab (defaults to <sup>MT-|</sup>RP|^MRP</p>
+<p>Default parameters for the regular expression used in the Gene
+selection tab (defaults to <sup>MT-|</sup>RP|^MRP</p>
 </li>
 <li>
 <p>DEBUG</p>
-<p>If set to TRUE, debugging information will be displayed on the console</p>
+<p>If set to TRUE, debugging information will be displayed on the
+console</p>
 </li>
 <li>
 <p>DEBUGSAVE</p>
-<p>If set to TRUE, intermediate file will be written to disc. This delays calculation. It also creates a directory in the home folder called SCHNAPPsDEBUG, where all saved files are stored.</p>
+<p>If set to TRUE, intermediate file will be written to disc. This
+delays calculation. It also creates a directory in the home folder
+called SCHNAPPsDEBUG, where all saved files are stored.</p>
 </li>
 <li>
 <p>historyPath</p>
-<p>location (directory) where history directories and data will be stored.</p>
+<p>location (directory) where history directories and data will be
+stored.</p>
 </li>
 </ul>
-<div id="loadData" class="section level2">
-<h2 class="hasAnchor">
-<a href="#loadData" class="anchor"></a>Load data</h2>
+<div class="section level3">
+<h3 id="loadData">Load data<a class="anchor" aria-label="anchor" href="#loadData"></a>
+</h3>
 <p>To load count data there are two formats that are accepted:</p>
 <ul>
 <li>singleCellExperiment object (preferred)</li>
-<li>CSV file with genes per row and cells as columns. <a href="https://open.spotify.com/track/0POuQCMT4zyRzB2MjbzVaI" class="uri">https://open.spotify.com/track/0POuQCMT4zyRzB2MjbzVaI</a> In addition, cell or gene metadata can be loaded from a CSV file (optional)</li>
+<li>CSV file with genes per row and cells as columns. <a href="https://open.spotify.com/track/0POuQCMT4zyRzB2MjbzVaI" class="external-link uri">https://open.spotify.com/track/0POuQCMT4zyRzB2MjbzVaI</a> In
+addition, cell or gene metadata can be loaded from a CSV file
+(optional)</li>
 </ul>
 <p>To save a singleCellExperiment object in an RData file use:</p>
-<pre><code><a href="https://rdrr.io/r/base/save.html">save(file = "filename.RData", "singleCellExperiementObject")</a></code></pre>
-<p>An example data set is provided with the package. Load a small set of 200 cells and save to a file in the local directory:</p>
-<pre><code><a href="https://rdrr.io/r/utils/data.html">data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")</a></code></pre>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"filename.RData"</span>, <span class="st">"singleCellExperiementObject"</span><span class="op">)</span></code></pre>
+<p>An example data set is provided with the package. Load a small set of
+200 cells and save to a file in the local directory:</p>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"scEx"</span>, package <span class="op">=</span> <span class="st">"SCHNAPPs"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"scEx.Rdata"</span>, list <span class="op">=</span> <span class="st">"scEx"</span><span class="op">)</span></code></pre>
 <p>This file can be loaded once the app is started.</p>
 </div>
 </div>
-<div id="overview-of-functionality" class="section level1">
-<h1 class="hasAnchor">
-<a href="#overview-of-functionality" class="anchor"></a>Overview of functionality</h1>
-<p>Below is the description of the individual tabs/views with the SCHNAPPs application. <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<div class="section level2">
+<h2 id="overview-of-functionality">Overview of functionality<a class="anchor" aria-label="anchor" href="#overview-of-functionality"></a>
+</h2>
+<p>Below is the description of the individual tabs/views with the
+SCHNAPPs application. <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <div class="figure" style="text-align: center">
 <img src="images/overview.png" alt="Overview, showing entry screen" width="90%"><p class="caption">
 Overview, showing entry screen
 </p>
 </div>
 </div>
-<div id="side-panel" class="section level1">
-<h1 class="hasAnchor">
-<a href="#side-panel" class="anchor"></a>Side panel</h1>
+<div class="section level2">
+<h2 id="side-panel">Side panel<a class="anchor" aria-label="anchor" href="#side-panel"></a>
+</h2>
 <ul>
 <li>
 <p>Tabs: input, Parameters, Cell selection, Gene selection</p>
@@ -215,7 +243,13 @@ Overview, showing entry screen
 </li>
 <li>
 <p>Summary statistics of this dataset</p>
-<p>The name of the input files are listed, number of cells that are actively used (not necessarily the input data, but after applying the filters), number of genes with more than one UMI over all cells, median UMIs per cell, median number of genes with more than 1 UMI per cell, total number of UMIs (reads), memory used (just a very rough estimate at the beginning of the calculations), normalization method selected in parameters.</p>
+<p>The name of the input files are listed, number of cells that are
+actively used (not necessarily the input data, but after applying the
+filters), number of genes with more than one UMI over all cells, median
+UMIs per cell, median number of genes with more than 1 UMI per cell,
+total number of UMIs (reads), memory used (just a very rough estimate at
+the beginning of the calculations), normalization method selected in
+parameters.</p>
 </li>
 <li>
 <p>Download counts.csv</p>
@@ -223,11 +257,15 @@ Overview, showing entry screen
 </li>
 <li>
 <p>Download Rdata</p>
-<p>Download an RData file with the scEx object that can be reloaded in SCHNAPPs or other applications (e.g. iSEE).</p>
+<p>Download an RData file with the scEx object that can be reloaded in
+SCHNAPPs or other applications (e.g. iSEE).</p>
 </li>
 <li>
 <p>(Save for DEBUG)</p>
-<p>Only displayed when DEBUG is set to TRUE during start-up. Can be selected to save internal data for debugging purposes. This delays calculation. It also creates a directory in the home folder called SCHNAPPsDEBUG, where all saved files are stored.</p>
+<p>Only displayed when DEBUG is set to TRUE during start-up. Can be
+selected to save internal data for debugging purposes. This delays
+calculation. It also creates a directory in the home folder called
+SCHNAPPsDEBUG, where all saved files are stored.</p>
 </li>
 <li>
 <p>add to history</p>
@@ -235,7 +273,8 @@ Overview, showing entry screen
 </li>
 <li>
 <p>bookmark</p>
-<p>generates a bookmark that can be used to return to a state of the analysis.</p>
+<p>generates a bookmark that can be used to return to a state of the
+analysis.</p>
 </li>
 </ul>
 <div class="figure" style="text-align: center">
@@ -244,16 +283,23 @@ While loading data
 </p>
 </div>
 </div>
-<div id="tabs" class="section level1">
-<h1 class="hasAnchor">
-<a href="#tabs" class="anchor"></a>Tabs</h1>
-<div id="input" class="section level2">
-<h2 class="hasAnchor">
-<a href="#input" class="anchor"></a>Input</h2>
+<div class="section level2">
+<h2 id="tabs">Tabs<a class="anchor" aria-label="anchor" href="#tabs"></a>
+</h2>
+<div class="section level3">
+<h3 id="input">Input<a class="anchor" aria-label="anchor" href="#input"></a>
+</h3>
 <ul>
 <li>
 <p>Count data upload</p>
-<p>Load RData file with singleCellExperiment object or a CSV file. Only the count matrix and the rowData/colData are used as the transformations and projections will be recalculated based on the actual cells used. An example for the RData file is scEx.RData. To create the data locally follow the instructs under <a href="#loadData">“Load data”</a>. The SingleCellExperiment object has to contain a sampleNames column in the ColData slot. RowData should contain columns called symbol, Description, and id. Multiple RData files can be loaded.</p>
+<p>Load RData file with singleCellExperiment object or a CSV file. Only
+the count matrix and the rowData/colData are used as the transformations
+and projections will be recalculated based on the actual cells used. An
+example for the RData file is scEx.RData. To create the data locally
+follow the instructs under <a href="#loadData">“Load data”</a>. The
+SingleCellExperiment object has to contain a sampleNames column in the
+ColData slot. RowData should contain columns called symbol, Description,
+and id. Multiple RData files can be loaded.</p>
 </li>
 </ul>
 <p>PleaseNote <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
@@ -261,57 +307,75 @@ While loading data
 <li>
 <p>Annotations to add</p>
 <p>Load annotation for cells and/or genes</p>
-<p>Examples for such files are given in :scExGenes.csv (gene annotations), scExCells.csv (cell annotations). Also the output from scorpius (see contributions) could be used here.</p>
+<p>Examples for such files are given in :scExGenes.csv (gene
+annotations), scExCells.csv (cell annotations). Also the output from
+scorpius (see contributions) could be used here.</p>
 </li>
 <li>
 <p>input options</p>
 <ul>
 <li>
 <p>sub sample</p>
-<p>allows subsampling the input data to a random set of cells (the number can be chosen)</p>
+<p>allows subsampling the input data to a random set of cells (the
+number can be chosen)</p>
 </li>
 <li>
 <p>compute normalization</p>
-<p>Here we can choose if the normalization and transformation should be perfromed using SCHNAPPs (calculate normalization here), should be takeing from the loaded RData file (the singleCellExperiment object contains the log_)</p>
+<p>Here we can choose if the normalization and transformation should be
+perfromed using SCHNAPPs (calculate normalization here), should be
+takeing from the loaded RData file (the singleCellExperiment object
+contains the log_)</p>
 </li>
 </ul>
 </li>
 <li>
 <p>regular expression to count genes/cell</p>
-<p>This is a regular expression that is used to calculate a projection called “before.filter”. These counts are based on the original input data. A common use case would be to include here ribosomal/mitochondrial proteins and use this in a 2D plot together with UMI counts to visualize dying cells.</p>
+<p>This is a regular expression that is used to calculate a projection
+called “before.filter”. These counts are based on the original input
+data. A common use case would be to include here ribosomal/mitochondrial
+proteins and use this in a 2D plot together with UMI counts to visualize
+dying cells.</p>
 </li>
 </ul>
 </div>
-<div id="parameters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#parameters" class="anchor"></a>Parameters</h2>
-<div id="normalization" class="section level3">
-<h3 class="hasAnchor">
-<a href="#normalization" class="anchor"></a>Normalization</h3>
+<div class="section level3">
+<h3 id="parameters">Parameters<a class="anchor" aria-label="anchor" href="#parameters"></a>
+</h3>
+<div class="section level4">
+<h4 id="normalization">Normalization<a class="anchor" aria-label="anchor" href="#normalization"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/parametersNormalization.png" alt="Parameters - Normalization" width="90%"><p class="caption">
 Parameters - Normalization
 </p>
 </div>
-<p>In SCHNAPPs there is only one normalization at a time. multiple normalization could be calculated but there is no way to compare them or switch between them.</p>
+<p>In SCHNAPPs there is only one normalization at a time. multiple
+normalization could be calculated but there is no way to compare them or
+switch between them.</p>
 <ul>
 <li>
 <p>rawNormalization:</p>
-<p>Umi counts, no transformation performed. Counts will still end up in the log-transformed slot</p>
+<p>Umi counts, no transformation performed. Counts will still end up in
+the log-transformed slot</p>
 </li>
 <li>
 <p>scEx-Log</p>
-<p>Normalize by the total number of UMIs, log2(x+1) transform, scale with factor 1000</p>
+<p>Normalize by the total number of UMIs, log2(x+1) transform, scale
+with factor 1000</p>
 </li>
 <li>
 <p>scaterNorm</p>
-<p>uses scran::computeSumFactors followed by SingleCellExperiment::normalize</p>
+<p>uses scran::computeSumFactors followed by
+SingleCellExperiment::normalize</p>
 <p>Source <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 </li>
 <li>
 <p>gene_norm</p>
-<p>Divide each expression by the sum of the genes supplied per cell. If no genes supplied then it is the same as scEx-log</p>
-<p>Additional parameters for a normalization from a contribution will be shown here as well. Since the standard normalizations don’t have any, none is shown.</p>
+<p>Divide each expression by the sum of the genes supplied per cell. If
+no genes supplied then it is the same as scEx-log</p>
+<p>Additional parameters for a normalization from a contribution will be
+shown here as well. Since the standard normalizations don’t have any,
+none is shown.</p>
 <p>Source <a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 </li>
 <li>
@@ -355,27 +419,39 @@ Parameters - Normalization
 </li>
 <li>
 <p>Cells table</p>
-<p>A table with the normalized values is shown below. Only 20 cells are shown (columns). Table shows the filtered cells/genes (after applying the filters from Cell selection and Gene selection). The rows can be sorted by clicking on the cell name. Individual genes can be selected by clicking in the row. Those genes are shown above the table (for copy/paste actions). The cells (all not only the 20 shown) can be sorted by the sum of the normalized gene expression when the corresponding check box is selected. The cellnames cannot be selected/copied. The full table can also be downloaded as a CSV (comma separated values) file.</p>
+<p>A table with the normalized values is shown below. Only 20 cells are
+shown (columns). Table shows the filtered cells/genes (after applying
+the filters from Cell selection and Gene selection). The rows can be
+sorted by clicking on the cell name. Individual genes can be selected by
+clicking in the row. Those genes are shown above the table (for
+copy/paste actions). The cells (all not only the 20 shown) can be sorted
+by the sum of the normalized gene expression when the corresponding
+check box is selected. The cellnames cannot be selected/copied. The full
+table can also be downloaded as a CSV (comma separated values)
+file.</p>
 </li>
 </ul>
 </div>
-<div id="general-parameters" class="section level3">
-<h3 class="hasAnchor">
-<a href="#general-parameters" class="anchor"></a>General Parameters</h3>
+<div class="section level4">
+<h4 id="general-parameters">General Parameters<a class="anchor" aria-label="anchor" href="#general-parameters"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/parametersGeneral.png" alt="Parameters - General" width="90%"><p class="caption">
 Parameters - General
 </p>
 </div>
-<p>The clustering process populates the dbCluster projection. To compare different clustering methods a given dbCluster can be renamed</p>
-<p>Quickcluster from the scran package is used for clustering of cells.</p>
+<p>The clustering process populates the dbCluster projection. To compare
+different clustering methods a given dbCluster can be renamed</p>
+<p>Quickcluster from the scran package is used for clustering of
+cells.</p>
 <ul>
 <li>
 <p>General Parameters</p>
 <ul>
 <li>
 <p>Parameters for PCA</p>
-<p>This is where the paramters for any PCA calculations are set. Normalized data is used to calculate the PCA (BiocSingular)</p>
+<p>This is where the paramters for any PCA calculations are set.
+Normalized data is used to calculate the PCA (BiocSingular)</p>
 <ul>
 <li>
 <p>Number of components</p>
@@ -383,7 +459,8 @@ Parameters - General
 </li>
 <li>
 <p>Number of variable Genes to be used</p>
-<p>rowVars is used to calculate the variance, which is used to select this many genes.</p>
+<p>rowVars is used to calculate the variance, which is used to select
+this many genes.</p>
 </li>
 </ul>
 <p><!--- * center data
@@ -393,7 +470,8 @@ Parameters - General
 <ul>
 <li>
 <p>scale data</p>
-<p>if set, the data is devided by the square root of the row-wise variance.</p>
+<p>if set, the data is devided by the square root of the row-wise
+variance.</p>
 </li>
 <li>
 <p>genes to be used for PCA</p>
@@ -411,7 +489,9 @@ Parameters - General
   - parameter for number of genes to plot
   - change color palette
   ---></p>
-<p>Needs further development. Right now, it shows the output of the Seurat::DimPlot function. The plot is resizable but cannot be saved.</p>
+<p>Needs further development. Right now, it shows the output of the
+Seurat::DimPlot function. The plot is resizable but cannot be
+saved.</p>
 </li>
 <li><p>Clustering Parameters</p></li>
 </ul>
@@ -419,24 +499,38 @@ Parameters - General
 <ul>
 <li>
 <p>Scran clustering</p>
-<p>Applies the quickCluster function to either the normalized data (logcounts) or raw counts (counts) with all the PCs from the previous PCA. As this can fail if the rank values are zero, if ranks are used this will automatically be set to false if an error occurs. A message is printed on the console in this event. If ranks are not used the might be duplicated cells (cells with exactly the same values but different names.)</p>
+<p>Applies the quickCluster function to either the normalized data
+(logcounts) or raw counts (counts) with all the PCs from the previous
+PCA. As this can fail if the rank values are zero, if ranks are used
+this will automatically be set to false if an error occurs. A message is
+printed on the console in this event. If ranks are not used the might be
+duplicated cells (cells with exactly the same values but different
+names.)</p>
 <ul>
 <li>
 <p>clustering method to use</p>
 <ul>
 <li>
 <p>Igraph (default)</p>
-<p>A shared nearest neighbor graph is constructed using the buildSNNGraph function. This is used to define clusters based on highly connected communities in the graph, using the graph.fun function.</p>
+<p>A shared nearest neighbor graph is constructed using the
+buildSNNGraph function. This is used to define clusters based on highly
+connected communities in the graph, using the graph.fun
+function.</p>
 </li>
 <li>
 <p>Hclust</p>
-<p>a distance matrix is constructed; hierarchical clustering is performed using Ward’s criterion; and cutreeDynamic is used to define clusters of cells. This can take substantially more time and memory.</p>
+<p>a distance matrix is constructed; hierarchical clustering is
+performed using Ward’s criterion; and cutreeDynamic is used to define
+clusters of cells. This can take substantially more time and
+memory.</p>
 </li>
 </ul>
 </li>
 <li>
 <p>Genes to be used for clustering</p>
-<p>Only genes shown here will be used for normalization. The normalization factor will be applied to all genes. If left empty all genes (after filtering) will be used.</p>
+<p>Only genes shown here will be used for normalization. The
+normalization factor will be applied to all genes. If left empty all
+genes (after filtering) will be used.</p>
 </li>
 </ul>
 </li>
@@ -454,7 +548,8 @@ Parameters - General
 </li>
 <li>
 <p>resolution parameter</p>
-<p>Value of the resolution parameter, use a value above (below) 1.0 if you want to obtain a larger (smaller) number of communities.</p>
+<p>Value of the resolution parameter, use a value above (below) 1.0 if
+you want to obtain a larger (smaller) number of communities.</p>
 </li>
 </ul>
 <p>Source: <a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a></p>
@@ -467,35 +562,49 @@ Parameters - General
 
     The work can be commented. These comments will show with the formatting in the report when "Generate report" is clicked.
 ---><ul>
-<li>Colors The colors for samples and cluster can be modified. The “Update colours” button needs to be clicked to apply the canges.</li>
+<li>Colors The colors for samples and cluster can be modified. The
+“Update colours” button needs to be clicked to apply the canges.</li>
 </ul>
 </div>
-<div id="tsne-plot" class="section level3">
-<h3 class="hasAnchor">
-<a href="#tsne-plot" class="anchor"></a>tSNE plot</h3>
+<div class="section level4">
+<h4 id="tsne-plot">tSNE plot<a class="anchor" aria-label="anchor" href="#tsne-plot"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/parametersTSNE.png" alt="Parameters - tSNE" width="90%"><p class="caption">
 Parameters - tSNE
 </p>
 </div>
-<p>Place to change the parameters for the tSNE calculations (Wrapper for the C++ implementation of Barnes-Hut t-Distributed Stochastic Neighbor Embedding. t-SNE is a method for constructing a low dimensional embedding of high-dimensional data, distances or similarities. Exact t-SNE can be computed by setting theta=0.0.) . Rtsne package is used. All PCA components available are used for the calculations. The number of PCs calculated is set under Parameters - General Parameters.</p>
-<p>The 3D display is not limited to the tsne projections and can be used in addition to the Co-expression -s Seleccted 2D plot. Special projections like histogram are not available.</p>
+<p>Place to change the parameters for the tSNE calculations (Wrapper for
+the C++ implementation of Barnes-Hut t-Distributed Stochastic Neighbor
+Embedding. t-SNE is a method for constructing a low dimensional
+embedding of high-dimensional data, distances or similarities. Exact
+t-SNE can be computed by setting theta=0.0.) . Rtsne package is used.
+All PCA components available are used for the calculations. The number
+of PCs calculated is set under Parameters - General Parameters.</p>
+<p>The 3D display is not limited to the tsne projections and can be used
+in addition to the Co-expression -s Seleccted 2D plot. Special
+projections like histogram are not available.</p>
 <ul>
 <li>
 <p>Tsne dimensions</p>
-<p>The number of dimensions to be calculated for tSNE. Fixe to 3 currently.</p>
+<p>The number of dimensions to be calculated for tSNE. Fixe to 3
+currently.</p>
 </li>
 <li>
 <p>Perplexity</p>
-<p>Perplexity parameter (should not be bigger than 3 * perplexity &lt; nrow(X) - 1, see details Rtsne for further information) default = 30, min = 1, max = 100.</p>
+<p>Perplexity parameter (should not be bigger than 3 * perplexity &lt;
+nrow(X) - 1, see details Rtsne for further information) default = 30,
+min = 1, max = 100.</p>
 </li>
 <li>
 <p>Theta</p>
-<p>Speed/accuracy trade-off (increase for less accuracy), set to 0.0 for exact TSNE (default: 0.5), min = 0.0, max = 1, step = 0.1.</p>
+<p>Speed/accuracy trade-off (increase for less accuracy), set to 0.0 for
+exact TSNE (default: 0.5), min = 0.0, max = 1, step = 0.1.</p>
 </li>
 <li>
 <p>Seed</p>
-<p>Seed for random data generator to be used. Default =1, min = 1, max = 10000.</p>
+<p>Seed for random data generator to be used. Default =1, min = 1, max =
+10000.</p>
 </li>
 <li>
 <p>X</p>
@@ -519,103 +628,143 @@ Parameters - tSNE
 </li>
 </ul>
 </div>
-<div id="umap" class="section level3">
-<h3 class="hasAnchor">
-<a href="#umap" class="anchor"></a>Umap</h3>
+<div class="section level4">
+<h4 id="umap">Umap<a class="anchor" aria-label="anchor" href="#umap"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/parametersUMAP.png" alt="Parameters - UMAP" width="90%"><p class="caption">
 Parameters - UMAP
 </p>
 </div>
-<p>Calculation of Umap projections. Since this can be quite time consuming there is a checkbox called “activate Umap projection” that starts the computation. When this is selected all changes in the parameters result in new executions. Thus it should be unchecked while the parameters are changed. The R package uwot is used. The description of the parameters comes directly from the package documentation.</p>
+<p>Calculation of Umap projections. Since this can be quite time
+consuming there is a checkbox called “activate Umap projection” that
+starts the computation. When this is selected all changes in the
+parameters result in new executions. Thus it should be unchecked while
+the parameters are changed. The R package uwot is used. The description
+of the parameters comes directly from the package documentation.</p>
 <ul>
 <li>
 <p>random seed</p>
-<p>Seed for random data generator to be used. Default =1, min = 1, max = 100.</p>
+<p>Seed for random data generator to be used. Default =1, min = 1, max =
+100.</p>
 </li>
 <li>
 <p>N Neighbors</p>
-<p>The size of local neighborhood (in terms of number of neighboring sample points) used for manifold approximation. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100.</p>
+<p>The size of local neighborhood (in terms of number of neighboring
+sample points) used for manifold approximation. Larger values result in
+more global views of the manifold, while smaller values result in more
+local data being preserved. In general values should be in the range 2
+to 100.</p>
 </li>
 <li>
 <p>N components</p>
-<p>The dimension of the space to embed into. This defaults to 2 to provide easy visualization, but can reasonably be set to any integer value in the range 2 to 100.</p>
+<p>The dimension of the space to embed into. This defaults to 2 to
+provide easy visualization, but can reasonably be set to any integer
+value in the range 2 to 100.</p>
 </li>
 <li>
 <p>negative sample rate</p>
-<p>The number of negative edge/1-simplex samples to use per positive edge/1-simplex sample in optimizing the low dimensional embedding.</p>
+<p>The number of negative edge/1-simplex samples to use per positive
+edge/1-simplex sample in optimizing the low dimensional
+embedding.</p>
 </li>
 <li>
 <p>Metric</p>
-<p>Type of distance metric to use to find nearest neighbors. Possible values: “euclidean”, “manhattan”, “cosine”, “hamming”</p>
+<p>Type of distance metric to use to find nearest neighbors. Possible
+values: “euclidean”, “manhattan”, “cosine”, “hamming”</p>
 </li>
 <li>
 <p>Epochs</p>
-<p>Number of epochs to use during the optimization of the embedded coordinates. By default, this value is set to 500 for datasets containing 10,000 vertices or less, and 200 otherwise.</p>
+<p>Number of epochs to use during the optimization of the embedded
+coordinates. By default, this value is set to 500 for datasets
+containing 10,000 vertices or less, and 200 otherwise.</p>
 </li>
 <li>
 <p>Init</p>
-<p>Type of initialization for the coordinates. Possible values: “spectral”, “random”.</p>
+<p>Type of initialization for the coordinates. Possible values:
+“spectral”, “random”.</p>
 </li>
 <li>
 <p>Spread</p>
-<p>The effective scale of embedded points. In combination with min_dist, this determines how clustered/clumped the embedded points are.</p>
+<p>The effective scale of embedded points. In combination with min_dist,
+this determines how clustered/clumped the embedded points are.</p>
 </li>
 <li>
 <p>min dist</p>
-<p>The effective minimum distance between embedded points. Smaller values will result in a more clustered/clumped embedding where nearby points on the manifold are drawn closer together, while larger values will result on a more even dispersal of points. The value should be set relative to the spread value, which determines the scale at which embedded points will be spread out.</p>
+<p>The effective minimum distance between embedded points. Smaller
+values will result in a more clustered/clumped embedding where nearby
+points on the manifold are drawn closer together, while larger values
+will result on a more even dispersal of points. The value should be set
+relative to the spread value, which determines the scale at which
+embedded points will be spread out.</p>
 </li>
 <li>
 <p>Set op mix ratio</p>
-<p>Interpolate between (fuzzy) union and intersection as the set operation used to combine local fuzzy simplicial sets to obtain a global fuzzy simplicial sets. Both fuzzy set operations use the product t-norm. The value of this parameter should be between 0.0 and 1.0; a value of 1.0 will use a pure fuzzy union, while 0.0 will use a pure fuzzy intersection.</p>
+<p>Interpolate between (fuzzy) union and intersection as the set
+operation used to combine local fuzzy simplicial sets to obtain a global
+fuzzy simplicial sets. Both fuzzy set operations use the product t-norm.
+The value of this parameter should be between 0.0 and 1.0; a value of
+1.0 will use a pure fuzzy union, while 0.0 will use a pure fuzzy
+intersection.</p>
 </li>
 <li>
 <p>local connectivity</p>
-<p>The local connectivity required – i.e. the number of nearest neighbors that should be assumed to be connected at a local level. The higher this value the more connected the manifold becomes locally. In practice this should be not more than the local intrinsic dimension of the manifold.</p>
+<p>The local connectivity required – i.e. the number of nearest
+neighbors that should be assumed to be connected at a local level. The
+higher this value the more connected the manifold becomes locally. In
+practice this should be not more than the local intrinsic dimension of
+the manifold.</p>
 </li>
 <li>
 <p>Bandwidth</p>
-<p>The effective bandwidth of the kernel if we view the algorithm as similar to Laplacian Eigenmaps. Larger values induce more connectivity and a more global view of the data, smaller values concentrate more locally.</p>
+<p>The effective bandwidth of the kernel if we view the algorithm as
+similar to Laplacian Eigenmaps. Larger values induce more connectivity
+and a more global view of the data, smaller values concentrate more
+locally.</p>
 </li>
 </ul>
 </div>
 </div>
-<div id="general-qc" class="section level2">
-<h2 class="hasAnchor">
-<a href="#general-qc" class="anchor"></a>General QC</h2>
-<div id="umi-histogram" class="section level3">
-<h3 class="hasAnchor">
-<a href="#umi-histogram" class="anchor"></a>UMI histogram</h3>
+<div class="section level3">
+<h3 id="general-qc">General QC<a class="anchor" aria-label="anchor" href="#general-qc"></a>
+</h3>
+<div class="section level4">
+<h4 id="umi-histogram">UMI histogram<a class="anchor" aria-label="anchor" href="#umi-histogram"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/generalUMI.png" alt="General QC - UMI histogram" width="90%"><p class="caption">
 General QC - UMI histogram
 </p>
 </div>
-<p>The number of UMIs per cell are displayed as a histogram. Different samples are colored differently. This allows identifying thresholds to be used in the cell selection panel.</p>
+<p>The number of UMIs per cell are displayed as a histogram. Different
+samples are colored differently. This allows identifying thresholds to
+be used in the cell selection panel.</p>
 </div>
-<div id="sample-histogram" class="section level3">
-<h3 class="hasAnchor">
-<a href="#sample-histogram" class="anchor"></a>Sample histogram</h3>
+<div class="section level4">
+<h4 id="sample-histogram">Sample histogram<a class="anchor" aria-label="anchor" href="#sample-histogram"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/generalSample.png" alt="General QC - sample histogram" width="90%"><p class="caption">
 General QC - sample histogram
 </p>
 </div>
-<p>Histgram of cells per samples. This allows verifying that the number of cells per sample is comparable.</p>
+<p>Histgram of cells per samples. This allows verifying that the number
+of cells per sample is comparable.</p>
 </div>
-<div id="pc-variance" class="section level3">
-<h3 class="hasAnchor">
-<a href="#pc-variance" class="anchor"></a>PC variance</h3>
+<div class="section level4">
+<h4 id="pc-variance">PC variance<a class="anchor" aria-label="anchor" href="#pc-variance"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/generalPC.png" alt="General QC - PC variances" width="90%"><p class="caption">
 General QC - PC variances
 </p>
 </div>
-<p>Variance of the first 10 principle components of the PCA are shown. This allows verifying the importance of the different PCs.</p>
+<p>Variance of the first 10 principle components of the PCA are shown.
+This allows verifying the importance of the different PCs.</p>
 </div>
-<div id="scater-qc" class="section level3">
-<h3 class="hasAnchor">
-<a href="#scater-qc" class="anchor"></a>Scater QC</h3>
+<div class="section level4">
+<h4 id="scater-qc">Scater QC<a class="anchor" aria-label="anchor" href="#scater-qc"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/generalScater1.png" alt="General QC - highest expressed genes before checking run" width="90%"><p class="caption">
 General QC - highest expressed genes before checking run
@@ -626,26 +775,35 @@ General QC - highest expressed genes before checking run
 General QC - highest expressed genes
 </p>
 </div>
-<p>Plots the highest expressing genes based on the scater package. (scater::plotHighestExprs), colour_cells_by = “log10_total_counts” and a maximum of 50 genes is displayed. This can take quite some time to compute for larger (or even small) data sets.</p>
+<p>Plots the highest expressing genes based on the scater package.
+(scater::plotHighestExprs), colour_cells_by = “log10_total_counts” and a
+maximum of 50 genes is displayed. This can take quite some time to
+compute for larger (or even small) data sets.</p>
 </div>
 </div>
-<div id="cell-selection" class="section level2">
-<h2 class="hasAnchor">
-<a href="#cell-selection" class="anchor"></a>Cell selection</h2>
+<div class="section level3">
+<h3 id="cell-selection">Cell selection<a class="anchor" aria-label="anchor" href="#cell-selection"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="images/CellSelection.png" alt="Cell selection" width="90%"><p class="caption">
 Cell selection
 </p>
 </div>
-<p>All selections are based on the original input data without filtering genes. In case this is needed, one can apply the gene filter, save the RData file and then apply the cell filters.</p>
+<p>All selections are based on the original input data without filtering
+genes. In case this is needed, one can apply the gene filter, save the
+RData file and then apply the cell filters.</p>
 <ul>
 <li>
 <p>List of genes with minimal expression</p>
-<p>Specify a comma separated list of genes that have to be expressed with at least one UMI. If you want to restrict to cells that express a gene to more than one UMI, you would have to select those cells manually using one of the 2D plots.</p>
+<p>Specify a comma separated list of genes that have to be expressed
+with at least one UMI. If you want to restrict to cells that express a
+gene to more than one UMI, you would have to select those cells manually
+using one of the 2D plots.</p>
 </li>
 <li>
 <p>Min # of UMIs / Max # of UMIs</p>
-<p>Select only cells that have at least / no more than X number of UMIs.</p>
+<p>Select only cells that have at least / no more than X number of
+UMIs.</p>
 </li>
 <li>
 <p>Comment for selection of cells</p>
@@ -657,13 +815,15 @@ Cell selection
 <li><p>Cells to be removed</p></li>
 <li>
 <p>Cell table</p>
-<p>All cells are shown, even those that have been removed. The result of the removal can be verified in the stats section of the side-panel.</p>
+<p>All cells are shown, even those that have been removed. The result of
+the removal can be verified in the stats section of the
+side-panel.</p>
 </li>
 </ul>
 </div>
-<div id="gene-selection" class="section level2">
-<h2 class="hasAnchor">
-<a href="#gene-selection" class="anchor"></a>Gene selection</h2>
+<div class="section level3">
+<h3 id="gene-selection">Gene selection<a class="anchor" aria-label="anchor" href="#gene-selection"></a>
+</h3>
 <img src="images/geneSelection1.png" width="90%" style="display: block; margin: auto;"><div class="figure" style="text-align: center">
 <img src="images/geneSelection2.png" alt="General QC - highest expressed genes" width="90%"><p class="caption">
 General QC - highest expressed genes
@@ -673,11 +833,14 @@ General QC - highest expressed genes
 <li><p>regular expression for selection of genes to be removed</p></li>
 <li>
 <p>GeneList Selection</p>
-<p>From this list sets of genes belonging to a specific class of proteins can be selected. This is only useful for human genes. Specific tables for other genomes could be made available upon request.</p>
+<p>From this list sets of genes belonging to a specific class of
+proteins can be selected. This is only useful for human genes. Specific
+tables for other genomes could be made available upon request.</p>
 </li>
 <li>
 <p>Min expression over all cells</p>
-<p>This corresponds to the rowSums in the kept genes table and refers total number of UMIs for a given gene over all cells.</p>
+<p>This corresponds to the rowSums in the kept genes table and refers
+total number of UMIs for a given gene over all cells.</p>
 </li>
 <li>
 <p>genes to keep</p>
@@ -685,7 +848,9 @@ General QC - highest expressed genes
 </li>
 <li>
 <p>Table Genes kept</p>
-<p>Holds the genes that are left after removal. The column rowSums holds the sum of UMIs for all cells The column rowSamples holds the number of cells where the gene is expressed</p>
+<p>Holds the genes that are left after removal. The column rowSums holds
+the sum of UMIs for all cells The column rowSamples holds the number of
+cells where the gene is expressed</p>
 </li>
 <li>
 <p>Table Genes removed</p>
@@ -693,12 +858,12 @@ General QC - highest expressed genes
 </li>
 </ul>
 </div>
-<div id="co-expression" class="section level2">
-<h2 class="hasAnchor">
-<a href="#co-expression" class="anchor"></a>Co-expression</h2>
-<div id="all-clusters" class="section level3">
-<h3 class="hasAnchor">
-<a href="#all-clusters" class="anchor"></a>All clusters</h3>
+<div class="section level3">
+<h3 id="co-expression">Co-expression<a class="anchor" aria-label="anchor" href="#co-expression"></a>
+</h3>
+<div class="section level4">
+<h4 id="all-clusters">All clusters<a class="anchor" aria-label="anchor" href="#all-clusters"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/coexpressionAll.png" alt="Co-expression - All clusters" width="90%"><p class="caption">
 Co-expression - All clusters
@@ -707,8 +872,12 @@ Co-expression - All clusters
 <ul>
 <li>
 <p>Comma separated gene names</p>
-<p>Comma separated list of genes to be displayed in the heatmap for all cells.</p>
-<p>If this field is emptied, the FindMarkers functions is used to identify characteristic genes for each cluster. The “number of marker genes to plot” number of markers for each cluster (a unique list) is used to identify the genes.</p>
+<p>Comma separated list of genes to be displayed in the heatmap for all
+cells.</p>
+<p>If this field is emptied, the FindMarkers functions is used to
+identify characteristic genes for each cluster. The “number of marker
+genes to plot” number of markers for each cluster (a unique list) is
+used to identify the genes.</p>
 </li>
 <li>
 <p>Heatmap plot</p>
@@ -717,9 +886,9 @@ Co-expression - All clusters
 </ul>
 <video controls><source src="images/coExpressionAllclusters.mp4" type="video/mp4"></source></video>
 </div>
-<div id="selected" class="section level3">
-<h3 class="hasAnchor">
-<a href="#selected" class="anchor"></a>Selected</h3>
+<div class="section level4">
+<h4 id="selected">Selected<a class="anchor" aria-label="anchor" href="#selected"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/coexpressionSelected1.png" alt="Co-expression - Selected -- before selection" width="90%"><p class="caption">
 Co-expression - Selected – before selection
@@ -733,29 +902,36 @@ Co-expression - Selected
 <ul>
 <li>
 <p>2D plot</p>
-<p>Uses a 2D plot module to display cells. Selected cells are being used in heatmap and table below.</p>
+<p>Uses a 2D plot module to display cells. Selected cells are being used
+in heatmap and table below.</p>
 </li>
 <li>
 <p>Heatmap</p>
-<p>Uses the selected cells from the above 2D Plot and displays a heatmap.</p>
+<p>Uses the selected cells from the above 2D Plot and displays a
+heatmap.</p>
 </li>
 <li>
 <p>min UMI count per gene:</p>
-<p>For the table below, set the minimum number of UMIs for a given gene to be considered.</p>
+<p>For the table below, set the minimum number of UMIs for a given gene
+to be considered.</p>
 </li>
 <li>
 <p>min percentage of cells expressing a genes</p>
-<p>Genes in the table below have to be expressed in at least this percent of the cells</p>
+<p>Genes in the table below have to be expressed in at least this
+percent of the cells</p>
 </li>
 <li>
 <p>Table of “co-expressing” genes</p>
-<p>Uses the Table module to display for the selected cells the genes that are expressed with a minimal UMI count (see above) in at least X % (see above) of the cells. This is yet another way to identify genes that are expressed over all the selected cells.</p>
+<p>Uses the Table module to display for the selected cells the genes
+that are expressed with a minimal UMI count (see above) in at least X %
+(see above) of the cells. This is yet another way to identify genes that
+are expressed over all the selected cells.</p>
 </li>
 </ul>
 </div>
-<div id="violin-plot" class="section level3">
-<h3 class="hasAnchor">
-<a href="#violin-plot" class="anchor"></a>Violin plot</h3>
+<div class="section level4">
+<h4 id="violin-plot">Violin plot<a class="anchor" aria-label="anchor" href="#violin-plot"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/coexpressionViolin1.png" alt="Co-expression - Violin plot" width="90%"><p class="caption">
 Co-expression - Violin plot
@@ -769,29 +945,38 @@ Co-expression - Violin plot with combinations
 <ul>
 <li>
 <p>show combinations</p>
-<p>Selecting this can cause substantial calculations if the number of genes is large and make the display very ugly. On the othe hand, it will show which combination of genes are co-expressed to which extend.</p>
+<p>Selecting this can cause substantial calculations if the number of
+genes is large and make the display very ugly. On the othe hand, it will
+show which combination of genes are co-expressed to which
+extend.</p>
 </li>
 <li>
 <p>Comma separated gene names</p>
-<p>A comma separated list of genes to investigate using the violin plot. If a gene doesn’t show it is not expressed in any of the cells.</p>
+<p>A comma separated list of genes to investigate using the violin plot.
+If a gene doesn’t show it is not expressed in any of the cells.</p>
 </li>
 <li>
 <p>X</p>
-<p>X-axis to be used. Only factors (cell attributes with less than 21 unique values) are shown.</p>
+<p>X-axis to be used. Only factors (cell attributes with less than 21
+unique values) are shown.</p>
 </li>
 <li>
 <p>min expression of genes</p>
-<p>Only genes with at least this number of UMIs are considered for the plot. This allows one to remove potential artefacts. Normalized counts are used.</p>
+<p>Only genes with at least this number of UMIs are considered for the
+plot. This allows one to remove potential artefacts. Normalized counts
+are used.</p>
 </li>
 <li>
 <p>Violin plot</p>
-<p>Cannot be interogated. This gives just an overview. The cells coresponding to the individual values have to be selected using one of the 2D plot (preferably the Co-expression-selected)</p>
+<p>Cannot be interogated. This gives just an overview. The cells
+coresponding to the individual values have to be selected using one of
+the 2D plot (preferably the Co-expression-selected)</p>
 </li>
 </ul>
 </div>
-<div id="som-cluster" class="section level3">
-<h3 class="hasAnchor">
-<a href="#som-cluster" class="anchor"></a>SOM cluster</h3>
+<div class="section level4">
+<h4 id="som-cluster">SOM cluster<a class="anchor" aria-label="anchor" href="#som-cluster"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/coexpressionSOM1.png" alt="Co-expression - SOM network too large" width="90%"><p class="caption">
 Co-expression - SOM network too large
@@ -802,41 +987,54 @@ Co-expression - SOM network too large
 Co-expression - SOM
 </p>
 </div>
-<p>A self organizing map is calculated of all the cells. The matrix of normalized counts is used for the clustering. A square SOM with X nodes per dimension is calculated using nEpoch = 10, radius0 = 0, radiusN = 0, radiusCooling = “linear”, mapType = “planar”, gridType = “rectangular”, scale0 = 1, scaleN = 0.01, scaleCooling = “linear” as parameters in the Rsomoclu.train function of the Rsomoclu package. globalBmus is used to identify genes that cluster together. The cluster(s) that contain the gene(s) of interest are returned.</p>
+<p>A self organizing map is calculated of all the cells. The matrix of
+normalized counts is used for the clustering. A square SOM with X nodes
+per dimension is calculated using nEpoch = 10, radius0 = 0, radiusN = 0,
+radiusCooling = “linear”, mapType = “planar”, gridType = “rectangular”,
+scale0 = 1, scaleN = 0.01, scaleCooling = “linear” as parameters in the
+Rsomoclu.train function of the Rsomoclu package. globalBmus is used to
+identify genes that cluster together. The cluster(s) that contain the
+gene(s) of interest are returned.</p>
 <ul>
 <li><p>number of nodes per dimension</p></li>
 <li><p>Gene of interest</p></li>
 <li>
 <p>Heatmap</p>
-<p>A heatmap of the identied genes is displayed. Cluster are not the SOM cluster (since all the genes are from the same cluster).</p>
+<p>A heatmap of the identied genes is displayed. Cluster are not the SOM
+cluster (since all the genes are from the same cluster).</p>
 </li>
 <li>
 <p>Identified gene list</p>
-<p>For better copy/paste operations the list of genes is displayed as a comma separated list.</p>
+<p>For better copy/paste operations the list of genes is displayed as a
+comma separated list.</p>
 </li>
 </ul>
 </div>
 </div>
-<div id="data-exploration" class="section level2">
-<h2 class="hasAnchor">
-<a href="#data-exploration" class="anchor"></a>Data Exploration</h2>
-<div id="expression" class="section level3">
-<h3 class="hasAnchor">
-<a href="#expression" class="anchor"></a>Expression</h3>
+<div class="section level3">
+<h3 id="data-exploration">Data Exploration<a class="anchor" aria-label="anchor" href="#data-exploration"></a>
+</h3>
+<div class="section level4">
+<h4 id="expression">Expression<a class="anchor" aria-label="anchor" href="#expression"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/dataexplorationExpression.png" alt="Data exploration - Expression" width="90%"><p class="caption">
 Data exploration - Expression
 </p>
 </div>
-<p>As a convenience the following three plots are combined in one view. Most of the functionality displayed here can also be achieved using other tabs/views.</p>
+<p>As a convenience the following three plots are combined in one view.
+Most of the functionality displayed here can also be achieved using
+other tabs/views.</p>
 <ul>
 <li>
 <p>Enter gene</p>
-<p>Gene name or comma separated list of genes whoes expression level is being used to color cells in the 3D plot and violin plot.</p>
+<p>Gene name or comma separated list of genes whoes expression level is
+being used to color cells in the 3D plot and violin plot.</p>
 </li>
 <li>
 <p>3D plot</p>
-<p>tSNE plot of the first 3 tSNE projections is shown, colored by the expression of the genes of interest.</p>
+<p>tSNE plot of the first 3 tSNE projections is shown, colored by the
+expression of the genes of interest.</p>
 </li>
 <li>
 <p>2D plot</p>
@@ -844,23 +1042,35 @@ Data exploration - Expression
 </li>
 <li>
 <p>Violin plot</p>
-<p>Whereas the violin plot under Co-expression-Violin shows the number of cells the express (or not) a given gene, here, the expression is estimated. The x-axis is fixed to clusters.</p>
+<p>Whereas the violin plot under Co-expression-Violin shows the number
+of cells the express (or not) a given gene, here, the expression is
+estimated. The x-axis is fixed to clusters.</p>
 </li>
 </ul>
 </div>
-<div id="panel-plot" class="section level3">
-<h3 class="hasAnchor">
-<a href="#panel-plot" class="anchor"></a>Panel plot</h3>
+<div class="section level4">
+<h4 id="panel-plot">Panel plot<a class="anchor" aria-label="anchor" href="#panel-plot"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/DataexplorationPanel.png" alt="Data exploration - Panel plot" width="90%"><p class="caption">
 Data exploration - Panel plot
 </p>
 </div>
-<p>2D plots of genes of interest. If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to the count for that gene. Otherwise, all genes are used. This plots automatically creates box plots if the x-axis is a categorical value. If a categorical value is chosen for the y-axis an error message is displayed (‘min’ not meaningful for factors). Choosing barcodes as an axis can cause the computer to hang. When y-axis is set to UMI.counts the most useful values for the x-axis are sampleNames or dbCluster, which allows comparing the expression of different genes in parallel over different samples or clusters.</p>
+<p>2D plots of genes of interest. If the x-axis is a categorical value
+and the y-axis is UMI.counts the y-axis related to the count for that
+gene. Otherwise, all genes are used. This plots automatically creates
+box plots if the x-axis is a categorical value. If a categorical value
+is chosen for the y-axis an error message is displayed (‘min’ not
+meaningful for factors). Choosing barcodes as an axis can cause the
+computer to hang. When y-axis is set to UMI.counts the most useful
+values for the x-axis are sampleNames or dbCluster, which allows
+comparing the expression of different genes in parallel over different
+samples or clusters.</p>
 <ul>
 <li>
 <p>Cluster</p>
-<p>Choose either all clusters combined (All) or an individual cluster</p>
+<p>Choose either all clusters combined (All) or an individual
+cluster</p>
 </li>
 <li>
 <p>X</p>
@@ -878,12 +1088,12 @@ Data exploration - Panel plot
 </ul>
 </div>
 </div>
-<div id="subcluster-analysis" class="section level2">
-<h2 class="hasAnchor">
-<a href="#subcluster-analysis" class="anchor"></a>Subcluster analysis</h2>
-<div id="dge-analysis" class="section level3">
-<h3 class="hasAnchor">
-<a href="#dge-analysis" class="anchor"></a>DGE analysis</h3>
+<div class="section level3">
+<h3 id="subcluster-analysis">Subcluster analysis<a class="anchor" aria-label="anchor" href="#subcluster-analysis"></a>
+</h3>
+<div class="section level4">
+<h4 id="dge-analysis">DGE analysis<a class="anchor" aria-label="anchor" href="#dge-analysis"></a>
+</h4>
 <div class="figure" style="text-align: center">
 <img src="images/subclusteranalysis1.png" alt="Subcluster analysis - DGE analysis before selection" width="90%"><p class="caption">
 Subcluster analysis - DGE analysis before selection
@@ -921,28 +1131,33 @@ Subcluster analysis - DGE analysis
 <ul>
 <li>
 <p>Chi-square test</p>
-<p>A chi-square test is performed on an estimated binomial distribution. This is one of the only remaining parts from the original CellView app that was used to help get started with this application.</p>
+<p>A chi-square test is performed on an estimated binomial distribution.
+This is one of the only remaining parts from the original CellView app
+that was used to help get started with this application.</p>
 </li>
 <li>
 <p>t-test</p>
-<p>Standard t-test from the R-stats package is used to calculate the p-values.</p>
+<p>Standard t-test from the R-stats package is used to calculate the
+p-values.</p>
 </li>
 </ul>
 </li>
 <li>
 <p>Table: differentially expressed genes</p>
-<p>Table with the differentially expressed genes. If a gene is higher expressed control samples (right plot) the average difference will be negative.</p>
+<p>Table with the differentially expressed genes. If a gene is higher
+expressed control samples (right plot) the average difference will be
+negative.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
-<div id="reused-gui-elements-modules" class="section level1">
-<h1 class="hasAnchor">
-<a href="#reused-gui-elements-modules" class="anchor"></a>Reused GUI elements (Modules)</h1>
-<div id="tables" class="section level2">
-<h2 class="hasAnchor">
-<a href="#tables" class="anchor"></a>Tables</h2>
+<div class="section level2">
+<h2 id="reused-gui-elements-modules">Reused GUI elements (Modules)<a class="anchor" aria-label="anchor" href="#reused-gui-elements-modules"></a>
+</h2>
+<div class="section level3">
+<h3 id="tables">Tables<a class="anchor" aria-label="anchor" href="#tables"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="images/table1.png" alt="Modular tables" width="90%"><p class="caption">
 Modular tables
@@ -963,29 +1178,41 @@ Modular tables - reorder
 Modular tables - all selected
 </p>
 </div>
-<p>A modular table can be downloaded using the “Download Table” button.</p>
+<p>A modular table can be downloaded using the “Download Table”
+button.</p>
 <ul>
 <li>
 <p>Selected names to be copied</p>
-<p>When selecting row the corresponding row names are displayed as a comma separated list. This is useful for copy/paste actions in different other views.</p>
+<p>When selecting row the corresponding row names are displayed as a
+comma separated list. This is useful for copy/paste actions in different
+other views.</p>
 </li>
 <li>
 <p>Select all rows</p>
-<p>Can be used to select all rows of the table and display the row names, but also through repetetive selection/unselection the selection can be removed.</p>
+<p>Can be used to select all rows of the table and display the row
+names, but also through repetetive selection/unselection the selection
+can be removed.</p>
 </li>
 <li>
 <p>reorder cells by sum of selected genes</p>
-<p>Only the first 20 columns are shown. Since it is not necessarily clear that the first columns are the most interesting the user has the option to select genes and the reorder the columns based on the sum of these genes per cell. This happens when this option is checked. This option is not always applicable (e.g. DGE analysis)</p>
+<p>Only the first 20 columns are shown. Since it is not necessarily
+clear that the first columns are the most interesting the user has the
+option to select genes and the reorder the columns based on the sum of
+these genes per cell. This happens when this option is checked. This
+option is not always applicable (e.g. DGE analysis)</p>
 </li>
 <li>
 <p>Table</p>
-<p>The table itself can be sorted (rows) by clicking on the column header. The sort order is indicated with a small triangle. Columns can also be filtered and a full text search is possible. The number of displayed rows can be changed as well.</p>
+<p>The table itself can be sorted (rows) by clicking on the column
+header. The sort order is indicated with a small triangle. Columns can
+also be filtered and a full text search is possible. The number of
+displayed rows can be changed as well.</p>
 </li>
 </ul>
 </div>
-<div id="d-plots" class="section level2">
-<h2 class="hasAnchor">
-<a href="#d-plots" class="anchor"></a>2D plots</h2>
+<div class="section level3">
+<h3 id="d-plots">2D plots<a class="anchor" aria-label="anchor" href="#d-plots"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="images/2Dplot1.png" alt="Modular 2D plots" width="90%"><p class="caption">
 Modular 2D plots
@@ -1001,19 +1228,28 @@ Modular 2D plots
 Modular 2D plots - additional options
 </p>
 </div>
-<p>Except for the Co-expression - Selected tab the selection of cells is not used.</p>
+<p>Except for the Co-expression - Selected tab the selection of cells is
+not used.</p>
 <ul>
 <li>
-<p>comma separated list of genes for UmiCountPerGenes (left / right)</p>
-<p>A list of comma separated gene names. In the columns below the sum of the expression per cell is used. Using these two fields one can plot the summed expression of two groups of gene (or individual genes) to visualize the cells that co-express these genes.</p>
+<p>comma separated list of genes for UmiCountPerGenes (left /
+right)</p>
+<p>A list of comma separated gene names. In the columns below the sum of
+the expression per cell is used. Using these two fields one can plot the
+summed expression of two groups of gene (or individual genes) to
+visualize the cells that co-express these genes.</p>
 </li>
 <li>
 <p>X, Y, color</p>
-<p>The fields allow the selection of the X and Y coordinate as well as selection of the color used for the cells.</p>
+<p>The fields allow the selection of the X and Y coordinate as well as
+selection of the color used for the cells.</p>
 </li>
 <li>
 <p>2D plot</p>
-<p>When hovering over the right top of the figure a collection of options for saving the plot, changing the selection style and others will be made visible. Zooming is possible in different ways (mouse, top right menu)</p>
+<p>When hovering over the right top of the figure a collection of
+options for saving the plot, changing the selection style and others
+will be made visible. Zooming is possible in different ways (mouse, top
+right menu)</p>
 </li>
 <li>
 <p>Show more options</p>
@@ -1022,24 +1258,32 @@ Modular 2D plots - additional options
 <li><p>Log transform X</p></li>
 <li>
 <p>Log transform Y</p>
-<p>Whether or not to show the data in log scale. Log with base 10 is used.</p>
+<p>Whether or not to show the data in log scale. Log with base 10 is
+used.</p>
 </li>
 <li><p>Divide X by</p></li>
 <li>
 <p>Divide Y by</p>
-<p>Divide the values of the X/Y axis with the values from this projection. This is useful for identifying dead cells, when using the “before.filter” projection or setting the UMICountsPerGene to ribosomal proteins (as a comma separated list)</p>
+<p>Divide the values of the X/Y axis with the values from this
+projection. This is useful for identifying dead cells, when using the
+“before.filter” projection or setting the UMICountsPerGene to ribosomal
+proteins (as a comma separated list)</p>
 </li>
 <li>
 <p>Add to group/otherwise overwrite</p>
-<p>When checked, clicking the “change current selection” button will add the selected cells from the plot to the named group</p>
+<p>When checked, clicking the “change current selection” button will add
+the selected cells from the plot to the named group</p>
 </li>
 <li>
 <p>Name group</p>
-<p>Here the name of a group can be changed. This will generate a new group. It is not possible to remove a group.</p>
+<p>Here the name of a group can be changed. This will generate a new
+group. It is not possible to remove a group.</p>
 </li>
 <li>
 <p>Group names</p>
-<p>A drop box selection for a group. This will also change the selection in the plot. This allows one to visualize a previously defined group of cells. Unfortunately it is not possible</p>
+<p>A drop box selection for a group. This will also change the selection
+in the plot. This allows one to visualize a previously defined group of
+cells. Unfortunately it is not possible</p>
 </li>
 <li>
 <p>Number of visible cells in section</p>
@@ -1053,11 +1297,20 @@ Modular 2D plots - additional options
 </li>
 </ul>
 <p>Comments on groups:</p>
-<p>Handling the groups is relatively complex because of the different possibilities especially with selection process within the plot. Once the group is activated (either after selecting a group in the group names dropdown or by clicking on “change current selection” the selected cells are colored red (instead of highlighted when selecting using the box/lasso select). This selection overwrites the selection in the plot. To deactivate this behaviour one has to uncheck the “show more options” check-box. Unfortunately the selection box/highlighting is removed in the plot though the selection is still used in the corresponding visualizations. This can be confusing.</p>
+<p>Handling the groups is relatively complex because of the different
+possibilities especially with selection process within the plot. Once
+the group is activated (either after selecting a group in the group
+names dropdown or by clicking on “change current selection” the selected
+cells are colored red (instead of highlighted when selecting using the
+box/lasso select). This selection overwrites the selection in the plot.
+To deactivate this behaviour one has to uncheck the “show more options”
+check-box. Unfortunately the selection box/highlighting is removed in
+the plot though the selection is still used in the corresponding
+visualizations. This can be confusing.</p>
 </div>
-<div id="heatmaps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#heatmaps" class="anchor"></a>Heatmaps</h2>
+<div class="section level3">
+<h3 id="heatmaps">Heatmaps<a class="anchor" aria-label="anchor" href="#heatmaps"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="images/heatmap1.png" alt="Modular heatmaps" width="90%"><p class="caption">
 Modular heatmaps
@@ -1073,33 +1326,43 @@ Modular heatmaps - order cells
 Modular heatmaps - dendrogram
 </p>
 </div>
-<p>Like most figures the heatmap is also resizable using the lower right corner that can be dragged.</p>
-<p>The color of the samples and clusters can be changed under Parameters - general parameters.</p>
+<p>Like most figures the heatmap is also resizable using the lower right
+corner that can be dragged.</p>
+<p>The color of the samples and clusters can be changed under Parameters
+- general parameters.</p>
 <ul>
 <li>
 <p>Show more options</p>
-<p>Once selected additional options for sorting and displaying annotion appear.</p>
+<p>Once selected additional options for sorting and displaying annotion
+appear.</p>
 <ul>
 <li>
 <p>Show tree for cells</p>
-<p>The check-box overwrites the order (if any) that is described below. The columns are odered corresponding to the hirachical clustering on the cells.</p>
+<p>The check-box overwrites the order (if any) that is described below.
+The columns are odered corresponding to the hirachical clustering on the
+cells.</p>
 </li>
 <li>
 <p>Group names</p>
-<p>Here, different projections can be chosen that appear as column annotations</p>
+<p>Here, different projections can be chosen that appear as column
+annotations</p>
 </li>
 <li>
 <p>Order of columns</p>
-<p>The columns can be ordered manually by any of the projections available.</p>
+<p>The columns can be ordered manually by any of the projections
+available.</p>
 </li>
 <li>
 <p>min/max values for heatmap</p>
-<p>Allows changing the relative color axis. Due to the limited number of available colors changing this value allows to visualize difference in any expression range .</p>
+<p>Allows changing the relative color axis. Due to the limited number of
+available colors changing this value allows to visualize difference in
+any expression range .</p>
 </li>
 <li><p>Width of image in pixel</p></li>
 <li>
 <p>height of image in pixel</p>
-<p>Set the size of the image. This allows making the gene names visible</p>
+<p>Set the size of the image. This allows making the gene names
+visible</p>
 </li>
 <li>
 <p>color palette to choose from</p>
@@ -1110,28 +1373,95 @@ Modular heatmaps - dendrogram
 </ul>
 </div>
 </div>
-<div id="create-input-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#create-input-data" class="anchor"></a>Create input data</h1>
+<div class="section level2">
+<h2 id="create-input-data">Create input data<a class="anchor" aria-label="anchor" href="#create-input-data"></a>
+</h2>
 <p>under construction.</p>
-<p>Please see scranWorkflow for an example or the contributions at <a href="https://github.com/baj12/SCHNAPPsContributions" class="uri">https://github.com/baj12/SCHNAPPsContributions</a></p>
+<p>Please see scranWorkflow for an example or the contributions at <a href="https://github.com/baj12/SCHNAPPsContributions" class="external-link uri">https://github.com/baj12/SCHNAPPsContributions</a></p>
 </div>
-<div id="notes" class="section level1">
-<h1 class="hasAnchor">
-<a href="#notes" class="anchor"></a>Notes</h1>
+<div class="section level2">
+<h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
+</h2>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr>
 <ol>
-<li id="fn1"><p> During the execution of a task, a message is displayed at the lower right corner. While the message is displayed other requests will wait. Though all mouse clicks and keyboard are normally retained (depending on the OS and computer characteristics), it is recommended to wait until the messages disappeared. Some internal SHINY processes that are not part of the actually SCHNAPPs application might also take considerable time. This can be checked using a monitoring tool (MAC: Activity Monitor).<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Since internally we call the singleCellExperiment object scEx, we first search for this name in the RData file. Otherwise the first SingleCellExperiment object is taken. For simplicity it is strongly recommended to have only one SingleCellExperiment in the RData file. <br> If only the “logcounts” slot is availbale it is taken as the “counts” slot since we require the “counts” slot. This also allows loading only transformed data. <br> When loading multiple RData files, it is strongly recommended not to use only logcount data as this hasn’t been tested well enough.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p> scaterNorm: <br><code>ta = table(sampinfo)</code><br><code>ta = ta[ta&gt;0]</code><br><code>mtab = min(ta)</code><br><code>stp = round((mtab - 21) /10)</code><br><code>scaterReads &lt;- scran::computeSumFactors(scEx, sizes = seq(21, mtab, stp),clusters = sampinfo,subset.row = genes2use)</code><br><code>scaterReads &lt;- SingleCellExperiment::normalize(scaterReads)</code><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>gene_norm:<br><code>nenner &lt;- Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])</code><br><code>nenner[nenner == 0] &lt;- 1</code><br><code>A@x &lt;- A@x / (nenner[A@j + 1L])</code><br><code>scEx_bcnorm &lt;- SingleCellExperiment(assay = list(logcounts = as(A, "dgTMatrix")),colData = colData(scEx),rowData = rowData(scEx)</code><br>) <code>x &lt;- uniqTsparse(assays(scEx_bcnorm)[[1]])</code><br><code>slot(x, "x") &lt;- log(1 + slot(x, "x"), base = 2) * scalingFactor</code><a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p> During the execution of a task, a message is displayed
+at the lower right corner. While the message is displayed other requests
+will wait. Though all mouse clicks and keyboard are normally retained
+(depending on the OS and computer characteristics), it is recommended to
+wait until the messages disappeared. Some internal SHINY processes that
+are not part of the actually SCHNAPPs application might also take
+considerable time. This can be checked using a monitoring tool (MAC:
+Activity Monitor).<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Since internally we call the singleCellExperiment object
+scEx, we first search for this name in the RData file. Otherwise the
+first SingleCellExperiment object is taken. For simplicity it is
+strongly recommended to have only one SingleCellExperiment in the RData
+file. <br> If only the “logcounts” slot is availbale it is taken as the
+“counts” slot since we require the “counts” slot. This also allows
+loading only transformed data. <br> When loading multiple RData files,
+it is strongly recommended not to use only logcount data as this hasn’t
+been tested well enough.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p> scaterNorm: <br><code>ta =
+table(sampinfo)</code><br><code>ta = ta[ta&gt;0]</code><br><code>mtab = min(ta)</code><br><code>stp = round((mtab - 21)
+/10)</code><br><code>scaterReads &lt;- scran::computeSumFactors(scEx,
+sizes = seq(21, mtab, stp),clusters = sampinfo,subset.row =
+genes2use)</code><br><code>scaterReads &lt;-
+SingleCellExperiment::normalize(scaterReads)</code><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>gene_norm:<br><code>nenner &lt;-
+Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])</code><br><code>nenner[nenner == 0] &lt;- 1</code><br><code>A@x &lt;- A@x /
+(nenner[A@j + 1L])</code><br><code>scEx_bcnorm &lt;-
+SingleCellExperiment(assay = list(logcounts = as(A,
+"dgTMatrix")),colData = colData(scEx),rowData =
+rowData(scEx)</code><br>) <code>x &lt;-
+uniqTsparse(assays(scEx_bcnorm)[[1]])</code><br><code>slot(x, "x")
+&lt;- log(1 + slot(x, "x"), base = 2) * scalingFactor</code><a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 <li id="fn5"><p>test:<br><code>hello   foo</code><a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p> SeuratStandard:<br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- NormalizeData(seur.list[[i]])</code><br><code>seur.list[[i]] &lt;- FindVariableFeatures(seur.list[[i]], selection.method = "vst", nfeatures = 2000)</code><br><code>}</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, dims = 1:dims, anchor.features = anchorsF, k.filter = kF)</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight</code><br><code>DefaultAssay(integrated) &lt;- "integrated"</code><br><code>result &lt;- ScaleData(integrated)</code> <a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p> SeuratSCtransform:<br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list, anchor.features = features)</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT",anchor.features = features, k.filter = k.filter)</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>anchors = unique(c(anchors, keep.features))</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, normalization.method = "SCT")</code><br><code>result &lt;- integrated@assays$integrated@data * scalingFactor</code> <a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p> SeratRefBased <br><code>seur.list &lt;- SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;- SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list, nfeatures = nfeatures)</code><br><code>#keep.features is the user supplied list of genes</code><br><code>keep.features = keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list, anchor.features = features)</code><br><code>reference_dataset &lt;- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]</code><br><code>anchors &lt;- FindIntegrationAnchors(object.list = seur.list, normalization.method = "SCT", anchor.features = features, k.filter = k.filter, reference = reference_dataset)</code><br><code>integrated &lt;- IntegrateData(anchorset = anchors, normalization.method = "SCT")</code><a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p> <code>seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)</code><br><code>seurDat &lt;- FindClusters(seurDat, resolution = resolution)</code><a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn6"><p> SeuratStandard:<br><code>seur.list &lt;-
+SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i
+in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;-
+NormalizeData(seur.list[[i]])</code><br><code>seur.list[[i]] &lt;-
+FindVariableFeatures(seur.list[[i]], selection.method = "vst", nfeatures
+= 2000)</code><br><code>}</code><br><code>anchors &lt;-
+FindIntegrationAnchors(object.list = seur.list, dims = 1:dims,
+anchor.features = anchorsF, k.filter = kF)</code><br><code>integrated
+&lt;- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight =
+k.weight</code><br><code>DefaultAssay(integrated) &lt;-
+"integrated"</code><br><code>result &lt;- ScaleData(integrated)</code>
+<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p> SeuratSCtransform:<br><code>seur.list &lt;-
+SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i
+in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;-
+SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list,
+nfeatures = nfeatures)</code><br><code>keep.features =
+keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list,
+anchor.features = features)</code><br><code>anchors &lt;-
+FindIntegrationAnchors(object.list = seur.list, normalization.method =
+"SCT",anchor.features = features, k.filter = k.filter)</code><br><code>keep.features = keep.features[keep.features %in%
+rownames(scEx)]</code><br><code>anchors = unique(c(anchors,
+keep.features))</code><br><code>integrated &lt;-
+IntegrateData(anchorset = anchors, normalization.method =
+"SCT")</code><br><code>result &lt;- integrated@assays$integrated@data
+* scalingFactor</code> <a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p> SeratRefBased <br><code>seur.list &lt;-
+SplitObject(seurDat, split.by = "sampleNames")</code><br><code>for (i
+in 1:length(seur.list)) {</code><br><code>seur.list[[i]] &lt;-
+SCTransform(seur.list[[i]])</code><br><code>}</code><br><code>features &lt;- SelectIntegrationFeatures(object.list = seur.list,
+nfeatures = nfeatures)</code><br><code>#keep.features is the user
+supplied list of genes</code><br><code>keep.features =
+keep.features[keep.features %in% rownames(scEx)]</code><br><code>features = unique(c(features, keep.features))</code><br><code>seur.list &lt;- PrepSCTIntegration(object.list = seur.list,
+anchor.features = features)</code><br><code>reference_dataset &lt;-
+order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing
+=T)[1]</code><br><code>anchors &lt;-
+FindIntegrationAnchors(object.list = seur.list, normalization.method =
+"SCT", anchor.features = features, k.filter = k.filter, reference =
+reference_dataset)</code><br><code>integrated &lt;-
+IntegrateData(anchorset = anchors, normalization.method =
+"SCT")</code><a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p> <code>seurDat = FindNeighbors(seurDat, dims = 1:dims,
+k.param = k.param)</code><br><code>seurDat &lt;- FindClusters(seurDat,
+resolution = resolution)</code><a href="#fnref9" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
@@ -1147,11 +1477,14 @@ Modular heatmaps - dendrogram
 
 
       <footer><div class="copyright">
-  <p>Developed by Bernd Jagla.</p>
+  <p></p>
+<p>Developed by Bernd Jagla.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>
@@ -1159,6 +1492,8 @@ Modular heatmaps - dendrogram
 
   
 
+
+  
 
   </body>
 </html>
