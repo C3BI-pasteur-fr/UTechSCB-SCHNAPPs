@@ -1436,10 +1436,12 @@ heatmapModuleFunction <- function(
   # 
   # to check if this is handled better in plotly
   if (is.null(scale)) heatmapData$scale <- "none"
+  heatmapData$name = "Expr."
   switch(scale,
          none = {heatmapData$scale <- "none"},
          row = {
            heatmapData$scale <- scale
+           heatmapData$name = "cent.+scaled Expr."
            rmRows = -which(apply(heatmapData$mat, 1, sd) == 0)
            if(length(rmRows) > 1){
              if (.schnappsEnv$DEBUG) {
@@ -1450,6 +1452,7 @@ heatmapModuleFunction <- function(
          },
          column = {
            heatmapData$scale <- scale
+           heatmapData$name = "cent.+scaled Expr."
            rmCols = -which(apply(heatmapData$mat, 2, sd) == 0)
            if (length(rmCols) > 1){
              if (.schnappsEnv$DEBUG) {
@@ -1460,11 +1463,14 @@ heatmapModuleFunction <- function(
          },
          row_order = {
            heatmapData$scale <- "none"
+           heatmapData$name = "ranked Expr."
+           
            # the "[]" are needed to preserve the row/column names
            heatmapData$mat[] <- t(apply(heatmapData$mat,1,order))
          },
          col_order = {
            heatmapData$scale <- "none"
+           heatmapData$name = "ranked Expr."
            heatmapData$mat[] <- apply(heatmapData$mat,2,order)
          }
   )
@@ -1604,7 +1610,7 @@ heatmapModuleFunction <- function(
   # heatmapData$legend = T
   
   # heatmapData$legend_breaks = c(1,2,3,5)
-  heatmapData$name = "Expression"
+  
   # heatmapData$run_draw = T
   # heatmapData$heatmap_legend_param = list(title="foo")
   # cutM =cut(heatmapData$mat,6)
