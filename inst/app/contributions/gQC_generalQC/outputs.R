@@ -4,7 +4,7 @@
 # TODO: verify that this anything and then integrate in DUMMY
 myZippedReportFiles <- c("gqcProjections.csv")
 
-
+require(stringr)
 
 .schnappsEnv$gQC_X1 <- "tsne1"
 .schnappsEnv$gQC_X2 <- "tsne2"
@@ -526,14 +526,17 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
                # browser()
-               
+               # sampe projections as displayed, i.e. only those available for the cells
+               # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
+               projections[,rnProj] =  factor(projections[,rnProj])
                if(is.null(
                  tryCatch({
-                   newLbVec = str_trim(str_split(newLables, ",")[[1]])
+                   newLbVec = stringr::str_trim(str_split(newLables, ",")[[1]])
                    if (ncol(newPrjs) == 0) {
                      newPrjs = data.frame(row.names = acn)
                      newPrjs[,newProjName] = "NA"
-                     newPrjs[rownames(projections),newProjName] <- projections[, rnProj, drop = FALSE]
+                     # drop = TRUE: we re interested in the vector not the data frame
+                     newPrjs[rownames(projections),newProjName] <- as.character(projections[, rnProj, drop = TRUE])
                    } else {
                      # browser()
                      newPrjs <- dplyr::full_join(
