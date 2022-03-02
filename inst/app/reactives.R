@@ -7,6 +7,13 @@ suppressMessages(require(ggalluvial))
 library(SingleCellExperiment)
 require(tidySingleCellExperiment)
 # base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
+if ("crayon" %in% rownames(installed.packages()) == FALSE) {
+  green <- function(x) {
+    x
+  }
+} else {
+  require(crayon)
+}
 
 # reactive values  ------------------------------------------------------------------
 inputFileStats <- reactiveValues(stats = NULL)
@@ -40,13 +47,6 @@ inputFile <- reactiveValues(
   inFile = "",
   annFile = ""
 )
-if ("crayon" %in% rownames(installed.packages()) == FALSE) {
-  green <- function(x) {
-    x
-  }
-} else {
-  require(crayon)
-}
 
 # add comment to history ----
 
@@ -184,6 +184,18 @@ inputDataFunc <- function(inFile) {
     return(NULL)
   }
   cat(file = stderr(), green(paste("file ", inFile$name[1], "contains variable", varName, " as SingleCellExperiment.\n")))
+  
+  # reducedDims
+  if(!isEmpty(reducedDims(scEx))){
+    colData(scEx)
+    for(rdN in 1:length(reducedDims(scEx))){
+      rDim = reducedDims(scEx)[[rdN]]
+      colnames(rDim) = make.unique(c(colnames(colData(scEx)),colnames(rDim)))[-c(1:ncol(colData(scEx)))]
+      colData(scEx) <- cbind(colData(scEx),rDim)
+    }
+    reducedDims(scEx) <- NULL
+  }
+  
   # save(file = "~/SCHNAPPsDebug/inputProblem.RData", list = ls())
   # load("~/SCHNAPPsDebug/inputProblem.RData")
   # fdAll <- rowData(scEx)
@@ -228,6 +240,17 @@ inputDataFunc <- function(inFile) {
           }
         }
       }
+      # reducedDims
+      if(!isEmpty(reducedDims(scEx))){
+        colData(scEx)
+        for(rdN in 1:length(reducedDims(scEx))){
+          rDim = reducedDims(scEx)[[rdN]]
+          colnames(rDim) = make.unique(c(colnames(colData(scEx)),colnames(rDim)))[-c(1:ncol(colData(scEx)))]
+          colData(scEx) <- cbind(colData(scEx),rDim)
+        }
+        reducedDims(scEx) <- NULL
+      }
+      
       cat(file = stderr(), green(paste("file ", inFile$datapath[fpIdx], "contains variable", varName, "\n")))
       if (!scExFound) {
         next()
@@ -236,14 +259,28 @@ inputDataFunc <- function(inFile) {
         if (is.null(allScEx)) {
           allScEx <- scEx
         } else {
+          
+          
           newColnames <- make.unique(c(colnames(allScEx), colnames(scEx)))
           colnames(scEx) <- newColnames[(ncol(allScEx) + 1):length(newColnames)]
           genesUnion <- intersect(rownames(scEx), rownames(allScEx))
           
           allScEx <- addColData(allScEx, scEx)
           scEx <- addColData(scEx, allScEx)
+          
           # if (!is.null(allScEx_log)) scEx <- addColData(scEx, allScEx_log)
           # colData(allScEx_log)
+          
+          # in case one of the loaded files doesn't have all the assays. (since cbind cannot handle this)
+          if(!all(union(names(assays(allScEx)), names(assays(scEx))) == 
+                  intersect(names(assays(allScEx)), names(assays(scEx))))){
+            cTemp <- counts(allScEx)
+            assays(allScEx) <- S4Vectors::SimpleList()
+            counts(allScEx) <- cTemp
+            cTemp <- counts(scEx)
+            assays(scEx) <- S4Vectors::SimpleList()
+            counts(scEx) <- cTemp
+          }
           allScEx <- SingleCellExperiment::cbind(allScEx[genesUnion, ], scEx[genesUnion, ])
         }
       } else {
