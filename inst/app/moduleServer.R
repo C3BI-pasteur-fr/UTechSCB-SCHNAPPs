@@ -255,7 +255,7 @@ clusterServer <- function(input, output, session,
       if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: saving\n")
       save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position"))
     }
-    # load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
+    # cp = load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
     # browser()
     
     # in case no normalization is done
@@ -915,7 +915,7 @@ clusterServer <- function(input, output, session,
     # in case there is a name given for a group we only print the rownames belonging to this name
     if (inputGroupName != ""){
       if(grpN %in% names(grpNs) ){
-        retVal = rownames(grpNs)[grpNs[,grpN]]
+        retVal = rownames(grpNs)[as.logical(grpNs[,grpN])]
       } else {
         return("")
       }
@@ -929,7 +929,7 @@ clusterServer <- function(input, output, session,
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls()))
     }
-    # load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
+    # cp = load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
     
     # inpClusters <- levels(projections$dbCluster)
     # featureData <- rowData(scEx_log)
