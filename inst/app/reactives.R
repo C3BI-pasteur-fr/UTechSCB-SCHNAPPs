@@ -84,7 +84,35 @@ observeEvent(input$Quit, {
 })
 
 observeEvent(input$openBrowser, {
-  browser()
+  # browser()
+  require(rmarkdown)
+  knitr::opts_chunk$set(
+    message = FALSE,
+    warning = FALSE,
+    echo = FALSE,
+    include = TRUE
+  )
+  inputList = reactiveValuesToList(input)
+  scEx_log = scEx_log()
+  scEx = scEx()
+  if(is.null(scEx_log)) scEx_log = "NULL"
+  tryCatch(
+    rmarkdown::render("test.Rmd",
+                      output_file = paste0("test.report.html"),
+                      output_format = "html_document",
+                      params = list(
+                        scEx = scEx,
+                        input = inputList,
+                        scEx_log = scEx_log,
+                        projections = projections(),
+                        ccols = clusterCols$colPal,
+                        scols = sampleCols$colPal
+                      )
+    ),
+    error = function(e) {cat(file = stderr(),paste("Error\n",e,"\n")); NULL}
+  )
+  
+  
 }
 )
 # When OK button is pressed, attempt to load the data set. If successful,
@@ -633,7 +661,7 @@ inputData <- reactive({
                        error = function(e){
                          cat(file = stderr(), paste("inputData: NULL", e,"\n"))
                          return(NULL)}
-                       )
+    )
   }
   
   if (is.null(retVal)) {
@@ -1078,7 +1106,13 @@ HVAinfoTable <- reactive({
     cat(file = stderr(), "output$HVAinfoTable\n")
   }
   scEx_log <- scEx_log()
+  scEx <- scEx()
+  pca = pcaReact()
+  hvgSelection <- isolate(input$hvgSelection)
   
+  if (is.null(pca)) {
+    return(NULL)
+  }
   if (is.null(scEx_log)) {
     return(NULL)
   }
@@ -1089,20 +1123,72 @@ HVAinfoTable <- reactive({
     )
   }
   # cp = load("~/SCHNAPPsDebug/HVAinfoTable.RData")
-  seurDat <- tryCatch( 
-    {
-      seurDat <- CreateAssayObject(
-        data = as.matrix(assays(scEx_log)[[1]])
-      )
-      # seurDat[["SCT"]] = 
-      vf = FindVariableFeatures(seurDat)
-      return(vf@meta.features[order(vf@meta.features$vst.variance.standardized),])
-    },
-    error = function(e) {
-      cat(file = stderr(), paste("\n\n!!!Error during HVAinfoTable:\n", e, "\n\n"))
-      return(NULL)
-    }
+  
+  hvgenes = rownames(pca$rotation)
+  pcaN = length(hvgenes)
+  # if(hvgSelection %in% c("vst", "mvp", "disp")){
+  tryCatch(  switch(hvgSelection,
+                    "vst" = {
+                      pbmc <-
+                        FindVariableFeatures(assays(scEx)[[1]], selection.method = "vst")
+                      return(pbmc[order(pbmc$vst.variance.standardized, decreasing = T)[1:pcaN],])
+                    },
+                    "mvp" = {
+                      pbmc <-
+                        FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot")
+                      pbmc <-
+                        FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot")
+                      pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
+                      return(pbmc[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN],])
+                    },
+                    "disp" = {
+                      pbmc <-
+                        Seurat::FindVariableFeatures(assays(scEx_log)[[1]],selection.method = "dispersion", nfeatures = pcaN)
+                      # NA values seem to have the highest variance. so we make sure to include them
+                      pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
+                      return(pbmc[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN],])
+                      
+                    },
+                    "getTopHVGs" = {
+                      # apply(as.matrix(assays(scEx_log)[[1]]), 1, max)
+                      scEx = logNormCounts(scEx)
+                      dec <- scran::modelGeneVar(scEx, assay.type = "logcounts")
+                      # geneshvg <- getTopHVGs(dec, prop=0.1)
+                      return(as.data.frame(dec[hvgenes,]))
+                    }
+  ),
+  error = function(e) {
+    cat(file = stderr(), paste("\n\n!!!Error during HVAinfoTable:\n", e, "\n\n"))
+    return(NULL)
+  }
   )
+  
+  #   seurDat <- tryCatch( 
+  #     {
+  #       # seurDat <- CreateAssayObject(
+  #       #   data = as.matrix(assays(scEx_log)[[1]])
+  #       # )
+  #       # seurDat[["SCT"]] = 
+  #       # vf = FindVariableFeatures(assays(scEx_log)[[1]], selection.method = selection.method)
+  #       vf = vf[hvgenes,]
+  #       return(vf@meta.features[order(vf@meta.features$vst.variance.standardized),])
+  #     },
+  #     error = function(e) {
+  #       cat(file = stderr(), paste("\n\n!!!Error during HVAinfoTable:\n", e, "\n\n"))
+  #       return(NULL)
+  #     }
+  #   )
+  #   
+  # }else {  #"getTopHVGs"
+  #   # apply(as.matrix(assays(scEx_log)[[1]]), 1, max)
+  #   scEx = logNormCounts(scEx)
+  #   dec <- scran::modelGeneVar(scEx, assay.type = "logcounts")
+  #   geneshvg <- getTopHVGs(dec, prop=0.1)
+  #   return(as.data.frame(dec[geneshvg,]))
+  # }
+  
+  cat(file = stderr(), "ERROR output$HVAinfoTable This should not happen!\n")
+  return(NULL)
 })
 
 
@@ -1682,7 +1768,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
              },
              "mvp" = {
                pbmc <-
-                 FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot", )
+                 FindVariableFeatures(assays(scEx_log)[[1]], selection.method = "mean.var.plot")
                pbmc$mvp.dispersion.scaled[which(is.na(pbmc$mvp.dispersion.scaled))] = max(pbmc$mvp.dispersion.scaled, na.rm = T) + 1
                geneshvg = rownames(pbmc)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
              },
@@ -1694,7 +1780,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
                geneshvg = rownames(pbmc)[order(pbmc$mvp.dispersion.scaled, decreasing = T)[1:pcaN]]
              },
              "getTopHVGs" = {
-               apply(as.matrix(assays(scEx_log)[[1]]), 1, max)
+               # apply(as.matrix(assays(scEx_log)[[1]]), 1, max)
                scEx = logNormCounts(scEx)
                dec <- scran::modelGeneVar(scEx, assay.type = "logcounts")
                geneshvg <- getTopHVGs(dec, prop=0.1)
@@ -1908,6 +1994,7 @@ pcaReact <- reactive({
       c("pcaN", pcaN),
       c("pcaCenter", center),
       c("pcaScale", scale),
+      c("hvgSelection", hvgSelection),
       c("genes4PCA", pcaGenes)
     ),
     button = "updatePCAParameters"
@@ -2375,13 +2462,14 @@ simlrFunc  <- function(){
     },
     warning = function(e) {
       if (DEBUG) cat(file = stderr(), paste("\nSNN clustering produced Warning:\n", e, "\n"))
-      cluster
+      # cluster
+      return(NULL)
     }
   )
   # if ("barcode" %in% colnames(colData(scEx_log))) {
   #   barCode <- colData(scEx_log)$barcode
   # } else {
-    # barCode <- rownames(colData(scEx_log))
+  # barCode <- rownames(colData(scEx_log))
   # }
   
   if (is.null(retVal)) {return(NULL)}
