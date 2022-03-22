@@ -1158,6 +1158,7 @@ observe(label = "ob_pca",
               c("pcaN", input$pcaN),
               c("pcaCenter", input$pcaCenter),
               c("pcaScale", input$pcaScale),
+              c("hvgSelection", input$hvgSelection),
               c("genes4PCA", input$genes4PCA)
             )
           )
