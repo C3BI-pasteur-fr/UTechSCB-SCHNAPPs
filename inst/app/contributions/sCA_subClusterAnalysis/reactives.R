@@ -298,7 +298,7 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
   counts = assays(scEx_log)[[1]][,rownames(group.info)]
   
   Pvals <- withWarnings(
-    suppressMessages(scDEA_individual_methods(raw.count = counts, cell.label = group.info$group,
+    suppressMessages(scDEA::scDEA_individual_methods(raw.count = as.matrix(counts), cell.label = group.info$group,
                              BPSC = T, DEsingle = T, DESeq2 = T, edgeR = T, 
                              MAST = T, monocle = T, scDD = T, Ttest = TRUE, Wilcoxon = TRUE, 
                              limma = T, Seurat = T, zingeR.edgeR = T))
