@@ -87,7 +87,12 @@ geneName2Index <- function(g_id, featureData) {
     }
   }
   
-  geneid <- unique(rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ]))
+  
+  # we need to compare case insensitive and then use case-sensitive rownames in the order of g_id
+  featureIdx = seq(nrow(featureData))
+  names(featureIdx) = toupper(featureData$symbol)
+  geneid <- rownames(featureData)[featureIdx[intersect(toupper(g_id) , toupper(featureData$symbol) )]]
+  # unique(rownames(featureData[which(toupper(featureData$symbol) %in% toupper(g_id)), ]))
   
   return(geneid)
 }
@@ -1396,6 +1401,7 @@ heatmapModuleFunction <- function(
   addColNames = "sampleNames",
   orderColNames = c(), 
   sortingCols = "dendrogram",
+  sortingRows = "dendrogram",
   scale = "none",
   colPal= "none",
   minMaxVal = NULL,
@@ -1434,6 +1440,13 @@ heatmapModuleFunction <- function(
   }
   if (is(heatmapData$mat, "sparseMatrix")) {
     heatmapData$mat = as.matrix(heatmapData$mat)
+  }
+  
+  if (sortingRows == "dendrogram") {
+    heatmapData$cluster_rows = T
+  }
+  if (sortingRows == "list") {
+    heatmapData$cluster_rows = F
   }
   # should be handled by plotly
   # heatmapData$mat[is.nan(heatmapData$mat)] <- 0.0
@@ -1599,7 +1612,9 @@ heatmapModuleFunction <- function(
   }
   
   set.seed(1) # to make clustering reproducible
-  heatmapData$run_draw = F
+  # run_draw is needed to interprete mouse click events
+  # drawback is that it creates a local plot (outside of Shiny)
+  heatmapData$run_draw = T 
   if (sortingCols == "gene (click)") heatmapData$run_draw = T
   
   # make sure only values that are plotted are in the annotation

@@ -224,6 +224,13 @@ pHeatMapUI <- function(id) {
               choices = c("dendrogram", "list", "gene (click)"),
               selected = defaultValue(ns("sortingCols"), "list"),
               multiple = FALSE
+            ),
+            selectInput(
+              ns("sortingRows"),
+              label = "order rows by",
+              choices = c("dendrogram", "list"),
+              selected = defaultValue(ns("sortingRows"), "dendrogram"),
+              multiple = FALSE
             )
           )
         ),
@@ -272,8 +279,9 @@ pHeatMapUI <- function(id) {
             #   min = 200, max = 20000, step = 10,
             #   value = defaultValue(ns("heatmapHeight"), 300)
             # ),
-            textInput(ns("heatMapGrpName"),"name of selected cells"),
+            textInput(ns("heatMapGrpName"),"name selected cells"),
             actionButton(ns("heatMapGrpNameButton"),"create projection"),
+            br(),
             selectInput(
               ns("colPal"),
               label = "color palette to choose from",
@@ -293,6 +301,14 @@ pHeatMapUI <- function(id) {
           )
         ),
         
+        fluidRow(
+          column(
+            width = 12,
+            div(
+              h5("Selected itmes to be copied"),
+              align = "left"
+            ),
+            verbatimTextOutput(ns("heatmapSelectedGenes")))),
         fluidRow(
           column(
             width = 12,
