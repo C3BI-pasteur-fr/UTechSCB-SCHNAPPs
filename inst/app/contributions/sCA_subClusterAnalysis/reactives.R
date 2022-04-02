@@ -89,7 +89,9 @@ myDiffExpFunctions <- list(
   c("seurat:Poisson", "sCA_dge_s_poisson")
 )
 
-
+if("scDEA" %in% rownames(installed.packages())){
+  myDiffExpFunctions[[length(myDiffExpFunctions)+1]] = c("scDEA - !! this might take hours !!","sCA_scDEA")
+}
 
 
 
@@ -215,7 +217,116 @@ sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2){
   sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="poisson", normFact = 1)
 }
 
+#' scDEA
+#'  
 
+
+
+sCA_scDEA <- function(scEx_log, cells.1, cells.2){
+  withWarnings <- function(expr) {
+    wHandler <- function(w) {
+      if (DEBUG) {
+        cat(file = stderr(), paste("runscDEA created a warning:", w, "\n"))
+      }
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          "Problem with scDEA?",
+          type = "warning",
+          id = "scDEAwarning",
+          duration = NULL
+        )
+      }
+      invokeRestart("muffleWarning")
+    }
+    eHandler <- function(e) {
+      cat(file = stderr(), paste("error in scDEA:", e))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          paste("Problem with scDEA, probably not enough cells?", e),
+          type = "warning",
+          id = "scDEAwarning",
+          duration = NULL
+        )
+      }
+      cat(file = stderr(), "scDEA FAILED!!!\n")
+      return(NULL)
+    }
+    val <- withCallingHandlers(expr, warning = wHandler, error = eHandler)
+    return(val)
+  }
+  
+  if (DEBUG) cat(file = stderr(), "sCA_scDEA started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "sCA_scDEA")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "sCA_scDEA")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("sCA_scDEA - this might take several hours", id = "sCA_scDEA", duration = NULL)
+  }
+  if (!"scDEA" %in% rownames(installed.packages())) {
+    warning("Please install scDEA - learn more at https://github.com/Zhangxf-ccnu/scDEA")
+    showNotification("Please install scDEA", id = "sCA_dge_deseq2NOTFOUND", duration = NULL, type = "error")
+    return(NULL)
+  }
+  require(scDEA)
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_scDEA.RData", list = c(ls()))
+  }
+  # cp = load(file='~/SCHNAPPsDebug/sCA_scDEA.RData')
+
+  dups = c(cells.1, cells.2)[duplicated(c(cells.1, cells.2))]
+  if(length(dups) > 0){
+    cells.1 = cells.1[!cells.1 %in% dups]
+    cells.2 = cells.2[!cells.2 %in% dups]
+    warning("Duplicated cells, using only unique ones")
+    showNotification("Duplicated cells, using only unique ones", id = "sCA_dge_deseq2NOTUnique", duration = NULL, type = "warning")
+  }
+  group.info <- data.frame(row.names = c(cells.1, cells.2))
+  group.info[cells.1, "group"] <- "Group1"
+  group.info[cells.2, "group"] <- "Group2"
+  group.info[, "group"] <- factor(x = group.info[, "group"])
+  group.info$wellKey <- rownames(x = group.info)
+  # TODO how to handle data / transformation ?
+  # it uses non-transformed org data. What happens if we loaded normalized data?
+  # can back tronsform the data in counts?
+  if (is.null(.schnappsEnv$normalizationFactor)) {
+    .schnappsEnv$normalizationFactor = 1
+  }
+  counts = assays(scEx_log)[[1]][,rownames(group.info)]
+  
+  Pvals <- withWarnings(
+    suppressMessages(scDEA_individual_methods(raw.count = counts, cell.label = group.info$group,
+                             BPSC = T, DEsingle = T, DESeq2 = T, edgeR = T, 
+                             MAST = T, monocle = T, scDD = T, Ttest = TRUE, Wilcoxon = TRUE, 
+                             limma = T, Seurat = T, zingeR.edgeR = T))
+    )
+  if(is.null(Pvals)) return(NULL)
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_scDEA.res.RData", list = c(ls()))
+  }
+  # cp = load(file='~/SCHNAPPsDebug/sCA_scDEA.res.RData')
+  allOnes = which(apply(Pvals,1,FUN=function(x)all(x==1)))
+  if(length(allOnes)==0) allOnes = -(1:nrow(Pvals))
+  PvalsO = Pvals[-allOnes,]
+  combination.Pvals <- lancaster.combination(PvalsO, weight = TRUE, trimmed = 0.2)
+  
+  adjusted.Pvals <- scDEA.p.adjust(combination.Pvals, adjusted.method = "bonferroni")
+  res = as.data.frame(PvalsO)
+  res$p_val_adj = adjusted.Pvals
+  res$p_val = combination.Pvals
+  res$avg_log2FC = log2(apply(counts[-allOnes,cells.1],1,mean) / apply(counts[-allOnes,cells.2],1,mean))
+  newMax = max(abs(res$avg_log2FC[!is.infinite(res$avg_log2FC)])) * 1.5
+  res$avg_log2FC[res$avg_log2FC==-Inf] = -newMax
+  res$avg_log2FC[res$avg_log2FC==Inf] = newMax
+  
+  
+  return(res)
+  
+}
 
 #' sCA_dge_deseq2
 #' calculate dge using DESeq2
@@ -423,7 +534,7 @@ sCA_dge <- reactive({
   gCells <- sCA_getCells(projections, cl1 = cellNs, db1, db2)
   
   # in case we need counts and not normalized counts
-  if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson")) {
+  if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson", "sCA_scDEA")) {
     scEx_log = scEx
   }
   # retVal <- do.call(dgeFunc, args = list(
@@ -436,7 +547,8 @@ sCA_dge <- reactive({
       cells.1 = gCells$c1, cells.2 = gCells$c2
     ))}, error = function(e) {
       require(Seurat)
-      if (!is.null(getDefaultReactiveDomain())) {
+      if(is.null(e)) e = "NULL"
+      if (!is.null(getDefaultReactiveDomain()) & !dgeFunc ==  "sCA_scDEA") {
         showNotification(e, id = "dgeFuncError", duration = NULL,type = "error")
       }
       cat(file = stderr(), "something went wrong with dge\n")
@@ -449,7 +561,7 @@ sCA_dge <- reactive({
         showNotification(w, id = "dgeFuncWarning", duration = NULL,type = "error")
       }
       cat(file = stderr(), "something went wrong with dge\n")
-      cat(file = stderr(), as.character(e))
+      cat(file = stderr(), as.character(w))
       cat(file = stderr(), "\n")
       return(NULL)
     }, finally = print("dgeFunc Hello"))

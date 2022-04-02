@@ -1634,7 +1634,7 @@ pHeatMapModule <- function(input, output, session,
     if (is.null(selection)) {
       save(file = "~/SCHNAPPsDebug/pHeatMapClickNULL.RData", list = c( ls()  ))
       return(NULL)
-      cp = load("~/SCHNAPPsDebug/pHeatMapClickNULL.RData")
+      # cp = load("~/SCHNAPPsDebug/pHeatMapClickNULL.RData")
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
@@ -1728,7 +1728,7 @@ pHeatMapModule <- function(input, output, session,
     if(is.null(pos)) return(NULL)
     if(is.null(htobj)) return(NULL)
     if(is.null(htpos_obj)) return(NULL)
-    save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
+    # save(file = "~/SCHNAPPsDebug/pHeatMapClick.RData", list = c( ls()  ))
     # cp = load("~/SCHNAPPsDebug/pHeatMapClick.RData")
     
     selection = tryCatch(
