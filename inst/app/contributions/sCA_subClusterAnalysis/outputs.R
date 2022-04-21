@@ -47,7 +47,7 @@ sCA_dgeTableReac <- reactive({
   if ("Description" %in% colnames(featureData)) {
     top.genes$Description <- featureData[rownames(top.genes), "Description"]
   }
-  rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "___")
+  rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "_#_")
   if (dim(top.genes)[1] > 0) {
     # change inf to high/low number
     infIdx <- which(is.infinite(top.genes$avg_diff))

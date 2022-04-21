@@ -1046,14 +1046,14 @@ tableSelectionServer <- function(input, output, session,
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
     # browser()
-    # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
+    # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "_#_" appended plus a number
     # remove this here
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ,drop=F])
       retVal <- retVal[!is.na(retVal)]
-      retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
+      retVal <- sub("(.?)_##_(.*)", "\\1,\\2", retVal)
       retVal <- unlist(strsplit(retVal, ","))
-      retVal <- sub("(.*)___.*", "\\1", retVal)
+      retVal <- sub("(.*)_#_.*", "\\1", retVal)
       retVal <- unique(retVal)
       # this removes everything other than row or col names
       # with just scEx we will cannot display the genes in the removed table
@@ -1291,9 +1291,9 @@ tableSelectionServer <- function(input, output, session,
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ,drop=F])
       retVal <- retVal[!is.na(retVal)]
-      retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
+      retVal <- sub("(.?)_##_(.*)", "\\1,\\2", retVal)
       retVal <- unlist(strsplit(retVal, ","))
-      retVal <- sub("(.*)___.*", "\\1", retVal)
+      retVal <- sub("(.*)_#_.*", "\\1", retVal)
       retVal <- unique(retVal)
       # this removes everything other than row or col names
       # with just scEx we will cannot display the genes in the removed table

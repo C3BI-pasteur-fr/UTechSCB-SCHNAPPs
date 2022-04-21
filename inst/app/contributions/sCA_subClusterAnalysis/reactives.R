@@ -298,10 +298,31 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
   counts = assays(scEx_log)[[1]][,rownames(group.info)]
   
   Pvals <- withWarnings(
-    suppressMessages(scDEA::scDEA_individual_methods(raw.count = as.matrix(counts), cell.label = group.info$group,
-                             BPSC = T, DEsingle = T, DESeq2 = T, edgeR = T, 
-                             MAST = T, monocle = T, scDD = T, Ttest = TRUE, Wilcoxon = TRUE, 
-                             limma = T, Seurat = T, zingeR.edgeR = T))
+    suppressMessages(scDEA::scDEA_individual_methods(raw.count = as.matrix(counts), 
+                                                     cell.label = group.info$group,
+                             BPSC = isolate(input$scDEA_BPSC), 
+                             DEsingle = isolate(input$scDEA_BPSC), 
+                             DESeq2 = isolate(input$scDEA_DESeq2), 
+                             edgeR = isolate(input$scDEA_edgeR), 
+                             MAST = isolate(input$scDEA_MAST), 
+                             monocle = isolate(input$scDEA_monocle), 
+                             scDD = isolate(input$scDEA_scDD),
+                             Ttest = isolate(input$scDEA_Ttest),
+                             
+                             
+                             
+                             Wilcoxon = isolate(input$scDEA_Wilcoxon), 
+                             limma = isolate(input$scDEA_limma), 
+                             Seurat = isolate(input$scDEA_Seurat),
+                             zingeR.edgeR = isolate(input$scDEA_zingeR.edgeR),
+                             
+                             BPSC.parallel = isolate(input$scDEA_parallel),
+                             DEsingle.parallel = isolate(input$scDEA_parallel),
+                             DESeq2.parallel = isolate(input$scDEA_parallel),
+                             MAST.parallel = isolate(input$scDEA_parallel),
+                             monocle.cores = ifelse(isolate(input$scDEA_parallel),parallel::detectCores(),1)
+                             
+                             ))
     )
   if(is.null(Pvals)) return(NULL)
   
