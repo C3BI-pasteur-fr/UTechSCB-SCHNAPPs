@@ -38,8 +38,7 @@ tabList <- list(
                      paste('also check out "Gene.count" to verify that number genes per cell.')
                    )
                    
-                 )}
-               ,
+                 )},
                cellSelectionUI("sCA_dataInput"),
                shinydashboard::box(width = 6,
                                    title = "Dimensions for plot",
@@ -100,6 +99,7 @@ tabList <- list(
                                      )
                                    )
                ),
+               br(),
                shinydashboard::box(
                  title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
                  dropdown_icon = NULL,
@@ -110,91 +110,93 @@ tabList <- list(
                      fluidRow(
                        column(width = 3,
                               checkboxInput("scDEA_parallel", "use parallel implementations", value = defaultValue("scDEA_parallel", TRUE)),
-                       ),
-                       fluidRow(
-                         column(width = 3,
-                                checkboxInput("scDEA_BPSC", "BPSC", value = defaultValue("scDEA_BPSC", TRUE)),
-                                checkboxInput("scDEA_DEsingle", "DEsingle", value = defaultValue("scDEA_DEsingle", TRUE)),
-                                checkboxInput("scDEA_DESeq2", "DESeq2", value = defaultValue("scDEA_DESeq2", TRUE)),
-                                checkboxInput("scDEA_edgeR", "edgeR", value = defaultValue("scDEA_edgeR", TRUE))),
-                         column(width = 3,
-                                checkboxInput("scDEA_MAST", "MAST", value = defaultValue("scDEA_MAST", TRUE)),
-                                checkboxInput("scDEA_monocle", "monocle", value = defaultValue("scDEA_monocle", TRUE)),
-                                checkboxInput("scDEA_scDD", "scDD", value = defaultValue("scDEA_scDD", TRUE)),
-                                checkboxInput("scDEA_Ttest", "Ttest", value = defaultValue("scDEA_Ttest", TRUE))),
-                         column(width=3,
-                                checkboxInput("scDEA_Wilcoxon", "Wilcoxon", value = defaultValue("scDEA_Wilcoxon", TRUE)),
-                                checkboxInput("scDEA_limma", "limma", value = defaultValue("scDEA_limma", TRUE)),
-                                checkboxInput("scDEA_Seurat", "Seurat", value = defaultValue("scDEA_Seurat", TRUE)),
-                                checkboxInput("scDEA_zingeR.edgeR", "zingeR.edgeR", value = defaultValue("scDEA_zingeR.edgeR", TRUE))
-                         )
-                       )
-                     ))
-               ),
-               # ,
-               # shinydashboard::box(
-               #   title = "DGE method", solidHeader = TRUE, width = 12, status = "primary",
-               #   collapsible = TRUE, collapsed = FALSE,
-               #   
-               # )
-               
-               br(),
-               # shinydashboard::box(width = 12,
-               #     ),
-               # br(),
-               
-               if ("manhattanly" %in% rownames(installed.packages()))
-                 tabPanel(
-                   title = "Volcano plot",  width = 12, 
-                   collapsible = FALSE, collapsed = FALSE,
-                   fluidRow(
-                     column(
-                       width = 6,
-                       numericInput(
-                         inputId = "sCA_volc_effectLimit", label = "x-axis threshold", value = defaultValue("sCA_volc_effectLimit", 1), min = 0.0, max = 10000,
-                         step = 0.1
                        )
                      ),
-                     column(
-                       width = 6,
-                       numericInput(
-                         inputId = "sCA_volc_pval", label = "y-axis threshold", value = defaultValue("sCA_volc_pval", 5), min = 0.0, max = 110000,
-                         step = 0.1
+                     fluidRow(
+                       column(width = 3,
+                              checkboxInput("scDEA_BPSC", "BPSC", value = defaultValue("scDEA_BPSC", TRUE)),
+                              checkboxInput("scDEA_DEsingle", "DEsingle", value = defaultValue("scDEA_DEsingle", TRUE)),
+                              checkboxInput("scDEA_DESeq2", "DESeq2", value = defaultValue("scDEA_DESeq2", TRUE)),
+                              checkboxInput("scDEA_edgeR", "edgeR", value = defaultValue("scDEA_edgeR", TRUE))),
+                       column(width = 3,
+                              checkboxInput("scDEA_MAST", "MAST", value = defaultValue("scDEA_MAST", TRUE)),
+                              checkboxInput("scDEA_monocle", "monocle", value = defaultValue("scDEA_monocle", TRUE)),
+                              checkboxInput("scDEA_scDD", "scDD", value = defaultValue("scDEA_scDD", TRUE)),
+                              checkboxInput("scDEA_Ttest", "Ttest", value = defaultValue("scDEA_Ttest", TRUE))),
+                       column(width=3,
+                              checkboxInput("scDEA_Wilcoxon", "Wilcoxon", value = defaultValue("scDEA_Wilcoxon", TRUE)),
+                              checkboxInput("scDEA_limma", "limma", value = defaultValue("scDEA_limma", TRUE)),
+                              checkboxInput("scDEA_Seurat", "Seurat", value = defaultValue("scDEA_Seurat", TRUE)),
+                              checkboxInput("scDEA_zingeR.edgeR", "zingeR.edgeR", value = defaultValue("scDEA_zingeR.edgeR", TRUE))
                        )
                      )
-                   ),
-                   fluidRow(
-                     column(
-                       width = 12,
-                       verbatimTextOutput("sCA_volc_selected")
-                     )
-                   ),
-                   fluidRow(
-                     column(
-                       width = 12,
-                       # https://stackoverflow.com/questions/44412382/clicking-same-plotly-marker-twice-does-not-trigger-events-twice
-                       useShinyjs(),
-                       # code to reset plotlys event_data() to NULL -> executed upon action button click
-                       # note that "A" needs to be replaced with plotly source string if used
-                       extendShinyjs(text = "shinyjs.sCA_volcanoPlot_resetClick = function() { Shiny.onInputChange('plotly_selected-A', 'null'); }", functions = "sCA_volcanoPlot_resetClick"),
-                       
-                       if ("manhattanly" %in% rownames(installed.packages()))
-                         jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
-                     )
-                   ),
-                   br(),
-                   actionButton("save2HistVolc", "save to history")
-                 ),
-               tabPanel(
-                 title = "Differentially Expressed Genes",  width = 12, 
-                 collapsible = FALSE, collapsed = TRUE,
-                 fluidRow(
-                   column(
-                     12,
-                     tableSelectionUi("sCA_dgeTable")
-                   )
+                     
                  )
                )
+      ),
+      # ,
+      # shinydashboard::box(
+      #   title = "DGE method", solidHeader = TRUE, width = 12, status = "primary",
+      #   collapsible = TRUE, collapsed = FALSE,
+      #   
+      # )
+      
+      # br(),
+      # shinydashboard::box(width = 12,
+      #     ),
+      # br(),
+      
+      if ("manhattanly" %in% rownames(installed.packages()))
+        tabPanel(
+          title = "Volcano plot",  width = 12, 
+          collapsible = FALSE, collapsed = FALSE,
+          fluidRow(
+            column(
+              width = 6,
+              numericInput(
+                inputId = "sCA_volc_effectLimit", label = "x-axis threshold", value = defaultValue("sCA_volc_effectLimit", 1), min = 0.0, max = 10000,
+                step = 0.1
+              )
+            ),
+            column(
+              width = 6,
+              numericInput(
+                inputId = "sCA_volc_pval", label = "y-axis threshold", value = defaultValue("sCA_volc_pval", 5), min = 0.0, max = 110000,
+                step = 0.1
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              verbatimTextOutput("sCA_volc_selected")
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              # https://stackoverflow.com/questions/44412382/clicking-same-plotly-marker-twice-does-not-trigger-events-twice
+              useShinyjs(),
+              # code to reset plotlys event_data() to NULL -> executed upon action button click
+              # note that "A" needs to be replaced with plotly source string if used
+              extendShinyjs(text = "shinyjs.sCA_volcanoPlot_resetClick = function() { Shiny.onInputChange('plotly_selected-A', 'null'); }", functions = "sCA_volcanoPlot_resetClick"),
+              
+              if ("manhattanly" %in% rownames(installed.packages()))
+                jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
+            )
+          ),
+          br(),
+          actionButton("save2HistVolc", "save to history")
+        ),
+      tabPanel(
+        title = "Differentially Expressed Genes",  width = 12, 
+        collapsible = FALSE, collapsed = TRUE,
+        fluidRow(
+          column(
+            12,
+            tableSelectionUi("sCA_dgeTable")
+          )
+        )
       )
     )
   )

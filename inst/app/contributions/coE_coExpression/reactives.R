@@ -257,7 +257,7 @@ coE_topExpGenesTable <- reactive({
     colnames(fd) <- c("gene", "description", "CV")
     # since we are returning a table to be plotted, we convert to regular table (non-sparse)
     outMat <- cbind2(fd, as.matrix(mat))
-    rownames(outMat) <- make.unique(as.character(outMat$gene), sep = "___")
+    rownames(outMat) <- make.unique(as.character(outMat$gene), sep = "_#_")
     retVal <- as.data.frame(outMat)
   }
   
@@ -360,7 +360,7 @@ coE_topExpCCTable <- reactive({
   
   retVal <- as.data.frame(flatMat[, ])
   # duplicated(retVal$row)
-  rownames(retVal) <- make.unique(paste0(retVal$row, "__________", retVal$column), sep = "___")
+  rownames(retVal) <- make.unique(paste0(retVal$row, "_##_", retVal$column), sep = "_#_")
   
   setRedGreenButton(
     vars = list(
