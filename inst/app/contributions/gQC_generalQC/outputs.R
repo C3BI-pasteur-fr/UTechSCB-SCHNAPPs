@@ -238,7 +238,7 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
     barmode="stack",
     bargap=0.1,
     title = "Histogram of UMIs",
-    yaxis = list(title = "Number of samples"),
+    yaxis = list(title = "Number of cells"),
     xaxis = list(title = "UMI count"))
   
   fig
