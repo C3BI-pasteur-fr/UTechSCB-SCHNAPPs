@@ -1046,14 +1046,14 @@ tableSelectionServer <- function(input, output, session,
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
     # browser()
-    # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "___" appended plus a number
+    # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "_#_" appended plus a number
     # remove this here
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ,drop=F])
       retVal <- retVal[!is.na(retVal)]
-      retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
+      retVal <- sub("(.?)_##_(.*)", "\\1,\\2", retVal)
       retVal <- unlist(strsplit(retVal, ","))
-      retVal <- sub("(.*)___.*", "\\1", retVal)
+      retVal <- sub("(.*)_#_.*", "\\1", retVal)
       retVal <- unique(retVal)
       # this removes everything other than row or col names
       # with just scEx we will cannot display the genes in the removed table
@@ -1291,9 +1291,9 @@ tableSelectionServer <- function(input, output, session,
     if (length(selectedRows) > 0) {
       retVal <- rownames(dataTables[selectedRows, ,drop=F])
       retVal <- retVal[!is.na(retVal)]
-      retVal <- sub("(.?)_{10}(.*)", "\\1,\\2", retVal)
+      retVal <- sub("(.?)_##_(.*)", "\\1,\\2", retVal)
       retVal <- unlist(strsplit(retVal, ","))
-      retVal <- sub("(.*)___.*", "\\1", retVal)
+      retVal <- sub("(.*)_#_.*", "\\1", retVal)
       retVal <- unique(retVal)
       # this removes everything other than row or col names
       # with just scEx we will cannot display the genes in the removed table
@@ -1326,7 +1326,7 @@ pHeatMapModule <- function(input, output, session,
   require(evaluate)
   if (DEBUG) cat(file = stderr(), paste("pHeatMapModule", session$ns("test"), "\n"))
   ns <- session$ns
-   outfilePH <- NULL
+  outfilePH <- NULL
   heatmap_id = NULL
   
   # browser()
@@ -1337,21 +1337,22 @@ pHeatMapModule <- function(input, output, session,
   
   addOptions <- reactive(
     {req(pheatmapList())
-    list(
-    sortingCols = input$sortingCols,
-    normRow = input$normRow,
-    heatMapGrpName = input$heatMapGrpName,
-    ColNames = input$ColNames,
-    colPal = input$colPal,
-    orderColNames = input$orderNames,
-    heatmapCellGrp = input$heatmapCellGrp,
-    heatmapMinMaxValue = ifelse({
-      # browser();
-      "mat" %in% names(pheatmapList())},
-                                c(min(pheatmapList()$mat), max(pheatmapList()$mat)),
-                                c(0,1)
-    )
-  )}) %>% debounce(1000)
+      list(
+        sortingCols = input$sortingCols,
+        normRow = input$normRow,
+        heatMapGrpName = input$heatMapGrpName,
+        ColNames = input$ColNames,
+        colPal = input$colPal,
+        orderColNames = input$orderNames,
+        heatmapCellGrp = input$heatmapCellGrp,
+        sortingRows = input$sortingRows,
+        heatmapMinMaxValue = ifelse({
+          # browser();
+          "mat" %in% names(pheatmapList())},
+          c(min(pheatmapList()$mat), max(pheatmapList()$mat)),
+          c(0,1)
+        )
+      )}) %>% debounce(1000)
   
   
   
@@ -1387,7 +1388,9 @@ pHeatMapModule <- function(input, output, session,
     orderColNames <- addOptions()$orderColNames
     # moreOptions <- input$moreOptions
     sortingCols <- addOptions()$sortingCols
+    sortingRows <- addOptions()$sortingRows
     scale <- addOptions()$normRow
+    
     myns <- ns("pHeatMap")
     save2History <- input$save2History
     # pWidth <- input$heatmapWidth
@@ -1429,6 +1432,7 @@ pHeatMapModule <- function(input, output, session,
       addColNames = addColNames,
       orderColNames = orderColNames,
       sortingCols = sortingCols,
+      sortingRows = sortingRows,
       scale = scale,
       colPal = colPal,
       minMaxVal = minMaxVal,
@@ -1446,6 +1450,7 @@ pHeatMapModule <- function(input, output, session,
                                                             addColNames = addColNames,
                                                             orderColNames = orderColNames,
                                                             sortingCols = sortingCols,
+                                                            sortingRows = sortingRows,
                                                             scale = scale,
                                                             colPal = colPal,
                                                             minMaxVal = minMaxVal,
@@ -1625,9 +1630,11 @@ pHeatMapModule <- function(input, output, session,
         cat(file = stderr(), paste("inputData: NULL", e,"\n"))
         return(NULL)}
     )
+    # cat(file=stderr(), paste("\n\n",current.viewport()$name,"\n\n"))
     if (is.null(selection)) {
       save(file = "~/SCHNAPPsDebug/pHeatMapClickNULL.RData", list = c( ls()  ))
       return(NULL)
+      # cp = load("~/SCHNAPPsDebug/pHeatMapClickNULL.RData")
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(
@@ -1639,8 +1646,6 @@ pHeatMapModule <- function(input, output, session,
     output$pHeatMapPlotSelection = renderPrint({
       print(selection)
     })
-    
-    if (!addOptions()$sortingCols == "gene (click)") return(NULL)
     
     if (is.null(heatmap_click)) {
       showNotification(
@@ -1663,14 +1668,50 @@ pHeatMapModule <- function(input, output, session,
     }
     
     
+    
     # unlist(selection$row_index)
     geneName = rowData(scEx_log)[rownames(htMat)[selection$row_index],"symbol"]
+    
+    # clusterServer - output$heatmapSelectedGenes ----
+    output$heatmapSelectedGenes <- renderText({
+      if (DEBUG)
+        cat(file = stderr(), "heatmapSelectedGenes started.\n")
+      start.time <- base::Sys.time()
+      on.exit({
+        printTimeEnd(start.time, "heatmapSelectedGenes")
+        if (!is.null(getDefaultReactiveDomain())) {
+          removeNotification(id = "heatmapSelectedGenes")
+        }
+        
+      })
+      # show in the app that this is running
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("heatmapSelectedGenes", id = "heatmapSelectedGenes", duration = NULL)
+      }
+      
+      retVal <- paste(geneName, collapse = ", ")
+      
+      # exportTestValues(ClusterCellSelection = {
+      #   retVal
+      # })
+      return(retVal)
+    })
+    
+    if (!addOptions()$sortingCols == "gene (click)") return(NULL)
     newPrj = make.names(geneName)
     newPrjs[colnames(htMat),newPrj] <- htMat[selection$row_index,]
     projectionsTable$newProjections <- newPrjs
     
     updateSelectInput(inputId = "orderNames", 
                       selected = c(newPrj, orderNames))
+    
+    # clusterServer - return ----
+    return(reactive({
+      returnValues
+    }))
+    
+    
+    
   }) 
   
   # observe brush -----
@@ -1678,6 +1719,8 @@ pHeatMapModule <- function(input, output, session,
     heatmap_brush = input$heatmap_brush
     htobj = ht_obj()
     htpos_obj = ht_pos_obj()
+    scEx_log = scEx_log()
+    htDat = myretVal()
     
     if(is.null(input$heatmap_brush)) return(NULL)
     pos = getPositionFromBrush(brush = input$heatmap_brush, 
@@ -1706,6 +1749,22 @@ pHeatMapModule <- function(input, output, session,
     output$pHeatMapPlotSelection = renderPrint({
       print(selection)
     })
+    
+    if ("ht_list" %in% slotNames(htDat)) {
+      htMat = htDat@ht_list[[1]]@matrix
+    } else if("matrix" %in% slotNames(htDat)) {
+      htMat = htDat@matrix
+    }
+    r_index = selection$row_index[[1]]
+    geneName = rowData(scEx_log)[rownames(htMat)[r_index],"symbol"]
+    
+    # clusterServer - output$heatmapSelectedGenes ----
+    output$heatmapSelectedGenes <- renderText({
+      retVal <- paste(geneName, collapse = ", ")
+      return(retVal)
+    })
+    
+    
   }) 
   
   
