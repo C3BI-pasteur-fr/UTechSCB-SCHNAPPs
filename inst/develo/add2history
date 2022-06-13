@@ -1,0 +1,52 @@
+output
+  af = alluvialPlotFunc
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  .schnappsEnv[["DE_panelPlot"]] <- list(panelPlotFunc = af,
+
+                                         scEx_log = scEx_log, 
+                                         projections=projections, 
+                                         genesin=genesin, dimx4=dimx4, 
+                                         dimy4=dimy4, sameScale=sameScale, 
+                                         nCol=nCol, sampdesc=sampdesc,
+                                         cellNs=cellNs
+
+                                         )
+
+
+
+
+ui.R
+             br(),
+             actionButton("save2HistAlluvial", "save to history")
+
+
+
+reactives.R
+
+
+observe(label = "save2HistPanel", {
+  clicked  = input$save2HistPanel
+  if (DEBUG) cat(file = stderr(), "observe input$save2HistPanel \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste0("# Panel plot\n",
+                               "# fun = plotData$plotData$panelPlotFunc\n", 
+                               "# environment(fun) = environment()\n",
+                               "# print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["DE_panelPlot"]])
+  
+})
+

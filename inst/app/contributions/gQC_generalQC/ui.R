@@ -117,10 +117,35 @@ modTab <- shinydashboard::tabItem(
                textAreaInput("gQC_renameLev", "new levels")
              )
            ),
+           br(),
            fluidRow(
              column(
                width = 6,
                actionButton("gQC_renameLevButton", "apply")
+             )
+           )
+         ),
+         tabPanel(
+           title = "rearrange levels", width = 12, value = "gQC_rearrangeLev",
+           tags$p("rearrange the levels of a factor"),
+           br(),
+           fluidRow(
+             column(
+               width = 6,
+               selectInput("gQC_raProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_raProj", "notyet"))
+             ),
+             column(width = 6, 
+                    textInput("gQC_newRaPrj", "name of new Projection", value = ""))
+           ),
+           fluidRow(
+             column(width = 12, 
+                    orderInput('gQC_newRaLev', 'Rearrange levels', items = NULL, placeholder = 'choose projection...'),
+             )),
+           br(),
+           fluidRow(
+             column(
+               width = 6,
+               actionButton("gQC_rearrangeLevButton", "apply")
              )
            )
          ),

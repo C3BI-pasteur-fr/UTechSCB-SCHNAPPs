@@ -1,6 +1,5 @@
 # source("moduleServer.R", local = TRUE)
 # source("reactives.R", local = TRUE)
-
 # TODO: verify that this anything and then integrate in DUMMY
 myZippedReportFiles <- c("gqcProjections.csv")
 
@@ -239,7 +238,7 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
     barmode="stack",
     bargap=0.1,
     title = "Histogram of UMIs",
-    yaxis = list(title = "Number of samples"),
+    yaxis = list(title = "Number of cells"),
     xaxis = list(title = "UMI count"))
   
   fig
@@ -504,6 +503,99 @@ verifyLevelModal <- function(NLevel, failed = FALSE) {
   )
 }
 
+# gQC_rearrange levels ----
+observeEvent(eventExpr = input$gQC_raProj,
+             label = "raLevBtn",
+             handlerExpr = {
+               projections <- projections()
+               projFactors <- projFactors()
+               if(is.null(projections)) return()
+               if(is.null(projFactors)) return()
+               # if(!input$gQC_raProj %in% projFactors) return()
+               
+               projLevels = levels(projections[,input$gQC_raProj])
+               updateOrderInput(
+                 session,
+                 'gQC_newRaLev',
+                 items = projLevels
+               )
+             }
+)
+observeEvent(eventExpr = input$gQC_rearrangeLevButton,
+             label = "raLevBtn",
+             handlerExpr = {
+               newProjName = make.names(input$gQC_newRaPrj)
+               newLevelOrder = input$gQC_newRaLev
+               projections = projections()
+               raProj = input$gQC_raProj
+               acn = allCellNames()
+               newPrjs <- projectionsTable$newProjections
+               if (is.null(projections)) {
+                 return(NULL)
+               }
+               if (.schnappsEnv$DEBUGSAVE) {
+                 save(
+                   file = "~/SCHNAPPsDebug/gQC_rearrangeButton.RData",
+                   list = c("normaliztionParameters", ls())
+                 )
+               }
+               # cp=  load(file="~/SCHNAPPsDebug/gQC_rearrangeButton.RData")
+               orgLevelNames = levels(factor(projections[,raProj]))
+               newLbVec = stringr::str_trim(str_split(newLevelOrder, ","))
+               names(newLbVec) = orgLevelNames
+               # browser()
+               # sampe projections as displayed, i.e. only those available for the cells
+               # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
+               projections[,raProj] =  factor(projections[,raProj])
+               if(is.null(
+                 tryCatch({
+                   
+                   if (ncol(newPrjs) == 0) {
+                     newPrjs = data.frame(row.names = acn)
+                     newPrjs[,newProjName] = "NA"
+                     # drop = TRUE: we re interested in the vector not the data frame
+                     newPrjs[rownames(projections),newProjName] <- as.character(projections[, raProj, drop = TRUE])
+                   } else {
+                     # browser()
+                     newPrjs <- dplyr::full_join(
+                       tibble::rownames_to_column(newPrjs), 
+                       tibble::rownames_to_column(projections[, raProj, drop = FALSE]), 
+                       by='rowname')
+                     rownames(newPrjs) = newPrjs[,1]
+                     newPrjs = newPrjs[,-1]
+                     # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,raProj])
+                   }
+                   
+                   newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
+                   
+                   # in case there was NA introduced by hidden cells
+                   if ("NA" %in% levels(newPrjs[,ncol(newPrjs)]) & !"NA" %in% newLevelOrder ){
+                     newLevelOrder = c(newLevelOrder, "NA")
+                   }
+                   if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(newLevelOrder) ){
+                     cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
+                     cat(file = stderr(), levels(newPrjs[,ncol(newPrjs)]))
+                     cat(file = stderr(), paste("\n\n\nnew levels:\n"))
+                     cat(file = stderr(), newLevelOrder)
+                     cat(file = stderr(), paste("\n"))
+                     showNotification("number of levels not correct. See console", id = "renameProbl", duration = NULL, type = "error")
+                     return(NULL)
+                   }
+                   newPrjs[,ncol(newPrjs)] = factor(newPrjs[,ncol(newPrjs)], levels = newLevelOrder)
+                 }, error=function(w){
+                   # browser()
+                   cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
+                   showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
+                   return(NULL)
+                 }))) return(NULL)
+               # newProjName = make.unique(c(colnames(projections),newProjName))[length(c(colnames(projections),newProjName))]
+               # updateTextInput(session, "gQC_newRnPrj", value = newProjName)
+               colnames(newPrjs)[ncol(newPrjs)] <- newProjName
+               projectionsTable$newProjections  <- newPrjs
+               
+             })
+
+
 # gQC_renameLevButton ----
 observeEvent(eventExpr = input$gQC_renameLevButton,
              label = "rnLevBtn",
@@ -534,7 +626,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                projections[,rnProj] =  factor(projections[,rnProj])
                if(is.null(
                  tryCatch({
-                  
+                   
                    if (ncol(newPrjs) == 0) {
                      newPrjs = data.frame(row.names = acn)
                      newPrjs[,newProjName] = "NA"
@@ -619,6 +711,10 @@ observe(label = "ob27b", {
   projFactors <- projFactors()
   
   # only factorials?
+  updateSelectInput(session, "gQC_raProj",
+                    choices = projFactors,
+                    selected = .schnappsEnv$gQC_raProj
+  )
   updateSelectInput(session, "gQC_combPrj1",
                     choices = colnames(projections),
                     selected = .schnappsEnv$gQC_combPrj1
@@ -669,6 +765,10 @@ observe(label = "ob27g", {
 observe(label = "ob27h", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_windProj\n")
   .schnappsEnv$gQC_windProj <- input$gQC_windProj
+})
+observe(label = "ob27i", {
+  if (DEBUG) cat(file = stderr(), "observe: gQC_raProj\n")
+  .schnappsEnv$gQC_raProj <- input$gQC_raProj
 })
 
 

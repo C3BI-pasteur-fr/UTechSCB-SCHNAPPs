@@ -1,0 +1,201 @@
+---
+title: "SCENIC test"
+output: html_notebook
+---
+
+```{r}
+dbFiles <- c("https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg19/refseq_r45/mc9nr/gene_based/hg19-500bp-upstream-7species.mc9nr.feather",
+             "https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg19/refseq_r45/mc9nr/gene_based/hg19-tss-centered-10kb-7species.mc9nr.feather")
+downloadedDBFiles <- c("cisTarget_databases/hg19-500bp-upstream-7species.mc9nr.feather",
+                       "cisTarget_databases/hg19-tss-centered-10kb-7species.mc9nr.feathe")
+
+dbFiles <- c("https://resources.aertslab.org/cistarget/databases/mus_musculus/mm9/refseq_r45/mc9nr/gene_based/mm9-500bp-upstream-7species.mc9nr.feather",
+"https://resources.aertslab.org/cistarget/databases/mus_musculus/mm9/refseq_r45/mc9nr/gene_based/mm9-tss-centered-10kb-7species.mc9nr.feather")
+
+## mc9nr: Motif collection version 9: 24k motifs
+
+## File names after download
+downloadedDBFiles <- c("cisTarget_databases/mm9-500bp-upstream-7species.mc9nr.feather",
+                       "cisTarget_databases/mm9-tss-centered-10kb-7species.mc9nr.feather")
+
+options(timeout = max(3000, getOption("timeout")))
+## The databases are downloaded only in the case when the files do not exist.
+if( !(file.exists(downloadedDBFiles[1]) & file.exists(downloadedDBFiles[2])) ){
+  
+  ## Create and move to the new folder
+  dir.create("cisTarget_databases");
+  setwd("cisTarget_databases") 
+  for(featherURL in dbFiles)
+  {
+    download.file(featherURL, destfile=basename(featherURL)) # saved in current dir
+    descrURL <- gsub(".feather$", ".descr", featherURL)
+    if(file.exists(descrURL)) download.file(descrURL, destfile=basename(descrURL))
+  }
+  setwd("..")
+  
+}
+
+## ...
+
+system("ln -s /absolute/path/cisTarget_databases databases")
+
+
+```
+
+
+```{r}
+
+library(SingleCellExperiment)
+## Get data from sce object:\
+cp = load(file = "~/Rstudio/scShinyHubData/jaechan.Neutrophils.schnapps.RData")
+exprMat <- as.array(counts(scX))
+cellInfo <- colData(scX)
+
+# cellInfo <- data.frame(seuratCluster=Idents(seuratObject))
+
+```
+
+
+```{r}
+dir.create("Neutrophils")
+setwd("Neutrophils") # Or `` in the first chunk if running a notebook
+knitr::opts_knit$set(root.dir = 'Neutrophils')
+### Initialize settings
+library(SCENIC)
+library(AUCell)
+dbs = defaultDbNames$mgi
+dbDir = "../cisTarget_databases"
+x = dbs[1]
+file.path(dbDir, x)
+getwd()
+
+
+dbsFound <- unlist(unname(lapply(dbs, function(x) setNames(file.exists(file.path(dbDir, 
+        x)), unname(file.path(dbDir, x))))))
+  
+
+scenicOptions <- initializeScenic(org="mgi", dbDir="../cisTarget_databases", nCores=10)
+# scenicOptions@inputDatasetInfo$cellInfo <- "int/cellInfo.Rds"
+saveRDS(scenicOptions, file="int/scenicOptions.Rds") 
+
+### Co-expression network
+genesKept <- geneFiltering(exprMat, scenicOptions)
+exprMat_filtered <- exprMat[genesKept, ]
+runCorrelation(exprMat_filtered, scenicOptions)
+exprMat_filtered_log <- log2(exprMat_filtered+1) 
+runGenie3(exprMat_filtered_log, scenicOptions)
+
+```
+
+
+```{r}
+setwd("/Users/bernd/Rstudio/UTechSCB-SCHNAPPs/Neutrophils")
+getwd()
+
+
+### Build and score the GRN
+exprMat_log <- log2(exprMat+1)
+scenicOptions@settings$dbs <- scenicOptions@settings$dbs["10kb"] # Toy run settings
+scenicOptions <- runSCENIC_1_coexNetwork2modules(scenicOptions)
+scenicOptions <- runSCENIC_2_createRegulons(scenicOptions, coexMethod=c("top5perTarget")) # Toy run settings
+scenicOptions <- runSCENIC_3_scoreCells(scenicOptions, exprMat_log)
+
+# Optional: Binarize activity
+# aucellApp <- plotTsne_AUCellApp(scenicOptions, exprMat_log)
+# savedSelections <- shiny::runApp(aucellApp)
+# newThresholds <- savedSelections$thresholds
+# scenicOptions@fileNames$int["aucell_thresholds",1] <- "int/newThresholds.Rds"
+# saveRDS(newThresholds, file=getIntName(scenicOptions, "aucell_thresholds"))
+scenicOptions <- runSCENIC_4_aucell_binarize(scenicOptions)
+tsneAUC(scenicOptions, aucType="AUC") # choose settings
+
+# Export:
+saveRDS(cellInfo, file=getDatasetInfo(scenicOptions, "cellInfo")) # Temporary, to add to loom
+# export2loom(scenicOptions, exprMat)
+
+# To save the current status, or any changes in settings, save the object again:
+saveRDS(scenicOptions, file="int/scenicOptions.Rds") 
+
+### Exploring output 
+# Check files in folder 'output'
+# Browse the output .loom file @ http://scope.aertslab.org
+
+# output/Step2_MotifEnrichment_preview.html in detail/subset:
+motifEnrichment_selfMotifs_wGenes <- loadInt(scenicOptions, "motifEnrichment_selfMotifs_wGenes")
+tableSubset <- motifEnrichment_selfMotifs_wGenes[highlightedTFs=="Gata2"]
+viewMotifs(tableSubset) 
+
+# output/Step2_regulonTargetsInfo.tsv in detail: 
+regulonTargetsInfo <- loadInt(scenicOptions, "regulonTargetsInfo")
+tableSubset <- regulonTargetsInfo[TF=="Stat6" & highConfAnnot==TRUE]
+viewMotifs(tableSubset) 
+
+# Cell-type specific regulators (RSS): 
+regulonAUC <- loadInt(scenicOptions, "aucell_regulonAUC")
+
+
+```
+
+```{r, fig.height=18, fig.width=8}
+setwd("/Users/bernd/Rstudio/UTechSCB-SCHNAPPs/Neutrophils")
+getwd()
+cellInfo <- readRDS("~/Rstudio/UTechSCB-SCHNAPPs/Neutrophils/int/cellInfo.Rds")
+scenicOptions <- readRDS("~/Rstudio/UTechSCB-SCHNAPPs/Neutrophils/int/scenicOptions.Rds")
+regulonAUC <- readRDS("~/Rstudio/UTechSCB-SCHNAPPs/Neutrophils/int/3.4_regulonAUC.Rds")
+
+# there are NA in the annotation
+cellInfo[is.na(cellInfo[colnames(regulonAUC), "cellTypes_ImmGenData.fine"]),"cellTypes_ImmGenData.fine"] = "B cells (B.CD19CONTROL)"
+# levels(cellInfo[colnames(regulonAUC), "cellTypes_ImmGenData.fine"]) = c(cellInfo[colnames(regulonAUC), "cellTypes_ImmGenData.fine"],"NA")
+
+rss <- calcRSS(AUC=getAUC(regulonAUC), cellAnnotation=cellInfo[colnames(regulonAUC), "cellTypes_ImmGenData.fine"], )
+rssPlot <- plotRSS(rss)
+plotly::ggplotly(rssPlot$plot)
+```
+
+
+
+
+```{r, fig.height=18, fig.width=8}
+cp = load("/Volumes/Oct2020/RStudio_history/jaechan/PCAgenes.Cluster3.hist_2022-Jan-19.08.34/projections.afcc17e2bde9.RData")
+cp
+projections = projections$projections
+cellInfo$dbCluster = projections[rownames(cellInfo),"dbCluster"]
+
+# there are NA in the annotation
+cellInfo[is.na(cellInfo[colnames(regulonAUC), "dbCluster"]),"dbCluster"] = "20"
+# levels(cellInfo[colnames(regulonAUC), "cellTypes_ImmGenData.fine"]) = c(cellInfo[colnames(regulonAUC), "cellTypes_ImmGenData.fine"],"NA")
+
+rss <- calcRSS(AUC=getAUC(regulonAUC), cellAnnotation=cellInfo[colnames(regulonAUC), "dbCluster"], )
+rssPlot <- plotRSS(rss)
+plotly::ggplotly(rssPlot$plot)
+
+```
+
+# ATF-1
+
+Cyclic AMP-dependent transcription factor ATF-1 is a protein that in humans is encoded by the ATF1 gene.
+
+This gene encodes an activating transcription factor, which belongs to the ATF subfamily and bZIP (basic-region leucine zipper) family. It influences cellular physiologic processes by regulating the expression of downstream target genes, which are related to growth, survival, and other cellular activities. This protein is phosphorylated at serine 63 in its kinase-inducible domain by serine/threonine kinases, cAMP-dependent protein kinase A, calmodulin-dependent protein kinase I/II, mitogen- and stress-activated protein kinase and cyclin-dependent kinase 3 (cdk-3). Its phosphorylation enhances its transactivation and transcriptional activities, and enhances cell transformation.[4]
+
+ATF1 has been shown to interact with:
+
+BRCA1,[6]
+CSNK2A2,[7]
+CSNK2A1,[7] and
+EWS.[8]
+
+# Cretb5
+
+Cyclic AMP-responsive element-binding protein 5 is a protein that in humans is encoded by the CREB5 gene.[5][6][7]
+
+The product of this gene belongs to the CRE (cAMP response element)-binding protein family. Members of this family contain zinc finger and bZIP DNA-binding domains. The encoded protein specifically binds to CRE as a homodimer or a heterodimer with c-Jun or CRE-BP1,[8] and functions as a CRE-dependent trans-activator. Alternatively spliced transcript variants encoding different isoforms have been identified.[7]
+
+# BHLHE40, BHLHB2
+
+Class E basic helix-loop-helix protein 40 is a protein that in humans is encoded by the BHLHE40 gene.[5][6][7][8]
+
+DEC1 encodes a basic helix-loop-helix protein expressed in various tissues. Expression in the chondrocytes is responsive to the addition of Bt2cAMP. Differentiated embryo chondrocyte expressed gene 1 is believed to be involved in the control of cell differentiation.[8]
+
+
+
+
