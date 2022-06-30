@@ -1753,7 +1753,7 @@ dheader <- function() {
     shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-question"),badgeStatus = NULL,
                                  headerText = "Help",
                                  notificationItem(text =  actionButton("menuTour", label = "short Tour", icon = icon("fas fa-directions")),
-                                                  icon = icon("")
+                                                  icon = icon("", verify_fa = FALSE)
                                  ),
                                  notificationItem(text =  "online documentation",
                                                   href="https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/", 
@@ -1763,7 +1763,7 @@ dheader <- function() {
     shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-info"),badgeStatus = NULL,
                                  headerText = "About",
                                  notificationItem(text =  actionButton("AboutApp", label = "about SCHNAPPs"),
-                                                  icon = icon("")
+                                                  icon = icon("", verify_fa = FALSE)
                                  )
     )
   )

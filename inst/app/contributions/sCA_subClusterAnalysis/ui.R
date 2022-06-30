@@ -3,7 +3,7 @@ source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 
 menuList <- list(
   shinydashboard::menuItem("Subcluster analysis",
-                           icon = icon("bar-chart-o"),
+                           icon = icon("biohazard"),
                            # id = 'subclusterID',
                            tabName = "subcluster", startExpanded = FALSE,
                            shinydashboard::menuSubItem("DGE analysis", tabName = "sCA_dge")

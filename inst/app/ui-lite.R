@@ -136,7 +136,7 @@ scShinyUI <- function(request) {
   allMenus <- list(
     
     shinydashboard::menuItem("Introduction",
-                             tabName = "Intro", icon = icon("dashboard")
+                             tabName = "Intro", icon = icon("tachometer-alt")
     ),
     shinydashboard::menuItem("Parameters",
                              tabName = "parameters", icon = icon("gopuram")
