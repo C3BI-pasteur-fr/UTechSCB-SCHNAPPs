@@ -5,7 +5,7 @@ source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 # list of menu Items
 menuList <- list(
   shinydashboard::menuItem("Co-expression",
-                           icon = icon("dashboard"),
+                           icon = icon("tachometer-alt"),
                            # id="coexpressionID",
                            tabName = "coexpression", startExpanded = FALSE,
                            shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
