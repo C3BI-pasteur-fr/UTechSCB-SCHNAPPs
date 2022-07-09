@@ -188,7 +188,7 @@ cols2use <- which(projections$dbCluster == dbCl)
     scaleCooling = "linear"
   )
   colnames(res2$codebook) <- colnames(iData)[cols2use]
-  rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "___")
+  rownames(res2$globalBmus) <- make.unique(as.character(rownames(iData)), sep = "_#_")
   simGenes <- rownames(res2$globalBmus)[which(res2$globalBmus[, 1] == res2$globalBmus[geneName, 1] &
                                                 res2$globalBmus[, 2] == res2$globalBmus[geneName, 2])]
   print(paste("dbCluster:", dbCl))
@@ -236,7 +236,7 @@ top.genes$symbol <-
 if ("Description" %in% colnames(featureData)) {
   top.genes$Description <- featureData[rownames(top.genes), "Description"]
 }
-rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "___")
+rownames(top.genes) <- make.unique(as.character(top.genes$symbol), sep = "_#_")
 
 DT::datatable(top.genes)
 ```
