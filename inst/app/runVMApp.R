@@ -16,7 +16,8 @@ if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 plan("multicore", workers = WORKERS)
 # plan(sequential)
-
+library(doParallel)
+registerDoParallel(cores=WORKERS)
 
 library("BiocParallel")
 register(MulticoreParam(WORKERS))
