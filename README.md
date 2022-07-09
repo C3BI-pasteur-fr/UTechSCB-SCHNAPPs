@@ -36,6 +36,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 # update bioconductor packages if required
 BiocManager::install()
 # BiocManager::install("BiocSingular")
+BiocManager::install("InteractiveComplexHeatmap")
 BiocManager::install("SingleR") # needed to prepare data.
 devtools::install_github("haowulab/Wind")
 devtools::install_github("nghiavtr/BPSC")
@@ -52,6 +53,15 @@ devtools::install_github("statOmics/zingeR")
 BiocManager::install("scater")
 install.packages("aggregation")
 devtools::install_github("Zhangxf-ccnu/scDEA")
+
+BiocManager::install("InteractiveComplexHeatmap")
+install.packages("bookdown")
+BiocManager::install ("GSVA")
+BiocManager::install("GSEABase")
+
+devtools::install_github("BaderLab/Tempora")
+
+
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 ```
 
