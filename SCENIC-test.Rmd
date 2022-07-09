@@ -6,8 +6,8 @@ output: html_notebook
 ```{r}
 dbFiles <- c("https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg19/refseq_r45/mc9nr/gene_based/hg19-500bp-upstream-7species.mc9nr.feather",
              "https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg19/refseq_r45/mc9nr/gene_based/hg19-tss-centered-10kb-7species.mc9nr.feather")
-downloadedDBFiles <- c("cisTarget_databases/hg19-500bp-upstream-7species.mc9nr.feather",
-                       "cisTarget_databases/hg19-tss-centered-10kb-7species.mc9nr.feathe")
+downloadedDBFiles <- c("/Volumes/LaCie2022/RStudio/cisTarget_databases/hg19-500bp-upstream-7species.mc9nr.feather",
+                       "/Volumes/LaCie2022/RStudio/cisTarget_databases/hg19-tss-centered-10kb-7species.mc9nr.feathe")
 
 dbFiles <- c("https://resources.aertslab.org/cistarget/databases/mus_musculus/mm9/refseq_r45/mc9nr/gene_based/mm9-500bp-upstream-7species.mc9nr.feather",
 "https://resources.aertslab.org/cistarget/databases/mus_musculus/mm9/refseq_r45/mc9nr/gene_based/mm9-tss-centered-10kb-7species.mc9nr.feather")
@@ -15,16 +15,16 @@ dbFiles <- c("https://resources.aertslab.org/cistarget/databases/mus_musculus/mm
 ## mc9nr: Motif collection version 9: 24k motifs
 
 ## File names after download
-downloadedDBFiles <- c("cisTarget_databases/mm9-500bp-upstream-7species.mc9nr.feather",
-                       "cisTarget_databases/mm9-tss-centered-10kb-7species.mc9nr.feather")
+downloadedDBFiles <- c("/Volumes/LaCie2022/RStudio/cisTarget_databases/mm9-500bp-upstream-7species.mc9nr.feather",
+                       "/Volumes/LaCie2022/RStudio/cisTarget_databases/mm9-tss-centered-10kb-7species.mc9nr.feather")
 
 options(timeout = max(3000, getOption("timeout")))
 ## The databases are downloaded only in the case when the files do not exist.
 if( !(file.exists(downloadedDBFiles[1]) & file.exists(downloadedDBFiles[2])) ){
   
   ## Create and move to the new folder
-  dir.create("cisTarget_databases");
-  setwd("cisTarget_databases") 
+  dir.create("/Volumes/LaCie2022/RStudio/cisTarget_databases");
+  setwd("/Volumes/LaCie2022/RStudio/cisTarget_databases") 
   for(featherURL in dbFiles)
   {
     download.file(featherURL, destfile=basename(featherURL)) # saved in current dir
@@ -37,7 +37,7 @@ if( !(file.exists(downloadedDBFiles[1]) & file.exists(downloadedDBFiles[2])) ){
 
 ## ...
 
-system("ln -s /absolute/path/cisTarget_databases databases")
+system("ln -s /Volumes/LaCie2022/RStudio/cisTarget_databases databases")
 
 
 ```
@@ -64,7 +64,7 @@ knitr::opts_knit$set(root.dir = 'Neutrophils')
 library(SCENIC)
 library(AUCell)
 dbs = defaultDbNames$mgi
-dbDir = "../cisTarget_databases"
+dbDir = "/Volumes/LaCie2022/RStudio/cisTarget_databases"
 x = dbs[1]
 file.path(dbDir, x)
 getwd()
@@ -74,7 +74,7 @@ dbsFound <- unlist(unname(lapply(dbs, function(x) setNames(file.exists(file.path
         x)), unname(file.path(dbDir, x))))))
   
 
-scenicOptions <- initializeScenic(org="mgi", dbDir="../cisTarget_databases", nCores=10)
+scenicOptions <- initializeScenic(org="mgi", dbDir="/Volumes/LaCie2022/RStudio/cisTarget_databases", nCores=10)
 # scenicOptions@inputDatasetInfo$cellInfo <- "int/cellInfo.Rds"
 saveRDS(scenicOptions, file="int/scenicOptions.Rds") 
 
