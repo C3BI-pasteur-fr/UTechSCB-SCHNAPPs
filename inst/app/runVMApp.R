@@ -101,7 +101,7 @@ runApp(app, host = "0.0.0.0", port = 6149, launch.browser = FALSE)
 # htmlwidgets::saveWidget(p, '~/profvis1.html')
 
 # 
-# schnapps(Ï
+# schnapps(
 # defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP",
 # defaultValueSingleGene = "MS4A1", DEBUG=TRUE
 # )
