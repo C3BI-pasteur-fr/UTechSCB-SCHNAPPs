@@ -94,6 +94,7 @@ clusterServer <- function(input, output, session,
   })
   # clusterServer - observe input$addToGroup ----
   observe(label = "ob39", {
+    # browser()
     if (DEBUG) cat(file = stderr(), "observe input$addToGroup \n")
     if (!is.null(input$addToGroup)) {
       if (input$addToGroup) {
@@ -608,6 +609,7 @@ clusterServer <- function(input, output, session,
   
   # clusterServer - observe input$changeGroups ----
   observe(label = "ob42", {
+    # browser()
     if (DEBUG) cat(file = stderr(), "observe input$changeGroups \n")
     start.time <- base::Sys.time()
     on.exit({
@@ -1076,7 +1078,8 @@ tableSelectionServer <- function(input, output, session,
   proxy <- DT::dataTableProxy("cellNameTable")
   
   observeEvent(input$selectAll, {
-    if (DEBUG) cat(file = stderr(), "observe input$selectAll\n")
+    # browser()
+    if (DEBUG) cat(file = stderr(), paste("observe input$selectAll",ns("test"),"\n"))
     ipSelect <- input$selectAll
     # prox <- proxy
     allrows <- input$cellNameTable_rows_all
@@ -1104,14 +1107,16 @@ tableSelectionServer <- function(input, output, session,
   # observe: cellNameTable_state ----
   observe(label = "ob45", {
     if (DEBUG) cat(file = stderr(), "observe input$cellNameTable_state\n")
-    # browser()
     # colOrder <<- input$cellNameTable_state$order
     # colState <<- input$cellNameTable_state
-    assign(ns("colState"), input$cellNameTable_state, envir = .schnappsEnv)
-    assign(ns("pageLength"), input$cellNameTable_state$pageLength, envir = .schnappsEnv)
-    assign(ns("colOrder"), input$cellNameTable_state$order, envir = .schnappsEnv)
-    assign(ns("currentStart"), input$cellNameTable_state$start, envir = .schnappsEnv)
-    tmp <- input$cellNameTable_state$search
+    if(!is.null(input$cellNameTable_state)){
+      # browser()
+      assign(ns("colState"), input$cellNameTable_state, envir = .schnappsEnv)
+      assign(ns("pageLength"), input$cellNameTable_state$pageLength, envir = .schnappsEnv)
+      assign(ns("colOrder"), input$cellNameTable_state$order, envir = .schnappsEnv)
+      assign(ns("currentStart"), input$cellNameTable_state$start, envir = .schnappsEnv)
+      tmp <- input$cellNameTable_state$search
+    }
   })
   
   # renderDT cellNameTable ----
@@ -1368,6 +1373,7 @@ pHeatMapModule <- function(input, output, session,
   # output$pHeatMapPlot <- renderImage(deleteFile = T,
   observe({
     if (DEBUG) cat(file = stderr(), "pHeatMapPlot started.\n")
+    # browser()
     start.time <- base::Sys.time()
     on.exit({
       printTimeEnd(start.time, "pHeatMapPlot")
@@ -2079,6 +2085,7 @@ cellSelectionModule <- function(input, output, session) {
     if (!input$Mod_clusterPP %in% colnames(projections)) {
       return(NULL)
     }
+    # browser()
     choicesVal <- levels(projections[, input$Mod_clusterPP])
     updateSelectInput(
       session,
