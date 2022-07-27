@@ -44,7 +44,7 @@ if (!exists(".schnappsEnv")) {
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    packagePath <- "inst/app"
+    packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
     # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
   }
 } else {
@@ -135,7 +135,7 @@ scShinyServer <- function(input, output, session) {
   # in development mode, called not from package? ----
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
-      packagePath <- "inst/app"
+      packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
@@ -153,78 +153,39 @@ scShinyServer <- function(input, output, session) {
   
   ### history setup ----
   # TODO put in function
+  # can this be done just with bookmarking?
   if (exists("historyPath", envir = .schnappsEnv)) {
+    # browser()
     if (!is.null(x = .schnappsEnv$historyPath)) {
-      .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
-      if (!dir.exists(.schnappsEnv$historyPath)){
-        dir.create(.schnappsEnv$historyPath, recursive = T)
-      }  
-      if (!exists("historyFile", envir = .schnappsEnv)) {
-        .schnappsEnv$historyFile = paste0("history.",format(Sys.time(), "%Y-%b-%d.%H.%M"),".Rmd")
+      # check that at least some of the files that can be created have been
+      rmdFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "history.*.Rmd")
+      projFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "projections.*.RData")
+      sxFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx.*.RData")
+      sxLogFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx_log.*.RData")
+      scolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scol.*.RData")
+      if(length(c(rmdFiles, projFiles, sxFiles, sxLogFiles, scolFiles))== 0){
+        # create directory with name and Rmd file
+        createHistory(.schnappsEnv)
+      } else { # restore from history
+        # load input variables
+        fileInfo = c(scolFiles, projFiles, sxFiles, sxLogFiles) %>% file.info()
+        latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+        cp = load(rownames(fileInfo)[latestFile])
+        if (!is.null(inp)){
+          loadInput(inp)
+        }else{
+          cat(file = )
+        }
+        # load latest files
+        for (fp in list( scolFiles, projFiles, sxFiles, sxLogFiles)){
+          fileInfo = fp %>% file.info()
+          latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+          cp = load(rownames(fileInfo)[latestFile])
+          cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
+          cat(file = stderr(),  "\n")
+        }
       }
-      if (is.null(.schnappsEnv$historyFile)) {
-        .schnappsEnv$historyFile = "history2.Rmd"
-      }
-      .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
-      line=paste0("---
-title: \"history\"
-output:
-  bookdown::html_document2:
-    toc: true
-    toc_depth: 3
-    toc_float: true
-    number_sections: true
-    code_folding: hide
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-suppressMessages(require(shiny))
-suppressMessages(require(shinyTree))
-suppressMessages(require(tibble))
-suppressMessages(require(plotly))
-suppressMessages(require(shinythemes))
-suppressMessages(require(ggplot2))
-suppressMessages(require(ggalluvial))
-suppressMessages(require(DT))
-suppressMessages(require(pheatmap))
-# suppressMessages(require(threejs))
-suppressMessages(require(RColorBrewer))
-# suppressMessages(require(mclust))
-suppressMessages(require(reshape2))
-suppressMessages(require(knitr))
-suppressMessages(require(shinyWidgets))
-suppressMessages(require(scater))
-suppressMessages(require(kohonen))
-# suppressMessages(require(Rsomoclu))
-suppressMessages(require(SingleCellExperiment))
-suppressMessages(require(Matrix))
-suppressMessages(require(colourpicker))
-# suppressMessages(require(shinytest))
-suppressMessages(require(ggalluvial))
-suppressMessages(require(scran))
-suppressMessages(require(BiocSingular))
-
-if (\"debugme\" %in% rownames(installed.packages())) {
-  suppressMessages(require(debugme))
-}
-if (\"gtools\" %in% rownames(installed.packages())) {
-  suppressMessages(require(gtools))
-}
-if (\"kableExtra\" %in% rownames(installed.packages())) {
-  suppressMessages(require(kableExtra))
-}
-if (\"reactlog\" %in% rownames(installed.packages())) {
-  suppressMessages(require(reactlog))
-}
-suppressMessages(require(Seurat))
-.schnappsEnv = list()
-.schnappsEnv$DEBUGSAVE = FALSE
-source(system.file(\"app\", \"serverFunctions.R\", package = \"SCHNAPPs\"))
-DEBUG=FALSE
-```\n" )
-      write(line,file=.schnappsEnv$historyFile,append=FALSE)
-      
     } else {
       rm("historyPath", envir = .schnappsEnv)
     }
@@ -267,49 +228,51 @@ DEBUG=FALSE
   base::source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
   base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
   
-  # bookmarking ----
+  # # bookmarking ----
+  # ### too complicated to debug.
   # setBookmarkExclude(c("bookmark1"))
   # observeEvent(input$bookmark1, {
   #   if (DEBUG) cat(file = stderr(), paste("bookmarking: \n"))
   #   if (DEBUG) cat(file = stderr(), paste(names(input), collapse = "\n"))
-  #
+  # 
   #   session$doBookmark()
   #   if (DEBUG) cat(file = stderr(), paste("bookmarking: DONE\n"))
   # })
-  # Need to exclude the buttons from themselves being bookmarked
-  # Save extra values in state$values when we bookmark
-  onBookmark(function(state) {
-    # TODO need to include here the color values and other reactive values
-    # message
-    # browser()
-    if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
-    # if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
-    # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
-    state$values$schnappsEnv <- .schnappsEnv
-  })
-  
-  # after bookmarking
-  onBookmarked(fun = function(url) {
-    # browser()
-    if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
-    # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
-    showBookmarkUrlModal(url)
-  }
-  )
-  setBookmarkExclude("bookmark1")
-  # Read values from state$values when we restore
-  onRestore(session = session, fun = function(state) {
-    # TODO need to include here the color values and other reactive values
-    if (DEBUG) base::cat(file = stderr(), paste("onRestore\n"))
-    .schnappsEnv <<-  state$values$schnappsEnv
-  })
-  #   
-  onRestored(session = session, fun = function(state) {
-    if (DEBUG) base::cat(file = stderr(), paste("onRestored\n"))
-    # browser()
-    .schnappsEnv <<-  state$values$schnappsEnv
-  })
-  
+  # # Need to exclude the buttons from themselves being bookmarked
+  # # Save extra values in state$values when we bookmark
+  # onBookmark(function(state) {
+  #   # TODO need to include here the color values and other reactive values
+  #   # message
+  #   # browser()
+  #   if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
+  #   # if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
+  #   # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
+  #   state$values$schnappsEnv <- .schnappsEnv
+  # })
+  # 
+  # # after bookmarking
+  # onBookmarked(fun = function(url) {
+  #   # browser()
+  #   if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
+  #   # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
+  #   showBookmarkUrlModal(url)
+  # }
+  # )
+  # setBookmarkExclude("bookmark1")
+  # # Read values from state$values when we restore
+  # onRestore(session = session, fun = function(state) {
+  #   # TODO need to include here the color values and other reactive values
+  #   browser()
+  #   if (DEBUG) base::cat(file = stderr(), paste("onRestore\n"))
+  #   .schnappsEnv <<-  state$values$schnappsEnv
+  # })
+  # #   
+  # onRestored(session = session, fun = function(state) {
+  #   if (DEBUG) base::cat(file = stderr(), paste("onRestored\n"))
+  #   browser()
+  #   .schnappsEnv <<-  state$values$schnappsEnv
+  # })
+  # 
   # load contribution reactives ----
   # parse all reactives.R files under contributions to include in application
   uiFiles <- base::dir(
