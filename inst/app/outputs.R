@@ -804,9 +804,9 @@ observeEvent(
 observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
-  scExx <- scEx()
+  scEx <- scEx()
   projections <- projections()
-  if (is.null(scExx) || is.null(projections)) {
+  if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
   
@@ -814,7 +814,7 @@ observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
   ccols <- lapply(seq_along(lev), function(i) {
     input[[paste0("clusterNamecol", lev[i])]]
   })
-  lev <- levels(colData(scExx)$sampleNames)
+  lev <- levels(colData(scEx)$sampleNames)
   scols <- lapply(seq_along(lev), function(i) {
     input[[paste0("sampleNamecol", lev[i])]]
   })
