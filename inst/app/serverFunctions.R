@@ -1882,8 +1882,86 @@ checkAllowed <- function(x, env=.schnappsEnv) {
   return(x)
 }
 
+### History
+# createHistory ---
 
+createHistory <- function(.schnappsEnv) {
+  
+  .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
+  if (!dir.exists(.schnappsEnv$historyPath)){
+    dir.create(.schnappsEnv$historyPath, recursive = T)
+  }  
+  if (!exists("historyFile", envir = .schnappsEnv)) {
+    .schnappsEnv$historyFile = paste0("history.",format(Sys.time(), "%Y-%b-%d.%H.%M"),".Rmd")
+  }
+  if (is.null(.schnappsEnv$historyFile)) {
+    .schnappsEnv$historyFile = "history2.Rmd"
+  }
+  .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
+  line=paste0("---
+  title: \"history\"
+  output:
+    bookdown::html_document2:
+      toc: true
+      toc_depth: 3
+      toc_float: true
+      number_sections: true
+      code_folding: hide
+  ---
+  
+  ```{r setup, include=FALSE}
+  knitr::opts_chunk$set(echo = TRUE)
+  suppressMessages(require(shiny))
+  suppressMessages(require(shinyTree))
+  suppressMessages(require(tibble))
+  suppressMessages(require(plotly))
+  suppressMessages(require(shinythemes))
+  suppressMessages(require(ggplot2))
+  suppressMessages(require(ggalluvial))
+  suppressMessages(require(DT))
+  suppressMessages(require(pheatmap))
+  # suppressMessages(require(threejs))
+  suppressMessages(require(RColorBrewer))
+  # suppressMessages(require(mclust))
+  suppressMessages(require(reshape2))
+  suppressMessages(require(knitr))
+  suppressMessages(require(shinyWidgets))
+  suppressMessages(require(scater))
+  suppressMessages(require(kohonen))
+  # suppressMessages(require(Rsomoclu))
+  suppressMessages(require(SingleCellExperiment))
+  suppressMessages(require(Matrix))
+  suppressMessages(require(colourpicker))
+  # suppressMessages(require(shinytest))
+  suppressMessages(require(ggalluvial))
+  suppressMessages(require(scran))
+  suppressMessages(require(BiocSingular))
+  
+  if (\"debugme\" %in% rownames(installed.packages())) {
+    suppressMessages(require(debugme))
+  }
+  if (\"gtools\" %in% rownames(installed.packages())) {
+    suppressMessages(require(gtools))
+  }
+  if (\"kableExtra\" %in% rownames(installed.packages())) {
+    suppressMessages(require(kableExtra))
+  }
+  if (\"reactlog\" %in% rownames(installed.packages())) {
+    suppressMessages(require(reactlog))
+  }
+  suppressMessages(require(Seurat))
+  .schnappsEnv = list()
+  .schnappsEnv$DEBUGSAVE = FALSE
+  source(system.file(\"app\", \"serverFunctions.R\", package = \"SCHNAPPs\"))
+  DEBUG=FALSE
+  ```\n" )
+  write(line,file=.schnappsEnv$historyFile,append=FALSE)
+  
+}
 
+loadInput = function(inp){
+  
+}
 
 
 if (.schnappsEnv$DEBUG) {
