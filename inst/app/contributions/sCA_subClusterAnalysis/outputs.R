@@ -3,6 +3,131 @@ myZippedReportFiles <- c("DGE.csv")
 require(Seurat)
 
 
+observe(label ="obs_sCA_volc_pval", x = {
+  .schnappsEnv$defaultValues[["sCA_volc_pval"]] = input$sCA_volc_pval
+})
+observe(label ="obs_sCA_volc_effectLimit", x = {
+  .schnappsEnv$defaultValues[["sCA_volc_effectLimit"]] = input$sCA_volc_effectLimit
+})
+observe(label ="obs_scDEA_zingeR.edgeR", x = {
+  .schnappsEnv$defaultValues[["scDEA_zingeR.edgeR"]] = input$scDEA_zingeR.edgeR
+})
+observe(label ="obs_scDEA_Seurat", x = {
+  .schnappsEnv$defaultValues[["scDEA_Seurat"]] = input$scDEA_Seurat
+})
+observe(label ="obs_scDEA_limma", x = {
+  .schnappsEnv$defaultValues[["scDEA_limma"]] = input$scDEA_limma
+})
+observe(label ="obs_scDEA_Wilcoxon", x = {
+  .schnappsEnv$defaultValues[["scDEA_Wilcoxon"]] = input$scDEA_Wilcoxon
+})
+observe(label ="obs_scDEA_Ttest", x = {
+  .schnappsEnv$defaultValues[["scDEA_Ttest"]] = input$scDEA_Ttest
+})
+observe(label ="obs_scDEA_scDD", x = {
+  .schnappsEnv$defaultValues[["scDEA_scDD"]] = input$scDEA_scDD
+})
+observe(label ="obs_scDEA_monocle", x = {
+  .schnappsEnv$defaultValues[["scDEA_monocle"]] = input$scDEA_monocle
+})
+observe(label ="obs_scDEA_MAST", x = {
+  .schnappsEnv$defaultValues[["scDEA_MAST"]] = input$scDEA_MAST
+})
+observe(label ="obs_scDEA_DESeq2", x = {
+  .schnappsEnv$defaultValues[["scDEA_DESeq2"]] = input$scDEA_DESeq2
+})
+observe(label ="obs_scDEA_DEsingle", x = {
+  .schnappsEnv$defaultValues[["scDEA_DEsingle"]] = input$scDEA_DEsingle
+})
+observe(label ="obs_scDEA_BPSC", x = {
+  .schnappsEnv$defaultValues[["scDEA_BPSC"]] = input$scDEA_BPSC
+})
+observe(label ="obs_scDEA_parallel", x = {
+  .schnappsEnv$defaultValues[["scDEA_parallel"]] = input$scDEA_parallel
+})
+observe(label ="obs_sCA_dgeRadioButton", x = {
+  .schnappsEnv$defaultValues[["sCA_dgeRadioButton"]] = input$sCA_dgeRadioButton
+})
+observe(label ="obs_sCA_subscluster_y1", x = {
+  .schnappsEnv$defaultValues[["sCA_subscluster_y1"]] = input$sCA_subscluster_y1
+})
+observe(label ="obs_sCA_subscluster_x1", x = {
+  .schnappsEnv$defaultValues[["sCA_subscluster_x1"]] = input$sCA_subscluster_x1
+})
+
+
+observe(label = "ob7", {
+  if (DEBUG) cat(file = stderr(), "observe: sCA_subscluster_x1\n")
+  .schnappsEnv$subClusterDim1 <- input$sCA_subscluster_x1
+})
+
+observe(label = "ob8", {
+  if (DEBUG) cat(file = stderr(), "observe: sCA_subscluster_y1\n")
+  .schnappsEnv$subClusterDim2 <- input$sCA_subscluster_y1
+})
+
+#' TODO
+#' if this observer is really needed we need to get rid of projections
+observe(label = "ob9", {
+  if (DEBUG) cat(file = stderr(), "observe: projections\n")
+  projections <- projections()
+  if (!is.null(projections)) {
+    noOfClusters <- levels(as.factor(projections$dbCluster))
+    # noOfClusters <- max(as.numeric(as.character(projections$dbCluster)))
+    if (is.null(.schnappsEnv$subClusterClusters)) {
+      .schnappsEnv$subClusterClusters <- noOfClusters
+    }
+  }
+})
+
+observe(label = "ob10", {
+  if (DEBUG) cat(file = stderr(), "observe: sCA_dgeClustersSelection\n")
+  .schnappsEnv$subClusterClusters <- input$sCA_dgeClustersSelection
+})
+
+
+# subcluster axes ----
+# update axes in subcluster analysis
+observeEvent(projections(), {
+  if (DEBUG) cat(file = stderr(), "updateInputSubclusterAxes started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "updateInputSubclusterAxes")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "updateInputSubclusterAxes")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("updateInputSubclusterAxes", id = "updateInputSubclusterAxes", duration = NULL)
+  }
+  
+  projections <- projections()
+  # we combine the group names with the projections to add ability to select groups
+  # gn <- groupNames$namesDF
+  # Can use character(0) to remove all choices
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls()))
+  }
+  # load(file="~/SCHNAPPsDebug/updateInputSubclusterAxes.RData")
+  # if (length(gn) > 0) {
+  #   projections <- cbind(projections, gn[rownames(projections), ] * 1)
+  # }
+  # Can also set the label and select items
+  updateSelectInput(session, "sCA_subscluster_x1",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$subClusterDim1
+  )
+  
+  updateSelectInput(session, "sCA_subscluster_y1",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$subClusterDim2
+  )
+})
+
+
 
 # sCA_dge_plot1 ----
 #' sCA_dge_plot1

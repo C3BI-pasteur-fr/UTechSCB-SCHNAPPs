@@ -27,14 +27,14 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("oldPrj", "projections to copy + rename", choices = defaultValue("oldPrj", "notyet"), selected = defaultValue("oldPrj", "notyet"))
+               sc_selectInput("oldPrj", "projections to copy + rename", choices = defaultValue("oldPrj", "notyet"), selected = defaultValue("oldPrj", "notyet"))
              ),
              column(
                width = 6,
                fluidRow(
                  column(
                    width = 8,
-                   textInput("newPrj", "new name of Projection", value = defaultValue("newPrj", ""))
+                   sc_textInput("newPrj", "new name of Projection", value = defaultValue("newPrj", ""))
                  ),
                  column(
                    width = 4,
@@ -44,7 +44,7 @@ modTab <- shinydashboard::tabItem(
                fluidRow(
                  column(
                    width = 8,
-                   selectInput("delPrj", "projections to delete", choices = defaultValue("delPrj", "notyet"), selected = defaultValue("delPrj", "notyet"))
+                   sc_selectInput("delPrj", "projections to delete", choices = defaultValue("delPrj", "notyet"), selected = defaultValue("delPrj", "notyet"))
                  ),
                  column(
                    width = 4,
@@ -68,16 +68,16 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("gQC_combPrj1", "1 st Projection", choices = c("notyet"), selected = "notyet")
+               sc_selectInput("gQC_combPrj1", "1 st Projection", choices = c("notyet"), selected = "notyet")
              ),
              column(
                width = 6,
                
-               selectInput("gQC_combPrj2", "2nd Projections", choices = c("notyet"), selected = "notyet")
+               sc_selectInput("gQC_combPrj2", "2nd Projections", choices = c("notyet"), selected = "notyet")
              )),
            fluidRow(
              column(width = 6, 
-                    textInput("gQC_newCombPrj", "name of new Projection", value = "")),
+                    sc_textInput("gQC_newCombPrj", "name of new Projection", value = "")),
              column(
                width = 6,
                actionButton("gQC_updateCombPrjsButton", "apply")
@@ -97,10 +97,10 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
+               sc_selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
              ),
              column(width = 6, 
-                     textInput("gQC_newRnPrj", "name of new Projection", value = ""))
+                     sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
            ),
            
            fluidRow(
@@ -132,10 +132,10 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("gQC_raProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_raProj", "notyet"))
+               sc_selectInput("gQC_raProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_raProj", "notyet"))
              ),
              column(width = 6, 
-                    textInput("gQC_newRaPrj", "name of new Projection", value = ""))
+                    sc_textInput("gQC_newRaPrj", "name of new Projection", value = ""))
            ),
            fluidRow(
              column(width = 12, 
@@ -157,7 +157,7 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               selectInput("gQC_windProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
+               sc_selectInput("gQC_windProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
              )
            ),
            fluidRow(
@@ -174,7 +174,7 @@ tabList <- list(
   shinydashboard::tabItem(
     "gQC_umiHist",
     tags$h3("Histogram of UMI counts"),
-    numericInput("gQC_binSize", "number of bins", 200, min=10),
+    sc_numericInput("gQC_binSize", "number of bins", defaultValue("gQC_binSize",200), min=10),
     fluidRow(column(
       10,
       offset = 0,
@@ -219,11 +219,11 @@ tabList <- list(
       fluidRow(
         column(
           width = 6,
-          numericInput("gQC_tsneDim", "Tsne dimensions", 3, min = 3, max = 3)
+          sc_numericInput("gQC_tsneDim", "Tsne dimensions", 3, min = 3, max = 3)
         ),
         column(
           width = 6,
-          numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 10), min = 1, max = 100)
+          sc_numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 10), min = 1, max = 100)
         )
       ),
       shinydashboard::box(
@@ -231,11 +231,11 @@ tabList <- list(
         collapsible = TRUE, collapsed = TRUE,
         column(
           width = 6,
-          numericInput("gQC_tsneTheta", "Theta", defaultValue("gQC_tsneTheta", 0.5), min = 0.0, max = 1, step = 0.1)
+          sc_numericInput("gQC_tsneTheta", "Theta", defaultValue("gQC_tsneTheta", 0.5), min = 0.0, max = 1, step = 0.1)
         ),
         column(
           width = 6,
-          numericInput("gQC_tsneSeed", "Seed", defaultValue("gQC_tsneSeed", 1), min = 1, max = 10000)
+          sc_numericInput("gQC_tsneSeed", "Seed", defaultValue("gQC_tsneSeed", 1), min = 1, max = 10000)
         )
       ),
       fluidRow(
@@ -254,7 +254,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 3,
-          selectInput("gQC_dim3D_x",
+          sc_selectInput("gQC_dim3D_x",
                       label = "X",
                       choices = c(defaultValue("gQC_dim3D_x", "tsne1"), "tsne2", "tsne3"),
                       selected = defaultValue("gQC_dim3D_x", "tsne1")
@@ -262,7 +262,7 @@ tabList <- list(
         ),
         column(
           width = 3,
-          selectInput("gQC_dim3D_y",
+          sc_selectInput("gQC_dim3D_y",
                       label = "Y",
                       choices = c("tsne1", defaultValue("gQC_dim3D_y", "tsne2"), "tsne3"),
                       selected = defaultValue("gQC_dim3D_y", "tsne2")
@@ -270,7 +270,7 @@ tabList <- list(
         ),
         column(
           width = 3,
-          selectInput("gQC_dim3D_z",
+          sc_selectInput("gQC_dim3D_z",
                       label = "Z",
                       choices = c("tsne1", "tsne2", defaultValue("gQC_dim3D_z", "tsne3")),
                       selected = defaultValue("gQC_dim3D_z", "tsne3")
@@ -278,7 +278,7 @@ tabList <- list(
         ),
         column(
           width = 3,
-          selectInput("gQC_col3D",
+          sc_selectInput("gQC_col3D",
                       label = "color",
                       choices = defaultValue("gQC_col3D", "sampleNames"),
                       selected = defaultValue("gQC_col3D", "sampleNames")
@@ -314,28 +314,28 @@ tabList <- list(
       fluidRow(
         column(
           width = 3,
-            selectInput("gQC_um_n_neighbors",
+            sc_selectInput("gQC_um_n_neighbors",
                       label = "N Neighbors",
                       choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "10")
           )
         ),
         column(
           width = 3,
-          selectInput("gQC_um_n_components",
+          sc_selectInput("gQC_um_n_components",
                       label = "N components",
                       choices = c(2:20), selected = defaultValue("gQC_um_n_components", "3")
           )
         ),
         column(
           width = 3,
-          selectInput("gQC_um_spread",
+          sc_selectInput("gQC_um_spread",
                       label = "spread",
                       choices = c(1:10), selected = defaultValue("gQC_um_spread", "10")
           )
         ),
         column(
           width = 3,
-          selectInput("gQC_um_local_connectivity",
+          sc_selectInput("gQC_um_local_connectivity",
                       label = "local connectivity",
                       choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "5")
           )
@@ -347,49 +347,49 @@ tabList <- list(
         fluidRow(
           column(
             width = 3,
-            selectInput("gQC_um_randSeed",
+            sc_selectInput("gQC_um_randSeed",
                         label = "random seed",
                         choices = c(1:100), selected = defaultValue("gQC_um_randSeed", "1")
             ),
-            selectInput("gQC_um_init",
+            sc_selectInput("gQC_um_init",
                         label = "init",
                         choices = c("spectral", "random"), selected = defaultValue("gQC_um_init", "spectral")
             )
           ),
           column(
             width = 3,
-            selectInput(
+            sc_selectInput(
               "gQC_um_negative_sample_rate",
               label = "negative sample rate",
               choices = c(1:50), selected = defaultValue("gQC_um_negative_sample_rate", "5")
             ),
-            selectInput("gQC_um_min_dist",
+            sc_selectInput("gQC_um_min_dist",
                         label = "min dist",
                         choices = seq(0.05, 0.5, 0.01), selected = defaultValue("gQC_um_min_dist", "0.01")
             )
           ),
           column(
             width = 3,
-            selectInput("gQC_um_metric",
+            sc_selectInput("gQC_um_metric",
                         label = "metric",
                         choices = c("euclidean", "manhattan", "cosine", "hamming"),
                         selected = defaultValue("gQC_um_metric", "euclidean")
             ),
-            selectInput("gQC_um_set_op_mix_ratio",
+            sc_selectInput("gQC_um_set_op_mix_ratio",
                         label = "set op mix ratio",
                         choices = seq(0, 1, 0.1), selected = defaultValue("gQC_um_set_op_mix_ratio", "1")
             )
           ),
           column(
             width = 3,
-            numericInput(inputId = "gQC_um_n_epochs", label = "epochs:", 
+            sc_numericInput(inputId = "gQC_um_n_epochs", label = "epochs:", 
                          value = as.numeric(defaultValue("gQC_um_n_epochs", 200)), min = 1, max = 1000),
             
             # selectizeInput("gQC_um_n_epochs",
             #             label = "epochs",
             #             choices = c(1:1000), selected = defaultValue("gQC_um_n_epochs", "200")
             # ),
-            selectInput(
+            sc_selectInput(
               "gQC_um_bandwidth",
               label = "bandwidth",
               choices = c(1:20), selected = defaultValue("gQC_um_bandwidth", "1")

@@ -234,11 +234,11 @@ scShinyUI <- function(request) {
         downloadButton("RDSsave", "Download RData", class = "butt"),
         br(),
         downloadButton("RmdSave", "Download History", class = "butt"),
-        if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
+        if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
         if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
         if (exists("historyPath", envir = .schnappsEnv)){
           br()
-          # checkboxInput("save2History", "save to history file", FALSE)
+          # sc_checkboxInput("save2History", "save to history file", FALSE)
           actionButton("comment2History", "Add comment to history")
         }
         # if (DEBUG) {

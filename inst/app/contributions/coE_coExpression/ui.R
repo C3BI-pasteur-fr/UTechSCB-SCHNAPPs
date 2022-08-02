@@ -29,21 +29,21 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          textInput("coE_heatmap_geneids", "Comma separated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
+          sc_textInput("coE_heatmap_geneids", "Comma separated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
         )
       ),
       fluidRow(
         column(
           width = 3,
-          numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 10, min=2)
+          sc_numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 10, min=2)
         ),
         column(
           width = 3,
-          numericInput("coE_lfc", "min log fold change", 2, min=0.1)
+          sc_numericInput("coE_lfc", "min log fold change", 2, min=0.1)
         ),
         column(
           width = 3,
-          selectInput("coE_direction", "direction", "up", choices = c("up", "down", "any"))
+          sc_selectInput("coE_direction", "direction", "up", choices = c("up", "down", "any"))
         )),
       
       fluidRow(
@@ -75,10 +75,10 @@ tabList <- list(
                       column( width = 12,
                               fluidRow(column(
                                 width = 12,
-                                textInput("coE_heatmapselected_geneids", "Comma separated gene names", value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
+                                sc_textInput("coE_heatmapselected_geneids", "Comma separated gene names", value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
                               )),
                               br(),
-                              # fluidRow(checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
+                              # fluidRow(sc_checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
                               tabBox(title = "cell group info", width = 12, id = "cellGroupInfo",
                                      tabPanel(
                                        title = "Heatmap of selected cells and genes", width = 12, 
@@ -116,13 +116,13 @@ tabList <- list(
                                        fluidRow(
                                          column(
                                            width = 3,
-                                           numericInput("coEtgMinExpr", "min UMI count per gene:",
+                                           sc_numericInput("coEtgMinExpr", "min UMI count per gene:",
                                                         defaultValue("coEtgMinExpr", 1),
                                                         min = 0, max = 100000
                                            )
                                          ), column(
                                            width = 3,
-                                           numericInput("coEtgPerc", "min percentage of cells expressing a genes:",
+                                           sc_numericInput("coEtgPerc", "min percentage of cells expressing a genes:",
                                                         defaultValue("coEtgPerc", 60),
                                                         min = 1, max = 100
                                            )
@@ -154,7 +154,7 @@ tabList <- list(
                                        fluidRow(
                                          column(
                                            width = 12,
-                                           # checkboxInput(inputId = "coE_topCCGenesShow", label = "calc correlations", value = FALSE)),
+                                           # sc_checkboxInput(inputId = "coE_topCCGenesShow", label = "calc correlations", value = FALSE)),
                                            tableSelectionUi("coE_topCCGenes")
                                          )
                                        )
@@ -188,15 +188,15 @@ tabList <- list(
              fluidRow(
                column(
                  width = 4,
-                 checkboxInput("coE_showPermutations", "show combinations", value = defaultValue("coE_showPermutations",FALSE))
+                 sc_checkboxInput("coE_showPermutations", "show combinations", value = defaultValue("coE_showPermutations",FALSE))
                ),
                column(
                  width = 4,
-                 checkboxInput("coE_showExpression", "show expression values rather than count cells", value = defaultValue("coE_showExpression",FALSE))
+                 sc_checkboxInput("coE_showExpression", "show expression values rather than count cells", value = defaultValue("coE_showExpression",FALSE))
                ),
                column(
                  width = 4,
-                 selectInput(
+                 sc_selectInput(
                  "coE_scale",
                  label = "Scale",
                  choices = c("area", "count", "width"),
@@ -207,11 +207,11 @@ tabList <- list(
              fluidRow(
                column(
                  width = 4,
-                 textInput("coE_geneGrpVioIds", "Comma separated gene names", value = defaultValue("coE_geneGrpVioIds", defaultValueMultiGenes))
+                 sc_textInput("coE_geneGrpVioIds", "Comma separated gene names", value = defaultValue("coE_geneGrpVioIds", defaultValueMultiGenes))
                ),
                column(
                  width = 4,
-                 selectInput(
+                 sc_selectInput(
                    "coE_dimension_xVioiGrp",
                    label = "X",
                    choices = c(defaultValue("coE_dimension_xVioiGrp", "dbCluster"), "sampleName", "tsne3"),
@@ -227,7 +227,7 @@ tabList <- list(
                    max = 100000000,
                    value = defaultValue("coEminMaxExprValue", c(-1,1))
                  )
-                 # numericInput("coEminExpr", "min expression of genes:",
+                 # sc_numericInput("coEminExpr", "min expression of genes:",
                  #              value = defaultValue("coEminExpr", 1),
                  #              min = -1000, max = 100000
                  # )
@@ -246,11 +246,11 @@ tabList <- list(
              fluidRow(
                column(
                  width = 4,
-                 textInput("coE_geneGrpVioIds2", "Comma separated gene names", value = defaultValue("coE_geneGrpVioIds2", defaultValueMultiGenes))
+                 sc_textInput("coE_geneGrpVioIds2", "Comma separated gene names", value = defaultValue("coE_geneGrpVioIds2", defaultValueMultiGenes))
                ),
                column(
                  width = 4,
-                 selectizeInput(
+                 sc_selectizeInput(
                    "coE_dimension_xVioiGrp2",
                    label = "X",
                    multiple = TRUE,
@@ -267,7 +267,7 @@ tabList <- list(
                    min = -10000000,
                    max = 100000000,
                    value = defaultValue("coEminMaxExpr2", c(-1,1))
-                 )# numericInput("coEminExpr2", "min expression of genes:",
+                 )# sc_numericInput("coEminExpr2", "min expression of genes:",
                  #              defaultValue("coEminExpr2", 1),
                  #              min = -1000, max = 100000
                  # )
@@ -289,9 +289,9 @@ tabList <- list(
             title = "alluvial plot", solidHeader = TRUE, width = 12, status = 'primary', 
             fluidRow(
               column(width = 6, 
-                     selectInput("alluiv1", "1st axis", choices = defaultValue("alluiv1", "notyet"), selected = defaultValue("alluiv1", "notyet"))),
+                     sc_selectInput("alluiv1", "1st axis", choices = defaultValue("alluiv1", "notyet"), selected = defaultValue("alluiv1", "notyet"))),
               column(width = 6, 
-                     selectInput("alluiv2", "2nd axis", choices = defaultValue("alluiv2", "notyet"), selected = defaultValue("alluiv2", "notyet")))
+                     sc_selectInput("alluiv2", "2nd axis", choices = defaultValue("alluiv2", "notyet"), selected = defaultValue("alluiv2", "notyet")))
             ),
             fluidRow(
               column(width = 12, 

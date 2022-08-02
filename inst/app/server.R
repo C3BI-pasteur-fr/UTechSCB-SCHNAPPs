@@ -24,6 +24,7 @@ suppressMessages(require(colourpicker))
 suppressMessages(require(scran))
 suppressMessages(require(ggalluvial))
 suppressMessages(require(BiocSingular))
+suppressMessages(require(dplyr))
 
 if ("debugme" %in% rownames(installed.packages())) {
   suppressMessages(require(debugme))
@@ -151,46 +152,6 @@ scShinyServer <- function(input, output, session) {
   )
   
   
-  ### history setup ----
-  # TODO put in function
-  # can this be done just with bookmarking?
-  if (exists("historyPath", envir = .schnappsEnv)) {
-    # browser()
-    if (!is.null(x = .schnappsEnv$historyPath)) {
-      # check that at least some of the files that can be created have been
-      rmdFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "history.*.Rmd")
-      projFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "projections.*.RData")
-      sxFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx.*.RData")
-      sxLogFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx_log.*.RData")
-      scolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scol.*.RData")
-      if(length(c(rmdFiles, projFiles, sxFiles, sxLogFiles, scolFiles))== 0){
-        # create directory with name and Rmd file
-        createHistory(.schnappsEnv)
-      } else { # restore from history
-        # load input variables
-        fileInfo = c(scolFiles, projFiles, sxFiles, sxLogFiles) %>% file.info()
-        latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
-        cp = load(rownames(fileInfo)[latestFile])
-        if (!is.null(inp)){
-          loadInput(inp)
-        }else{
-          cat(file = )
-        }
-        # load latest files
-        for (fp in list( scolFiles, projFiles, sxFiles, sxLogFiles)){
-          fileInfo = fp %>% file.info()
-          latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
-          cp = load(rownames(fileInfo)[latestFile])
-          cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
-          cat(file = stderr(),  "\n")
-        }
-      }
-
-    } else {
-      rm("historyPath", envir = .schnappsEnv)
-    }
-    }
-  
   
   # gene list for gene selection tree ----
   # TODO check if file exists
@@ -204,7 +165,7 @@ scShinyServer <- function(input, output, session) {
     }
   }
   
-
+  
   # initialize projection functions ----
   # base projections
   # display name, reactive to calculate projections
@@ -221,13 +182,12 @@ scShinyServer <- function(input, output, session) {
   # used in subcluster analysis
   .schnappsEnv$diffExpFunctions <- list()
   diffExpFunctions <- list()
-
+  
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
   base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
   base::source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
   base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
-  
   # # bookmarking ----
   # ### too complicated to debug.
   # setBookmarkExclude(c("bookmark1"))
@@ -243,7 +203,7 @@ scShinyServer <- function(input, output, session) {
   # onBookmark(function(state) {
   #   # TODO need to include here the color values and other reactive values
   #   # message
-  #   # browser()
+  #   # deepDebug()
   #   if (DEBUG) base::cat(file = stderr(), paste("onBookmark\n"))
   #   # if (DEBUG) base::cat(file = stderr(), paste("token5", str(environment()),  "\n"))
   #   # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
@@ -252,7 +212,7 @@ scShinyServer <- function(input, output, session) {
   # 
   # # after bookmarking
   # onBookmarked(fun = function(url) {
-  #   # browser()
+  #   # deepDebug()
   #   if (DEBUG) base::cat(file = stderr(), paste("onBookmarked\n"))
   #   # if (DEBUG) base::cat(file = stderr(), paste("token2", str(parent.env(environment())),  "\n"))
   #   showBookmarkUrlModal(url)
@@ -262,14 +222,14 @@ scShinyServer <- function(input, output, session) {
   # # Read values from state$values when we restore
   # onRestore(session = session, fun = function(state) {
   #   # TODO need to include here the color values and other reactive values
-  #   browser()
+  #   deepDebug()
   #   if (DEBUG) base::cat(file = stderr(), paste("onRestore\n"))
   #   .schnappsEnv <<-  state$values$schnappsEnv
   # })
   # #   
   # onRestored(session = session, fun = function(state) {
   #   if (DEBUG) base::cat(file = stderr(), paste("onRestored\n"))
-  #   browser()
+  #   deepDebug()
   #   .schnappsEnv <<-  state$values$schnappsEnv
   # })
   # 
@@ -306,7 +266,7 @@ scShinyServer <- function(input, output, session) {
   }
   updateSelectizeInput(
     session = session, inputId = "sCA_dgeRadioButton",
-    choices = dgeChoices
+    choices = dgeChoices, selected = defaultValue("sCA_dgeRadioButton", "none")
   )
   .schnappsEnv$diffExpFunctions <- diffExpFunctions
   
@@ -327,6 +287,109 @@ scShinyServer <- function(input, output, session) {
     zippedReportFiles <- c(zippedReportFiles, myZippedReportFiles)
   }
   .schnappsEnv$projectionFunctions <- projectionFunctions
+  
+  ### history setup ----
+  # TODO put in function
+  # can this be done just with bookmarking?
+  if (exists("historyPath", envir = .schnappsEnv)) {
+    
+    .schnappsEnv$restoreHistory = FALSE
+    if (!is.null(x = .schnappsEnv$historyPath)) {
+      # check that at least some of the files that can be created have been
+      rmdFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "history.*.Rmd")
+      projFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "projections.*.RData")
+      sxFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx\\..*.RData")
+      sxLogFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx_log.*.RData")
+      scolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scol.*.RData")
+      ccolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "ccol.*.RData")
+      plotFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "plotData.*.RData")
+      allDataFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = ".RData")
+      # if there is already a history
+      if(length(rmdFiles)>0 & length(projFiles)>0 & 
+         length(sxFiles)>0 & length(sxLogFiles)>0 & 
+         length(scolFiles)>0){
+        deepDebug()
+        # browser()
+        # this will be overwritten but should be session specific
+        oldTmpFolder = .schnappsEnv$reportTempDir
+        # load input variables
+        fileInfo = c(sxLogFiles, plotFiles, ccolFiles, scolFiles, sxLogFiles, projFiles) %>% fs::file_info()
+        latestFile = fileInfo %>% pull("birth_time") %>% order()  %>% last()
+        # this should load inp, i.e. the old input variable with all parameters
+        tempEnv =  new.env(parent=emptyenv())
+        cp = load(fileInfo[latestFile, "path"] %>% as.character(), envir = tempEnv)
+        
+        if(!"schnappsEnv" %in% cp){
+          cat(file = stderr(), paste("There is no 'inp' in ", rownames(fileInfo)[latestFile], "\n\n\n"))
+        }
+        # RData file now contain the .schnappsEnv
+        # add anything that is not set
+        for(na in ls(tempEnv$schnappsEnv)[!ls(tempEnv$schnappsEnv) %in% ls(.schnappsEnv)]){
+          .schnappsEnv[[na]] = tempEnv$schnappsEnv[[na]]
+        }
+        # input is handled by .schnappsEnv$defaultValues in the UI
+        if (!is.null(tempEnv$inp)){
+          # loadInput(inp, session, input)
+          .schnappsEnv$restoreHistory = TRUE
+          filesxInfo =  sxFiles %>% file.info()
+          latestsxFile = filesxInfo %>% pull("ctime") %>% order()  %>% last()
+          inp = tempEnv$inp
+          if(!"file1" %in% names(inp) | is.null(inp$file1)) {
+            inp$file1 = data.frame(name="dummy name",  size = 0, type = "", datapath = "")
+          }
+          inp$file1$datapath = rownames(filesxInfo)[latestsxFile]
+          .schnappsEnv$inputFile = inp$file1
+          
+          fileRmdInfo =  rmdFiles %>% file.info()
+          latestRmdFile = fileRmdInfo %>% pull("ctime") %>% order()  %>% last()
+          .schnappsEnv$historyFile = rownames(filesxInfo)[latestRmdFile]
+        }else{
+          cat(file = stderr(), "input is null from history file please update SCHNAPPs and start over.")
+        }
+        rm("tempEnv")
+        #scol
+        fileInfo = scolFiles %>% file.info()
+        latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+        tempEnv =  new.env(parent=emptyenv())
+        cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
+        if("scol" %in% cp) {
+          sampleCols$colPal <- unlist(tempEnv$scol$scol)
+        }
+        rm("tempEnv")
+        fileInfo = ccolFiles %>% file.info()
+        latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+        tempEnv =  new.env(parent=emptyenv())
+        cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
+        if("ccol" %in% cp) {
+          clusterCols$colPal <- unlist(tempEnv$ccol$ccol)
+        }
+        rm("tempEnv")
+        
+        cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
+        cat(file = stderr(),  "\n")
+        tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
+        cp = load(file = tfile)
+        if(all(c("prjs", "newPrjs") %in% cp)){
+          sessionProjections$prjs = prjs
+          projectionsTable$newProjections = newPrjs
+        }
+       
+        # derived/modified projections from projections tab
+        deepDebug()
+        .schnappsEnv$reportTempDir = oldTmpFolder
+        
+
+      } else { 
+        # create directory with name and Rmd file
+        createHistory(.schnappsEnv)
+      }
+      
+    } else {
+      rm("historyPath", envir = .schnappsEnv)
+    }
+  }
+  
+  
   
 } # END SERVER
 

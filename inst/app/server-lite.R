@@ -219,7 +219,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # overwrite all reactives not needed or modified
   base::source(paste0(packagePath, "/reactives-lite.R"), local = TRUE)
   cat(file = stderr(), "HALL============================\n")
-  # browser()
+  # deepDebug()
   .schnappsEnv$projectionFunctions <- projectionFunctions
   
   # overwrite reactives that should not be calculatated anymore

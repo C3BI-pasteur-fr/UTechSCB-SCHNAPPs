@@ -121,7 +121,7 @@ coE_heatmapSelectedReactive <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_heatmapSelectedReactive", id = "coE_heatmapSelectedReactive", duration = NULL)
   }
-  
+  # deepDebug()
   scEx_log <- scEx_log()
   projections <- projections()
   clicked <- input$updateHeatMapSelectedParameters
@@ -134,19 +134,19 @@ coE_heatmapSelectedReactive <- reactive({
   ccols <- isolate(clusterCols$colPal)
   # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
   
-  
   if (is.null(scEx_log) ||is.null(scCells) || length(scCells) == 0 ||
       is.null(projections)) {
     # output$coE_heatmapNull = renderUI(tags$h3(tags$span(style="color:red", "please select some cells")))
-    return(
-      list(
-        src = "empty.png",
-        contentType = "image/png",
-        width = 96,
-        height = 96,
-        alt = "heatmap should be here"
-      )
-    )
+    return(NULL)
+    # return(
+    #   list(
+    #     src = "empty.png",
+    #     contentType = "image/png",
+    #     width = 96,
+    #     height = 96,
+    #     alt = "heatmap should be here"
+    #   )
+    # )
   }
   # else {
   # output$coE_heatmapNull = NULL
@@ -299,10 +299,15 @@ coE_topExpCCTable <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("coE_topExpCCTable", id = "coE_topExpCCTable", duration = NULL)
   }
-  # browser()
+  # deepDebug()
   scEx_log <- scEx_log()
   projections <- projections()
-  
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "pca:NULL\n")
+    }
+    return(NULL)
+  }
   clicked <- input$updatetopCCGenesSelectedParameters
   
   genesin <- isolate(input$coE_heatmapselected_geneids)
@@ -820,24 +825,6 @@ observe(label = "save2histVio2", {
 #' Update x/y axis selection possibilities for violin plot
 #' could probably be an observer, but it works like this as well...
 # .schnappsEnv$coE_vioGrp <- "sampleNames"
-observe(label = "ob16", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
-  .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
-})
-
-observe(label = "ob16a", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
-  .schnappsEnv$coE_vioGrp2 <- input$coE_dimension_xVioiGrp2
-})
-observe(label = "ob16b", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
-  .schnappsEnv$alluiv1 <- input$alluiv1
-})
-observe(label = "ob16c", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
-  .schnappsEnv$alluiv2 <- input$alluiv2
-})
-
 
 
 coE_updateInputXviolinPlot <- observe({
@@ -873,6 +860,10 @@ coE_updateInputXviolinPlot <- observe({
   )
 })
 
+
+observe(label = "obs_coE_heatmap_geneids", x= {
+  .schnappsEnv$defaultValues[["coE_heatmap_geneids"]] = input$coE_heatmap_geneids
+})
 
 # coE_heatmapReactive -------
 # reactive for module pHeatMapModule
@@ -942,6 +933,7 @@ coE_heatmapReactive <- reactive({
     genesin =  paste(featureData[markerlist, "symbol"], collapse  = ", ")
     updateTextInput(session = session, inputId = "coE_heatmap_geneids",
                     value = genesin)
+    
   }
   
   

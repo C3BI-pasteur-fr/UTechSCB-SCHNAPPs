@@ -27,25 +27,25 @@ clusterUI <- function(id) {
     fluidRow(
       column(
         width = 6,
-        textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = defaultValue(ns("geneIds"), ""))
+        sc_textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = defaultValue(ns("geneIds"), ""))
       ),
       column(
         width = 6,
-        textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes2", value = defaultValue(ns("geneIds2"), ""))
+        sc_textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes2", value = defaultValue(ns("geneIds2"), ""))
       )
     ),
     fluidRow(
       column(
         width = 4,
-        selectInput(ns("dimension_x"),
+        {sc_selectInput(ns("dimension_x"),
                     label = "X",
                     choices = c(defaultValue(ns("dimension_x"), "tsne1"), "tsne2", "tsne3"),
                     selected = defaultValue(ns("dimension_x"), "tsne1")
-        )
+        )}
       ),
       column(
         width = 4,
-        selectInput(ns("dimension_y"),
+        sc_selectInput(ns("dimension_y"),
                     label = "Y",
                     choices = c("tsne1", defaultValue(ns("dimension_y"), "tsne2"), "tsne3"),
                     selected = defaultValue(ns("dimension_y"), "tsne2")
@@ -53,7 +53,7 @@ clusterUI <- function(id) {
       ),
       column(
         width = 4,
-        selectInput(ns("dimension_col"),
+        sc_selectInput(ns("dimension_col"),
                     label = "color",
                     choices = c(defaultValue(ns("dimension_col"), "sampleNames")),
                     selected = defaultValue(ns("dimension_col"), "sampleNames")
@@ -79,15 +79,15 @@ clusterUI <- function(id) {
         fluidRow(
           column(
             width = 3,
-            checkboxInput(ns("logX"), "log transform X", value = defaultValue(ns("logX"), FALSE))
+            sc_checkboxInput(ns("logX"), "log transform X", value = defaultValue(ns("logX"), FALSE))
           ),
           column(
             width = 3,
-            checkboxInput(ns("logY"), "log transform Y", value = defaultValue(ns("logY"), FALSE))
+            sc_checkboxInput(ns("logY"), "log transform Y", value = defaultValue(ns("logY"), FALSE))
           ),
           column(
             width = 3,
-            selectInput(ns("divideXBy"),
+            sc_selectInput(ns("divideXBy"),
                         label = "Divide X by",
                         # choices = c("None", "Gene.count", "UMI.count"),
                         choices = c(defaultValue(ns("divideXBy"), "None"), "UmiCountPerGenes", "UmiCountPerGenes2"),
@@ -96,7 +96,7 @@ clusterUI <- function(id) {
           ),
           column(
             width = 3,
-            selectInput(ns("divideYBy"),
+            sc_selectInput(ns("divideYBy"),
                         label = "Divide Y by",
                         # choices = c("None", "Gene.count", "UMI.count"),
                         choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2", "normByCol"),
@@ -107,16 +107,16 @@ clusterUI <- function(id) {
         fluidRow(
           column(
             width = 12,
-            checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", TRUE),
-            list(textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = ""),
-            selectInput(ns("groupNames"),
+            sc_checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", defaultValue(ns("groupNames"), TRUE)),
+            list(sc_textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = ""),
+            sc_selectInput(ns("groupNames"),
                         label = "group names, !When modifying a group this list of cells is used as a reference!",
                         choices = c(defaultValue(ns("groupNames"), "plot"), "all", "none"),
                         selected = defaultValue(ns("groupNames"), "plot")
             ),
             verbatimTextOutput(ns("nCellsVisibleSelected")),
             actionButton(ns("changeGroups"), "change current selection")) %>% setId("groupTutorial"),
-            checkboxInput(ns("showCells"), "show cell names", defaultValue(ns("showCells"), FALSE)),
+            sc_checkboxInput(ns("showCells"), "show cell names", defaultValue(ns("showCells"), FALSE)),
             verbatimTextOutput(ns("cellSelection")),
             actionButton(ns("save2Hist"), "save to history"),
             uiOutput(ns("additionalOptions")) # TODO:is this still needed???
@@ -126,7 +126,7 @@ clusterUI <- function(id) {
     )
     # ,
     # fluidRow(column(width = 6,
-    #                 checkboxInput(ns("moreOptions"), "show more options", FALSE),
+    #                 sc_checkboxInput(ns("moreOptions"), "show more options", FALSE),
     # )
     # )
   )
@@ -163,19 +163,19 @@ tableSelectionUi <- function(id) {
       fluidRow(
         column(
           width = 3,
-          checkboxInput(ns("selectAll"), "Select all rows", FALSE)
+          sc_checkboxInput(ns("selectAll"), "Select all rows", FALSE)
         ),
         column(
           width = 3,
-          checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)
+          sc_checkboxInput(ns("reorderCells"), "reorder cells by sum of selected genes", FALSE)
         ),
         column(
           width = 3,
-          checkboxInput(ns("showAllCells"), "show all columns", defaultValue(ns("showAllCells"), FALSE))
+          sc_checkboxInput(ns("showAllCells"), "show all columns", defaultValue(ns("showAllCells"), FALSE))
         ),
         column(
           width = 3,
-          checkboxInput(ns("showRowNames"),"show row names", defaultValue(ns("showRowNames"), FALSE))
+          sc_checkboxInput(ns("showRowNames"),"show row names", defaultValue(ns("showRowNames"), FALSE))
         )
       ),
       br(),
@@ -208,7 +208,8 @@ pHeatMapUI <- function(id) {
         )),
       fluidRow(
         column(width = 12,
-               verbatimTextOutput(ns("pHeatMapPlotSelection")))
+               verbatimTextOutput(ns("pHeatMapPlotSelection"))
+               )
       ),
       shinydashboard::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
@@ -216,16 +217,16 @@ pHeatMapUI <- function(id) {
         fluidRow(
           column(
             width = 12,
-            # checkboxInput(ns("moreOptions"), "show more options", FALSE),
-            # checkboxInput(ns("showColTree"), label = "Show tree for cells", value = defaultValue(ns("showColTree"),FALSE)),
-            selectInput(
+            # sc_checkboxInput(ns("moreOptions"), "show more options", FALSE),
+            # sc_checkboxInput(ns("showColTree"), label = "Show tree for cells", value = defaultValue(ns("showColTree"),FALSE)),
+            sc_selectInput(
               ns("sortingCols"),
               label = "order columns by",
               choices = c("dendrogram", "list", "gene (click)"),
               selected = defaultValue(ns("sortingCols"), "list"),
               multiple = FALSE
             ),
-            selectInput(
+            sc_selectInput(
               ns("sortingRows"),
               label = "order rows by",
               choices = c("dendrogram", "list"),
@@ -237,12 +238,12 @@ pHeatMapUI <- function(id) {
         fluidRow(
           column(
             width = 6,
-            selectInput(ns("normRow"),
+            sc_selectInput(ns("normRow"),
                         label = "scale by row (for color)",
                         choices = c("row", "column", "row_order", "col_order", defaultValue(ns("normRow"), "none")),
                         selected = defaultValue(ns("normRow"), "none")
             ),
-            selectInput(
+            sc_selectInput(
               ns("ColNames"),
               label = "group names",
               choices = defaultValue(ns("ColNames"), "sampleNames"),
@@ -250,7 +251,7 @@ pHeatMapUI <- function(id) {
               multiple = TRUE
             ),
             
-            selectInput(
+            sc_selectInput(
               ns("orderNames"),
               label = "order of columns",
               choices = defaultValue(ns("orderNames"), "sampleNames"),
@@ -267,22 +268,22 @@ pHeatMapUI <- function(id) {
           ),
           column(
             width = 6,
-            # numericInput(
+            # sc_numericInput(
             #   ns("heatmapWidth"),
             #   label = "width of image in pixel",
             #   min = 100, max = 20000, step = 10,
             #   value = defaultValue(ns("heatmapWidth"),800)
             # ),
-            # numericInput(
+            # sc_numericInput(
             #   ns("heatmapHeight"),
             #   label = "height of image in pixel",
             #   min = 200, max = 20000, step = 10,
             #   value = defaultValue(ns("heatmapHeight"), 300)
             # ),
-            textInput(ns("heatMapGrpName"),"name selected cells"),
+            sc_textInput(ns("heatMapGrpName"),"name selected cells"),
             actionButton(ns("heatMapGrpNameButton"),"create projection"),
             br(),
-            selectInput(
+            sc_selectInput(
               ns("colPal"),
               label = "color palette to choose from",
               choices = c("none", "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", 
@@ -318,7 +319,7 @@ pHeatMapUI <- function(id) {
           )
         )
         
-        # checkboxInput(ns("showCells"), "show cell names", FALSE),
+        # sc_checkboxInput(ns("showCells"), "show cell names", FALSE),
         #
         # verbatimTextOutput(ns('cellSelection'))
       ) # box
@@ -336,7 +337,7 @@ cellSelectionUI <- function(id) {
       column(
         width = 6,
         # uiOutput("DE_clusterSelectionPanelPlot")
-        selectInput(
+        sc_selectInput(
           inputId = ns("Mod_clusterPP"), label = "Clusters/Factor to use",
           choices = c(defaultValue(ns("Mod_clusterPP"), "dbCluster"), "sampleNames"),
           selected = defaultValue(ns("Mod_clusterPP"), "dbCluster")
@@ -344,7 +345,7 @@ cellSelectionUI <- function(id) {
       ),
       column(
         width = 6,
-        selectInput(
+        sc_selectInput(
           inputId = ns("Mod_PPGrp"), label = "Values to use",
           choices = c(defaultValue(ns("Mod_PPGrp"), "1"), "2"), selected = defaultValue(ns("Mod_PPGrp"), "1"), multiple = TRUE
         )

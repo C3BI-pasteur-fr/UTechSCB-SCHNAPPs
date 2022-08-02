@@ -84,7 +84,7 @@ if (!AllowClustering)
     
       
     
-    # browser()
+    # deepDebug()
     
     # todo colData() now returns a s4 object of class DataFrame
     # not sure what else is effected...
@@ -110,14 +110,13 @@ if (!AllowClustering)
     #     if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2], "\n"))
     #     assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
     #     if (.schnappsEnv$DEBUGSAVE) {
-    #       save(
-    #         file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
+    #       save(file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
     #         list = c("tmp")
     #       )
     #       iter <- iter + 1
     #     }
     #     # load(file="~/SCHNAPPsDebug/projections.1.RData")
-    #     # browser()
+    #     # deepDebug()
     #     # TODO here, dbCluster is probably overwritten and appended a ".1"
     #     if (is(tmp, "data.frame")) {
     #       cn <- make.names(c(colnames(projections), colnames(tmp)), unique = TRUE)
@@ -307,7 +306,7 @@ DE_scaterPNG <- reactive({
       return(NULL)
     }
   )
-  # browser()
+  # deepDebug()
   retVal <- list(
     src = normalizePath(outfile, mustWork = FALSE),
     contentType = "image/png",

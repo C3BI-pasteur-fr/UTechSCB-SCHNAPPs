@@ -549,7 +549,7 @@ sCA_dge <- reactive({
   # tools:::makeLazyLoadDB(lazyLoad, "Huge")
   # lazyLoad("Huge")
   # objNames <- ls()
-  # browser()
+  # deepDebug()
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions) == method) / 2)
   dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
   gCells <- sCA_getCells(projections, cl1 = cellNs, db1, db2)
@@ -626,78 +626,6 @@ sCA_dge <- reactive({
 .schnappsEnv$subClusterDim1 <- "PC1"
 .schnappsEnv$subClusterDim2 <- "PC2"
 .schnappsEnv$subClusterClusters <- NULL
-
-observe(label = "ob7", {
-  if (DEBUG) cat(file = stderr(), "observe: sCA_subscluster_x1\n")
-  .schnappsEnv$subClusterDim1 <- input$sCA_subscluster_x1
-})
-
-observe(label = "ob8", {
-  if (DEBUG) cat(file = stderr(), "observe: sCA_subscluster_y1\n")
-  .schnappsEnv$subClusterDim2 <- input$sCA_subscluster_y1
-})
-
-#' TODO
-#' if this observer is really needed we need to get rid of projections
-observe(label = "ob9", {
-  if (DEBUG) cat(file = stderr(), "observe: projections\n")
-  projections <- projections()
-  if (!is.null(projections)) {
-    noOfClusters <- levels(as.factor(projections$dbCluster))
-    # noOfClusters <- max(as.numeric(as.character(projections$dbCluster)))
-    if (is.null(.schnappsEnv$subClusterClusters)) {
-      .schnappsEnv$subClusterClusters <- noOfClusters
-    }
-  }
-})
-
-observe(label = "ob10", {
-  if (DEBUG) cat(file = stderr(), "observe: sCA_dgeClustersSelection\n")
-  .schnappsEnv$subClusterClusters <- input$sCA_dgeClustersSelection
-})
-
-
-# subcluster axes ----
-# update axes in subcluster analysis
-observeEvent(projections(), {
-  if (DEBUG) cat(file = stderr(), "updateInputSubclusterAxes started.\n")
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "updateInputSubclusterAxes")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "updateInputSubclusterAxes")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("updateInputSubclusterAxes", id = "updateInputSubclusterAxes", duration = NULL)
-  }
-  
-  projections <- projections()
-  # we combine the group names with the projections to add ability to select groups
-  # gn <- groupNames$namesDF
-  # Can use character(0) to remove all choices
-  if (is.null(projections)) {
-    return(NULL)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls()))
-  }
-  # load(file="~/SCHNAPPsDebug/updateInputSubclusterAxes.RData")
-  # if (length(gn) > 0) {
-  #   projections <- cbind(projections, gn[rownames(projections), ] * 1)
-  # }
-  # Can also set the label and select items
-  updateSelectInput(session, "sCA_subscluster_x1",
-                    choices = colnames(projections),
-                    selected = .schnappsEnv$subClusterDim1
-  )
-  
-  updateSelectInput(session, "sCA_subscluster_y1",
-                    choices = colnames(projections),
-                    selected = .schnappsEnv$subClusterDim2
-  )
-})
-
 
 
 #' subCluster2Dplot

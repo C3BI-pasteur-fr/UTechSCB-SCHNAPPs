@@ -28,8 +28,7 @@ for (fp in parFiles) {
   myNormalizationParameters <- list()
   source(fp, local = TRUE)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
+    save(file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
       list = c("normaliztionParameters", ls())
     )
   }
@@ -66,6 +65,118 @@ for (fp in parFiles) {
     }
   }
 }
+
+
+observe(label ="obs_pcaRank", x = {
+  .schnappsEnv$defaultValues[["pcaRank"]] = input$pcaRank
+})
+observe(label ="obs_normalizationRadioButton", x = {
+  .schnappsEnv$defaultValues[["normalizationRadioButton"]] = input$normalizationRadioButton
+})
+observe(label ="obs_cellSelectionComment", x = {
+  .schnappsEnv$defaultValues[["cellSelectionComment"]] = input$cellSelectionComment
+})
+observe(label ="obs_cellsFiltersOut", x = {
+  .schnappsEnv$defaultValues[["cellsFiltersOut"]] = input$cellsFiltersOut
+})
+observe(label ="obs_cellKeepOnly", x = {
+  .schnappsEnv$defaultValues[["cellKeepOnly"]] = input$cellKeepOnly
+})
+observe(label ="obs_cellKeep", x = {
+  .schnappsEnv$defaultValues[["cellKeep"]] = input$cellKeep
+})
+observe(label ="obs_cellPatternRM", x = {
+  .schnappsEnv$defaultValues[["cellPatternRM"]] = input$cellPatternRM
+})
+observe(label ="obs_maxGenes", x = {
+  .schnappsEnv$defaultValues[["maxGenes"]] = input$maxGenes
+})
+observe(label ="obs_minGenes", x = {
+  .schnappsEnv$defaultValues[["minGenes"]] = input$minGenes
+})
+observe(label ="obs_minNonExpGenes", x = {
+  .schnappsEnv$defaultValues[["minNonExpGenes"]] = input$minNonExpGenes
+})
+observe(label ="obs_minExpGenes", x = {
+  .schnappsEnv$defaultValues[["minExpGenes"]] = input$minExpGenes
+})
+observe(label ="obs_genesKeep", x = {
+  .schnappsEnv$defaultValues[["genesKeep"]] = input$genesKeep
+})
+observe(label ="obs_minGenesGS", x = {
+  .schnappsEnv$defaultValues[["minGenesGS"]] = input$minGenesGS
+})
+observe(label ="obs_selectIds", x = {
+  .schnappsEnv$defaultValues[["selectIds"]] = input$selectIds
+})
+observe(label ="obs_whichscLog", x = {
+  .schnappsEnv$defaultValues[["whichscLog"]] = input$whichscLog
+})
+observe(label ="obs_subsampleNum", x = {
+  .schnappsEnv$defaultValues[["subsampleNum"]] = input$subsampleNum
+})
+observe(label ="obs_sampleInput", x = {
+  .schnappsEnv$defaultValues[["sampleInput"]] = input$sampleInput
+})
+
+observe(label ="obs_simlr_maxClust", x = {
+  .schnappsEnv$defaultValues[["simlr_maxClust"]] = input$simlr_maxClust
+})
+observe(label ="obs_simlr_nClust", x = {
+  .schnappsEnv$defaultValues[["simlr_nClust"]] = input$simlr_nClust
+})
+observe(label ="obs_snnType", x = {
+  .schnappsEnv$defaultValues[["snnType"]] = input$snnType
+})
+observe(label ="obs_snnClusterSource", x = {
+  .schnappsEnv$defaultValues[["snnClusterSource"]] = input$snnClusterSource
+})
+observe(label ="obs_geneSelectionClustering", x = {
+  .schnappsEnv$defaultValues[["geneSelectionClustering"]] = input$geneSelectionClustering
+})
+observe(label ="obs_useRanks", x = {
+  .schnappsEnv$defaultValues[["useRanks"]] = input$useRanks
+})
+observe(label ="obs_minClusterSize", x = {
+  .schnappsEnv$defaultValues[["minClusterSize"]] = input$minClusterSize
+})
+observe(label ="obs_clusterMethod", x = {
+  .schnappsEnv$defaultValues[["clusterMethod"]] = input$clusterMethod
+})
+observe(label ="obs_clusterSource", x = {
+  .schnappsEnv$defaultValues[["clusterSource"]] = input$clusterSource
+})
+observe(label ="obs_seurClustresolution", x = {
+  .schnappsEnv$defaultValues[["seurClustresolution"]] = input$seurClustresolution
+})
+observe(label ="obs_seurClustk.param", x = {
+  .schnappsEnv$defaultValues[["seurClustk.param"]] = input$seurClustk.param
+})
+observe(label ="obs_seurClustDims", x = {
+  .schnappsEnv$defaultValues[["seurClustDims"]] = input$seurClustDims
+})
+observe(label ="obs_tabsetCluster", x = {
+  .schnappsEnv$defaultValues[["tabsetCluster"]] = input$tabsetCluster
+})
+observe(label ="obs_genesRMPCA", x = {
+  .schnappsEnv$defaultValues[["genesRMPCA"]] = input$genesRMPCA
+})
+observe(label ="obs_genes4PCA", x = {
+  .schnappsEnv$defaultValues[["genes4PCA"]] = input$genes4PCA
+})
+observe(label ="obs_useSeuratPCA", x = {
+  .schnappsEnv$defaultValues[["useSeuratPCA"]] = input$useSeuratPCA
+})
+observe(label ="obs_hvgSelection", x = {
+  .schnappsEnv$defaultValues[["hvgSelection"]] = input$hvgSelection
+})
+observe(label ="obs_pcaScale", x = {
+  .schnappsEnv$defaultValues[["pcaScale"]] = input$pcaScale
+})
+observe(label ="obs_pcaN", x = {
+  .schnappsEnv$defaultValues[["pcaN"]] = input$pcaN
+})
+
 
 output$noLogWarning <- renderText({
   logCalc <- input$whichscLog
@@ -164,8 +275,7 @@ output$normalizationsParametersDynamic <- renderUI({
   selectedChoice <- input$normalizationRadioButton
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
+    save(file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
       list = c("normaliztionParameters", ls())
     )
   }
@@ -207,6 +317,7 @@ observeEvent(
   label = "ob20",
   eventExpr = input$updateCellSelectionParameters,
   handlerExpr = {
+    deepDebug()
     if (DEBUG) cat(file = stderr(), "observe updateCellSelectionParameters\n")
     cellSelectionValues(list(
       minExpGenes = input$minExpGenes,
@@ -229,6 +340,7 @@ observeEvent(
 
 observe(label = "ob_cellSelection",
         {
+          deepDebug()
           if (DEBUG) cat(file = stderr(), "observe ob_cellSelection\n")
           setRedGreenButtonCurrent(
             vars = list(
@@ -251,6 +363,7 @@ observe(label = "ob_cellSelection",
 
 # observe: clustering Button ----
 ob_clusteringParams <- observe(label = "ob_clusteringParams", {
+  deepDebug()
   if (DEBUG) cat(file = stderr(), "observe ob_clusteringParams\n")
   
   # this happens when the lite version is used
@@ -288,6 +401,7 @@ observeEvent(
   label = "ob21",
   eventExpr = input$updateGeneSelectionParameters,
   handlerExpr = {
+    deepDebug()
     geneSelectionValues(list(
       selectIds = input$selectIds,
       geneListSelection = input$geneListSelection,
@@ -305,6 +419,7 @@ observeEvent(
 
 observe(label = "ob_geneSelection", 
         {
+          deepDebug()
           if (DEBUG) cat(file = stderr(), "observe ob_geneSelection\n")
           setRedGreenButtonCurrent(
             vars = list(
@@ -348,8 +463,7 @@ output$summaryStatsSideBar <- renderUI({
   infile <- inputFile$inFile
   normalizationRadioButton <- input$normalizationRadioButton
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
+    save(file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
       list = c("normaliztionParameters", ls())
     )
   }
@@ -438,8 +552,7 @@ output$geneListSelection <- shinyTree::renderTree({
 #     return(NULL)
 #   }
 #   if (.schnappsEnv$DEBUGSAVE) {
-#     save(
-#       file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
+#     save(file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
 #       list = c("normaliztionParameters", ls())
 #     )
 #   }
@@ -482,8 +595,7 @@ output$geneListSelection <- shinyTree::renderTree({
 #   useGenes <- !useGenes
 #
 #   if (.schnappsEnv$DEBUGSAVE) {
-#     save(
-#       file = "~/SCHNAPPsDebug/removedGenesTable.RData",
+#     save(file = "~/SCHNAPPsDebug/removedGenesTable.RData",
 #       list = c("normaliztionParameters", ls())
 #     )
 #   }
@@ -542,7 +654,7 @@ output$DEBUGSAVEstring <- renderText({
 })
 
 # output$currentTabInfo <- renderText({
-#   # browser()
+#   # deepDebug()
 #   str(input$sideBarID)
 # })
 
@@ -583,8 +695,7 @@ output$descriptOfWorkOutput <- renderPrint({
 #     return(NULL)
 #   }
 #   if (.schnappsEnv$DEBUGSAVE) {
-#     save(
-#       file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
+#     save(file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
 #       list = c("normaliztionParameters", ls())
 #     )
 #   }
@@ -618,8 +729,7 @@ output$ColorSelection <- renderUI({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
+    save(file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
       list = c("normaliztionParameters", ls())
     )
   }
@@ -629,7 +739,7 @@ output$ColorSelection <- renderUI({
   # cols <- gg_fill_hue(length(lev))
   lev1 <- levels(projections$dbCluster)
   lev2 <- levels(colData(scEx)$sampleNames)
-  # browser()
+  # deepDebug()
   tmpFun <- function(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors){
     tabPanel(
       name, value = value,
@@ -667,8 +777,7 @@ output$ColorSelection <- renderUI({
 #     return(NULL)
 #   }
 #   if (.schnappsEnv$DEBUGSAVE) {
-#     save(
-#       file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
+#     save(file = "~/SCHNAPPsDebug/clusterColorSelection.RData",
 #       list = c("normaliztionParameters", ls())
 #     )
 #   }
@@ -696,7 +805,7 @@ output$ColorSelection <- renderUI({
 
 # askComment <- function(failed = FALSE) {
 #   modalDialog(
-#     textInput("HistComment", "add a comment", value = paste("created at ",date())),
+#     sc_textInput("HistComment", "add a comment", value = paste("created at ",date())),
 #     footer = tagList(
 #       modalButton("Cancel"),
 #       actionButton("HistCommentok", "OK")
@@ -744,6 +853,7 @@ observeEvent(
   label = "ob22",
   eventExpr = input$updateColors,
   handlerExpr = {
+    deepDebug()
     cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
     scExx <- scEx()
     projections <- projections()
@@ -769,6 +879,7 @@ observeEvent(
     
     # isolate({
     sampleCols$colPal <- unlist(inCols)
+    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
     # })
     
     # cluster colors
@@ -789,6 +900,8 @@ observeEvent(
     
     # isolate({
     clusterCols$colPal <- unlist(inCols)
+    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
+    
     # })
     setRedGreenButton(
       vars = list(
@@ -802,6 +915,7 @@ observeEvent(
 
 # observe: color selection----
 observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
+  deepDebug()
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
   scEx <- scEx()
@@ -917,7 +1031,7 @@ output$RDSsave <- downloadHandler(
       save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
-    
+    deepDebug()
     scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
     
     # we save the pca separately because I don't know how to store the rotation  otherwise.
@@ -927,7 +1041,7 @@ output$RDSsave <- downloadHandler(
     if(!is.null(pca)){
       saveList = c(saveList, "pca")
     }
-    # browser()
+    # deepDebug()
     # save projections that shouldn't be recalculated in lite version
     if (length(.schnappsEnv$projectionFunctions) > 0){
       for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
@@ -1086,11 +1200,16 @@ scranWarning <- function() {
   )
 }
 
+
+
+
+
 # handle long executions ----
 observeEvent(
   label = "ob23",
   eventExpr = input$clusterMethod,
   handlerExpr = {
+    deepDebug()
     if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterMethod\n"))
     if (input$clusterMethod == "hclust") {
       showModal(scranWarning())
@@ -1104,6 +1223,7 @@ observeEvent(
   label = "ob24",
   eventExpr = input$clusterSource,
   handlerExpr = {
+    deepDebug()
     if (DEBUG) cat(file = stderr(), paste0("observe: input$clusterSource\n"))
     # if (input$clusterSource == "logcounts") {
     #   showModal(scranWarning())
@@ -1118,6 +1238,7 @@ observeEvent(
   label = "ob25",
   eventExpr = input$scranWarning_cancel,
   handlerExpr = {
+    deepDebug()
     updateSelectInput(session, "clusterMethod",
                       selected = "igraph"
     )
@@ -1131,6 +1252,7 @@ observeEvent(
   label = "ob26",
   eventExpr = input$scranWarning_ok,
   handlerExpr = {
+    deepDebug()
     if (input$clusterMethod == "hclust") {
       clusterMethodReact$clusterMethod <- "hclust"
     }
@@ -1145,6 +1267,7 @@ observeEvent(
 
 observe(label = "ob_pca",
         {
+          deepDebug()
           if (DEBUG) cat(file = stderr(), "observe ob_pca\n")
           # out <- pcaReact()
           # if (is.null(out)) {
@@ -1221,6 +1344,7 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
 
 # about modal ----
 observeEvent(input$AboutApp,{
+  deepDebug()
   showModal(modalDialog(
     title = "About SCHNAPPs",
     tags$a(tags$b("Here comes the about text")),
@@ -1238,6 +1362,7 @@ inputHelpIJS <- tryCatch(read.delim(system.file("extdata", "inputHelpIJS.txt",pa
 # inputHelpIJS<- read.delim("inst/extdata/inputHelpIJS.txt", sep=";", stringsAsFactors = FALSE)
 
 observeEvent(input$inputHelp, {
+  deepDebug()
   cat(file = stderr(), paste("inputHelp started\n"))
   cat(file = stderr(), apply(inputHelpIJS, 1, FUN = function(x) if(length(x)>0)cat(file = stderr(), paste(x, "\n"))))
   introjs(session,

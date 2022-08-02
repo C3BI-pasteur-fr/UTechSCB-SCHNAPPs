@@ -26,6 +26,79 @@ observe(label = "ob5", {
   .schnappsEnv$gQC_col <- input$gQC_col3D
 })
 
+observe(label = "obs_gQC_tsnePerplexity", x = {
+  .schnappsEnv$defaultValues[["gQC_tsnePerplexity"]] = input$gQC_tsnePerplexity
+})
+observe(label = "obs_gQC_tsneSeed", x = {
+  .schnappsEnv$defaultValues[["gQC_tsneSeed"]] = input$gQC_tsneSeed
+})
+observe(label = "obs_gQC_tsneTheta", x = {
+  .schnappsEnv$defaultValues[["gQC_tsneTheta"]] = input$gQC_tsneTheta
+})
+observe(label = "obs_gQC_tsneDim", x = {
+  .schnappsEnv$defaultValues[["gQC_tsneDim"]] = input$gQC_tsneDim
+})
+
+observe(label = "obs_gQC_dim3D_x", x = {
+  .schnappsEnv$defaultValues[["gQC_dim3D_x"]] = input$gQC_dim3D_x
+})
+observe(label = "obs_gQC_dim3D_y", x = {
+  .schnappsEnv$defaultValues[["gQC_dim3D_y"]] = input$gQC_dim3D_y
+})
+observe(label = "obs_gQC_dim3D_z", x = {
+  .schnappsEnv$defaultValues[["gQC_dim3D_z"]] = input$gQC_dim3D_z
+})
+observe(label = "obs_gQC_col3D", x = {
+  .schnappsEnv$defaultValues[["gQC_col3D"]] = input$gQC_col3D
+})
+observe(label = "obs_gQC_um_spread", x = {
+  .schnappsEnv$defaultValues[["gQC_um_spread"]] = input$gQC_um_spread
+})
+observe(label = "obs_gQC_um_n_components", x = {
+  .schnappsEnv$defaultValues[["gQC_um_n_components"]] = input$gQC_um_n_components
+})
+observe(label = "obs_gQC_um_n_neighbors", x = {
+  .schnappsEnv$defaultValues[["gQC_um_n_neighbors"]] = input$gQC_um_n_neighbors
+})
+observe(label = "obs_gQC_um_init", x = {
+  .schnappsEnv$defaultValues[["gQC_um_init"]] = input$gQC_um_init
+})
+
+observe(label = "obs_gQC_um_negative_sample_rate", x = {
+  .schnappsEnv$defaultValues[["gQC_um_negative_sample_rate"]] = input$gQC_um_negative_sample_rate
+})
+
+observe(label = "obs_gQC_um_randSeed", x = {
+  .schnappsEnv$defaultValues[["gQC_um_randSeed"]] = input$gQC_um_randSeed
+})
+
+observe(label = "obs_gQC_um_local_connectivity", x = {
+  .schnappsEnv$defaultValues[["gQC_um_local_connectivity"]] = input$gQC_um_local_connectivity
+})
+observe(label ="obs_gQC_um_bandwidth", x = {
+  .schnappsEnv$defaultValues[["gQC_um_bandwidth"]] = input$gQC_um_bandwidth
+})
+
+observe(label ="obs_gQC_um_n_epochs", x = {
+  .schnappsEnv$defaultValues[["gQC_um_n_epochs"]] = input$gQC_um_n_epochs
+})
+
+observe(label ="obs_gQC_um_set_op_mix_ratio", x = {
+  .schnappsEnv$defaultValues[["gQC_um_set_op_mix_ratio"]] = input$gQC_um_set_op_mix_ratio
+})
+
+observe(label ="obs_gQC_um_metric", x = {
+  .schnappsEnv$defaultValues[["gQC_um_metric"]] = input$gQC_um_metric
+})
+
+observe(label ="obs_gQC_um_min_dist", x = {
+  .schnappsEnv$defaultValues[["gQC_um_min_dist"]] = input$gQC_um_min_dist
+})
+observe(label ="obs_gQC_binSize", x = {
+  .schnappsEnv$defaultValues[["gQC_binSize"]] = input$gQC_binSize
+})
+
+
 # gQC_update3DInput ----
 #' gQC_update3DInput
 #' update axes for tsne display
@@ -74,7 +147,7 @@ gQC_update3DInput <- reactive({
 observe(label = "ob_UMAPParams", {
   # save(file = "~/SCHNAPPsDebug/ob_UMAPParams.RData", list = c(ls(), ".schnappsEnv"))
   # load("~/SCHNAPPsDebug/updateButtonColor.RData")
-  # browser()
+  deepDebug()
   if (DEBUG) cat(file = stderr(), "observe umapVars\n")
   
   input$activateUMAP
@@ -109,6 +182,7 @@ observe(label = "ob_UMAPParams", {
 
 # observe: cellNameTable_rows_selected ----
 observe(label = "ob_tsneParams", {
+  deepDebug()
   if (DEBUG) cat(file = stderr(), "observe tsneVars\n")
   out <- tsne()
   if (is.null(out)) {
@@ -330,6 +404,7 @@ observeEvent(
   label = "ob30",
   eventExpr = input$updatePrjsButton,
   handlerExpr = {
+    deepDebug()
     if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
     oldPrj <- input$oldPrj
     newPrj <- input$newPrj
@@ -342,13 +417,12 @@ observeEvent(
     }
     
     if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
+      save(file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
         list = c("normaliztionParameters", ls())
       )
     }
     # cp = load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
-    # browser()
+    # deepDebug()
     if (newPrj %in% colnames(projections)) {
       showNotification(
         "New column name already used",
@@ -363,7 +437,7 @@ observeEvent(
       newPrjs[rownames(projections),newPrj] <- projections[, oldPrj, drop = FALSE]
     } else {
       # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[, oldPrj, drop = FALSE])
-      # browser()
+      # deepDebug()
       newPrjs <- dplyr::full_join(
         tibble::rownames_to_column(newPrjs), 
         tibble::rownames_to_column(projections[, oldPrj, drop = FALSE]), 
@@ -383,6 +457,7 @@ observeEvent(
 # })
 
 observe(label = "ob28", {
+  deepDebug()
   input$newPrj
   updateTextInput(session, "newPrj", value = make.names(input$newPrj, unique = TRUE))
 })
@@ -391,6 +466,7 @@ observeEvent(
   label = "ob29",
   eventExpr = input$delPrjsButton,
   handlerExpr = {
+    deepDebug()
     if (DEBUG) cat(file = stderr(), "updatePrjsButton\n")
     newPrjs <- projectionsTable$newProjections
     delPrj <- input$delPrj
@@ -400,10 +476,9 @@ observeEvent(
     if (!delPrj %in% colnames(newPrjs)) {
       return(NULL)
     }
-    # browser()
+    # deepDebug()
     if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/delPrjsButton.RData",
+      save(file = "~/SCHNAPPsDebug/delPrjsButton.RData",
         list = c("normaliztionParameters", ls())
       )
     }
@@ -435,8 +510,7 @@ observeEvent(
     }
     
     if (.schnappsEnv$DEBUGSAVE) {
-      save(
-        file = "~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData",
+      save(file = "~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData",
         list = c("normaliztionParameters", ls())
       )
     }
@@ -449,13 +523,13 @@ observeEvent(
       )
       return(NULL)
     }
-    # browser()
+    # deepDebug()
     combProjections = data.frame(row.names = rownames(projections), 
                                  newPrj=  paste(projections[,prj1], projections[,prj2], sep = " - ") %>% as.factor())
     if (length(levels(combProjections[,1])) > 100) {
       out = showModal(verifyLevelModal(NLevel = length(levels(combProjections[,1]))))
       if (DEBUG) cat(file = stderr(), paste("gQC_updateCombPrjsButton modal out:", out, "\n"))
-      # browser()
+      # deepDebug()
     }
     if (ncol(newPrjs) == 0) {
       newPrjs <- data.frame(row.names = acn)
@@ -463,7 +537,7 @@ observeEvent(
       # rownames(newPrjs) = rownames(projections)
     } else {
       # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], combProjections)
-      # browser()
+      # deepDebug()
       newPrjs <- dplyr::left_join(
         tibble::rownames_to_column(newPrjs), 
         tibble::rownames_to_column(combProjections), 
@@ -483,7 +557,7 @@ output$gQC_orgLevels = renderText({
   shiny::req(rnProj)
   shiny::req(projections)
   if (! rnProj %in% colnames(projections)) return(NULL)
-  # browser()
+  # deepDebug()
   paste(levels(factor(projections[,rnProj])), collapse = ", ")
 })
 
@@ -507,11 +581,12 @@ verifyLevelModal <- function(NLevel, failed = FALSE) {
 observeEvent(eventExpr = input$gQC_raProj,
              label = "raLevBtn",
              handlerExpr = {
+               deepDebug()
                projections <- projections()
                projFactors <- projFactors()
                if(is.null(projections)) return()
                if(is.null(projFactors)) return()
-               # if(!input$gQC_raProj %in% projFactors) return()
+               if(input$gQC_raProj %in% projFactors){
                
                projLevels = levels(projections[,input$gQC_raProj])
                updateOrderInput(
@@ -519,11 +594,20 @@ observeEvent(eventExpr = input$gQC_raProj,
                  'gQC_newRaLev',
                  items = projLevels
                )
+               }else{
+                 updateOrderInput(
+                   session,
+                   'gQC_newRaLev',
+                   items = "not yet"
+                 )
+               }
+               
              }
 )
 observeEvent(eventExpr = input$gQC_rearrangeLevButton,
              label = "raLevBtn",
              handlerExpr = {
+               deepDebug()
                newProjName = make.names(input$gQC_newRaPrj)
                newLevelOrder = input$gQC_newRaLev
                projections = projections()
@@ -534,8 +618,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                  return(NULL)
                }
                if (.schnappsEnv$DEBUGSAVE) {
-                 save(
-                   file = "~/SCHNAPPsDebug/gQC_rearrangeButton.RData",
+                 save(file = "~/SCHNAPPsDebug/gQC_rearrangeButton.RData",
                    list = c("normaliztionParameters", ls())
                  )
                }
@@ -543,7 +626,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                orgLevelNames = levels(factor(projections[,raProj]))
                newLbVec = stringr::str_trim(str_split(newLevelOrder, ","))
                names(newLbVec) = orgLevelNames
-               # browser()
+               # deepDebug()
                # sampe projections as displayed, i.e. only those available for the cells
                # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
                projections[,raProj] =  factor(projections[,raProj])
@@ -556,7 +639,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                      # drop = TRUE: we re interested in the vector not the data frame
                      newPrjs[rownames(projections),newProjName] <- as.character(projections[, raProj, drop = TRUE])
                    } else {
-                     # browser()
+                     # deepDebug()
                      newPrjs <- dplyr::full_join(
                        tibble::rownames_to_column(newPrjs), 
                        tibble::rownames_to_column(projections[, raProj, drop = FALSE]), 
@@ -583,7 +666,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                    }
                    newPrjs[,ncol(newPrjs)] = factor(newPrjs[,ncol(newPrjs)], levels = newLevelOrder)
                  }, error=function(w){
-                   # browser()
+                   # deepDebug()
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
                    showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
                    return(NULL)
@@ -600,6 +683,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
 observeEvent(eventExpr = input$gQC_renameLevButton,
              label = "rnLevBtn",
              handlerExpr = {
+               deepDebug()
                newLables = input$gQC_renameLev
                rnProj = input$gQC_rnProj
                newProjName = make.names(input$gQC_newRnPrj)
@@ -614,13 +698,12 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                names(newLbVec) = orgLevelNames
                
                if (.schnappsEnv$DEBUGSAVE) {
-                 save(
-                   file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
+                 save(file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
                    list = c("normaliztionParameters", ls())
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
-               # browser()
+               # deepDebug()
                # sampe projections as displayed, i.e. only those available for the cells
                # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
                projections[,rnProj] =  factor(projections[,rnProj])
@@ -633,7 +716,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      # drop = TRUE: we re interested in the vector not the data frame
                      newPrjs[rownames(projections),newProjName] <- as.character(projections[, rnProj, drop = TRUE])
                    } else {
-                     # browser()
+                     # deepDebug()
                      newPrjs <- dplyr::full_join(
                        tibble::rownames_to_column(newPrjs), 
                        tibble::rownames_to_column(projections[, rnProj, drop = FALSE]), 
@@ -674,7 +757,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                    }
                    levels(newPrjs[,ncol(newPrjs)]) = stringr::str_trim(newLbVec)
                  }, error=function(w){
-                   # browser()
+                   # deepDebug()
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
                    showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
                    return(NULL)
@@ -689,13 +772,14 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
 observeEvent(eventExpr = input$gQC_rnProj,
              label = "gqc1",
              handlerExpr = {
+               deepDebug()
                rnProj = input$gQC_rnProj
                projections = projections()
                shiny::req(rnProj)
                shiny::req(projections)
                if (! rnProj %in% colnames(projections)) return(NULL)
                
-               # browser()
+               # deepDebug()
                updateTextAreaInput(session, inputId = "gQC_renameLev", value = paste(as.character(levels(factor(projections[,rnProj]))), 
                                                                                      collapse = ", "))
              })
@@ -707,6 +791,7 @@ observeEvent(eventExpr = input$gQC_rnProj,
 .schnappsEnv$gQC_rnProj <- "tsne1"
 
 observe(label = "ob27b", {
+  deepDebug()
   projections <- projections()
   projFactors <- projFactors()
   
@@ -765,6 +850,7 @@ observe(label = "ob27g", {
 observe(label = "ob27h", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_windProj\n")
   .schnappsEnv$gQC_windProj <- input$gQC_windProj
+  .schnappsEnv$defaultValues[["gQC_windProj"]] <- input$gQC_windProj
 })
 observe(label = "ob27i", {
   if (DEBUG) cat(file = stderr(), "observe: gQC_raProj\n")

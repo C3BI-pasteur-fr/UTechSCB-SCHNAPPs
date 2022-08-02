@@ -17,17 +17,61 @@ callModule(
 #' update x/y coordinates that can be chosen based on available
 #' projections
 
+observe(label ="obs_DE_logNormalization_sf", x = {
+  .schnappsEnv$defaultValues[["DE_logNormalization_sf"]] = input$DE_logNormalization_sf
+})
+observe(label ="obs_DE_seuratRefBased_splitby", x = {
+  .schnappsEnv$defaultValues[["DE_seuratRefBased_splitby"]] = input$DE_seuratRefBased_splitby
+})
+observe(label ="obs_DE_seuratSCtransform_split.by", x = {
+  .schnappsEnv$defaultValues[["DE_seuratSCtransform_split.by"]] = input$DE_seuratSCtransform_split.by
+})
+observe(label ="obs_DE_seuratSCtransform_vars2regress", x = {
+  .schnappsEnv$defaultValues[["DE_seuratSCtransform_vars2regress"]] = input$DE_seuratSCtransform_vars2regress
+})
+observe(label ="obs_DE_seuratStandard_splitby", x = {
+  .schnappsEnv$defaultValues[["DE_seuratStandard_splitby"]] = input$DE_seuratStandard_splitby
+})
+observe(label ="obs_DE_seuratLogNorm_var2reg", x = {
+  .schnappsEnv$defaultValues[["DE_seuratLogNorm_var2reg"]] = input$DE_seuratLogNorm_var2reg
+})
+observe(label ="obs_DE_logNormalization_sf", x = {
+  .schnappsEnv$defaultValues[["DE_logNormalization_sf"]] = input$DE_logNormalization_sf
+})
+observe(label ="obs_DE_panelplotids", x = {
+  .schnappsEnv$defaultValues[["DE_panelplotids"]] = input$DE_panelplotids
+})
+observe(label ="obs_DE_seuratSCTnorm_var2reg", x = {
+  .schnappsEnv$defaultValues[["DE_seuratSCTnorm_var2reg"]] = input$DE_seuratSCTnorm_var2reg
+})
+observe(label ="obs_DE_nCol", x = {
+  .schnappsEnv$defaultValues[["DE_nCol"]] = input$DE_nCol
+})
+observe(label ="obs_DE_panelplotSameScale", x = {
+  .schnappsEnv$defaultValues[["DE_panelplotSameScale"]] = input$DE_panelplotSameScale
+})
+observe(label ="obs_DE_expclusters_col", x = {
+  .schnappsEnv$defaultValues[["DE_expclusters_col"]] = input$DE_expclusters_col
+})
+observe(label ="obs_DE_gene_id", x = {
+  .schnappsEnv$defaultValues[["DE_gene_id"]] = input$DE_gene_id
+})
+
+
 observe(label = "ob17x", {
   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_x\n")
   .schnappsEnv$DE_expclusters_x <- input$DE_expclusters_x
+  .schnappsEnv$defaultValues$DE_expclusters_x <- input$DE_expclusters_x
 })
 observe(label = "ob17y", {
   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_y\n")
   .schnappsEnv$DE_expclusters_y <- input$DE_expclusters_y
+  .schnappsEnv$defaultValues$DE_expclusters_y <- input$DE_expclusters_y
 })
 observe(label = "ob17z", {
   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_z\n")
   .schnappsEnv$DE_expclusters_z <- input$DE_expclusters_z
+  .schnappsEnv$defaultValues$DE_expclusters_z <- input$DE_expclusters_z
 })
 # observe(label = "ob17c", {
 #   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_col\n")
@@ -36,18 +80,19 @@ observe(label = "ob17z", {
 observe(label = "ob17d", {
   if (DEBUG) cat(file = stderr(), "observe: DE_gene_vio_x\n")
   .schnappsEnv$DE_gene_vio_x <- input$DE_gene_vio_x
+  .schnappsEnv$defaultValues$DE_gene_vio_x <- input$DE_gene_vio_x
 })
-
-
-.schnappsEnv$DE_X1 <- "tsne1"
-.schnappsEnv$DE_Y1 <- "tsne1"
+.schnappsEnv$DE_dim_x <- "tsne1"
+.schnappsEnv$DE_dim_y <- "tsne1"
 observe(label = "ob17", {
   if (DEBUG) cat(file = stderr(), "observe: DE_dim_x\n")
-  .schnappsEnv$DE_X1 <- input$DE_dim_x
+  .schnappsEnv$DE_dim_x <- input$DE_dim_x
+  .schnappsEnv$defaultValues$DE_dim_x <- input$DE_dim_x
 })
 observe(label = "ob18", {
   if (DEBUG) cat(file = stderr(), "observe: DE_dim_y\n")
-  .schnappsEnv$DE_Y1 <- input$DE_dim_y
+  .schnappsEnv$DE_dim_y <- input$DE_dim_y
+  .schnappsEnv$defaultValues$DE_dim_y <- input$DE_dim_y
 })
 
 observe({
@@ -95,13 +140,13 @@ observe({
   
   updateSelectInput(session, "DE_dim_x",
                     choices = colnames(projections),
-                    selected = .schnappsEnv$DE_X1
+                    selected = .schnappsEnv$DE_dim_x
   )
   
   # Can also set the label and select items
   updateSelectInput(session, "DE_dim_y",
     choices = colnames(projections),
-    selected = .schnappsEnv$DE_Y1
+    selected = .schnappsEnv$DE_dim_y
   )
   # return(TRUE)
 })
@@ -128,9 +173,9 @@ observe(label = "DE_seuratSCtransform_vars2regressOBSinp", {
   if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_vars2regress\n"))
   .schnappsEnv$DE_seuratSCtransform_vars2regress <- input$DE_seuratSCtransform_vars2regress
 })
-observe(label = "DE_seuratSCtransformm_split.byOBSinp", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransformm_split.by\n"))
-  .schnappsEnv$DE_seuratSCtransformm_split.by <- input$DE_seuratSCtransformm_split.by
+observe(label = "DE_seuratSCtransform_split.byOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_split.by\n"))
+  .schnappsEnv$DE_seuratSCtransform_split.by <- input$DE_seuratSCtransform_split.by
 })
 observe(label = "DE_seuratStandard_splitbyOBSinp", {
   if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratStandard_splitby\n"))
@@ -152,7 +197,7 @@ observe(label = "DE_seuratLogNorm_var2regOBS", {
   choicesVal = c("", choicesVal)
   # save(file = "~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS.RData", list = c(ls(), ".schnappsEnv"))
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS.RData")
-  # browser()
+  # deepDebug()
   updateSelectInput(
     session,
     "DE_seuratLogNorm_var2reg",
@@ -169,31 +214,31 @@ observe(label = "DE_seuratLogNorm_var2regOBS", {
   )
   updateSelectInput(
     session,
-    "DE_seuratSCtransformm_split.by",
+    "DE_seuratSCtransform_split.by",
     choices = choicesVal
     ,
-    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+    selected = .schnappsEnv$DE_seuratSCtransform_split.by
   )
   updateSelectInput(
     session,
     "DE_seuratSCTnorm_var2reg",
     choices = choicesVal
     ,
-    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+    selected = .schnappsEnv$DE_seuratSCtransform_split.by
   )
   updateSelectInput(
     session,
     "DE_seuratStandard_splitby",
     choices = choicesVal
     ,
-    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+    selected = .schnappsEnv$DE_seuratSCtransform_split.by
   )
   updateSelectInput(
     session,
     "DE_seuratRefBased_splitby",
     choices = choicesVal
     ,
-    selected = .schnappsEnv$DE_seuratSCtransformm_split.by
+    selected = .schnappsEnv$DE_seuratSCtransform_split.by
   )
   # save(file = "~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS2.RData", list = c(ls(), ".schnappsEnv"))
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratLogNorm_var2regOBS2.RData")
@@ -268,7 +313,7 @@ output$DE_clusterSelectionPanelPlot <- renderUI({
     HTML("Please load data")
   } else {
     noOfClusters <- levels(as.factor(projections$dbCluster))
-    selectInput(
+    sc_selectInput(
       "DE_clusterSelectionPanelPlot",
       label = "Cluster",
       choices = c(c("All"), noOfClusters),
@@ -505,7 +550,7 @@ output$DE_downloadPanel <- downloadHandler(
     # TODO should be taken from projections.
     tsne <- tsne()
 
-    if (is.null(scEx)) {
+    if (is.null(scEx) | is.null(scEx_log)) {
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {

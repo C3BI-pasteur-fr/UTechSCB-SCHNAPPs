@@ -1029,13 +1029,13 @@ valuesChanged <- function(parameters) {
     } else {
       if (is.na(get(oldVar, envir = .schnappsEnv)) | is.na(get(currVar, envir = .schnappsEnv))){
         if (!(is.na(get(oldVar, envir = .schnappsEnv)) & is.na(get(currVar, envir = .schnappsEnv)))){
-          # browser()
+          # deepDebug()
           # cat(file = stderr(), "modified3a\n")
           modified <- TRUE
         }
       } else
         if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
-          # browser()
+          # deepDebug()
           # cat(file = stderr(), "modified3\n")
           # cat(file = stderr(), oldVar)
           # cat(file = stderr(), get(oldVar, envir = .schnappsEnv))
@@ -1133,13 +1133,13 @@ getReactEnv <- function(DEBUG) {
           )
         }
         # if ( var == "coE_selctedCluster")
-        # browser()
+        # deepDebug()
         rectVals <- c(rectVals, var)
         tempVar <- tryCatch(eval(parse(text = paste0(
           "\`", var, "\`()"
         ))),
         error = function(e) {
-          # browser()
+          # deepDebug()
           cat(file = stderr(), paste("error var", var, ":(", e, ")\n"))
           e
         },
@@ -1163,7 +1163,7 @@ getReactEnv <- function(DEBUG) {
             #   )
             # )
             # if( paste0(var,"-cluster") == "coE_selctedCluster-cluster")
-            #   browser()
+            #   deepDebug()
             # assign(paste0(var, "-cluster"),
             # eval(report.env[[var]][["cluster"]]),
             # envir = report.env
@@ -1184,7 +1184,7 @@ getReactEnv <- function(DEBUG) {
 }
 
 # updateButtonUI = function(input, name, variables){
-#   # browser()
+#   # deepDebug()
 #   if (is.null(input[[name]])){
 #     cat(file = stderr(), paste("\ncreating button: ", name,"\n"))
 #     return(renderUI({actionButton(inputId = name, label = "apply changes", width = '80%')}))
@@ -1194,7 +1194,7 @@ getReactEnv <- function(DEBUG) {
 #     # inp <- isolate(reactiveValuesToList(get("input")))
 #     # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), "name", "variables", ".schnappsEnv", "inp", "session"))
 #     # cp =load(file = "~/SCHNAPPsDebug/render.RData")
-#     # browser()
+#     # deepDebug()
 #     if (DEBUG) cat(file = stderr(), "updateButtonUI\n")
 #     modified = FALSE
 #     # input$updatetsneParameters
@@ -1259,9 +1259,15 @@ add2history <- function(type, comment = "", input = input, ...) {
     # if this variable is not set we are not saving
     return(NULL)
   }
+  # deepDebug()
   
+  defaultValues = .schnappsEnv$defaultValues
+  dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
+  save(file=dvFile, list = c("defaultValues"))
   varnames <- lapply(substitute(list(...))[-1], deparse)
   arg <- list(...)
+  inp = input
+  schnappsEnv = .schnappsEnv
   if(is.null(arg[[1]])) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls(), ".schnappsEnv"), compress = F)
@@ -1277,12 +1283,12 @@ add2history <- function(type, comment = "", input = input, ...) {
     
   }
   
-  # browser()
+  # deepDebug()
   if (type == "save") {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
+    if (file.exists(tfile)){}
     assign(names(varnames[1]), arg[1])
-    inp = input
-    save(file = tfile, list = c(names(varnames[1]), "inp"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp","schnappsEnv"), compress = F)
     # the load is commented out because it is not used at the moment and only takes time to load
     if(comment %in% c("scEx", "scEx_log")) {
       commentOutLoad = "#"
@@ -1290,7 +1296,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       commentOutLoad = ""
     }
     line <- paste0(
-      "```{R, fig.cap = \"\"}\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
+      "```{R, fig.cap = \"\"}\n#",date(),"\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
       "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1307,7 +1313,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       line <- paste0(
         # "```{R, fig.cap = \"\"}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),
         # "\")\nhtmltools::tagList(", names(varnames[1]), ")\n```\n",
-        "\n![](",basename(tfile),")\n\n"
+        "\n", date(), "\n![](",basename(tfile),")\n\n"
       )
       write(line, file = .schnappsEnv$historyFile, append = TRUE)
     }, error = function(w){
@@ -1316,14 +1322,14 @@ add2history <- function(type, comment = "", input = input, ...) {
   }
   
   if (type == "tronco") {
-    # browser()
+    # deepDebug()
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
     
     line <- paste0(
-      "```{R, fig.cap = \"\"}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R, fig.cap = \"\"}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]) ,"$filename <- NULL \n",
       "\ndo.call(TRONCO::pheatmap, ", names(varnames[1]), ")\n```\n"
     )
@@ -1334,10 +1340,10 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
     
     line <- paste0(
-      "```{R, fig.cap = \"\"}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R, fig.cap = \"\"}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1348,10 +1354,10 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "input"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
     
     line <- paste0(
-      "```{R}\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1730,11 +1736,11 @@ loadLiteData <- function(fileName = NULL) {
   return(returnList)
 }
 
-# defaultValue
+# defaultValue ---
 # get a value that has been supplied as a parameter or return the default value val.
 defaultValue <- function(param = "coEtgMinExpr", val ) {
   # if (DEBUG) cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
-  # browser()
+  # deepDebug()
   if (!exists(".schnappsEnv")) return (val)
   if (exists(envir = .schnappsEnv, x = "defaultValues")) {
     if ( param %in% names(.schnappsEnv$defaultValues)) {
@@ -1956,11 +1962,114 @@ createHistory <- function(.schnappsEnv) {
   DEBUG=FALSE
   ```\n" )
   write(line,file=.schnappsEnv$historyFile,append=FALSE)
-  
 }
 
-loadInput = function(inp){
+sc_textInput <- function(...){
+  arg <- list(...)
+  .schnappsEnv$textInputlist = unique(c(.schnappsEnv$textInputlist, arg[[1]][1]))
+  return(textInput(...))
+}
+sc_numericInput <- function(...){
+  arg <- list(...)
+  .schnappsEnv$numericInputList = unique(c(.schnappsEnv$numericInputList, arg[[1]][1]))
+  return(numericInput(...))
+}
+sc_checkboxInput <- function(...){
+  arg <- list(...)
+  .schnappsEnv$checkboxInputList = unique(c(.schnappsEnv$checkboxInputList, arg[[1]][1]))
+  return(checkboxInput(...))
+}
+sc_selectInput <- function(...){
+  arg <- list(...)
+  .schnappsEnv$selectInputList = unique(c(.schnappsEnv$selectInputList, arg[[1]][1]))
+  return(selectInput(...))
+}
+sc_radioButtons <- function(...){
+  arg <- list(...)
+  .schnappsEnv$radioButtonsList = unique(c(.schnappsEnv$radioButtonsList, arg[[1]][1]))
+  return(radioButtons(...))
+}
+sc_selectizeInput <- function(...){
+  arg <- list(...)
+  .schnappsEnv$selectizeInputList = unique(c(.schnappsEnv$selectizeInputList, arg[[1]][1]))
+  return(selectizeInput(...))
+}
+
+
+
+# textAreaInput => used for projections rename not useful
+# orderInput => used for rearrange levels not useful
+
+deepDebug <-function(){
+  # callingFun = as.list(sys.call(-1))[[1]]
+  # cat(file = stderr(), paste("called from :", callingFun, "\n"))
+  # deepDebug()
+  # lobstr::cst()
+  # traceback()
+  # # trace()
+  # recover()
+  # # lobstr::sxp()
+}
+
+## loadInput ---
+loadInput = function(inp, session, input){
+  # deepDebug()
+  deepDebug()
+  if (is.null(getDefaultReactiveDomain())) {
+    cat(file = stderr(), "I need to be in a reactive context.")
+    stop()
+  }
   
+  for (id in .schnappsEnv$textInputlist){
+    if(!id %in% names(inp)) {
+      cat(file = stderr(), paste("not found:", id,"\n"))
+      next()
+    }
+    updateTextInput(session = session, inputId = id, value = inp[[id]])
+  }
+  for (id in .schnappsEnv$numericInputList){
+    if(!id %in% names(inp)) {
+      cat(file = stderr(), paste("not found numericInputList:", id,"\n"))
+      next()
+    }
+    updateNumericInput(session = session, inputId = id, value = inp[[id]])
+  }
+  for (id in .schnappsEnv$checkboxInputList){
+    if(!id %in% names(inp)) {
+      cat(file = stderr(), paste("not found checkboxInputList:", id,"\n"))
+      next()
+    }
+    updateCheckboxInput(session = session, inputId = id, value = inp[[id]])
+  }
+  for (id in .schnappsEnv$selectInputList){
+    if(!id %in% names(inp)) {
+      cat(file = stderr(), paste("not found checkboxInputList:", id,"\n"))
+      next()
+    }
+    updateSelectInput(session = session, inputId = id, selected = inp[[id]])
+  }
+  for (id in .schnappsEnv$radioButtonsList){
+    deepDebug()
+    inp[[id]]
+    if(!id %in% names(inp)) {
+      cat(file = stderr(), paste("not found checkboxInputList:", id,"\n"))
+      next()
+    }
+    updateRadioButtons(session = session, inputId = id, selected = inp[[id]])
+  }
+  for (id in .schnappsEnv$selectizeInputList){
+    inp[[id]]
+    if(!id %in% names(inp)) {
+      cat(file = stderr(), paste("not found checkboxInputList:", id,"\n"))
+      next()
+    }
+    updateSelectizeInput(session = session, inputId = id, selected = inp[[id]])
+  }
+  
+    # updateRadioButtons(session = session, inputId = "whichscLog", selected = "calcLog")
+
+  for(inName in names(inp)){
+  }
 }
 
 

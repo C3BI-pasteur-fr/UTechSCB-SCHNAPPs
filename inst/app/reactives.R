@@ -5,7 +5,7 @@ suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(ggalluvial))
 library(SingleCellExperiment)
-require(tidySingleCellExperiment)
+# require(tidySingleCellExperiment)
 # base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
 if ("crayon" %in% rownames(installed.packages()) == FALSE) {
   green <- function(x) {
@@ -60,7 +60,7 @@ commentModal <- function(failed = FALSE) {
     #     "Please describe your work. This will be included in the history"
     #   )
     # } else {
-    textInput("Comment4history", "Please describe your work. This will be included in the history")
+    sc_textInput("Comment4history", "Please describe your work. This will be included in the history")
     # }
     ,
     footer = tagList(
@@ -72,11 +72,13 @@ commentModal <- function(failed = FALSE) {
 
 # Show modal when button is clicked.
 observeEvent(input$comment2History, {
+  deepDebug()
   showModal(commentModal())
 })
 # Show modal when button is clicked.
 # # TODO modal to confirm
 observeEvent(input$Quit, {
+  deepDebug()
   if(input$Quit <= 1) return(NULL)
   if(DEBUG) {cat(file = stderr(), "\nquit the app\n\n")}
   stopApp()
@@ -84,7 +86,7 @@ observeEvent(input$Quit, {
 })
 
 observeEvent(input$openBrowser, {
-  # browser()
+  deepDebug()
   require(rmarkdown)
   knitr::opts_chunk$set(
     message = FALSE,
@@ -120,7 +122,7 @@ observeEvent(input$openBrowser, {
 # message.
 observeEvent(input$commentok, {
   # cat(file = stderr(), paste0("commentok: \n"))
-  # browser()
+  deepDebug()
   comment <- input$Comment4history
   add2history(type = "text", comment = "",  input=isolate( reactiveValuesToList(input)), text2add = comment)
   removeModal()
@@ -147,7 +149,6 @@ inputDataFunc <- function(inFile) {
   stats$names <- inFile$name
   stats$nFeatures <- 0
   stats$nCells <- 0
-  
   #
   cat(file = stderr(), paste("reading", inFile$name[1], "\n"))
   fp <- inFile$datapath[1]
@@ -430,6 +431,8 @@ inputDataFunc <- function(inFile) {
   # if (is.null(rowData(dataTables$scEx)$symbol)){
   #
   # }
+  # deepDebug()
+  
   isolate(allCellNames(rownames(colData(dataTables$scEx))))
   inputFileStats$stats <- stats
   return(dataTables)
@@ -606,6 +609,16 @@ appendAnnotation <- function(scEx, annFile) {
   return(scEx)
 }
 
+dataFile <- reactive({
+  deepDebug()
+  if(.schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
+    iFile = .schnappsEnv$inputFile
+  }else{
+    iFile = input$file1
+  }
+  return(iFile)
+})
+
 # inputData ----
 # load RData file with singlecellExperiment object
 # internal, should not be used by plug-ins
@@ -624,7 +637,7 @@ inputData <- reactive({
     showNotification("inputData", id = "inputData", duration = NULL)
   }
   
-  inFile <- input$file1
+  inFile <- dataFile()
   annFile <- input$annoFile
   sampleCells <- input$sampleInput
   subsampleNum <- input$subsampleNum
@@ -679,11 +692,16 @@ inputData <- reactive({
   }
   
   sampNames <- levels(colData(retVal$scEx)$sampleNames)
+  # deepDebug()
+  # browser()
+  
+  
   isolate({
-    sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
-    names(sampleCols$colPal) <- sampNames
-    add2history(type = "save", input=NULL, comment = "scol", scol = sampleCols$colPal)
-    
+    if (!all(names(sampleCols$colPal) %in% sampNames)){
+      sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
+      names(sampleCols$colPal) <- sampNames
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
+    }
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
   inputFile$annFile <- paste(annFile$name, collapse = ", ")
@@ -1117,8 +1135,7 @@ HVAinfoTable <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/HVAinfoTable.RData",
+    save(file = "~/SCHNAPPsDebug/HVAinfoTable.RData",
       list = c( ls())
     )
   }
@@ -1203,8 +1220,7 @@ PCAloadingsTable <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/PCAloadingsTable.RData",
+    save(file = "~/SCHNAPPsDebug/PCAloadingsTable.RData",
       list = c( ls())
     )
   }
@@ -1228,8 +1244,7 @@ gsSelectedGenesTable <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
+    save(file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
       list = c("normaliztionParameters", ls())
     )
   }
@@ -1274,8 +1289,7 @@ gsRMGenesTable <- reactive({
   useGenes <- !useGenes
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/removedGenesTable.RData",
+    save(file = "~/SCHNAPPsDebug/removedGenesTable.RData",
       list = c("normaliztionParameters", ls())
     )
   }
@@ -1392,7 +1406,7 @@ scExFunc <-
       removeNotification(id = "scExFunc1")
       removeNotification(id = "scExFunc2")
     }
-    # browser()
+    # deepDebug()
     # change names to be hopefully a bit more clear
     changed <- FALSE # trace if something changed
     keepGenes <- useGenes
@@ -1494,6 +1508,7 @@ scExFunc <-
 # apply filters that depend on genes & cells
 # it is here that useCells and useGenes are combined and applied to select for
 scEx <- reactive({
+  deepDebug()
   if (DEBUG) {
     cat(file = stderr(), "scEx started.\n")
   }
@@ -1545,7 +1560,7 @@ scEx <- reactive({
   scEx = retVal
   # ensure that we take the counts slot
   # when reloading additional slots might be loaded as well.
-  # browser()
+  # deepDebug()
   if(!is.null(scEx)){
     assays(scEx) = list(counts = assays(scEx)[["counts"]])
   }
@@ -1605,7 +1620,7 @@ scEx_log <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("scEx_log", id = "scEx_log", duration = NULL)
   }
-  
+  # deepDebug()
   scEx <- scEx()
   dataTables <- inputData()
   whichscLog <- input$whichscLog # from the input page
@@ -1685,7 +1700,7 @@ scExLogMatrixDisplay <- reactive({
   # useGenes = useGenes()
   scEx <- scEx()
   scEx_log <- scEx_log()
-  if (is.null(scEx)) {
+  if (is.null(scEx) | is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "scExLogMatrixDisplay:NULL\n")
     }
@@ -1975,7 +1990,7 @@ pcaReact <- reactive({
     }
     return(NULL)
   }
-  # browser()
+  # deepDebug()
   if (is.null(rank)) rank <- 10
   if (is.null(center)) centr <- TRUE
   if (is.null(scale)) scale <- FALSE
@@ -2262,6 +2277,12 @@ seurat_Clustering <- function() {
   if (tabsetCluster != "seurat_Clustering" | is.null(pca)){
     return(NULL)
   }
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "pca:NULL\n")
+    }
+    return(NULL)
+  }
   cellMeta <- colData(scEx)
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
@@ -2323,7 +2344,12 @@ snnGraph <- function(){
   type = isolate(input$snnType)
   # clusterSource = isolate(input$snnClusterSource)
   tabsetCluster = isolate(input$tabsetCluster)
-  
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "pca:NULL\n")
+    }
+    return(NULL)
+  }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/snnGraph_Clustering.RData", list = c(ls()))
   }
@@ -2437,6 +2463,12 @@ simlrFunc  <- function(){
       Sys.info()["sysname"] == "Darwin" && getRversion() == "4.0.2") {
     parallel:::setDefaultClusterOptions(setup_strategy = "sequential")
   }
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "pca:NULL\n")
+    }
+    return(NULL)
+  }
   retVal <- tryCatch(
     {
       if (nClust == 0) {
@@ -2534,7 +2566,12 @@ dbCluster <- reactive({
     }
     return(NULL)
   }
-  
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "pca:NULL\n")
+    }
+    return(NULL)
+  }
   dbCluster <- clustering$Cluster
   
   # cluster colors
@@ -2544,9 +2581,10 @@ dbCluster <- reactive({
   inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
   
-  clusterCols$colPal <- unlist(inCols)
-  add2history(type = "save", input=NULL, comment = "ccol", ccol = clusterCols$colPal)
-  
+  if(!all(names(clusterCols$colPal) %in% levels(dbCluster))){
+    clusterCols$colPal <- unlist(inCols)
+    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
+  }
   setRedGreenButton(
     vars = list(
       c("sampleNamecol", isolate(sampleCols$colPal)),
@@ -2619,6 +2657,16 @@ projections <- reactive({
   # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
   
   
+  # save session specific projections for restore
+  if (exists("historyPath", envir = .schnappsEnv)) {
+    # if this variable is not set we are not saving
+    # browser()
+    tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
+    save(file = tfile, list = c("prjs", "newPrjs"))
+  }
+  # deepDebug()
+  
+  
   
   # todo colData() now returns a s4 object of class DataFrame
   # not sure what else is effected...
@@ -2657,14 +2705,13 @@ projections <- reactive({
       if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2], "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
       if (.schnappsEnv$DEBUGSAVE) {
-        save(
-          file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
+        save(file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
           list = c("tmp")
         )
         iter <- iter + 1
       }
       # load(file="~/SCHNAPPsDebug/projections.3.RData")
-      # browser()
+      # deepDebug()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (is(tmp, "data.frame")) {
         cn <- make.names(c(colnames(projections), colnames(tmp)), unique = TRUE)
@@ -2744,8 +2791,9 @@ projections <- reactive({
   # TODO
   # this takes too long
   # UNCOMMENT
-  add2history(type = "save", input=NULL, comment = "projections", projections = projections)
+  add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "projections", projections = projections)
   
+  cat(file = stderr(), paste("\n\nscLog: ",isolate(input$whichscLog),"\n\n"))
   # add2history(type = "save", comment = "projections", projections = projections)
   
   exportTestValues(projections = {
@@ -2772,6 +2820,7 @@ projFactors <- reactive({
   }
   
   projections <- projections()
+  deepDebug()
   if (is.null(projections)) {
     choices <- c("no valid columns")
     return(choices)
@@ -3315,9 +3364,9 @@ reacativeReport <- function() {
   projections <- projections()
   scEx_log <- scEx_log()
   inputNames <- names(input)
-  # browser()
+  # deepDebug()
   
-  if (is.null(scEx)) {
+  if (is.null(scEx) | is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "output$report:NULL\n")
     }
@@ -3337,8 +3386,7 @@ reacativeReport <- function() {
   
   scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
   reportTempDir <- get("reportTempDir", envir = .schnappsEnv)
-  base::save(
-    file = tmpPrjFile,
+  base::save(file = tmpPrjFile,
     list = c(
       "reportTempDir",
       "projections",
@@ -3350,10 +3398,9 @@ reacativeReport <- function() {
   )
   userDataEnv <-
     as.environment(as.list(session$userData, all.names = TRUE))
-  # browser()
+  # deepDebug()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(
-      file = "~/SCHNAPPsDebug/tempReport.1.RData",
+    save(file = "~/SCHNAPPsDebug/tempReport.1.RData",
       list = c("session", "report.env", "file", ls())
     )
   }
@@ -3605,8 +3652,7 @@ reacativeReport <- function() {
   write.csv(as.matrix(assays(scEx_log)[[1]]),
             file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")
   )
-  base::save(
-    file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.RData"),
+  base::save(file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.RData"),
     list = c("scEx", "projections")
   )
   zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
