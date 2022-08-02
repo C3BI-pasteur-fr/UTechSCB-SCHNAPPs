@@ -62,28 +62,28 @@ tabList <- list(
       fluidRow(
         column( offset = 1,
                 width = 10, 
-                textInput("DE_gene_id", "Enter gene(s) of interest", value = defaultValue("DE_gene_id", defaultValueSingleGene))
+                sc_textInput("DE_gene_id", "Enter gene(s) of interest", value = defaultValue("DE_gene_id", defaultValueSingleGene))
         )),
       
       br(),
       fluidRow(
         column(
           width = 3,
-          selectInput("DE_expclusters_x",
+          sc_selectInput("DE_expclusters_x",
                       label = "X",
                       choices = c(defaultValue("DE_expclusters_x", "tsne1"), "tsne2", "tsne3"),
                       selected = defaultValue("DE_expclusters_x", "tsne1")
           )),
           column(
             width = 3,
-            selectInput("DE_expclusters_y",
+            sc_selectInput("DE_expclusters_y",
                         label = "Y",
                         choices = c(defaultValue("DE_expclusters_y", "tsne1"), "tsne2", "tsne3"),
                         selected = defaultValue("DE_expclusters_y", "tsne2")
             )),
             column(
               width = 3,
-              selectInput("DE_expclusters_z",
+              sc_selectInput("DE_expclusters_z",
                           label = "Z",
                           choices = c(defaultValue("DE_expclusters_z", "tsne1"), "tsne2", "tsne3"),
                           selected = defaultValue("DE_expclusters_z", "tsne3")
@@ -91,7 +91,7 @@ tabList <- list(
         # ,
         # column(
         #   width = 3,
-        #   selectInput("DE_expclusters_col",
+        #   sc_selectInput("DE_expclusters_col",
         #               label = "color",
         #               choices = defaultValue("DE_expclusters_col", "sampleName"),
         #               selected = defaultValue("DE_expclusters_col", "sampleName")
@@ -108,7 +108,7 @@ tabList <- list(
       br(),
     fluidRow(column(
       width = 3,
-      selectInput("DE_gene_vio_x",
+      sc_selectInput("DE_gene_vio_x",
                   label = "X",
                   choices = defaultValue("DE_gene_vio_x", "sampleNames"),
                   selected = defaultValue("DE_gene_vio_x", "sampleNames")
@@ -156,19 +156,19 @@ tabList <- list(
       # fluidRow(
       #   column(width = 3,
       #          # uiOutput("DE_clusterSelectionPanelPlot")
-      #          selectInput(inputId = "DE_clusterPP", label = "Clusters/Factor to use",
+      #          sc_selectInput(inputId = "DE_clusterPP", label = "Clusters/Factor to use",
       #                      choices = c("dbCluster", "sampleNames"),
       #                      selected = "dbCluster")
       #   ),
       #   column(width = 3,
-      #          selectInput(inputId = "DE_PPGrp", label = "Values to use",
+      #          sc_selectInput(inputId = "DE_PPGrp", label = "Values to use",
       #                      choices = c("1","2"), selected = "1", multiple = TRUE)
       #   )),
       shinydashboard::box(width = 6, 
           fluidRow(
             column(
               width = 6,
-              selectInput("DE_dim_x",
+              sc_selectInput("DE_dim_x",
                           label = "X",
                           choices = c(defaultValue("DE_dim_x", "tsne1"), "tsne2", "tsne3"),
                           selected = defaultValue("DE_dim_x", "tsne1")
@@ -176,7 +176,7 @@ tabList <- list(
             ),
             column(
               width = 6,
-              selectInput("DE_dim_y",
+              sc_selectInput("DE_dim_y",
                           label = "Y",
                           choices = c("tsne1", defaultValue("DE_dim_y", "tsne2"), "tsne3"),
                           selected = defaultValue("DE_dim_y", "tsne2")
@@ -186,11 +186,11 @@ tabList <- list(
           fluidRow(
             column(
               width = 4,
-              checkboxInput("DE_panelplotSameScale", "same scale", value = defaultValue("DE_panelplotSameScale", TRUE))
+              sc_checkboxInput("DE_panelplotSameScale", "same scale", value = defaultValue("DE_panelplotSameScale", TRUE))
             ),
             column(
               width = 8,
-              selectInput("DE_nCol",
+              sc_selectInput("DE_nCol",
                           label = "number of columns for plot",
                           choices = c(1:10),
                           selected = defaultValue("DE_nCol", 4)
@@ -201,7 +201,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          textInput("DE_panelplotids", "Comma separated gene names", value = defaultValue("DE_panelplotids", defaultValueMultiGenes))
+          sc_textInput("DE_panelplotids", "Comma separated gene names", value = defaultValue("DE_panelplotids", defaultValueMultiGenes))
         ),
       ),
       fluidRow(column(

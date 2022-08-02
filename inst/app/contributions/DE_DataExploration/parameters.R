@@ -18,18 +18,18 @@ myNormalizationChoices <- list(
 # will be displayed via renderUI
 myNormalizationParameters <- list(
   DE_logNormalization = tagList(
-    numericInput("DE_logNormalization_sf",
+    sc_numericInput("DE_logNormalization_sf",
                  label = "scale by (0 => minvalue)",
                  min = 0, max = 200000, step = 1, value = defaultValue("DE_logNormalization_sf", 0)
     )
     ),
   DE_scaterNormalization = h5("no Parameters implemented"),
   DE_seuratSCTnorm = tagList(
-    numericInput("DE_seuratSCTnorm_nHVG",
+    sc_numericInput("DE_seuratSCTnorm_nHVG",
                  label = "Number of variable genes",
                  min = 10, max = 200000, step = 1, value = 3000
     ),
-    selectInput(
+    sc_selectInput(
       "DE_seuratSCTnorm_var2reg",
       label = "Vars to regress out (only factors are allowed)",
       multiple = TRUE,
@@ -41,11 +41,11 @@ myNormalizationParameters <- list(
     )
   ),
   DE_seuratLogNorm = tagList(
-    numericInput("DE_seuratLogNorm_nHVG",
+    sc_numericInput("DE_seuratLogNorm_nHVG",
                  label = "Number of variable genes",
                  min = 10, max = 200000, step = 1, value = 3000
     ),
-    selectInput(
+    sc_selectInput(
       "DE_seuratLogNorm_var2reg",
       label = "Vars to regress out (only factors are allowed)",
       multiple = TRUE,
@@ -56,28 +56,28 @@ myNormalizationParameters <- list(
       # options = list(maxItems = 20)
     )
   ),
-  DE_logGeneNormalization = textInput(inputId = "DE_geneIds_norm", label = "comma separated list of genes used for normalization", value = ""),
+  DE_logGeneNormalization = sc_textInput(inputId = "DE_geneIds_norm", label = "comma separated list of genes used for normalization", value = ""),
   DE_seuratStandard = tagList(
-    numericInput("DE_seuratStandard_dims",
+    sc_numericInput("DE_seuratStandard_dims",
                  label = "Which dimensions to use from the CCA to specify the neighbor search space",
                  min = 2, max = 20000, step = 1, value = 30
     ),
-    numericInput("DE_seuratStandard_anchorF",
+    sc_numericInput("DE_seuratStandard_anchorF",
                  label = "select the provided number of features to be used in anchor finding",
                  min = 60, max = 30000, step = 10,
                  value = 2000
     ),
-    numericInput("DE_seuratStandard_kF",
+    sc_numericInput("DE_seuratStandard_kF",
                  label = "How many neighbors (k) to use when filtering anchors",
                  min = 2, max = 3000, step = 1,
                  value = 200
     ),
-    numericInput("DE_seuratStandard_k.weight",
+    sc_numericInput("DE_seuratStandard_k.weight",
                  label = "Number of neighbors to consider when weighting",
                  min = 2, max = 3000, step = 1,
                  value = 100
     ),
-    selectInput(
+    sc_selectInput(
       "DE_seuratStandard_splitby",
       label = "apply scTransform to individual entries (levels of factor)",
       multiple = FALSE,
@@ -88,11 +88,11 @@ myNormalizationParameters <- list(
     )
   ),
   DE_seuratSCtransform = tagList(
-    numericInput("DE_seuratSCtransform_nhvg",
+    sc_numericInput("DE_seuratSCtransform_nhvg",
                  label = "number of highly variable genes",
                  min = 200, max = 400000, step = 10, value = 3000
     ),
-    selectInput(
+    sc_selectInput(
       "DE_seuratSCtransform_vars2regress",
       label = "Vars to regress out (only factors are allowed)",
       multiple = TRUE,
@@ -102,66 +102,66 @@ myNormalizationParameters <- list(
       # , 
       # options = list(maxItems = 20)
     ),
-    numericInput("DE_seuratSCtransform_dimsMin",
+    sc_numericInput("DE_seuratSCtransform_dimsMin",
                  label = "minimum dimension (PCA) to use",
                  min = 1, max = 100, step = 1, value = 1
     ),
-    numericInput("DE_seuratSCtransform_dimsMax",
+    sc_numericInput("DE_seuratSCtransform_dimsMax",
                  label = "maximum dimension (PCA) to use",
                  min = 3, max = 100, step = 1, value = 30
     ),
-    numericInput("DE_seuratSCtransform_nfeatures",
+    sc_numericInput("DE_seuratSCtransform_nfeatures",
                  label = "number of genes to keep for the integration step",
                  min = 200, max = 400000, step = 10, value = 3000
     ),
-    numericInput("DE_seuratSCtransform_k.anchor",
+    sc_numericInput("DE_seuratSCtransform_k.anchor",
                  label = "Number of anchors to use",
                  min = 1, max = 100, step = 1,
                  value = 5
     ),
-    numericInput("DE_seuratSCtransform_k.filter",
+    sc_numericInput("DE_seuratSCtransform_k.filter",
                  label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
                  min = 1, max = 1000, step = 10,
                  value = 200
     ),
-    numericInput("DE_seuratSCtransform_k.score",
+    sc_numericInput("DE_seuratSCtransform_k.score",
                  label = "k score",
                  min = 1, max = 1000, step = 1,
                  value = 30
     ),
-    # numericInput("DE_seuratSCtransform_scalingFactor",
+    # sc_numericInput("DE_seuratSCtransform_scalingFactor",
     #              label = "Scaling to use for transformed data",
     #              min = 1, max = 30000, step = 10,
     #              value = 1000
     # ),
-    selectInput(
-      "DE_seuratSCtransformm_split.by",
+    sc_selectInput(
+      "DE_seuratSCtransform_split.by",
       label = "apply scTransform to individual entries (levels of factor)",
       multiple = FALSE,
-      choices = unique(c(defaultValue("DE_seuratSCtransformm_split.by", ""), ""))
+      choices = unique(c(defaultValue("DE_seuratSCtransform_split.by", ""), ""))
       ,
-      selected = defaultValue("DE_seuratSCtransformm_split.by", "")
+      selected = defaultValue("DE_seuratSCtransform_split.by", "")
       # , 
       # options = list(maxItems = 20)
     ),
-    textInput("DE_seuratSCtransformm_keepfeatures", "comma separated list of genes keep", value = "")
+    sc_textInput("DE_seuratSCtransform_keepfeatures", "comma separated list of genes keep", value = "")
   ),
   DE_seuratRefBased = tagList(
-    numericInput("DE_seuratRefBased_nfeatures",
+    sc_numericInput("DE_seuratRefBased_nfeatures",
                  label = "Number of features to retain/use",
                  min = 200, max = 20000, step = 10, value = 3000
     ),
-    numericInput("DE_seuratRefBased_k.filter",
+    sc_numericInput("DE_seuratRefBased_k.filter",
                  label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
                  min = 60, max = 30000, step = 10,
                  value = 200
     ),
-    # numericInput("DE_seuratRefBased_scaleFactor",
+    # sc_numericInput("DE_seuratRefBased_scaleFactor",
     #              label = "Scaling to use for transformed data",
     #              min = 1, max = 30000, step = 10,
     #              value = 1000
     # ),
-    selectInput(
+    sc_selectInput(
       "DE_seuratRefBased_splitby",
       label = "apply scTransform to individual entries (levels of factor)",
       multiple = FALSE,
@@ -170,7 +170,7 @@ myNormalizationParameters <- list(
       # , 
       # options = list(maxItems = 20)
     ),
-    textInput("DE_seuratRefBased_keepfeatures", "comma separated list of genes keep", value = "")
+    sc_textInput("DE_seuratRefBased_keepfeatures", "comma separated list of genes keep", value = "")
   )
 )
 
@@ -514,8 +514,8 @@ DE_seuratSCtransform <- reactive({
   k.filter <- isolate(input$DE_seuratSCtransform_k.filter)
   k.score <- isolate(input$DE_seuratSCtransform_k.score)
   # scalingFactor <- isolate(input$DE_seuratSCtransform_scalingFactor)
-  geneNames <-  isolate(input$DE_seuratSCtransformm_keepfeatures)
-  split.by <-  isolate(input$DE_seuratSCtransformm_split.by)
+  geneNames <-  isolate(input$DE_seuratSCtransform_keepfeatures)
+  split.by <-  isolate(input$DE_seuratSCtransform_split.by)
   
   if (is.null(scEx) | runThis == "") {
     if (DEBUG) {

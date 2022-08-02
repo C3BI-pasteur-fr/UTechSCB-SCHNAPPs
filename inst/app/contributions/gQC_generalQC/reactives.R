@@ -8,7 +8,7 @@ require(plotly)
 # save to history violoin observer ----
 observe(label = "save2histumi", {
   clicked  = input$save2Histumi
-  # browser()
+  deepDebug()
   if (DEBUG) cat(file = stderr(), "observe input$save2histumi \n")
   start.time <- base::Sys.time()
   on.exit(
@@ -31,6 +31,7 @@ observe(label = "save2histumi", {
 
 # save to history save2HistSample observer ----
 observe({
+  deepDebug()
   clicked  = input$save2HistSample
   if (DEBUG) cat(file = stderr(), "observe input$save2HistSample \n")
   start.time <- base::Sys.time()
@@ -53,6 +54,7 @@ observe({
 
 # save to history save2HistSample observer ----
 observe(label = "save2histvar", {
+  deepDebug()
   clicked  = input$save2Histvar  
   if (DEBUG) cat(file = stderr(), "observe input$save2histvar \n")
   start.time <- base::Sys.time()
@@ -175,7 +177,7 @@ gQC_sampleHistFunc <- function(sampleInf, scols) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("gQC_sampleHistFunc", id = "gQC_sampleHistFunc", duration = NULL)
   }
-  # browser()
+  # deepDebug()
   
   # if (!is.factor(sampleInf)) {
     sampleInf = factor(sampleInf)

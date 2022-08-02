@@ -11,7 +11,7 @@ deProjTable <- reactive({
   if (is.null(projections) | is.null(cellNs)) {
     return(NULL)
   }
-  # browser()
+  # deepDebug()
   cellNs <- cellNs[cellNs %in% rownames(projections)]
   projections[cellNs, ]
 })

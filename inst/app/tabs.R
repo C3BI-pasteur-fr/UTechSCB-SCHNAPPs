@@ -112,9 +112,9 @@ inputTab <- function() {
         column(
           6,
           
-          checkboxInput("sampleInput", label = "sub-sample", value = defaultValue("sampleInput", FALSE)),
+          sc_checkboxInput("sampleInput", label = "sub-sample", value = defaultValue("sampleInput", FALSE)),
           
-          numericInput("subsampleNum",
+          sc_numericInput("subsampleNum",
                        label = "max number of cells per sample",
                        min = 500, max = 10000, step = 100, value = defaultValue("subsampleNum", 1000)
           )
@@ -124,7 +124,7 @@ inputTab <- function() {
         column(
           6,
           
-          radioButtons("whichscLog",
+          sc_radioButtons("whichscLog",
                        label = "Compute normalizations?",
                        choices = c(
                          "disable log" = "disablescEx_log",
@@ -133,7 +133,7 @@ inputTab <- function() {
                        ),
                        selected = defaultValue("whichscLog", "disablescEx_log")
           )
-          # checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
+          # sc_checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
         ),
         checkbsTT("whichscLog"),
         checkbsTT("disablescEx_log")
@@ -147,7 +147,7 @@ inputTab <- function() {
       fluidRow(column(
         6,
         
-        textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
+        sc_textInput("beforeFilterRegEx", "regular expression to count genes/cell", value = "^MT-")
       )), checkbsTT("beforeFilterRegEx")
     )
   )
@@ -171,7 +171,7 @@ geneSelectionTab <- function() {
       fluidRow(
         column(
           width = 4,
-          textInput("selectIds", "regular expression for selection of genes to be removed", value = defaultValue("selectIds", "^MT-|^RP|^MRP"))
+          sc_textInput("selectIds", "regular expression for selection of genes to be removed", value = defaultValue("selectIds", "^MT-|^RP|^MRP"))
         ), checkbsTT("selectIds"),
         # column(
         #   width = 4,
@@ -181,13 +181,13 @@ geneSelectionTab <- function() {
         column(
           width = 4,
           h4("Min expression over all cells"),
-          numericInput("minGenesGS", "Min # of UMIs over all cells", defaultValue("minGenesGS", 100), min = 1, max = 1000000)
+          sc_numericInput("minGenesGS", "Min # of UMIs over all cells", defaultValue("minGenesGS", 100), min = 1, max = 1000000)
         )
       ), checkbsTT("minGenesGS"),
       fluidRow(
         column(
           width = 8, align = "center", offset = 2,
-          textInput("genesKeep", "genes to keep", value = defaultValue("genesKeep", ""))
+          sc_textInput("genesKeep", "genes to keep", value = defaultValue("genesKeep", ""))
         )
       )
     ), checkbsTT("genesKeep"),
@@ -246,13 +246,13 @@ cellSelectionTab <- function() {
       fluidRow(
         column(
           width = 6,
-          textInput("minExpGenes", "List of genes with minimal expression", value = defaultValue("minExpGenes", defaultValueRegExGene)), # tool tip: '^CD7$|^KIT$
-          textInput("minNonExpGenes", "List of genes that should not be expressed", value = defaultValue("minNonExpGenes",""))
+          sc_textInput("minExpGenes", "List of genes with minimal expression", value = defaultValue("minExpGenes", defaultValueRegExGene)), # tool tip: '^CD7$|^KIT$
+          sc_textInput("minNonExpGenes", "List of genes that should not be expressed", value = defaultValue("minNonExpGenes",""))
         ),
         column(
           width = 6,
-          numericInput("minGenes", "Min # of UMIs", defaultValue("minGenes", 2), min = 2, max = 1000000),
-          numericInput("maxGenes", "Max # of UMIs", defaultValue("maxGenes", 1000000), min = 10, max = 1000000)
+          sc_numericInput("minGenes", "Min # of UMIs", defaultValue("minGenes", 2), min = 2, max = 1000000),
+          sc_numericInput("maxGenes", "Max # of UMIs", defaultValue("maxGenes", 1000000), min = 10, max = 1000000)
         )
       )
     ),
@@ -262,11 +262,11 @@ cellSelectionTab <- function() {
       fluidRow(
         column(
           width = 12,
-          textInput("cellPatternRM", "cells to be filtered out by pattern", value = defaultValue("cellPatternRM", "")),
-          textInput("cellKeep", "cells to keep", value = defaultValue("cellKeep", "")),
-          textInput("cellKeepOnly", "cells to keep (remove others)", value = defaultValue("cellKeepOnly", "")),
-          textInput("cellsFiltersOut", "Cells to be removed", width = "100%", value = defaultValue("cellsFiltersOut", "")),
-          textInput("cellSelectionComment", "Comment for selection of cells", value = defaultValue("cellSelectionComment", ""))
+          sc_textInput("cellPatternRM", "cells to be filtered out by pattern", value = defaultValue("cellPatternRM", "")),
+          sc_textInput("cellKeep", "cells to keep", value = defaultValue("cellKeep", "")),
+          sc_textInput("cellKeepOnly", "cells to keep (remove others)", value = defaultValue("cellKeepOnly", "")),
+          sc_textInput("cellsFiltersOut", "Cells to be removed", width = "100%", value = defaultValue("cellsFiltersOut", "")),
+          sc_textInput("cellSelectionComment", "Comment for selection of cells", value = defaultValue("cellSelectionComment", ""))
         )
       )
     ),
@@ -373,7 +373,7 @@ clusterParametersTab <- function() {
                  fluidRow(
                    column(
                      width = 12,
-                     radioButtons(
+                     sc_radioButtons(
                        inputId = "normalizationRadioButton",
                        label = "choose a normalization method",
                        choices = normaliztionChoices,
@@ -423,23 +423,23 @@ clusterParametersTab <- function() {
                title = "Parameters for PCA", solidHeader = TRUE, width = 12, value = "PCAparameters",
                # The id lets us use input$tabset1 on the server to find the current tab
                id = "tabsetPCA",
-               fluidRow(
+               fluidRow({
                  column(4,
                         offset = 0,
-                        numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 15), min = 2),
-                        checkboxInput("pcaCenter", "center data", TRUE)
+                        sc_numericInput("pcaRank", "Number of components", defaultValue("pcaRank", 15), min = 2),
+                        sc_checkboxInput("pcaCenter", "center data", TRUE)
+                 )},
+                 column(4,
+                        offset = 0,
+                        sc_numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 200), min = 50),
+                        sc_checkboxInput("pcaScale", "scale data", defaultValue("pcaScale", TRUE))
                  ),
                  column(4,
                         offset = 0,
-                        numericInput("pcaN", "Number of variable genes to be used", defaultValue("pcaN", 200), min = 50),
-                        checkboxInput("pcaScale", "scale data", defaultValue("pcaScale", TRUE))
-                 ),
-                 column(4,
-                        offset = 0,
-                        selectInput("hvgSelection","How to select highly variable genes.", 
+                        sc_selectInput("hvgSelection","How to select highly variable genes.", 
                                     choices = c("getTopHVGs","vst", "mvp", "disp"),
                                     selected = defaultValue("hvgSelection", "getTopHVGs")),
-                        checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", TRUE))
+                        sc_checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", TRUE))
                  )
                ),
                checkbsTT(item = "pcaRank"),
@@ -449,13 +449,13 @@ clusterParametersTab <- function() {
                fluidRow(
                  column(12,
                         offset = 0,
-                        textInput("genes4PCA", "Genes to be used for PCA", width = "100%", value = defaultValue("genes4PCA",""))
+                        sc_textInput("genes4PCA", "Genes to be used for PCA", width = "100%", value = defaultValue("genes4PCA",""))
                  ), checkbsTT("genes4PCA")
                ),
                fluidRow(
                  column(12,
                         offset = 0,
-                        textInput("genesRMPCA", "Genes NOT to be used for PCA", width = "100%", value = defaultValue("genesRMPCA", ""))
+                        sc_textInput("genesRMPCA", "Genes NOT to be used for PCA", width = "100%", value = defaultValue("genesRMPCA", ""))
                  ), checkbsTT("genesRMPCA")
                ),
                fluidRow(
@@ -516,12 +516,12 @@ clusterParametersTab <- function() {
                  fluidRow(
                    column(
                      width = 6,
-                     numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = defaultValue("seurClustDims", 15), width = "100%"),
-                     numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",10), width = "100%")
+                     sc_numericInput("seurClustDims", "Dimensions of PCA to use", min = 5, value = defaultValue("seurClustDims", 15), width = "100%"),
+                     sc_numericInput("seurClustk.param", "K for k-nearest neighbor algorithm", min = 20, value = defaultValue("seurClustk.param",10), width = "100%")
                    ),
                    column(
                      width = 6,
-                     numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = defaultValue("seurClustresolution", 0.5), min = 0.1, width = "100%"),
+                     sc_numericInput("seurClustresolution", "Value of the resolution parameter (below 1 -> smaller communities)", value = defaultValue("seurClustresolution", 0.5), min = 0.1, width = "100%"),
                      # TOD implement more options
                    )
                  ),
@@ -532,13 +532,13 @@ clusterParametersTab <- function() {
                  fluidRow(
                    column(
                      width = 6,
-                     selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("clusterSource", "logcounts"), width = "100%"),
-                     selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = defaultValue("clusterMethod", "igraph"), width = "100%")
+                     sc_selectInput("clusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("clusterSource", "logcounts"), width = "100%"),
+                     sc_selectInput("clusterMethod", "clustering method to use", choices = c("hclust", "igraph"), selected = defaultValue("clusterMethod", "igraph"), width = "100%")
                    ),
                    column(
                      width = 6,
-                     numericInput("minClusterSize", "minimum size of each cluster.", defaultValue("minClusterSize", 2), min = 2, width = "100%"),
-                     selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = defaultValue("useRanks", "TRUE"), width = "100%")
+                     sc_numericInput("minClusterSize", "minimum size of each cluster.", defaultValue("minClusterSize", 2), min = 2, width = "100%"),
+                     sc_selectInput("useRanks", "use ranks?\n", choices = c("TRUE", "FALSE"), selected = defaultValue("useRanks", "TRUE"), width = "100%")
                    )
                  ),
                  checkbsTT(item = "clusterSource"),
@@ -548,7 +548,7 @@ clusterParametersTab <- function() {
                  fluidRow(
                    column(
                      12,
-                     textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%", value = defaultValue("geneSelectionClustering", ""))
+                     sc_textInput("geneSelectionClustering", "Genes to be used for clustering", width = "100%", value = defaultValue("geneSelectionClustering", ""))
                    )
                  ),
                  checkbsTT(item = "geneSelectionClustering")
@@ -560,11 +560,11 @@ clusterParametersTab <- function() {
                  fluidRow(
                    # column(
                    #   width = 4,
-                   #   selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
+                   #   sc_selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
                    # ),
                    column(
                      width = 4,
-                     selectInput("snnType", "type to use", 
+                     sc_selectInput("snnType", "type to use", 
                                  selected = defaultValue("snnType", "rank"),
                                  choices = c("rank", "number", "jaccard"))
                    )
@@ -576,17 +576,17 @@ clusterParametersTab <- function() {
                    fluidRow(
                      # column(
                      #   width = 4,
-                     #   selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
+                     #   sc_selectInput("snnClusterSource", "use raw counts or normalized data?", choices = c("counts", "logcounts"), selected = defaultValue("snnClusterSource", "logcounts"), width = "100%"),
                      # ),
                      column(
                        width = 4,
-                       numericInput("simlr_nClust", "number of clusters (0 = estimate)", 
+                       sc_numericInput("simlr_nClust", "number of clusters (0 = estimate)", 
                                     value = defaultValue("simlr_nClust", 10),
                                     min = 0, max = 1000)
                      ),
                      column(
                        width = 4,
-                       numericInput("simlr_maxClust", "max number of clusters when estimating)", 
+                       sc_numericInput("simlr_maxClust", "max number of clusters when estimating)", 
                                     value = defaultValue("simlr_maxClust", 20),
                                     min = 2, max = 1000)
                      )

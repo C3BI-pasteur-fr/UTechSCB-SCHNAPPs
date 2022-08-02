@@ -55,6 +55,19 @@ if ("introjsUI" %in% rownames(installed.packages())) {
 
 
 scShinyUI <- function(request) {
+  
+  # browser()
+  # load from history directory the old input variable that use defaultValues function
+  dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
+  if(file.exists(dvFile)){
+    cp = load(file=dvFile)
+    if("defaultValues" %in% cp){
+      # .schnappsEnv$defaultValues = defaultValues
+      assign("defaultValues", defaultValues, envir = .schnappsEnv)
+    }else{
+      warning("defaultValues file exist but no defaultValues\n\n")
+    }
+  }
   source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
   source(paste0(packagePath, "/tabs.R"), local = TRUE)
   # general tabs
@@ -66,7 +79,7 @@ scShinyUI <- function(request) {
     # ,
     # renameTab()
   )
-
+  
   # parameters tab, includes basic normalization
   source(paste0(packagePath, "/parameters.R"), local = TRUE)
   base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
@@ -200,11 +213,11 @@ scShinyUI <- function(request) {
           downloadButton("RDSsave", "Download RData", class = "butt"),
           br(),
           downloadButton("RmdSave", "Download History", class = "butt"),
-          if (DEBUG) checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
+          if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
           verbatimTextOutput("DEBUGSAVEstring"),
           if (is.environment(.schnappsEnv)) {
             if (exists("historyPath", envir = .schnappsEnv)) {
-              # checkboxInput("save2History", "save to history file", FALSE)
+              # sc_checkboxInput("save2History", "save to history file", FALSE)
               actionButton("comment2History", "Add comment to history")
             }
           },

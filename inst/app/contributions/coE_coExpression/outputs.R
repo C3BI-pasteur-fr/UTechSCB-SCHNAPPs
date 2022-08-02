@@ -92,6 +92,53 @@ observe(label = "ob_MinExprParams", {
   ))
 })
 
+observe(label = "ob16", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
+  .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
+  .schnappsEnv$defaultValues$coE_vioGrp <- input$coE_dimension_xVioiGrp
+})
+
+observe(label = "ob16a", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  .schnappsEnv$coE_vioGrp2 <- input$coE_dimension_xVioiGrp2
+  .schnappsEnv$defaultValues$coE_vioGrp2 <- input$coE_dimension_xVioiGrp2
+})
+observe(label = "ob16b", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  .schnappsEnv$alluiv1 <- input$alluiv1
+  .schnappsEnv$defaultValues$alluiv1 <- input$alluiv1
+})
+observe(label = "ob16c", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  .schnappsEnv$alluiv2 <- input$alluiv2
+  .schnappsEnv$defaultValues$alluiv2 <- input$alluiv2
+})
+
+observe(label ="obs_coE_geneGrpVioIds2", x = {
+  .schnappsEnv$defaultValues[["coE_geneGrpVioIds2"]] = input$coE_geneGrpVioIds2
+})
+observe(label ="obs_coEminMaxExprValue", x = {
+  .schnappsEnv$defaultValues[["coEminMaxExprValue"]] = input$coEminMaxExprValue
+})
+observe(label ="obs_coE_geneGrpVioIds", x = {
+  .schnappsEnv$defaultValues[["coE_geneGrpVioIds"]] = input$coE_geneGrpVioIds
+})
+observe(label ="obs_coE_scale", x = {
+  .schnappsEnv$defaultValues[["coE_scale"]] = input$coE_scale
+})
+observe(label ="obs_coE_showExpression", x = {
+  .schnappsEnv$defaultValues[["coE_showExpression"]] = input$coE_showExpression
+})
+observe(label ="obs_coE_showPermutations", x = {
+  .schnappsEnv$defaultValues[["coE_showPermutations"]] = input$coE_showPermutations
+})
+observe(label ="obs_coEtgPerc", x = {
+  .schnappsEnv$defaultValues[["coEtgPerc"]] = input$coEtgPerc
+})
+observe(label ="obs_coEtgMinExpr", x = {
+  .schnappsEnv$defaultValues[["coEtgMinExpr"]] = input$coEtgMinExpr
+})
+
 
 # EXPLORE TAB VIOLIN PLOT ------------------------------------------------------------------
 # output$coE_geneGrp_vio_plot <- plotly::renderPlotly({
