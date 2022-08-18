@@ -695,9 +695,8 @@ inputData <- reactive({
   # deepDebug()
   # browser()
   
-  
-  isolate({
-    if (!all(names(sampleCols$colPal) %in% sampNames)){
+   isolate({
+    if (is.null(names(sampleCols$colPal)) | !all(names(sampleCols$colPal) %in% sampNames)){
       sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
       names(sampleCols$colPal) <- sampNames
       add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
@@ -2581,7 +2580,7 @@ dbCluster <- reactive({
   inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
   
-  if(!all(names(clusterCols$colPal) %in% levels(dbCluster))){
+  if(is.null(names(clusterCols$colPal)) | !all(names(clusterCols$colPal) %in% levels(dbCluster))){
     clusterCols$colPal <- unlist(inCols)
     add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
   }
