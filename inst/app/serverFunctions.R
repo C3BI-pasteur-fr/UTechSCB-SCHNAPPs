@@ -1489,12 +1489,12 @@ heatmapModuleFunction <- function(
            heatmapData$name = "ranked Expr."
            
            # the "[]" are needed to preserve the row/column names
-           heatmapData$mat[] <- t(apply(heatmapData$mat,1,order))
+           heatmapData$mat[] <- t(apply(heatmapData$mat,1,FUN = function(x)rank(x, ties.method = "min")))
          },
          col_order = {
            heatmapData$scale <- "none"
            heatmapData$name = "ranked Expr."
-           heatmapData$mat[] <- apply(heatmapData$mat,2,order)
+           heatmapData$mat[] <- apply(heatmapData$mat,2,FUN = function(x)rank(x, ties.method = "min"))
          }
   )
   
