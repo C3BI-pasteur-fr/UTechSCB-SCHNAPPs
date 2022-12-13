@@ -598,7 +598,7 @@ sCA_dge <- reactive({
       scEx_log = scEx_log,
       cells.1 = gCells$c1, cells.2 = gCells$c2
     ))})
-  browser()
+  # browser()
   if(is.null(retVal)) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("dge: NULL,did you install everything?", id = "dgewarning", duration = 10, type = "warning")
