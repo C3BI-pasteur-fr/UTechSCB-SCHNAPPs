@@ -562,11 +562,22 @@ sCA_dge <- reactive({
   #   scEx_log = scEx_log,
   #   cells.1 = gCells$c1, cells.2 = gCells$c2
   # ))
-  retVal <- tryCatch({
-    do.call(dgeFunc, args = list(
-      scEx_log = scEx_log,
-      cells.1 = gCells$c1, cells.2 = gCells$c2
-    ))}, error = function(e) {
+  
+  withWarnings <- function(expr) {
+    wHandler <- function(w) {
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(as.character(w), id = "dgeFuncWarning", duration = NULL,type = "warning")
+      }
+      cat(file = stderr(), "something went wrong with dge\n")
+      cat(file = stderr(), as.character(w))
+      cat(file = stderr(), "\n")
+      # at some point I introduced return NULL, but I don\t remember why. Now, there is warning issued
+      # about 1GB memory being used but the function still returns correctly. Thus removing and this has
+      # to be handled later
+      # return(NULL)
+      invokeRestart("muffleWarning")
+    }
+    eHandler <- function(e) {
       require(Seurat)
       if(is.null(e)) e = "NULL"
       if (!is.null(getDefaultReactiveDomain()) & !dgeFunc ==  "sCA_scDEA") {
@@ -576,17 +587,18 @@ sCA_dge <- reactive({
       cat(file = stderr(), as.character(e))
       cat(file = stderr(), "\n")
       return(NULL)
-    },
-    warning = function(w){
-      if (!is.null(getDefaultReactiveDomain())) {
-        showNotification(w, id = "dgeFuncWarning", duration = NULL,type = "error")
-      }
-      cat(file = stderr(), "something went wrong with dge\n")
-      cat(file = stderr(), as.character(w))
-      cat(file = stderr(), "\n")
-      return(NULL)
-    }, finally = print("dgeFunc Hello"))
+    }
+    val <- withCallingHandlers(expr, warning = wHandler, error = eHandler)
+    return(val)
+  }
   
+  
+  retVal <- withWarnings({
+    do.call(dgeFunc, args = list(
+      scEx_log = scEx_log,
+      cells.1 = gCells$c1, cells.2 = gCells$c2
+    ))})
+  browser()
   if(is.null(retVal)) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("dge: NULL,did you install everything?", id = "dgewarning", duration = 10, type = "warning")
@@ -600,6 +612,7 @@ sCA_dge <- reactive({
       showNotification("dge: nothing found", id = "dgewarning", duration = 10, type = "warning")
     }
   }
+
   # update reactiveValue
   sCA_selectedDge$sCA_dgeTable <- retVal
   
