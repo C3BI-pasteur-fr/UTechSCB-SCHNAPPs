@@ -1534,7 +1534,7 @@ heatmapModuleFunction <- function(
   
   # heatmapData$mat = orgMat
   # system.time(do.call(pheatmap, heatmapData))
-  # heatmapData$mat = as(orgMat, "dgTMatrix")
+  # heatmapData$mat = as(orgMat, "TsparseMatrix")
   heatmapData$fontsize <- 14
   # heatmapData$fontsize_row = 18
   # heatmapData$filename=NULL
