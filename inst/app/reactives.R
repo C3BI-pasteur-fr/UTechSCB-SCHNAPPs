@@ -470,7 +470,7 @@ readCSV <- function(inFile) {
     rownames(data) <- make.unique(data[, 1])
     data <- data[, -1]
   }
-  exAll <- as(as.matrix(data), "dgTMatrix")
+  exAll <- as(as.matrix(data), "TsparseMatrix")
   rownames(exAll) <- rownames(data)
   colnames(exAll) <- colnames(data)
   if (all(stringr::str_detect(colnames(data),"-"))) {
@@ -1870,10 +1870,10 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   }
   
   scaterPCA <- withWarnings({
-    # not sure, but this works on another with dgTMatrix
-    if (is(assays(scEx_log)[["logcounts"]], "dgTMatrix")) {
+    # not sure, but this works on another with TsparseMatrix
+    if (is(assays(scEx_log)[["logcounts"]], "TsparseMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
-        as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
+        as(assays(scEx_log)[["logcounts"]], "CsparseMatrix")
     }
     x <- assays(scEx_log)[["logcounts"]]
     genesin = genesin[genesin %in% rownames(scEx_log)]
@@ -2291,8 +2291,8 @@ seurat_Clustering <- function() {
     meta.data = meta.data
   )
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
   dims = min(dims,ncol(pca$x)) 
   
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 

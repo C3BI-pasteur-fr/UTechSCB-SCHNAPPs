@@ -103,8 +103,8 @@ gQC_scaterReadsFunc <- function(scEx) {
     showNotification("gQC_scaterReadsFunc", id = "gQC_scaterReadsFunc", duration = NULL)
   }
   
-  if (is(assays(scEx)[[1]], "dgTMatrix")) {
-    assays(scEx)[["counts"]] <- as(assays(scEx)[["counts"]], "dgCMatrix")
+  if (is(assays(scEx)[[1]], "TsparseMatrix")) {
+    assays(scEx)[["counts"]] <- as(assays(scEx)[["counts"]], "CsparseMatrix")
   }
   
   # ercc <- rownames(scEx)[grepl("ERCC-", rownames(scEx), ignore.case = TRUE)]

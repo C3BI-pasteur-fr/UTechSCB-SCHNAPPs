@@ -237,7 +237,7 @@ output$dimPlotPCA <- renderPlot({
   logDat = assays(scEx_log)[[1]]
   rData = rowData(scEx_log)
   rownames(logDat) = rData$symbol
-  seurDat@assays$RNA@data = as(logDat,"dgCMatrix")
+  seurDat@assays$RNA@data = as(logDat,"CsparseMatrix")
   # seurDat <- NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
   # seurDat <- FindVariableFeatures(seurDat, selection.method = "vst", nfeatures = 2000)
   
