@@ -668,6 +668,7 @@ subCluster2Dplot <- function() {
     # cellNs <- isolate(selectedCells$cellNames())
     # sampdesc <- isolate(selectedCells$selectionDescription())
     selectedCells <- sCA_dataInp()
+    if(is.null(selectedCells)) return(NULL)
     cellNs <- selectedCells$cellNames()
     sampdesc <- selectedCells$selectionDescription()
     prjs <- selectedCells$ProjectionUsed()

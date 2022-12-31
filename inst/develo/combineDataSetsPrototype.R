@@ -10,7 +10,7 @@ colData(scEx)[,setdiff(allCols,colnames(colData(scEx)) )] = NA
 newcDat = DataFrame(rbind(colData(scEx2),colData(scEx)))
 
 commGenes = intersect(rownames(scEx), rownames(scEx2))
-mat =  cbind(as.data.frame(assays(scEx)[["counts"]])[commGenes,], as.data.frame(assays(scEx2)[["counts"]])[commGenes,]) %>% as.matrix %>% as("dgCMatrix")
+mat =  cbind(as.data.frame(assays(scEx)[["counts"]])[commGenes,], as.data.frame(assays(scEx2)[["counts"]])[commGenes,]) %>% as.matrix %>% as("CsparseMatrix")
 mat
 
 allCols = union(colnames(rowData(scEx2)), colnames(rowData(scEx)))
