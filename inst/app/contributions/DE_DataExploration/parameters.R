@@ -326,6 +326,7 @@ DE_seuratRefBased <- reactive({
     }
     return(NULL)
   }
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls()))
   }

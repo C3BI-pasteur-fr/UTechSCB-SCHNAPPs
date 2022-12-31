@@ -1263,6 +1263,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   
   defaultValues = .schnappsEnv$defaultValues
   dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
+  if (DEBUG) cat(file = stderr(), paste0("add2history: saving default Values to", dvFile, "\n"))
   save(file=dvFile, list = c("defaultValues"))
   varnames <- lapply(substitute(list(...))[-1], deparse)
   arg <- list(...)
@@ -1280,6 +1281,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       "\n", get(names(varnames[1])), "\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving text to", .schnappsEnv$historyFile, "\n"))
     
   }
   
@@ -1289,6 +1291,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     if (file.exists(tfile)){}
     assign(names(varnames[1]), arg[1])
     save(file = tfile, list = c(names(varnames[1]), "inp","schnappsEnv"), compress = F)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: inp, schnappsEnv to", tfile, "\n"))
     # the load is commented out because it is not used at the moment and only takes time to load
     if(comment %in% c("scEx", "scEx_log")) {
       commentOutLoad = "#"
@@ -1300,6 +1303,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving stuff to", .schnappsEnv$historyFile, "\n"))
   }
   
   if (type == "renderPlotly") {
@@ -1316,6 +1320,7 @@ add2history <- function(type, comment = "", input = input, ...) {
         "\n", date(), "\n![](",basename(tfile),")\n\n"
       )
       write(line, file = .schnappsEnv$historyFile, append = TRUE)
+      if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderPlotly to", .schnappsEnv$historyFile, "\n"))
     }, error = function(w){
       cat(file = stderr(),paste("problem with orca:",w,"\n"))
     })
@@ -1327,6 +1332,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
     save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: tronco data to", tfile, "\n"))
     
     line <- paste0(
       "```{R, fig.cap = \"\"}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
@@ -1334,6 +1340,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       "\ndo.call(TRONCO::pheatmap, ", names(varnames[1]), ")\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving tronco to", .schnappsEnv$historyFile, "\n"))
   }
   
   if (type == "renderPlot") {
@@ -1341,12 +1348,14 @@ add2history <- function(type, comment = "", input = input, ...) {
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
     save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderPlot to", tfile, "\n"))
     
     line <- paste0(
       "```{R, fig.cap = \"\"}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderPlot to", .schnappsEnv$historyFile, "\n"))
     
   }
   
@@ -1355,13 +1364,14 @@ add2history <- function(type, comment = "", input = input, ...) {
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
     save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderDT to", tfile, "\n"))
     
     line <- paste0(
       "```{R}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
-    
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderDT to", .schnappsEnv$historyFile, "\n"))
   }
   if (DEBUG) cat(file = stderr(), paste0("add2history done\n"))
   
@@ -1403,17 +1413,17 @@ get_density <- function(x, y, ...) {
 # heatmapModuleFunction =====
 
 heatmapModuleFunction <- function(
-  heatmapData = NULL,
-  addColNames = "sampleNames",
-  orderColNames = c(), 
-  sortingCols = "dendrogram",
-  sortingRows = "dendrogram",
-  scale = "none",
-  colPal= "none",
-  minMaxVal = NULL,
-  proje = NULL,
-  outfile = NULL,
-  heatmapCellGrp = 5
+    heatmapData = NULL,
+    addColNames = "sampleNames",
+    orderColNames = c(), 
+    sortingCols = "dendrogram",
+    sortingRows = "dendrogram",
+    scale = "none",
+    colPal= "none",
+    minMaxVal = NULL,
+    proje = NULL,
+    outfile = NULL,
+    heatmapCellGrp = 5
 ) {
   
   colTree = FALSE
@@ -1741,6 +1751,8 @@ loadLiteData <- function(fileName = NULL) {
 defaultValue <- function(param = "coEtgMinExpr", val ) {
   # if (DEBUG) cat(file = stderr(), paste( "defaultValue : ",param, " val: ", str(val), "\n"))
   # deepDebug()
+  # if(param == "Scorpius_dataInput-Mod_clusterPP")
+  #   browser()
   if (!exists(".schnappsEnv")) return (val)
   if (exists(envir = .schnappsEnv, x = "defaultValues")) {
     if ( param %in% names(.schnappsEnv$defaultValues)) {
@@ -2066,12 +2078,25 @@ loadInput = function(inp, session, input){
     updateSelectizeInput(session = session, inputId = id, selected = inp[[id]])
   }
   
-    # updateRadioButtons(session = session, inputId = "whichscLog", selected = "calcLog")
-
+  # updateRadioButtons(session = session, inputId = "whichscLog", selected = "calcLog")
+  
   for(inName in names(inp)){
   }
 }
 
+debugControl <- function( name = "cellSelectionModule", list = c(ls())){
+  saveVal = FALSE
+  if(!is.null(.schnappsEnv[["DEBUGSAVE"]])) {
+    saveVal = .schnappsEnv[["DEBUGSAVE"]]
+  }
+  saveVal = .schnappsEnv$DEBUGSAVE
+  if(!is.null(.schnappsEnv[[paste0("DEBUGSAVE_",name)]])) {
+    saveVal = .schnappsEnv[[paste0("DEBUGSAVE_",name)]]
+  }
+  if (saveVal ) {
+    save(file = paste0("~/SCHNAPPsDebug/", name, ".RData"), list = list)
+  }
+}
 
 if (.schnappsEnv$DEBUG) {
   cat(file = stderr(), "end severFunctions.R\n")

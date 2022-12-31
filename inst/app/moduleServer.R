@@ -65,6 +65,11 @@ clusterServer <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
     .schnappsEnv[[ns('dimension_x')]] <- input$dimension_x
     .schnappsEnv$defaultValues[[ns('dimension_x')]] <- input$dimension_x
+ 
+    .schnappsEnv[[ns('geneIds')]] <- input$geneIds
+    .schnappsEnv$defaultValues[[ns('geneIds')]] <- input$geneIds
+    .schnappsEnv[[ns('geneIds2')]] <- input$geneIds2
+    .schnappsEnv$defaultValues[[ns('geneIds2')]] <- input$geneIds2
   })
   observe(label = "ob32", {
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_y\n"))
@@ -1350,6 +1355,27 @@ pHeatMapModule <- function(input, output, session,
   ht_pos_obj = reactiveVal(NULL)
   myretVal = reactiveVal(NULL)
   
+  observe(label = ns("parameterChanged"),{
+    if (DEBUG) cat(file = stderr(), paste0("observe: ",ns("parameterChange"),"\n"))
+    .schnappsEnv[[ns('sortingCols')]]  = input$sortingCols
+    .schnappsEnv[[ns('normRow')]]  = input$normRow
+    .schnappsEnv[[ns('heatMapGrpName')]]  = input$heatMapGrpName
+    .schnappsEnv[[ns('ColNames')]]  = input$ColNames
+    .schnappsEnv[[ns('colPal')]]  = input$colPal
+    .schnappsEnv[[ns('orderNames')]]  = input$orderNames
+    .schnappsEnv[[ns('heatmapCellGrp')]]  = input$heatmapCellGrp
+    .schnappsEnv[[ns('sortingRows')]]  = input$sortingRows
+    
+    .schnappsEnv$defaultValues[[ns('sortingCols')]]  = input$sortingCols
+    .schnappsEnv$defaultValues[[ns('normRow')]]  = input$normRow
+    .schnappsEnv$defaultValues[[ns('heatMapGrpName')]]  = input$heatMapGrpName
+    .schnappsEnv$defaultValues[[ns('ColNames')]]  = input$ColNames
+    .schnappsEnv$defaultValues[[ns('colPal')]]  = input$colPal
+    .schnappsEnv$defaultValues[[ns('orderNames')]]  = input$orderNames
+    .schnappsEnv$defaultValues[[ns('heatmapCellGrp')]]  = input$heatmapCellGrp
+    .schnappsEnv$defaultValues[[ns('sortingRows')]]  = input$sortingRows
+  })
+
   addOptions <- reactive(
     {req(pheatmapList())
       list(
@@ -1781,21 +1807,6 @@ pHeatMapModule <- function(input, output, session,
     
   }) 
   
-  
-  
-  
-  observe(label = "ColNames", {
-    if (DEBUG) cat(file = stderr(), paste0("observe: ColNames\n"))
-    .schnappsEnv[[ns('ColNames')]] <- addOptions()$ColNames
-    .schnappsEnv$defaultValues[[ns('ColNames')]] <- addOptions()$ColNames
-  })
-  observe(label = "orderNames", {
-    if (DEBUG) cat(file = stderr(), paste0("observe: orderNames\n"))
-    .schnappsEnv[[ns('orderNames')]] <- addOptions()$orderColNames
-    .schnappsEnv$defaultValues[[ns('orderNames')]] <- addOptions()$orderColNames
-  }) 
-  
-  
   # observe save 2 history ----
   observe(label = "save2histHM", {
     clicked <- input$save2HistHM
@@ -2020,6 +2031,8 @@ pHeatMapModule <- function(input, output, session,
     }
   )
 }
+#
+
 
 cellSelectionModule <- function(input, output, session) {
   if (DEBUG) cat(file = stderr(), paste("cellSelectionModule", session$ns("my-test"), "\n"))
@@ -2029,31 +2042,42 @@ cellSelectionModule <- function(input, output, session) {
   # init valuse for Env to remember selections
   # and observe/save if changed
   
+  # browser()
+  .schnappsEnv[[ns("Mod_clusterPP")]] = "dbCluster"
+  observe(label = "Mod_clusterPP", 
+          {
+            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP\n"))
+            # assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
+            # browser()
+            # initialization by history
+            if(input$Mod_clusterPP=="") {
+              if("defaultValues" %in% names(.schnappsEnv))
+                if(ns("Mod_clusterPP") %in% names(.schnappsEnv$defaultValues))
+                  .schnappsEnv[[ns("Mod_clusterPP")]] = .schnappsEnv$defaultValues[[ns("Mod_clusterPP")]]
+              return()
+            }
+            
+            .schnappsEnv[[ns("Mod_clusterPP")]] = input$Mod_clusterPP
+            .schnappsEnv$defaultValues[[ns("Mod_clusterPP")]] = input$Mod_clusterPP
+          })
+  
+  
   .schnappsEnv[[ns("Mod_PPGrp")]] = "1"
   observe(label = "Mod_PPGrp",
           {
-            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp\n"))
+            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp",input$Mod_PPGrp,"\n"))
             # assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
             .schnappsEnv[[ns("Mod_PPGrp")]] = input$Mod_PPGrp
             .schnappsEnv$defaultValues[[ns("Mod_PPGrp")]] = input$Mod_PPGrp
             
           })
   
-  .schnappsEnv[[ns("Mod_clusterPP")]] = "dbCluster"
-  observe(label = "Mod_clusterPP", 
-          {
-            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP\n"))
-            # assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
-            .schnappsEnv[[ns("Mod_clusterPP")]] = input$Mod_clusterPP
-            .schnappsEnv$defaultValues[[ns("Mod_clusterPP")]] = input$Mod_clusterPP
-          })
-  
-  
   
   # Mod_updateInputPPt if projections changed ====
   observe(label = "Mod_clusterPP", 
           {
-            if (DEBUG) cat(file = stderr(), "Mod_updateInputPPt started.\n")
+            if (DEBUG) cat(file = stderr(), paste("Mod_updateInputPPt started.", 
+                                                  .schnappsEnv[[ns("Mod_clusterPP")]],"\n"))
             start.time <- base::Sys.time()
             on.exit({
               printTimeEnd(start.time, "Mod_updateInputPPt")
@@ -2081,11 +2105,12 @@ cellSelectionModule <- function(input, output, session) {
             #   }
             # }
             # 
+            # browser()
             
             updateSelectInput(
               session,
               "Mod_clusterPP",
-              choices = projFactors,
+              choices = unique(projFactors, .schnappsEnv[[ns("Mod_clusterPP")]]),
               selected = .schnappsEnv[[ns("Mod_clusterPP")]]
             )
           })
@@ -2093,7 +2118,7 @@ cellSelectionModule <- function(input, output, session) {
   observe({
     projections <- projections()
     
-    if (DEBUG) cat(file = stderr(), "observeEvent: input$Mod_clusterPP\n")
+    if (DEBUG) cat(file = stderr(), paste("observeEvent:: input$Mod_clusterPP: \n"))
     # Can use character(0) to remove all choices
     if (is.null(projections)) {
       return(NULL)
@@ -2107,7 +2132,7 @@ cellSelectionModule <- function(input, output, session) {
       session,
       "Mod_PPGrp",
       choices = choicesVal,
-      selected = .schnappsEnv[[ns("Mod_PPGrp")]]
+      selected = .schnappsEnv$defaultValues[[ns("Mod_PPGrp")]]
     )
   })
   
@@ -2121,12 +2146,13 @@ cellSelectionModule <- function(input, output, session) {
         prjVals <- input$Mod_PPGrp
         projections <- projections()
         req(projections)
-        
-        if (.schnappsEnv$DEBUGSAVE) {
-          save(file = "~/SCHNAPPsDebug/cellSelectionModule.RData", list = c(ls()))
-        }
+        req(prjNames)
+        req(prjVals)
+        # browser() 
+        # debugControl("cellSelectionModule", list = c(ls()))
         # cp = load(file = "~/SCHNAPPsDebug/cellSelectionModule.RData")
-        if (length(prjVals) == 0 | length(prjNames) == 0) {
+        if (length(prjVals) == 0 | str_length(prjNames) == 0 |
+            !prjNames %in% colnames(projections)) {
           return(NULL)
         } else {
           retVal <- rownames(projections[projections[, prjNames] %in% prjVals, ])
@@ -2152,6 +2178,7 @@ cellSelectionModule <- function(input, output, session) {
       }),
     ProjectionValsUsed = reactive(
       {
+        if (DEBUG) cat(file = stderr(), "ProjectionValsUsed: ",.schnappsEnv[[ns("Mod_PPGrp")]],"\n")
         prjGrp <- input$Mod_PPGrp
         prjGrp
       })

@@ -850,13 +850,13 @@ coE_updateInputXviolinPlot <- observe({
     session,
     "coE_dimension_xVioiGrp",
     choices = projFactors,
-    selected = .schnappsEnv$coE_vioGrp
+    selected = .schnappsEnv$coE_dimension_xVioiGrp
   )
   updateSelectInput(
     session,
     "coE_dimension_xVioiGrp2",
     choices = projFactors,
-    selected = .schnappsEnv$coE_vioGrp2
+    selected = .schnappsEnv$coE_dimension_xVioiGrp2
   )
 })
 

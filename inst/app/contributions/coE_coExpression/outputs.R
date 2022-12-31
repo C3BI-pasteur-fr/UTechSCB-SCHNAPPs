@@ -94,22 +94,22 @@ observe(label = "ob_MinExprParams", {
 
 observe(label = "ob16", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
-  .schnappsEnv$coE_vioGrp <- input$coE_dimension_xVioiGrp
-  .schnappsEnv$defaultValues$coE_vioGrp <- input$coE_dimension_xVioiGrp
+  .schnappsEnv$coE_dimension_xVioiGrp <- input$coE_dimension_xVioiGrp
+  .schnappsEnv$defaultValues$coE_dimension_xVioiGrp <- input$coE_dimension_xVioiGrp
 })
 
 observe(label = "ob16a", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
-  .schnappsEnv$coE_vioGrp2 <- input$coE_dimension_xVioiGrp2
-  .schnappsEnv$defaultValues$coE_vioGrp2 <- input$coE_dimension_xVioiGrp2
+  .schnappsEnv$coE_dimension_xVioiGrp2 <- input$coE_dimension_xVioiGrp2
+  .schnappsEnv$defaultValues$coE_dimension_xVioiGrp2 <- input$coE_dimension_xVioiGrp2
 })
 observe(label = "ob16b", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  if (DEBUG) cat(file = stderr(), paste0("observe: alluiv1\n"))
   .schnappsEnv$alluiv1 <- input$alluiv1
   .schnappsEnv$defaultValues$alluiv1 <- input$alluiv1
 })
 observe(label = "ob16c", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp2\n"))
+  if (DEBUG) cat(file = stderr(), paste0("observe: alluiv2\n"))
   .schnappsEnv$alluiv2 <- input$alluiv2
   .schnappsEnv$defaultValues$alluiv2 <- input$alluiv2
 })

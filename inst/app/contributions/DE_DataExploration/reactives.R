@@ -4,6 +4,7 @@ suppressMessages(require(ggplot2))
 deProjTable <- reactive({
   projections <- projections()
   selectedCells <- DE_Exp_dataInput() #DE_Exp_dataInput
+  if(is.null(selectedCells)) return(NULL)
   cellNs <- selectedCells$cellNames()
   
   if (DEBUG) cat(file = stderr(), "observeEvent: input$DE_clusterPP\n")
