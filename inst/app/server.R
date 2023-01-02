@@ -45,7 +45,7 @@ if (!exists(".schnappsEnv")) {
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+    packagePath <- "~/Rstudio/Schnapps/inst/app/"
     # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
   }
 } else {
@@ -136,7 +136,7 @@ scShinyServer <- function(input, output, session) {
   # in development mode, called not from package? ----
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
-      packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      packagePath <- "~/Rstudio/Schnapps/inst/app/"
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
