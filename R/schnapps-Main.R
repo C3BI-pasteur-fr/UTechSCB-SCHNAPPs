@@ -79,7 +79,7 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   devscShinyApp <- FALSE
   source(paste0(packagePath, "/server.R"), local = TRUE)
   source(paste0(packagePath, "/ui.R"), local = TRUE)
-  app <- shinyApp(ui = scShinyUI, server = scShinyServer)
+  app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
   runApp(app, port = port)
 }
 
