@@ -19,6 +19,7 @@ suppressMessages(require(pheatmap))
 # suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinyjs))
+suppressMessages(require(shinyjqui))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -55,7 +56,7 @@ if ("introjsUI" %in% rownames(installed.packages())) {
 
 
 scShinyUI <- function(request) {
-  
+  library(shinyjqui)
   # browser()
   # load from history directory the old input variable that use defaultValues function
   dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")

@@ -347,7 +347,7 @@ cellSelectionUI <- function(id) {
         width = 6,
         sc_selectInput(
           inputId = ns("Mod_PPGrp"), label = "Values to use",
-          choices = c(defaultValue(ns("Mod_PPGrp"), "1"), "2"), selected = defaultValue(ns("Mod_PPGrp"), "1"), multiple = TRUE
+          choices = defaultValue(ns("Mod_PPGrp"), "1"), selected = defaultValue(ns("Mod_PPGrp"), "1"), multiple = TRUE
         )
       )
     ),

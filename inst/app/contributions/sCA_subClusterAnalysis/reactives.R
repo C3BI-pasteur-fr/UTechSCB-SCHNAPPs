@@ -144,8 +144,8 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   }
   
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
   seurDat@assays$RNA@scale.data = as.matrix(seurDat@assays$RNA@data)
   
   # not sure we need the normalization factor
@@ -668,6 +668,7 @@ subCluster2Dplot <- function() {
     # cellNs <- isolate(selectedCells$cellNames())
     # sampdesc <- isolate(selectedCells$selectionDescription())
     selectedCells <- sCA_dataInp()
+    if(is.null(selectedCells)) return(NULL)
     cellNs <- selectedCells$cellNames()
     sampdesc <- selectedCells$selectionDescription()
     prjs <- selectedCells$ProjectionUsed()

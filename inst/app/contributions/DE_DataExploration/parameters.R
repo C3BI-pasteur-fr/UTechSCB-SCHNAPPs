@@ -286,7 +286,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
     return(NULL)
   }
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
     rowData = rowData(scEx)[rownames(A), , drop = FALSE]
   )
@@ -326,6 +326,7 @@ DE_seuratRefBased <- reactive({
     }
     return(NULL)
   }
+  
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls()))
   }
@@ -476,7 +477,7 @@ DE_seuratSCtransformFunc <- function(scEx,
   }
   
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
     rowData = rowData(scEx)[rownames(A), , drop = FALSE]
   )
@@ -646,7 +647,7 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
   }
   # A <- seurDat@assays$integrated@data
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
     rowData = rowData(scEx)[rownames(A), , drop = FALSE]
   )
@@ -835,7 +836,7 @@ DE_seuratSCTnormfunc <- function(scEx, nHVG, var2reg) {
   
   A <- seurDat[["SCT"]]@scale.data
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
     rowData = rowData(scEx)[rownames(A), , drop = FALSE]
   )
@@ -979,7 +980,7 @@ DE_seuratLogNormfunc <- function(scEx, nHVG, var2reg) {
   
   A <- seurDat[["RNA"]]@scale.data
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
     rowData = rowData(scEx)[rownames(A), , drop = FALSE]
   )
@@ -1069,7 +1070,7 @@ DE_logNormalizationGenefunc <- function(scEx, inputGenes) {
     showNotification("DE_logNormalizationGenefunc", id = "DE_logNormalizationGenefunc", duration = NULL)
   }
   
-  # use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "dgTMatrix"),
+  # use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "TsparseMatrix"),
   #                                   "i")))
   #
   # bc_sums <- Matrix::colSums(assays(scEx)[[1]])
@@ -1078,14 +1079,14 @@ DE_logNormalizationGenefunc <- function(scEx, inputGenes) {
   if (rlang::is_empty(genesin)) {
     genesin <- rownames(scEx)
   }
-  A <- as(assays(scEx)[[1]], "dgTMatrix")
-  assays(scEx)[[1]] <- as(assays(scEx)[[1]], "dgTMatrix")
+  A <- as(assays(scEx)[[1]], "TsparseMatrix")
+  assays(scEx)[[1]] <- as(assays(scEx)[[1]], "TsparseMatrix")
   nenner <- Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])
   nenner[nenner == 0] <- 1
   # A@x <- A@x / Matrix::colSums(A)[assays(scEx)[[1]]@j + 1L]
   A@x <- A@x / (nenner[A@j + 1L])
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx),
     rowData = rowData(scEx)
   )
@@ -1252,20 +1253,20 @@ DE_logNormalizationfunc <- function(scEx, sfactor) {
     showNotification("DE_logNormalizationfunc", id = "DE_logNormalizationfunc", duration = NULL)
   }
   if(is.null(sfactor)) return(NULL)
-  # use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "dgTMatrix"),
+  # use_genes <- sort(unique(1 + slot(as(assays(scEx)[[1]], "TsparseMatrix"),
   #                                   "i")))
   #
   # bc_sums <- Matrix::colSums(assays(scEx)[[1]])
   # median_sum <- median(bc_sums)
-  A <- as(assays(scEx)[[1]], "dgCMatrix")
-  assays(scEx)[[1]] <- as(assays(scEx)[[1]], "dgTMatrix")
+  A <- as(assays(scEx)[[1]], "CsparseMatrix")
+  assays(scEx)[[1]] <- as(assays(scEx)[[1]], "TsparseMatrix")
   A@x <- A@x / Matrix::colSums(A)[assays(scEx)[[1]]@j + 1L]
   if (sfactor <=0){
     sfactor = min(A@x[A@x>0])
   }
   A@x = A@x / sfactor
   scEx_bcnorm <- SingleCellExperiment(
-    assay = list(logcounts = as(A, "dgTMatrix")),
+    assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx),
     rowData = rowData(scEx)
   )
