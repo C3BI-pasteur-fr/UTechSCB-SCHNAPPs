@@ -107,7 +107,7 @@ observe({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("DE_updateInputExpPanel", id = "DE_updateInputExpPanel", duration = NULL)
   }
-
+  
   projections <- projections()
   projFactors <- projFactors()
   
@@ -115,7 +115,7 @@ observe({
   if (is.null(projections)) {
     return(NULL)
   }
-
+  
   # Can also set the label and select items
   updateSelectInput(session, "DE_expclusters_x",
                     choices = colnames(projections),
@@ -145,8 +145,8 @@ observe({
   
   # Can also set the label and select items
   updateSelectInput(session, "DE_dim_y",
-    choices = colnames(projections),
-    selected = .schnappsEnv$DE_dim_y
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_dim_y
   )
   # return(TRUE)
 })
@@ -261,7 +261,7 @@ output$DE_gene_vio_plot <- renderPlot({
     showNotification("DE_gene_vio_plot", id = "DE_gene_vio_plot", duration = NULL)
   }
   if (DEBUG) cat(file = stderr(), "output$DE_gene_vio_plot\n")
-
+  
   scEx_log <- scEx_log()
   projections <- projections()
   g_id <- input$DE_gene_id
@@ -269,6 +269,7 @@ output$DE_gene_vio_plot <- renderPlot({
   x = input$DE_gene_vio_x
   
   selectedCells <- DE_Exp_dataInput()
+  if(is.null(selectedCells)) return(NULL)
   cellNs <- selectedCells$cellNames()
   sampdesc <- selectedCells$selectionDescription()
   prj <- isolate(selectedCells$ProjectionUsed())
@@ -278,14 +279,12 @@ output$DE_gene_vio_plot <- renderPlot({
     if (DEBUG) cat(file = stderr(), "output$DE_gene_vio_plot:NULL\n")
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_gene_vio_plot.RData", list = c(ls()),compress = F)
-  }
+  # debugControl("DE_gene_vio_plot", list = c(ls()))
   # cp = load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
-
-
+  
+  
   p1 <- DE_geneViolinFunc(scEx_log = scEx_log[, cellNs], g_id = g_id, projections = projections[cellNs, ], ccols = ccols, x)
-
+  
   printTimeEnd(start.time, "DE_gene_vio_plot")
   exportTestValues(DE_gene_vio_plot = {
     p1
@@ -336,27 +335,27 @@ DE_Exp_dataInput <- callModule(
 
 # Panel plot button observer ----
 #observe: cellNameTable_rows_selected ----
-  observe(label = "ob_panelPlotParams", {
-    if (DEBUG) cat(file = stderr(), "observe ob_panelPlotParams\n")
-    
-    input$updatePanelPlot
-    setRedGreenButtonCurrent(
-      vars = list(
-        c("DE_panelplotids", (input$DE_panelplotids)),
-        c("DE_dim_x", (input$DE_dim_x)),
-        c("DE_dim_y", (input$DE_dim_y)),
-        c("DE_panelplotSameScale", (input$DE_panelplotSameScale)),
-        c("DE_nCol", (input$DE_nCol)),
-        c("DE_PanelPlotCellSelection-Mod_clusterPP", (input$`DE_PanelPlotCellSelection-Mod_clusterPP`)),
-        c("DE_PanelPlotCellSelection-Mod_PPGrp", (input$`DE_PanelPlotCellSelection-Mod_PPGrp`))
-      )
+observe(label = "ob_panelPlotParams", {
+  if (DEBUG) cat(file = stderr(), "observe ob_panelPlotParams\n")
+  
+  input$updatePanelPlot
+  setRedGreenButtonCurrent(
+    vars = list(
+      c("DE_panelplotids", (input$DE_panelplotids)),
+      c("DE_dim_x", (input$DE_dim_x)),
+      c("DE_dim_y", (input$DE_dim_y)),
+      c("DE_panelplotSameScale", (input$DE_panelplotSameScale)),
+      c("DE_nCol", (input$DE_nCol)),
+      c("DE_PanelPlotCellSelection-Mod_clusterPP", (input$`DE_PanelPlotCellSelection-Mod_clusterPP`)),
+      c("DE_PanelPlotCellSelection-Mod_PPGrp", (input$`DE_PanelPlotCellSelection-Mod_PPGrp`))
     )
-    
-    updateButtonColor(buttonName = "updatePanelPlot", parameters = c(
-      "DE_panelplotids", "DE_dim_x", "DE_dim_y", "DE_panelplotSameScale", 
-      "DE_nCol", "DE_PanelPlotCellSelection-Mod_clusterPP", "DE_PanelPlotCellSelection-Mod_PPGrp"
-    ))
-  })
+  )
+  
+  updateButtonColor(buttonName = "updatePanelPlot", parameters = c(
+    "DE_panelplotids", "DE_dim_x", "DE_dim_y", "DE_panelplotSameScale", 
+    "DE_nCol", "DE_PanelPlotCellSelection-Mod_clusterPP", "DE_PanelPlotCellSelection-Mod_PPGrp"
+  ))
+})
 
 
 
@@ -379,7 +378,7 @@ output$DE_panelPlot <- renderPlot({
     showNotification("DE_panelPlot", id = "DE_panelPlot", duration = NULL)
   }
   if (DEBUG) cat(file = stderr(), "output$DE_panelPlot\n")
-
+  
   clicked <- input$updatePanelPlot
   scEx_log <- scEx_log()
   projections <- projections()
@@ -388,34 +387,31 @@ output$DE_panelPlot <- renderPlot({
   # cl4 <- input$DE_clusterSelectionPanelPlot
   # ppgrp <- isolate(input$DE_PPGrp)
   # ppCluster <- isolate(input$DE_clusterPP)
-
+  
   selectedCells <- isolate(dePanelCellSelection())
   cellNs <- isolate(selectedCells$cellNames())
   sampdesc <- isolate(selectedCells$selectionDescription())
-
+  
   dimx4 <- isolate(input$DE_dim_x)
   dimy4 <- isolate(input$DE_dim_y)
   sameScale <- isolate(input$DE_panelplotSameScale)
   nCol <- isolate(as.numeric(input$DE_nCol))
-
+  
   if (is.null(scEx_log) | is.null(projections) | is.null(cellNs)) {
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c("scEx_log", "projections", "genesin",
-                                                               "dimx4", "dimy4", "sameScale", "nCol", "sampdesc" , "cellNs"
-                                                               ), compress = F)
-  }
+  # debugControl("DE_panelPlot", list = c("scEx_log", "projections", "genesin",
+                                        # "dimx4", "dimy4", "sameScale", "nCol", "sampdesc" , "cellNs"))
   # cp = load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
-
+  
   genesin <- toupper(genesin)
   genesin <- gsub(" ", "", genesin, fixed = TRUE)
   genesin <- strsplit(genesin, ",")
   genesin <- genesin[[1]]
-
+  
   if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
   retVal <- panelPlotFunc(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs )
-
+  
   setRedGreenButton(
     vars = list(
       c("DE_panelplotids", isolate(input$DE_panelplotids)),
@@ -445,7 +441,7 @@ output$DE_panelPlot <- renderPlot({
                                          dimy4=dimy4, sameScale=sameScale, 
                                          nCol=nCol, sampdesc=sampdesc,
                                          cellNs=cellNs
-                                         )
+  )
   retVal
 })
 
@@ -472,7 +468,7 @@ output$DE_scaterQC <- renderImage(deleteFile = T, {
       alt = "Scater plot will be here when 'run scater' is checked"
     ))
   }
-
+  
   DE_scaterPNG()
 })
 
@@ -489,11 +485,12 @@ output$DE_tsne_plt <- plotly::renderPlotly({
     showNotification("DE_tsne_plt", id = "DE_tsne_plt", duration = NULL)
   }
   if (DEBUG) cat(file = stderr(), "output$DE_tsne_plt\n")
-
+  
   scEx_log <- scEx_log()
   g_id <- input$DE_gene_id
   projections <- projections()
   selectedCells <- DE_Exp_dataInput()
+  if(is.null(selectedCells)) return(NULL)
   cellNs <- selectedCells$cellNames()
   sampdesc <- selectedCells$selectionDescription()
   prj <- isolate(selectedCells$ProjectionUsed())
@@ -508,10 +505,9 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   if (is.null(scEx_log) | is.null(projections) | is.null(cellNs) ) {
     return(NULL)
   }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_tsne_plt.RData", list = c(ls()), compress = F)
-  }
+  # debugControl("DE_tsne_plt", list = c(ls()))
   # cp = load(file="~/SCHNAPPsDebug/DE_tsne_plt.RData")
+  
   # projections$ExpressionColor = 
   dimCol = "ExpressionColor"
   featureData <- rowData(scEx_log)
@@ -521,15 +517,15 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   }
   
   if (length(geneid) == 1) {
-    ExpressionColor <- assays(scEx_log)[[1]][geneid, ]
+    projections$ExpressionColor <- assays(scEx_log)[[1]][geneid, ]
   } else {
-    ExpressionColor <- Matrix::colSums(assays(scEx_log)[[1]][geneid, ])
+    projections$ExpressionColor <- Matrix::colSums(assays(scEx_log)[[1]][geneid, ])
   }
   
   retVal <- tsnePlot(projections, x,y,z, dimCol, scols, ccols) 
-    
+  
   # retVal <- DE_dataExpltSNEPlot(scEx_log[,cellNs], g_id, projections[cellNs, ], x,y,z)
-
+  
   printTimeEnd(start.time, "DE_dataExpltSNEPlot")
   exportTestValues(DE_dataExpltSNEPlot = {
     str(retVal)
@@ -542,118 +538,33 @@ output$DE_downloadPanel <- downloadHandler(
   filename = paste0("panelPlot.", Sys.Date(), ".Zip"),
   content = function(file) {
     if (DEBUG) cat(file = stderr(), paste("DE_downloadPanel: \n"))
-
+    
     scEx <- scEx()
     projections <- projections()
     scEx_log <- scEx_log()
     pca <- pcaReact()
     # TODO should be taken from projections.
     tsne <- tsne()
-
+    
     if (is.null(scEx) | is.null(scEx_log)) {
       return(NULL)
     }
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/DE_downloadPanel.RData", list = c(ls()))
-    }
+    # debugControl("DE_downloadPanel", list = c(ls()))
     # load(file='~/SCHNAPPsDebug/DE_downloadPanel.RData')
-
+    
     reducedDims(scEx) <- SimpleList(PCA = pca$x, TSNE = tsne)
     assays(scEx)[["logcounts"]] <- assays(scEx_log)[[1]]
     colData(scEx)[["before.Filter"]] <- projections$before.filter
     colData(scEx)[["dbCluster"]] <- projections$dbCluster
     colData(scEx)[["UmiCountPerGenes"]] <- projections$UmiCountPerGenes
     colData(scEx)[["UmiCountPerGenes2"]] <- projections$UmiCountPerGenes2
-
+    
     save(file = file, list = c("scEx"))
     if (DEBUG) cat(file = stderr(), paste("DE_downloadPanel:done \n"))
-
+    
     # write.csv(as.matrix(exprs(scEx)), file)
   }
 )
-
-# observe({
-#   if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
-#   .schnappsEnv$DE_dimension_y <- input$DE_dimension_y
-# })
-# observe({
-#   updateSelectInput(session, "DE_dimension_y",
-#                     choices = c(colnames(projections), "UmiCountPerGenes"),
-#                     selected = .schnappsEnv$DE_dimension_y
-#   )
-#
-# })
-#
-# output$DE_sortedPlot <- plotly::renderPlotly({
-#   if (DEBUG) cat(file = stderr(), paste("Module: output$DE_sortedPlot\n"))
-#   start.time <- base::Sys.time()
-#
-#   # remove any notification on exit that we don't want
-#   on.exit(
-#     if (!is.null(getDefaultReactiveDomain())) {
-#       removeNotification(id = "DE_sortedPlot")
-#     }
-#   )
-#   # show in the app that this is running
-#   if (!is.null(getDefaultReactiveDomain())) {
-#     showNotification("DE_sortedPlot", id = "DE_sortedPlot", duration = NULL)
-#   }
-#
-#   scEx_log <- scEx_log()
-#   tdata <- tData()
-#   projections <- projections()
-#   DE_dimension_y <- input$DE_dimension_y
-#
-#   if (is.null(scEx_log) | is.null(scEx_log) | is.null(tdata)) {
-#     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
-#     return(NULL)
-#   }
-#
-#
-#
-#   # event_register(p1, 'plotly_selected')
-#   printTimeEnd(start.time, "DE_sortedPlot")
-#   exportTestValues(DE_sortedPlot = {
-#     p1
-#   })
-#   suppressMessages(p1)
-#
-# })
-#
-# output$DE_SelectionText <- renderText({
-#   if (DEBUG) cat(file = stderr(), "DE_SelectionText\n")
-#   start.time <- base::Sys.time()
-#   on.exit({
-#     printTimeEnd(start.time, "DE_SelectionText")
-#     if (!is.null(getDefaultReactiveDomain())) {
-#       removeNotification(id = "DE_SelectionText")
-#     }
-#   })
-#   # show in the app that this is running
-#   if (!is.null(getDefaultReactiveDomain())) {
-#     showNotification("DE_SelectionText", id = "DE_SelectionText", duration = NULL)
-#   }
-#
-#   selectedCells <- DE_selectedCells()$selectedCells
-#
-#   if (is.null(selectedCells)) {
-#     return(NULL)
-#   }
-#   if (.schnappsEnv$DEBUGSAVE) {
-#     save(file = "~/SCHNAPPsDebug/DE_SelectionText.RData", list = c(ls()))
-#   }
-#   # load(file="~/SCHNAPPsDebug/DE_SelectionText.RData")
-#   inpClusters <- levels(projections$dbCluster)
-#
-#   retVal <- paste(selectedCells)
-#
-#   exportTestValues(DummyReactive = {
-#     retVal
-#   })
-#   return(retVal)
-# })
-#
-#
 
 # observers for input parameters and
 
@@ -673,9 +584,9 @@ observe(label = "observe DE_seuratRefBased", {
     # set one parameter to something not possible to deactivate button/or choose different
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
-
+  
   # currentValues
- setRedGreenButtonCurrent(
+  setRedGreenButtonCurrent(
     vars = list(
       c("DE_seuratRefBased_nfeatures", input$DE_seuratRefBased_nfeatures),
       c("DE_seuratRefBased_k.filter", input$DE_seuratRefBased_k.filter),
@@ -687,8 +598,8 @@ observe(label = "observe DE_seuratRefBased", {
     "DE_seuratRefBased_nfeatures", "DE_seuratRefBased_k.filter",
     "DE_seuratRefBased_scaleFactor"
   ))
-
-
+  
+  
   # Here, we create the actual button
   # output$updateNormalizationButton <- updateButtonUI(input = input, name = "updateNormalization",
   #                                                    variables = c("nfeatures", "k.filter", "scalingFactor"  ) )
@@ -708,10 +619,10 @@ observe(label = "obs.updateNormalization", {
   if (is.null(buttonPressed)) {
     buttonPressed <- 0
   }
-
+  
   # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
   if (radioButtonVal == "DE_seuratRefBased" &
-    !.schnappsEnv$DE_seuratRefBasedButtonOldVal == buttonPressed) {
+      !.schnappsEnv$DE_seuratRefBasedButtonOldVal == buttonPressed) {
     cat(file = stderr(), green(paste("\n=====changing value\n")))
     DE_seuratRefBasedButton(buttonPressed)
     .schnappsEnv$DE_seuratRefBasedButtonOldVal <- buttonPressed
@@ -757,10 +668,10 @@ observe(label = "ob DE_seuratSCtransformButtonOldVal", {
   if (is.null(buttonPressed)) {
     buttonPressed <- 0
   }
-
+  
   # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
   if (radioButtonVal == "DE_seuratSCtransform" &
-    !.schnappsEnv$DE_seuratSCtransformButtonOldVal == buttonPressed) {
+      !.schnappsEnv$DE_seuratSCtransformButtonOldVal == buttonPressed) {
     cat(file = stderr(), green(paste("\n=====changing value\n")))
     DE_seuratSCtransformButton(buttonPressed)
     .schnappsEnv$DE_seuratSCtransformButtonOldVal <- buttonPressed
@@ -783,7 +694,7 @@ observe(label = "observe DE_seuratSCtransform", {
     # set one parameter to something not possible to deactivate button/or choose different
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
-
+  
   setRedGreenButtonCurrent(
     vars = list(
       c("DE_seuratSCtransform_nfeatures", input$DE_seuratSCtransform_nfeatures),
@@ -791,7 +702,7 @@ observe(label = "observe DE_seuratSCtransform", {
       c("DE_seuratSCtransform_scaleFactor", input$DE_seuratSCtransform_scaleFactor)
     )
   )
-
+  
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratSCtransform_nfeatures",
     "DE_seuratSCtransform_k.filter",
@@ -862,7 +773,7 @@ observe(label = "observe DE_seuratStandard", {
     # set one parameter to something not possible to deactivate button/or choose different
     .schnappsEnv$DE_seuratRefBased_nfeatures <- "NA"
   }
-
+  
   setRedGreenButtonCurrent(
     vars = list(
       c("DE_seuratStandard_dims", input$DE_seuratStandard_dims),
@@ -871,7 +782,7 @@ observe(label = "observe DE_seuratStandard", {
       c("DE_seuratStandard_k.weight", input$DE_seuratStandard_k.weight)
     )
   )
-
+  
   updateButtonColor(buttonName = "updateNormalization", parameters = c(
     "DE_seuratStandard_dims",
     "DE_seuratStandard_anchorF",
@@ -919,10 +830,10 @@ observe(label = "obs.updateNormalization", {
   if (is.null(buttonPressed)) {
     buttonPressed <- 0
   }
-
+  
   # changing the reactive DE_logGeneNormalizationButton will trigger the recalculation
   if (radioButtonVal == "DE_logGeneNormalization" &
-    !.schnappsEnv$DE_logGeneNormalizationButtonOldVal == buttonPressed) {
+      !.schnappsEnv$DE_logGeneNormalizationButtonOldVal == buttonPressed) {
     cat(file = stderr(), green(paste("\n=====changing value\n")))
     DE_logGeneNormalizationButton(buttonPressed)
     .schnappsEnv$DE_logGeneNormalizationButtonOldVal <- buttonPressed
@@ -950,18 +861,18 @@ observe(label = "oblogGene", {
     return(NULL)
   }
   out <- isolate(DE_logGeneNormalization())
-
+  
   if (is.null(out)) {
     # set one parameter to something not possible to deactivate button/or choose different
     .schnappsEnv$calculated_DE_geneIds_norm <- "NOT AVAILABLE"
   }
-
+  
   setRedGreenButtonCurrent(
     vars = list(
       c("DE_geneIds_norm", input$DE_geneIds_norm)
     )
   )
- # Here, we create the actual button
+  # Here, we create the actual button
   updateButtonColor(buttonName = "updateNormalization", parameters = c("DE_geneIds_norm"))
   # output$updateNormalizationButton <- updateButtonUI(input = input, name = "updateNormalization",
   #                                                    variables = c("DE_geneIds_norm"))
@@ -973,7 +884,7 @@ observe(label = "ob12", {
   if (DEBUG) cat(file = stderr(), "observe normalizationRadioButton\n")
   out <- scEx_log()
   radioButtonValue <- input$normalizationRadioButton
-
+  
   if (is.null(out)) {
     # set one parameter to something not possible to deactivate button/or choose different
     .schnappsEnv$calculated_normalizationRadioButton <- "NA"
@@ -987,7 +898,7 @@ observe(label = "ob12", {
   assign("normalizationRadioButton", radioButtonValue, envir = .schnappsEnv)
   # Here, we create the actual button
   updateButtonColor(buttonName = "updateNormalization", parameters = c("normalizationRadioButton"))
-
+  
   # output$updateNormalizationButton <- updateButtonUI(input = input, name = "updateNormalization",
   #                                                    variables = c("normalizationRadioButton"))
 })

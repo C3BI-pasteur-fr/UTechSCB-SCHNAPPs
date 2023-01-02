@@ -81,6 +81,9 @@ observeEvent(input$Quit, {
   deepDebug()
   if(input$Quit <= 1) return(NULL)
   if(DEBUG) {cat(file = stderr(), "\nquit the app\n\n")}
+  add2history(type = "save", input=isolate( reactiveValuesToList(input)), 
+              comment = "manual quit", sessionInfo = sessionInfo())
+  
   stopApp()
   # exit()
 })
@@ -470,7 +473,7 @@ readCSV <- function(inFile) {
     rownames(data) <- make.unique(data[, 1])
     data <- data[, -1]
   }
-  exAll <- as(as.matrix(data), "dgTMatrix")
+  exAll <- as(as.matrix(data), "TsparseMatrix")
   rownames(exAll) <- rownames(data)
   colnames(exAll) <- colnames(data)
   if (all(stringr::str_detect(colnames(data),"-"))) {
@@ -695,7 +698,7 @@ inputData <- reactive({
   # deepDebug()
   # browser()
   
-   isolate({
+  isolate({
     if (is.null(names(sampleCols$colPal)) | !all(names(sampleCols$colPal) %in% sampNames)){
       sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
       names(sampleCols$colPal) <- sampNames
@@ -1135,7 +1138,7 @@ HVAinfoTable <- reactive({
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/HVAinfoTable.RData",
-      list = c( ls())
+         list = c( ls())
     )
   }
   # cp = load("~/SCHNAPPsDebug/HVAinfoTable.RData")
@@ -1220,7 +1223,7 @@ PCAloadingsTable <- reactive({
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/PCAloadingsTable.RData",
-      list = c( ls())
+         list = c( ls())
     )
   }
   # load("~/SCHNAPPsDebug/PCAloadingsTable.RData")
@@ -1244,7 +1247,7 @@ gsSelectedGenesTable <- reactive({
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/selectedGenesTable.RData",
-      list = c("normaliztionParameters", ls())
+         list = c("normaliztionParameters", ls())
     )
   }
   # load("~/SCHNAPPsDebug/selectedGenesTable.RData")
@@ -1289,7 +1292,7 @@ gsRMGenesTable <- reactive({
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/removedGenesTable.RData",
-      list = c("normaliztionParameters", ls())
+         list = c("normaliztionParameters", ls())
     )
   }
   # load("~/SCHNAPPsDebug/removedGenesTable.RData")
@@ -1870,10 +1873,10 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   }
   
   scaterPCA <- withWarnings({
-    # not sure, but this works on another with dgTMatrix
-    if (is(assays(scEx_log)[["logcounts"]], "dgTMatrix")) {
+    # not sure, but this works on another with TsparseMatrix
+    if (is(assays(scEx_log)[["logcounts"]], "TsparseMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
-        as(assays(scEx_log)[["logcounts"]], "dgCMatrix")
+        as(assays(scEx_log)[["logcounts"]], "CsparseMatrix")
     }
     x <- assays(scEx_log)[["logcounts"]]
     genesin = genesin[genesin %in% rownames(scEx_log)]
@@ -2291,8 +2294,8 @@ seurat_Clustering <- function() {
     meta.data = meta.data
   )
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "dgCMatrix")))
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "dgCMatrix")[useGenes,]
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
   dims = min(dims,ncol(pca$x)) 
   
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
@@ -2632,7 +2635,7 @@ projections <- reactive({
   # scEx is the fundamental variable with the raw data, which is available after loading
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
-  
+  # .schnappsEnv$DEBUGSAVE = T
   scEx <- scEx()
   pca <- pcaReact()
   # manually specified groups of cells (see 2D plot in moduleServer.R)
@@ -2654,7 +2657,6 @@ projections <- reactive({
     save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
-  
   
   # save session specific projections for restore
   if (exists("historyPath", envir = .schnappsEnv)) {
@@ -2697,7 +2699,8 @@ projections <- reactive({
     iter <- 1
     for (proj in .schnappsEnv$projectionFunctions) {
       start.time1 <- Sys.time()
-      incProgress(1 / n, detail = paste("Creating ", proj[1]))
+      if (!is.null(getDefaultReactiveDomain())) 
+        incProgress(1 / n, detail = paste("Creating ", proj[1]))
       if (DEBUG) {
         cat(file = stderr(), paste("calculation projection (", iter,"):  ", proj[1], "\n"))
       }
@@ -2705,7 +2708,7 @@ projections <- reactive({
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
       if (.schnappsEnv$DEBUGSAVE) {
         save(file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
-          list = c("tmp")
+             list = c("tmp")
         )
         iter <- iter + 1
       }
@@ -2766,7 +2769,22 @@ projections <- reactive({
   }
   
   if (ncol(prjs) > 0 ) {
-    projections <- cbind(projections, prjs[rownames(projections),,drop=FALSE])
+    errorPrjs = FALSE
+    if(is.null(rownames(prjs))) {
+      errorPrjs = TRUE
+    } else {
+      if (!all(rownames(projections) %in% rownames(prjs))) errorPrjs = TRUE
+    }
+    if(errorPrjs){
+      cat(file = stderr(), paste("\n\n\nprjs ERROR\n\n\n\n"))
+      save(file = "~/SCHNAPPsDebug/prjs.ERROR.RData", list = c(ls()))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("prjs ERROR", id = "prjs", duration = NULL, type = "error")
+      }
+      stop("\n\n\nERROR: prjs didn't work correctly, please send file ~/SCHNAPPsDebug/prjs.ERROR.RData to bernd\n\n\n")
+    }else{
+      projections <- cbind(projections, prjs[rownames(projections),,drop=FALSE])
+    }
   }
   # # remove columns with only one unique value
   # rmC <- c()
@@ -2798,6 +2816,7 @@ projections <- reactive({
   exportTestValues(projections = {
     projections
   })
+  # .schnappsEnv$DEBUGSAVE = F
   return(projections)
 })
 
@@ -2827,7 +2846,7 @@ projFactors <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projFactors.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/projFactors.RData")
+  # cp=load(file="~/SCHNAPPsDebug/projFactors.RData")
   
   coln <- colnames(projections)
   choices <- c()
@@ -2836,10 +2855,10 @@ projFactors <- reactive({
       choices <- c(choices, cn)
     }
   }
-  if (is.null(projFactors)) {
+  if (is.null(choices)) {
     choices <- c("no valid columns")
   }
-  if (length(projFactors) == 0) {
+  if (length(choices) == 0) {
     choices <- c("no valid columns")
   }
   return(choices)
@@ -3386,21 +3405,21 @@ reacativeReport <- function() {
   scEx <- consolidateScEx(scEx, projections, scEx_log, pca, tsne)
   reportTempDir <- get("reportTempDir", envir = .schnappsEnv)
   base::save(file = tmpPrjFile,
-    list = c(
-      "reportTempDir",
-      "projections",
-      "scEx_log",
-      "scEx",
-      "report.env",
-      ".schnappsEnv"
-    )
+             list = c(
+               "reportTempDir",
+               "projections",
+               "scEx_log",
+               "scEx",
+               "report.env",
+               ".schnappsEnv"
+             )
   )
   userDataEnv <-
     as.environment(as.list(session$userData, all.names = TRUE))
   # deepDebug()
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/tempReport.1.RData",
-      list = c("session", "report.env", "file", ls())
+         list = c("session", "report.env", "file", ls())
     )
   }
   # load('~/SCHNAPPsDebug/tempReport.1.RData')
@@ -3652,7 +3671,7 @@ reacativeReport <- function() {
             file = paste0(.schnappsEnv$reportTempDir, "/normalizedCounts.csv")
   )
   base::save(file = paste0(.schnappsEnv$reportTempDir, "/inputUsed.RData"),
-    list = c("scEx", "projections")
+             list = c("scEx", "projections")
   )
   zippedReportFiles <- c(paste0(tDir, zippedReportFiles))
   zip(outZipFile, zippedReportFiles, flags = "-9Xj")

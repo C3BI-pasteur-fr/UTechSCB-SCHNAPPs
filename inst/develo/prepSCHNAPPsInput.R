@@ -80,7 +80,7 @@ schnappsRead10X_h5 <- function(filename, use.names = TRUE, unique.features = TRU
     }
     rownames(x = sparse.mat) <- features
     colnames(x = sparse.mat) <- barcodes[]
-    sparse.mat <- as(object = sparse.mat, Class = "dgCMatrix")
+    sparse.mat <- as(object = sparse.mat, Class = "CsparseMatrix")
     if (infile$exists(name = paste0(genome, "/features"))) {
       types <- infile[[paste0(genome, "/features/feature_type")]][]
       types.unique <- unique(x = types)

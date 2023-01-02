@@ -25,6 +25,7 @@ suppressMessages(require(scran))
 suppressMessages(require(ggalluvial))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(dplyr))
+suppressMessages(require(shinyjqui))
 
 if ("debugme" %in% rownames(installed.packages())) {
   suppressMessages(require(debugme))
@@ -115,6 +116,7 @@ base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 .schnappsEnv$reportTempDir <- base::tempdir()
 
 scShinyServer <- function(input, output, session) {
+  library(shinyjqui)
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   session$onSessionEnded(stopApp)
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
@@ -325,6 +327,7 @@ scShinyServer <- function(input, output, session) {
         # RData file now contain the .schnappsEnv
         # add anything that is not set
         for(na in ls(tempEnv$schnappsEnv)[!ls(tempEnv$schnappsEnv) %in% ls(.schnappsEnv)]){
+          cat(file = stderr(), paste("setting from history file(",fileInfo[latestFile, "path"] %>% as.character(),"):",na,"\n"))
           .schnappsEnv[[na]] = tempEnv$schnappsEnv[[na]]
         }
         # input is handled by .schnappsEnv$defaultValues in the UI
@@ -342,7 +345,7 @@ scShinyServer <- function(input, output, session) {
           
           fileRmdInfo =  rmdFiles %>% file.info()
           latestRmdFile = fileRmdInfo %>% pull("ctime") %>% order()  %>% last()
-          .schnappsEnv$historyFile = rownames(filesxInfo)[latestRmdFile]
+          .schnappsEnv$historyFile = rownames(fileRmdInfo)[latestRmdFile]
         }else{
           cat(file = stderr(), "input is null from history file please update SCHNAPPs and start over.")
         }
@@ -388,7 +391,7 @@ scShinyServer <- function(input, output, session) {
       rm("historyPath", envir = .schnappsEnv)
     }
   }
-  
+  # browser()
   
   
 } # END SERVER

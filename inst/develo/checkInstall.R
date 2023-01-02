@@ -51,7 +51,7 @@ gList = c('ggnetwork', 'shinyMCE',
 
 instList = c('BiocManager', 'pdftools',
              'shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r',
-             'forcats', 'kohonen', 'SCORPIUS', 'shinyBS', 'threejs', 'DT', 'shinythemes'
+             'forcats', 'kohonen', 'SCORPIUSbj', 'shinyBS', 'threejs', 'DT', 'shinythemes'
   
 )
 # setRepositories(ind = c(1,2,3))
