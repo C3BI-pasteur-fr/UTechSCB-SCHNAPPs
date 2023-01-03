@@ -1,3 +1,6 @@
+require(parallel)
+
+
 # source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
 # since DE_scaterPNG is not used frequently it is not included in the heavyCalculations
@@ -401,7 +404,7 @@ output$DE_panelPlot <- renderPlot({
     return(NULL)
   }
   # debugControl("DE_panelPlot", list = c("scEx_log", "projections", "genesin",
-                                        # "dimx4", "dimy4", "sameScale", "nCol", "sampdesc" , "cellNs"))
+  # "dimx4", "dimy4", "sameScale", "nCol", "sampdesc" , "cellNs"))
   # cp = load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
   
   genesin <- toupper(genesin)
@@ -445,8 +448,127 @@ output$DE_panelPlot <- renderPlot({
   retVal
 })
 
-
+#
+# 
+# 
 # Scater QC ----
+#
+# 
+# 
+
+emptyImage = list(
+  src = "images/Empty.png",
+  contentType = "image/png",
+  width = 100,
+  height = 100,
+  alt = "Scater plot will be here when 'apply changes' is checked"
+)
+
+createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL) {
+  if (.schnappsEnv$DEBUG) cat(file = stderr(), "function: createScaterPNG\n")
+  p1 = pltHighExp( scaterReads, n, scols) 
+  outfile <- paste0(tempdir(), "/scaterPlot.png")
+  # calculations
+  if (is.null(width)) {
+    width <- 96 * 7
+  }
+  if (is.null(height)) {
+    height <- 96 * 7
+  }
+  myPNGwidth <- width / 96
+  myPNGheight <- height / 96
+  
+  tryCatch(
+    ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
+    error = function(e) {
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("Problem saving ggplot", type = "warning", duration = NULL)
+      }
+      return(emptyImage)
+    }
+  )
+  retVal <- list(
+    src = normalizePath(outfile, mustWork = FALSE),
+    contentType = "image/png",
+    width = width,
+    height = height,
+    alt = "Scater plot should be here"
+  )
+  
+  return(retVal)
+}
+
+# click on start button
+observeEvent(input$runScater,{
+  if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$runScater\n")
+  if (!is.null(detachedProc$process))
+    return()
+  start.time <- base::Sys.time()
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
+  }
+  scaterReads <- isolate(scaterReads())
+  scols <- isolate(sampleCols$colPal)
+  
+  width <- session$clientData$output_plot_width
+  height <- session$clientData$output_plot_height
+  
+  n <- min(nrow(scaterReads), 50)
+# browser()
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scater.RData", list = c(ls()))
+  }
+  # cp=load(file='~/SCHNAPPsDebug/scater.RData')
+  detachedProc$result <- emptyImage
+  # span process
+  detachedProc$process <- mcparallel({
+    createScaterPNG(scaterReads, n, scols, width=width, height=height)
+  })
+  detachedProc$startTime = start.time
+  detachedProc$msg <- sprintf("%1$s started", detachedProc$process$pid)
+})
+#
+# Stop the process
+#
+observeEvent(input$stopScater, {
+  detachedProc$result <- emptyImage
+  if (!is.null(detachedProc$process)) {
+    tools::pskill(detachedProc$process$pid)
+    detachedProc$msg <- sprintf("%1$s killed", detachedProc$process$pid)
+    detachedProc$process <- NULL
+    
+    if (!is.null(detachedProc$obs)) {
+      detachedProc$obs$destroy()
+    }
+  }
+})
+
+#
+# Handle process event
+#
+observeEvent(detachedProc$process, {
+  if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process\n")
+  detachedProc$obs <- observe({
+    # this will re-execute the collection process of mcparallel
+    if (.schnappsEnv$DEBUG) cat(file = stderr(), "observe: detachedProc$obs\n")
+    invalidateLater(500, session)
+    isolate({
+      # browser()
+      result <- mccollect(detachedProc$process, wait = FALSE)
+      if (!is.null(result)) {
+        # endTime = 
+        if (!is.null(getDefaultReactiveDomain())) {
+          removeNotification(id = "DE_scaterPNG")
+        }
+        printTimeEnd(detachedProc$startTime, "DE_scaterPNG")
+        detachedProc$result <- result[[1]]
+        detachedProc$obs$destroy()
+        detachedProc$process <- NULL
+      }
+    })
+  })
+})
+
 output$DE_scaterQC <- renderImage(deleteFile = T, {
   start.time <- base::Sys.time()
   on.exit(
@@ -458,18 +580,31 @@ output$DE_scaterQC <- renderImage(deleteFile = T, {
     showNotification("DE_scaterQC", id = "DE_scaterQC", duration = NULL)
   }
   if (DEBUG) cat(file = stderr(), "output$DE_scaterQC\n")
-  scaterReads <- scaterReads()
+  scaterReads <- isolate(scaterReads())
   if (is.null(scaterReads)) {
-    return(list(
-      src = "",
-      contentType = "image/png",
-      width = 10,
-      height = 10,
-      alt = "Scater plot will be here when 'run scater' is checked"
-    ))
+    return(emptyImage)
   }
-  
-  DE_scaterPNG()
+  af = pltHighExp
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  n <- min(nrow(scaterReads), 50)
+  scols <- isolate(sampleCols$colPal)
+  .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
+                                         # plotHighestExprs = plotHighestExprs,
+                                         scaterReads = scaterReads, 
+                                         n = n,
+                                         scols = scols
+  )
+  setRedGreenButton(
+    vars = list(
+      c("scaterRan", 1)
+    ),
+    button = "runScater"
+  )
+  exportTestValues(DE_scaterPNG = {
+    detachedProc$result
+  })
+  detachedProc$result
 })
 
 # DE_tsne_plt ----

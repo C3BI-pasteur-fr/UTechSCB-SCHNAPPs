@@ -147,120 +147,109 @@ observe(label = "save2HistPanel", {
 #' it is not in the heavyCalculations list.
 #' TODO
 #' maybe in a future version there can be a button to enable caclulations
-DE_scaterPNG <- reactive({
-  start.time <- base::Sys.time()
-  on.exit(
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "DE_scaterPNG")
-    }
-  )
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
-  }
-  if (DEBUG) cat(file = stderr(), "DE_scaterPNG\n")
-  
-  clicked <- input$runScater
-  cat(file = stderr(), paste("DE_scaterPNG", clicked, "\n"))
-  # takes too long, commenting out for course
-  # if (is.null(.schnappsEnv$scaterRan)){
-  #   .schnappsEnv$scaterRan = 0
-  #   return(list(
-  #     src = "",
-  #     contentType = "image/png",
-  #     width = 10,
-  #     height = 10,
-  #     alt = "Scater plot will be here when 'apply changes' is checked"
-  #   ))
-  # }
-  if (clicked < 1) {
-    return(list(
-      src = "",
-      contentType = "image/png",
-      width = 10,
-      height = 10,
-      alt = "Scater plot will be here when 'apply changes' is checked"
-    ))
-  }
-  scaterReads <- isolate(scaterReads())
-  if (is.null(scaterReads)) {
-    return(list(
-      src = "",
-      contentType = "image/png",
-      width = 10,
-      height = 10,
-      alt = "Scater plot will be here when 'apply changes' is clicked"
-    ))
-  }
-  scols <- isolate(sampleCols$colPal)
-  
-  width <- session$clientData$output_plot_width
-  height <- session$clientData$output_plot_height
-  
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater.RData", list = c(ls()))
-  }
-  # cp=load(file='~/SCHNAPPsDebug/scater.RData')
-  
-  # calculations
-  if (is.null(width)) {
-    width <- 96 * 7
-  }
-  if (is.null(height)) {
-    height <- 96 * 7
-  }
-  
-  myPNGwidth <- width / 96
-  myPNGheight <- height / 96
-  
-  outfile <- paste0(tempdir(), "/scaterPlot.png")
-  # outfile <- paste0("~/SCHNAPPsDebug",'/scaterPlot.png')
-  if (DEBUG) cat(file = stderr(), paste("output file: ", outfile, "\n"))
-  if (DEBUG) cat(file = stderr(), paste("output file normalized: ", normalizePath(outfile, mustWork = FALSE), "\n"))
-  n <- min(nrow(scaterReads), 50)
-  
-  rownames(scaterReads) <- rowData(scaterReads)$symbol
-  p1 = pltHighExp( scaterReads, n, scols) 
-  
-  tryCatch(
-    ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
-    error = function(e) {
-      if (!is.null(getDefaultReactiveDomain())) {
-        showNotification("Problem saving ggplot", type = "warning", duration = NULL)
-      }
-      return(NULL)
-    }
-  )
-  retVal <- list(
-    src = normalizePath(outfile, mustWork = FALSE),
-    contentType = "image/png",
-    width = width,
-    height = height,
-    alt = "Scater plot should be here"
-  )
-  # end calculation
-  af = pltHighExp
-  # remove env because it is too big
-  environment(af) = new.env(parent = emptyenv())
-  
-  .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
-                                         # plotHighestExprs = plotHighestExprs,
-                                         scaterReads = scaterReads, 
-                                         n = n,
-                                         scols = scols
-  )
-  setRedGreenButton(
-    vars = list(
-      c("scaterRan", 1)
-    ),
-    button = "runScater"
-  )
-  
-  printTimeEnd(start.time, "DE_scaterPNG")
-  exportTestValues(DE_scaterPNG = {
-    retVal
-  })
-  return(retVal)
-})
+# DE_scaterPNG <- reactive({
+#   start.time <- base::Sys.time()
+#   on.exit(
+#     if (!is.null(getDefaultReactiveDomain())) {
+#       removeNotification(id = "DE_scaterPNG")
+#     }
+#   )
+#   if (!is.null(getDefaultReactiveDomain())) {
+#     showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
+#   }
+#   if (DEBUG) cat(file = stderr(), "DE_scaterPNG\n")
+#   
+#   clicked <- input$runScater
+#   cat(file = stderr(), paste("DE_scaterPNG", clicked, "\n"))
+#   if (clicked < 1) {
+#     return(list(
+#       src = "",
+#       contentType = "image/png",
+#       width = 10,
+#       height = 10,
+#       alt = "Scater plot will be here when 'apply changes' is checked"
+#     ))
+#   }
+#   scaterReads <- isolate(scaterReads())
+#   if (is.null(scaterReads)) {
+#     return(list(
+#       src = "",
+#       contentType = "image/png",
+#       width = 10,
+#       height = 10,
+#       alt = "Scater plot will be here when 'apply changes' is clicked"
+#     ))
+#   }
+#   scols <- isolate(sampleCols$colPal)
+#   
+#   width <- session$clientData$output_plot_width
+#   height <- session$clientData$output_plot_height
+#   
+#   if (.schnappsEnv$DEBUGSAVE) {
+#     save(file = "~/SCHNAPPsDebug/scater.RData", list = c(ls()))
+#   }
+#   # cp=load(file='~/SCHNAPPsDebug/scater.RData')
+#   
+#   # calculations
+#   if (is.null(width)) {
+#     width <- 96 * 7
+#   }
+#   if (is.null(height)) {
+#     height <- 96 * 7
+#   }
+#   
+#   myPNGwidth <- width / 96
+#   myPNGheight <- height / 96
+#   
+#   outfile <- paste0(tempdir(), "/scaterPlot.png")
+#   # outfile <- paste0("~/SCHNAPPsDebug",'/scaterPlot.png')
+#   if (.schnappsEnv$DEBUG) cat(file = stderr(), paste("output file: ", outfile, "\n"))
+#   if (.schnappsEnv$DEBUG) cat(file = stderr(), paste("output file normalized: ", normalizePath(outfile, mustWork = FALSE), "\n"))
+#   n <- min(nrow(scaterReads), 50)
+#   
+#   rownames(scaterReads) <- rowData(scaterReads)$symbol
+#   p1 = pltHighExp( scaterReads, n, scols) 
+#   
+#   tryCatch(
+#     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
+#     error = function(e) {
+#       if (!is.null(getDefaultReactiveDomain())) {
+#         showNotification("Problem saving ggplot", type = "warning", duration = NULL)
+#       }
+#       return(NULL)
+#     }
+#   )
+#   retVal <- list(
+#     src = normalizePath(outfile, mustWork = FALSE),
+#     contentType = "image/png",
+#     width = width,
+#     height = height,
+#     alt = "Scater plot should be here"
+#   )
+#   # end calculation
+#   af = pltHighExp
+#   # remove env because it is too big
+#   environment(af) = new.env(parent = emptyenv())
+#   
+#   .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
+#                                          # plotHighestExprs = plotHighestExprs,
+#                                          scaterReads = scaterReads, 
+#                                          n = n,
+#                                          scols = scols
+#   )
+#   setRedGreenButton(
+#     vars = list(
+#       c("scaterRan", 1)
+#     ),
+#     button = "runScater"
+#   )
+#   
+#   printTimeEnd(start.time, "DE_scaterPNG")
+#   exportTestValues(DE_scaterPNG = {
+#     retVal
+#   })
+#   return(retVal)
+# })
 
 # DE_dataExpltSNEPlot ---
 #' DE_dataExpltSNEPlot

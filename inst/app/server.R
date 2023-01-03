@@ -120,6 +120,16 @@ scShinyServer <- function(input, output, session) {
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   session$onSessionEnded(stopApp)
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
+  
+  # detached Process, currently only scaterPNG
+  detachedProc <- reactiveValues()
+  detachedProc$process <- NULL
+  detachedProc$msg <- NULL
+  detachedProc$obs <- NULL
+  detachedProc$startTime= NULL
+  
+  
+  
   # seed ----
   # TODO needs to be an option
   seed <- 2

@@ -220,7 +220,8 @@ tabList <- list(
       width = 12, status = "primary", height = "1627px",
       fluidRow(
         column(12, offset = 1,
-               actionButton("runScater", "apply changes", width = "80%")
+               actionButton("runScater", "apply changes", width = "50%"),
+               actionButton("stopScater", "stop calculations", width = "20%", class = "btn-danger")
         )
       ),
       br(),
