@@ -46,7 +46,7 @@ if (!exists(".schnappsEnv")) {
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    packagePath <- "~/Rstudio/Schnapps/inst/app/"
+    packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
     # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
   }
 } else {
@@ -127,8 +127,9 @@ scShinyServer <- function(input, output, session) {
   detachedProc$msg <- NULL
   detachedProc$obs <- NULL
   detachedProc$startTime= NULL
+  detachedProc$result = NULL
   
-  
+  activateObserver <- reactiveVal(0)
   
   # seed ----
   # TODO needs to be an option
@@ -148,7 +149,7 @@ scShinyServer <- function(input, output, session) {
   # in development mode, called not from package? ----
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
-      packagePath <- "~/Rstudio/Schnapps/inst/app/"
+      packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
