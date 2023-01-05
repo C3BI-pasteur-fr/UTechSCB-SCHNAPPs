@@ -2,8 +2,10 @@ library(shiny)
 library(parallel)
 library(future)
 library("BiocParallel")
+library("future.callr")
 
-plan(multisession, workers = 5)
+plan(callr, workers = 5)
+# plan(multisession, workers = 5)
 # f <- future({
 #   cat("Hello world!\n")
 #   3.14
@@ -27,6 +29,7 @@ detachedProc <- reactiveValues()
 detachedProc$process <- NULL
 detachedProc$msg <- NULL
 detachedProc$obs <- NULL
+detachedProc$PID <- NULL
 # counter <- 0
 # results <- list()
 dfEmpty <- data.frame(results = numeric(0))
@@ -42,7 +45,16 @@ analyze <- function() {
     Sys.sleep(1)
     rnorm(1)
   })
-  data.frame(results = unlist(out))
+  return(Sys.getpid())
+}
+
+getWorkerPIDs <- function(){
+  v <- listenv::listenv()  # requires listenv package
+  for (ii in 1:works) {
+    v[[ii]] %<-% {
+      Sys.getpid()
+    }
+  }
 }
 
 # f = future({
@@ -81,7 +93,7 @@ shinyApp(
   server = function(input, output, session)
   {
     
-    actrivateObserver <- reactiveVal(0)
+    activateObserver <- reactiveVal(0)
     #
     # Add something to play with during waiting
     #
@@ -117,12 +129,31 @@ shinyApp(
       if (!is.null(detachedProc$process))
         return()
       detachedProc$result <- dfEmpty
+      pl=plan()
+      
       #span the process/function call
       detachedProc$process <- future({
         # detachedProc$process$pid = Sys.getpid()
         analyze()
-      },seed=NULL)
-      actrivateObserver(1)
+      },seed=NULL,
+      packages = NULL,
+      globals = list(analyze=analyze), # we specify all variables with the function call
+      lazy = FALSE, #start immediatly
+      stdout = structure(TRUE, drop = TRUE))
+      activateObserver(1)
+      cat(file = stderr(), paste("input$start",detachedProc$process$process$get_pid(),"me:",Sys.getpid(),"\n"))
+      if("callr" %in% class(pl)){
+        detachedProc$PID = detachedProc$process$process$get_pid()
+      }else{
+        # if("multisession" %in% class(pl)){
+        #   currentWorkerPIDs = getWorkerPIDs()
+        # }
+        #
+        # please use callr otherwise we cannot kill process (for now)
+        # 
+      }
+      
+      # browser()
       detachedProc$msg <- sprintf("%1$s started", detachedProc$process$pid)
       
     })
@@ -132,21 +163,19 @@ shinyApp(
     # Stop the process
     #
     observeEvent(input$stop, {
-      detachedProc$result <- dfEmpty
-      if (!is.null(detachedProc$process)) {
-        # need to get process id and kill using #For windows
-        # system(sprintf("taskkill /F /PID %s", v[[i]]))
-        #For Linux
-        # system(sprintf("kill -9 %s", v[[i]]))
-        
-        # tools::pskill(detachedProc$process$pid)
-        
-        detachedProc$msg <- sprintf("%1$s killed", detachedProc$process$pid)
-        detachedProc$process <- NULL
-        
-        # if (!is.null(detachedProc$obs)) {
-        # detachedProc$obs$destroy()
-        # }
+      # we can only kill when using future.callr
+      cat(file = stderr(), "input$stop\n")
+      if (!is.null(detachedProc$PID)) {
+        if("running" == detachedProc$process$state){
+          #For windows
+          # system(sprintf("taskkill /F /PID %s", v[[i]]))
+          
+          #For Linux
+          system(sprintf("kill -9 %s", detachedProc$PID))
+          activateObserver(0)
+          detachedProc$PID = NULL
+          detachedProc$process = NULL
+        }
       }
     })
     
@@ -159,14 +188,14 @@ shinyApp(
         cat(file = stderr(), "detachedProc$obs\n")
         # this will re-execute the collection process of mcparallel
         # if(!is.null(detachedProc$process))
-        if(actrivateObserver()>0)
+        if(activateObserver()>0)
           invalidateLater(500, session)
         isolate({
           if(resolved(detachedProc$process))
             if(!is.null(detachedProc$process)){
               detachedProc$result <- value(detachedProc$process)
               detachedProc$process <- NULL
-              actrivateObserver(0)
+              activateObserver(0)
             }
           
         })

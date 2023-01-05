@@ -457,17 +457,18 @@ output$DE_panelPlot <- renderPlot({
 # 
 
 emptyImage = list(
-  src = "images/Empty.png",
+  src =  normalizePath("/Users/bernd/Rstudio/UTechSCB-SCHNAPPs/inst/www/images/schnappsLogo.png",mustWork = F),
   contentType = "image/png",
-  width = 100,
-  height = 100,
+  width = 500,
+  height = 500,
   alt = "Scater plot will be here when 'apply changes' is checked"
 )
 
-createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL) {
-  if (.schnappsEnv$DEBUG) cat(file = stderr(), "function: createScaterPNG\n")
+createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL, DEBUG, outfile) {
+  if (DEBUG) cat(file = stderr(), "function: createScaterPNG\n")
+  # save(file = "~/SCHNAPPsDebug/createScaterPNG.RData", list = c(ls()))
+  # cp=load(file='~/SCHNAPPsDebug/createScaterPNG.RData')
   p1 = pltHighExp( scaterReads, n, scols) 
-  outfile <- paste0(tempdir(), "/scaterPlot.png")
   # calculations
   if (is.null(width)) {
     width <- 96 * 7
@@ -501,8 +502,9 @@ createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL) {
 # click on start button
 observeEvent(input$runScater,{
   if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$runScater\n")
-  if (!is.null(detachedProc$process))
+  if (!is.null(detachedProc$process)){
     return()
+    }
   start.time <- base::Sys.time()
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
@@ -510,8 +512,17 @@ observeEvent(input$runScater,{
   scaterReads <- isolate(scaterReads())
   scols <- isolate(sampleCols$colPal)
   
-  width <- session$clientData$output_plot_width
-  height <- session$clientData$output_plot_height
+  if (is.null(scaterReads)){
+    removeNotification(id="DE_scaterPNG")
+    detachedProc$result <- emptyImage
+    return()
+    }
+  # width <- session$clientData$output_plot_width
+  # height <- session$clientData$output_plot_height
+  width <- NULL
+  height <- NULL
+  # outfile has to be set outside of the future since it will be removed after the session closes.
+  outfile <- paste0(tempdir(), "/scaterPlot.png")
   
   n <- min(nrow(scaterReads), 50)
 # browser()
@@ -520,10 +531,35 @@ observeEvent(input$runScater,{
   }
   # cp=load(file='~/SCHNAPPsDebug/scater.RData')
   detachedProc$result <- emptyImage
+  pl=plan()
   # span process
-  detachedProc$process <- mcparallel({
-    createScaterPNG(scaterReads, n, scols, width=width, height=height)
-  })
+  # detachedProc$process <- mcparallel({
+  #   createScaterPNG(scaterReads, n, scols, width=width, height=height)
+  # })
+  #span the process/function call
+  detachedProc$process <- future({
+    # detachedProc$process$pid = Sys.getpid()
+    createScaterPNG(scaterReads=scaterReads, n=n, scols=scols, width=NULL, height=NULL, DEBUG = DEBUG, outfile=outfile)
+  },seed=NULL,
+  packages = "scater",
+  globals = list(createScaterPNG=createScaterPNG, emptyImage=emptyImage, DEBUG=.schnappsEnv$DEBUG, pltHighExp=pltHighExp,
+                 scaterReads=scaterReads, n=n, scols=scols, width=NULL, height=NULL, outfile=outfile), # we specify all variables with the function call
+  lazy = FALSE, #start immediatly
+  stdout = structure(TRUE, drop = TRUE)
+  )
+  activateObserver(1)
+  cat(file = stderr(), paste("input$start",detachedProc$process$process$get_pid(),"me:",Sys.getpid(),"\n"))
+  if("callr" %in% class(pl)){
+    detachedProc$PID = detachedProc$process$process$get_pid()
+  }else{
+    # if("multisession" %in% class(pl)){
+    #   currentWorkerPIDs = getWorkerPIDs()
+    # }
+    #
+    # please use callr otherwise we cannot kill process (for now)
+    # 
+  }
+  
   detachedProc$startTime = start.time
   detachedProc$msg <- sprintf("%1$s started", detachedProc$process$pid)
 })
@@ -531,14 +567,22 @@ observeEvent(input$runScater,{
 # Stop the process
 #
 observeEvent(input$stopScater, {
-  detachedProc$result <- emptyImage
-  if (!is.null(detachedProc$process)) {
-    tools::pskill(detachedProc$process$pid)
-    detachedProc$msg <- sprintf("%1$s killed", detachedProc$process$pid)
-    detachedProc$process <- NULL
-    
-    if (!is.null(detachedProc$obs)) {
-      detachedProc$obs$destroy()
+  if(.schnappsEnv$DEBUG) cat(file = stderr(), "input$stopScater\n")
+  if (!is.null(detachedProc$PID)) {
+    if("running" == detachedProc$process$state){
+      #For windows
+      # system(sprintf("taskkill /F /PID %s", v[[i]]))
+      
+      #For Linux
+      system(sprintf("kill -9 %s", detachedProc$PID))
+      activateObserver(0)
+      detachedProc$PID = NULL
+      detachedProc$process = NULL
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "DE_scaterQC")
+        removeNotification(id = "DE_scaterPNG")
+      }
+      
     }
   }
 })
@@ -546,30 +590,33 @@ observeEvent(input$stopScater, {
 #
 # Handle process event
 #
-observeEvent(detachedProc$process, {
+detachedProc$obs <- observe({
   if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process\n")
-  detachedProc$obs <- observe({
-    # this will re-execute the collection process of mcparallel
-    if (.schnappsEnv$DEBUG) cat(file = stderr(), "observe: detachedProc$obs\n")
+  # this will re-execute the collection process of mcparallel
+  # if(!is.null(detachedProc$process))
+  if(activateObserver()>0)
     invalidateLater(500, session)
-    isolate({
-      # browser()
-      result <- mccollect(detachedProc$process, wait = FALSE)
-      if (!is.null(result)) {
-        # endTime = 
-        if (!is.null(getDefaultReactiveDomain())) {
-          removeNotification(id = "DE_scaterPNG")
-        }
-        printTimeEnd(detachedProc$startTime, "DE_scaterPNG")
-        detachedProc$result <- result[[1]]
-        detachedProc$obs$destroy()
+  isolate({
+    if(resolved(detachedProc$process))
+      if(!is.null(detachedProc$process)){
+        # browser()
+        detachedProc$result <- value(detachedProc$process)
+        result = detachedProc$result
+        save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
+        # cp=load(file='~/SCHNAPPsDebug/createScaterPNGprocess.RData')
         detachedProc$process <- NULL
+        activateObserver(0)
+        printTimeEnd(detachedProc$startTime, "DE_scaterPNG")
+        if (!is.null(getDefaultReactiveDomain())) {
+          removeNotification( id = "DE_scaterPNG")
+        }
+        
       }
-    })
+    
   })
 })
 
-output$DE_scaterQC <- renderImage(deleteFile = T, {
+output$DE_scaterQC <- renderImage(deleteFile = F, {
   start.time <- base::Sys.time()
   on.exit(
     if (!is.null(getDefaultReactiveDomain())) {
@@ -579,9 +626,11 @@ output$DE_scaterQC <- renderImage(deleteFile = T, {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("DE_scaterQC", id = "DE_scaterQC", duration = NULL)
   }
-  if (DEBUG) cat(file = stderr(), "output$DE_scaterQC\n")
+  if (DEBUG) cat(file = stderr(), "renderImage. output$DE_scaterQC\n")
+  # browser()
+  result = detachedProc$result
   scaterReads <- isolate(scaterReads())
-  if (is.null(scaterReads)) {
+  if (is.null(scaterReads) | is.null(result)) {
     return(emptyImage)
   }
   af = pltHighExp
@@ -601,10 +650,11 @@ output$DE_scaterQC <- renderImage(deleteFile = T, {
     ),
     button = "runScater"
   )
+  
   exportTestValues(DE_scaterPNG = {
-    detachedProc$result
+    result
   })
-  detachedProc$result
+  result
 })
 
 # DE_tsne_plt ----
