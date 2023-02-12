@@ -9,6 +9,7 @@ menuList <- list(
                            # id="coexpressionID",
                            tabName = "coexpression", startExpanded = FALSE,
                            shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
+                           shinydashboard::menuSubItem("Gene sets", tabName = "geneSets"),
                            shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
                            shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
                            if(("ggalluvial" %in% rownames(installed.packages())))
@@ -54,7 +55,75 @@ tabList <- list(
       )
     )
   ),
-  
+  # geneSetsTab ----
+  geneSetsTab = shinydashboard::tabItem(
+    "geneSets",
+    shinydashboard::box(
+      title = "Dot plot", solidHeader = TRUE, width = 12, status = "primary",
+      fluidRow(
+        column(
+          width = 4,
+          sc_selectInput("coE_dotPlot_geneSets", label = "Gene sets for y axis", 
+          choices = c("please load GMT file"),
+          selected = .schnappsEnv$coE_dotPlot_geneSets,
+          multiple = T),
+          sc_numericInput("coE_dotPlot_col.min", "Minimum scaled average expression threshold",
+                          defaultValue("coE_dotPlot_col.min", -2.5),
+                          min = -10, max = 10, step = 0.1
+          ),
+          sc_numericInput("coE_dotPlot_col.max", "Maximum scaled average expression threshold",
+                          defaultValue("coE_dotPlot_col.max", 2.5),
+                          min = -10, max = 10, step = 0.1
+          )
+         ),column(
+          width = 4,
+          sc_selectInput(
+            "coE_dimension_ydotPlotClusters",
+            label = "Y",
+            choices = c(defaultValue("coE_dimension_ydotPlotClusters", "dbCluster"), "sampleName", "tsne3"),
+            selected = defaultValue("coE_dimension_ydotPlotClusters", "dbCluster")
+          ),
+          sc_numericInput("coE_dotPlot_dot.min", "The fraction of cells at which to draw the smallest dot",
+                          defaultValue("coE_dotPlot_dot.min", 0),
+                          min = 0, max = 1, step = 0.1
+          ),
+          sc_numericInput("coE_dotPlot_dot.scale", "Scale the size of the points",
+                          defaultValue("coE_dotPlot_dot.scale", 6),
+                          min = 1, max = 20, step = 0.1
+          )
+         ),column(
+          width = 4,
+          sc_selectInput(
+            "coE_dotPlot_col",
+            label = "col",
+            choices = rownames(x = brewer.pal.info),
+            selected = "RdBu"
+          ),
+          sc_selectInput(
+            "coE_dotPlot_scale.by",
+            label = "Scale the size of the points",
+            choices = c("size", "radius"),
+            selected = "radius"
+          )
+          # not needed? :
+          #' @param scale.by Scale the size of the points by 'size' or by 'radius'
+          #' @param scale.min Set lower limit for scaling, use NA for default
+          #' @param scale.max Set upper limit for scaling, use NA for default
+          
+        )
+      ),
+      
+      fluidRow(
+        column(
+          width = 12,
+          # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
+          jqui_resizable(plotOutput("coE_dotPlot_GeneSets"))
+        )
+      ),
+      br(),
+      actionButton("save2histDotPlot", "save to history")
+    )
+  ),
   # coexpression selected -----
   coexpressionSelectedTab = shinydashboard::tabItem(
     "coexpressionSelected",
@@ -117,14 +186,14 @@ tabList <- list(
                                          column(
                                            width = 3,
                                            sc_numericInput("coEtgMinExpr", "min UMI count per gene:",
-                                                        defaultValue("coEtgMinExpr", 1),
-                                                        min = 0, max = 100000
+                                                           defaultValue("coEtgMinExpr", 1),
+                                                           min = 0, max = 100000
                                            )
                                          ), column(
                                            width = 3,
                                            sc_numericInput("coEtgPerc", "min percentage of cells expressing a genes:",
-                                                        defaultValue("coEtgPerc", 60),
-                                                        min = 1, max = 100
+                                                           defaultValue("coEtgPerc", 60),
+                                                           min = 1, max = 100
                                            )
                                          )
                                        ),
@@ -197,11 +266,11 @@ tabList <- list(
                column(
                  width = 4,
                  sc_selectInput(
-                 "coE_scale",
-                 label = "Scale",
-                 choices = c("area", "count", "width"),
-                 selected = defaultValue("coE_scale", "count")
-               )
+                   "coE_scale",
+                   label = "Scale",
+                   choices = c("area", "count", "width"),
+                   selected = defaultValue("coE_scale", "count")
+                 )
                )
              ),
              fluidRow(

@@ -141,6 +141,18 @@ observe(label = "save2HistPanel", {
 
 
 # DE_scaterPNG ----
+
+# detached Process, currently only scaterPNG
+detachedProc <- reactiveValues()
+detachedProc$process <- NULL
+detachedProc$msg <- NULL
+detachedProc$obs <- NULL
+detachedProc$startTime= NULL
+detachedProc$result = NULL
+
+activateObserver <- reactiveVal(0)
+
+
 #' DE_scaterPNG
 #' reactive to plot highest expressed genes
 #' take quite some time to compute, but since we normally don't need it

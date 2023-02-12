@@ -1,4 +1,5 @@
 # # LIBRARIES -----------------------------------------------------------------
+suppressMessages(require(shinyjqui))
 suppressMessages(require(shiny))
 suppressMessages(require(shinyTree))
 suppressMessages(require(tibble))
@@ -25,7 +26,6 @@ suppressMessages(require(scran))
 suppressMessages(require(ggalluvial))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(dplyr))
-suppressMessages(require(shinyjqui))
 
 if ("debugme" %in% rownames(installed.packages())) {
   suppressMessages(require(debugme))
@@ -121,15 +121,6 @@ scShinyServer <- function(input, output, session) {
   session$onSessionEnded(stopApp)
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
   
-  # detached Process, currently only scaterPNG
-  detachedProc <- reactiveValues()
-  detachedProc$process <- NULL
-  detachedProc$msg <- NULL
-  detachedProc$obs <- NULL
-  detachedProc$startTime= NULL
-  detachedProc$result = NULL
-  
-  activateObserver <- reactiveVal(0)
   
   # seed ----
   # TODO needs to be an option

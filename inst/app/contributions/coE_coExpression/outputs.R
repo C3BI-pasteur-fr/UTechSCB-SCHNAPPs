@@ -201,6 +201,74 @@ coeMinMax = reactive({
     input$coEminMaxExpr
 }) %>% debounce(1000)
 
+
+# coE_dotPlot_GeneSets ----
+output$coE_dotPlot_GeneSets <- renderPlot({
+  # output$coE_dotPlot_GeneSets <- renderPlotly({
+    if (DEBUG) cat(file = stderr(), "coE_dotPlot_GeneSets started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_dotPlot_GeneSets")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_dotPlot_GeneSets")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_dotPlot_GeneSets", id = "coE_dotPlot_GeneSets", duration = NULL)
+  }
+  projections <- projections()
+  scEx_log <- scEx_log()
+  clusters = input$coE_dimension_ydotPlotClusters
+  geneSets = input$coE_dotPlot_geneSets
+  col = input$coE_dotPlot_col
+  col.min = input$coE_dotPlot_col.min
+  col.max = input$coE_dotPlot_col.max
+  dot.min = input$coE_dotPlot_dot.min
+  dot.scale = input$coE_dotPlot_dot.scale
+  scale.by = input$coE_dotPlot_scale.by
+  
+  gmtData = gmtData()
+  
+  if (is.null(projections) | is.null(scEx_log) | is.null(gmtData) | !all(geneSets %in% names(gmtData))) {
+    if (DEBUG) cat(file = stderr(), "output$coE_dotPlot_GeneSets:NULL\n")
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_dotPlot_GeneSets.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/coE_dotPlot_GeneSets.RData")
+  featureData <- rowData(scEx_log)
+  retVal <- coE_dotPlot_GeneSets(
+    projections = projections,
+    scEx_log <- scEx_log,
+    clusters = clusters,
+    geneSets = geneSets,
+    gmtData = gmtData,
+    col = col,
+    col.min = col.min,
+    col.max = col.max,
+    dot.min = dot.min,
+    dot.scale = dot.scale,
+    scale.by = scale.by
+  )
+  
+
+  if(is.null(retVal)) return(NULL)
+  af = coE_geneGrp_vioFunc
+  # remove env because it is too big
+  specEnv = emptyenv()
+  environment(af) = new.env(parent = specEnv)
+  .schnappsEnv[["coE_dotPlot_GeneSets"]] <- list(plotFunc = af,
+                                                 projections = projections,
+                                                 scEx_log = scEx_log,
+                                                 clusters = clusters,
+                                                 geneSets = geneSets
+                                                 
+  )
+  return(retVal)
+})
+
+
 output$coE_geneGrp_vio_plot <- renderPlot({
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot started.\n")
   start.time <- base::Sys.time()
@@ -425,23 +493,19 @@ output$alluvial_plot <- renderPlot({
   return(gg)
 })
 
+observe({
+  if (DEBUG) cat(file = stderr(), "observe gmtData: coE_dotPlot_geneSets\n")
+  
+  gmtList = gmtData()
+  updateSelectInput(session, "coE_dotPlot_geneSets",
+                    choices = names(gmtList),
+                    selected = .schnappsEnv$coE_dotPlot_geneSets
+  )
+})
+
 # observe alluiv ----
 observe({
-  # projections <- projections()
-  # 
-  # req(projections)
   projF = projFactors()
-  # save(file = "~/SCHNAPPsDebug/alluvial_plot2.RData", list = c(ls(), ls(envir = globalenv())))
-  # load(file="~/SCHNAPPsDebug/alluvial_plot2.RData")
-  # facs = which(lapply(projections, class) == "factor")
-  # idx=1
-  # for (ff in facs){
-  #   if(length(levels(projections[,ff]))>100){
-  #     facs = facs[-idx]
-  #   }
-  #   idx = idx + 1
-  # }
-  
   updateSelectInput(session, "alluiv1",
                     choices = projF,
                     selected = .schnappsEnv$alluiv1
@@ -450,6 +514,9 @@ observe({
                     choices = projF,
                     selected = .schnappsEnv$alluiv2
   )
+  updateSelectInput(session, "coE_dimension_ydotPlotClusters",
+                    choices = projF,
+                    selected = .schnappsEnv$coE_dimension_ydotPlotClusters)
 })
 
 

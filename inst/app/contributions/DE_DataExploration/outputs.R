@@ -602,7 +602,7 @@ detachedProc$obs <- observe({
         # browser()
         detachedProc$result <- value(detachedProc$process)
         result = detachedProc$result
-        save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
+        # save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
         # cp=load(file='~/SCHNAPPsDebug/createScaterPNGprocess.RData')
         detachedProc$process <- NULL
         activateObserver(0)
