@@ -1,16 +1,16 @@
 suppressMessages(library(magrittr))
 
-if ("shinycssloaders" %in% rownames(installed.packages())) {
-  suppressMessages(library(shinycssloaders))
-} else {
-  withSpinner <- function(x) {
-    x
-  }
-}
 if ("shinyjqui" %in% rownames(installed.packages())) {
   suppressMessages(require(shinyjqui))
 } else {
   jqui_resizable <- function(x, ...) {
+    x
+  }
+}
+if ("shinycssloaders" %in% rownames(installed.packages())) {
+  suppressMessages(library(shinycssloaders))
+} else {
+  withSpinner <- function(x) {
     x
   }
 }

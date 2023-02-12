@@ -107,6 +107,109 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
 }
 
 
+# save to history dotplot ---d-
+observe(label = "save2histDotPlot", {
+  clicked  = input$save2HistVio
+  if (DEBUG) cat(file = stderr(), "observe save2histDotPlot \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# DotPlot genes \n",
+                              "fun = plotData$plotData$plotFunc\n", 
+                              "environment(fun) = environment()\n",
+                              "plotData$plotData$outfile=NULL\n",
+                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["coE_dotPlot_GeneSets"]])
+  
+})
+
+
+# coE_dotPlot_GeneSetsFunc ----
+coE_dotPlot_GeneSets <- function(projections = projections,
+                                 scEx_log = scEx_log,
+                                 clusters = clusters,
+                                 geneSets = geneSets,
+                                 gmtData = gmtData,
+                                 summarize = T,
+                                 col = "RdBu",
+                                 col.min = col.min,
+                                 col.max = col.max,
+                                 dot.min = dot.min,
+                                 dot.scale = dot.scale,
+                                 scale.by = scale.by
+){
+  # replace "_", with "."
+  newRN = stringr::str_replace_all(rownames(scEx_log),"_",".")
+  rownames(scEx_log) = newRN
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx_log)[[1]]
+  )
+  Idents(seurDat) <- as.factor(projections[,clusters])
+  featureDat = rowData(scEx_log)
+  if(length(geneSets) == 1){
+    features = geneName2Index(paste(gmtData[[geneSets]]$genes,collapse = ", "), featureDat)
+  } else {
+    FUN = function(x){
+      geneName2Index(paste(gmtData[[x]]$genes,collapse = ", "), featureDat)
+    }
+    features = lapply(geneSets, FUN = FUN)
+    names(features) = geneSets
+  }
+  # handle duplicated gene names
+  ulFeatures = unlist(features)
+  FUN = function(x,g){
+    # cat(file = stderr(), g)
+    if(length(which(x==g)>0)) x = x[-which(x==g)]
+    x
+  }
+  for(dupGene in ulFeatures[which(ulFeatures %>% duplicated())]){
+    features =lapply(features,FUN = FUN,g=dupGene)
+    features$common =c(features$common, dupGene)
+  }
+  p = DotPlot(seurDat, 
+              assay="RNA", 
+              features = features, 
+              cols = col,
+              col.min = col.min,
+              col.max = col.max,
+              dot.min = dot.min,
+              dot.scale = dot.scale,
+              idents = NULL,
+              group.by = NULL,
+              split.by = NULL,
+              cluster.idents = FALSE,
+              scale = TRUE,
+              scale.by = scale.by,
+              scale.min = NA,
+              scale.max = NA
+  )
+  geneOrder = c()
+  cellOrder = c()
+  for(gIdx in seq(length(ggplot_build(p)$layout$panel_params))){
+    geneOrder = c(geneOrder,ggplot_build(p)$layout$panel_params[[gIdx]]$x$breaks)
+  }
+  cellOrder = ggplot_build(p)$layout$panel_params[[1]]$y$breaks %>% stringr::str_replace("SeuratProject_","")
+  # }
+  p= p + scale_x_discrete(labels = featureDat[geneOrder,"symbol"]) +
+    scale_y_discrete(labels = cellOrder) +
+    ylab(clusters) + theme(axis.text.x = element_text(angle = 25, vjust = 0.5),
+                           strip.text.x = element_text(angle=5))
+  # ggplotly(p)
+  p
+}
+
+
 # coE_heatmapSelectedReactive ----
 # reactive function for selected heatmap
 coE_heatmapSelectedReactive <- reactive({
@@ -416,8 +519,8 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
- 
-   if (coE_showPermutations & showExpression) {
+  
+  if (coE_showPermutations & showExpression) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(
         "Please use only one of show expression and permuationas",

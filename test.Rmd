@@ -1,0 +1,48 @@
+---
+title: "TEST"
+author: "Bernd Jagla"
+date: "2022-12-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/serverFunctions.R", echo=F)
+
+```
+
+```{r}
+  doCalc <- input$scorpiusCalc
+```
+
+```{r som}
+# "dimScorpiusX" %in% names(.schnappsEnv$defaultValues)
+# "dimScorpiusY" %in% names(.schnappsEnv$defaultValues)
+# .schnappsEnv$defaultValues[["dimScorpiusX"]]
+# .schnappsEnv$defaultValues[["dimScorpiusY"]]
+# "elpiStartNode" %in% names(.schnappsEnv$defaultValues)
+# 
+# res2 = coE_somTrainReact()
+# scEx <- isolate(scEx())
+# scEx_log <- isolate(scEx_log())
+# prjs <- isolate(sessionProjections$prjs)
+# projFactors <- projFactors()
+# projections <- isolate(projections())
+# inp = reactiveValuesToList(input)
+# somInputData = somInputData()
+# coE_somMapReact = coE_somMapReact()
+# coE_somTrainReact = coE_somTrainReact()
+# coE_somGenesReact = coE_somGenesReact()
+# coE_heatmapSOMReactive = coE_heatmapSOMReactive()
+
+genesin <- input$coE_geneSOM
+
+featureData <- rowData(scEx_log)
+geneName = geneName2Index(genesin, featureData)
+
+# coE_SOMcodebook = output$coE_SOMcodebook()
+endpoints <- traj_endpoints()
+save(file = "test.RData", list = c(ls(),".schnappsEnv"))
+
+
+```

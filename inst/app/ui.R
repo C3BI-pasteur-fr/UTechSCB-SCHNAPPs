@@ -6,6 +6,7 @@
 #
 
 
+suppressMessages(require(shinyjqui))
 suppressMessages(require(shiny))
 source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 suppressMessages(require(shinydashboard))
@@ -19,7 +20,6 @@ suppressMessages(require(pheatmap))
 # suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinyjs))
-suppressMessages(require(shinyjqui))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -238,13 +238,22 @@ scShinyUI <- function(request) {
         inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
         inlineCSS(list(.green = "background-color: lightgreen")),
         getallTabs(),
-        if(DEBUG){
-          library(profvis)
-          library(shiny)
-          profvis_ui("profiler")
-        },
+        
+        ### !!!! https://github.com/Yang-Tang/shinyjqui/issues/87
+        ### not working resize shinyjqui
+        # if(DEBUG){
+        #   library(profvis)
+        #   library(shiny)
+        #   profvis_ui("profiler")
+        # },
+        
         tags$head(tags$style(HTML("div.box-header {display: block;}"))),
         tags$head(tags$style(HTML("h3.box-title {display: block;}")))
+        # tags$head(
+        #   tags$script(version    = "1.12.1",
+        #               src        = "www/shared/jqueryui",
+        #               script     = "jquery-ui.min.js"
+        #               ))
         # tags$div(list(inputTab(),
         #               geneSelectionTab()),
         #          # inputTab(),

@@ -249,7 +249,7 @@ In SCHNAPPs there is only one normalization at a time. multiple normalization co
     ```nenner <- Matrix::colSums(assays(scEx)[[1]][genesin, , drop = FALSE])```<br/>
   ```nenner[nenner == 0] <- 1```<br/>
   ```A@x <- A@x / (nenner[A@j + 1L])```<br/>
-  ```scEx_bcnorm <- SingleCellExperiment(assay = list(logcounts = as(A, "dgTMatrix")),colData = colData(scEx),rowData = rowData(scEx)```<br/>)
+  ```scEx_bcnorm <- SingleCellExperiment(assay = list(logcounts = as(A, "TsparseMatrix")),colData = colData(scEx),rowData = rowData(scEx)```<br/>)
   ```x <- uniqTsparse(assays(scEx_bcnorm)[[1]])```<br/>
   ```slot(x, "x") <- log(1 + slot(x, "x"), base = 2) * scalingFactor```
 ]

@@ -452,6 +452,56 @@ readMM <- function(inFile) {
 # scMat = as.matrix(assays(scEx)[[1]])
 # write.file.csv(scMat, row.names=TRUE, file="data/scEx.csv" )
 
+
+## readGMT ----
+
+readGMT <- function(inFile, scEx){
+  # inFile = list()
+  # inFile$datapath="h.all.v2022.1.Hs.symbols.gmt"
+  con <- file(inFile$datapath, "r")
+  first_line <- readLines(con, n = 1)
+  close(con)
+  commaCount <- length(gregexpr(",", first_line, perl = T)[[1]])
+  tabCount <- length(gregexpr("\t", first_line, perl = T)[[1]])
+  spaceCount <- length(gregexpr(" ", first_line, perl = T)[[1]])
+  sep <- ","
+  if (spaceCount > commaCount) sep <- " "
+  if (commaCount > tabCount) sep <- ","
+  if (tabCount > commaCount) sep <- "\t"
+  con <- file(inFile$datapath, "r")
+  dat <- readLines(con = con)
+  close(con)
+  dat <- strsplit(dat, sep)
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/readGMT.RData", list = c(ls()))
+  }
+  # load(file='~/SCHNAPPsDebug/readGMT.RData')
+  FUN = function(x){
+    name = x[1]
+    desc = x[2]
+    genes = x[3:length(x)]
+    noGenes = genes[which(!genes %in% rowData(scEx)$symbol)]
+    if(.schnappsEnv$DEBUG){
+      cat(file = stderr(), paste("GMT reader: ", name, "genes not found:", paste(noGenes, collapse = ","), "\n"))
+    }
+    genes = genes[which(genes %in% rowData(scEx)$symbol)]
+    if (length(genes) == 0) {
+      if(.schnappsEnv$DEBUG){
+        cat(file = stderr(), paste("GMT reader: ", name, "no genes found:\n"))
+      }
+      return(NULL)
+    }
+    paste(genes, collapse = ", " )
+    return(list(name = name, desc = desc, genes = genes))
+    
+  }
+  retVal = lapply(dat,FUN = FUN)
+  retVal = retVal[lapply(retVal,length)>0]
+  names(retVal) = lapply(retVal, FUN=function(x)x$name) %>% unlist
+  retVal
+}
+
+## readCSV ----
 readCSV <- function(inFile) {
   # check.names = T will change the rownames. Since this is not enforced for the singleExperiment we shouldn't do it here either.
   con <- file(inFile$datapath, "r")
@@ -514,24 +564,24 @@ readCSV <- function(inFile) {
 # write.file.csv(colData(scEx), row.names=TRUE, file="data/scExCells.csv" )
 # write.file.csv(rowData(scEx), row.names=TRUE, file="data/scExGenes.csv" )
 # annFile$datapath="data/scExGenes.csv"
-#' appendAnnotation
-#'
-#' append annotation to singleCellExperiment object
-#' uses colData
+# appendAnnotation ----
+#
+# append annotation to singleCellExperiment object
+# uses colData
 appendAnnotation <- function(scEx, annFile) {
   if (DEBUG) {
     cat(file = stderr(), "appendAnnotation\n")
   }
   rDat <- rowData(scEx)
   cDat <- colData(scEx)
-  
+  success = FALSE
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/appendAnnotation.RData", list = c(ls()))
     }
     # cp = load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
-    if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES")) {
+    if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES", "CELL_ID")) {
       rownames(data) <- data[, 1]
       data <- data[, -1]
     }
@@ -547,6 +597,7 @@ appendAnnotation <- function(scEx, annFile) {
         }
       }
       rDat[rownames(data), colnames(data)] <- data
+      success = TRUE
     }
     # symbol used as row name
     if (any(rownames(data) %in% rDat$symbol)) {
@@ -577,11 +628,12 @@ appendAnnotation <- function(scEx, annFile) {
         }
       }
       rDat[rownames(data), colnames(data)] <- data
+      success = TRUE
     }
     
     # colData
     if (any(rownames(data) %in% rownames(cDat))) {
-      # if any factor is already set we need to avoid having different levles
+      # if any factor is already set we need to avoid having different levels
       if (any(colnames(cDat) %in% colnames(data))) {
         commonCols <- colnames(cDat) %in% colnames(data)
         for (cCol in colnames(cDat)[commonCols]) {
@@ -600,18 +652,30 @@ appendAnnotation <- function(scEx, annFile) {
       }
       # only take cells that are also in the data set
       data = data[rownames(data) %in% colnames(scEx),]
-      cDat[rownames(data), colnames(data)] <- data
+      data = data[rownames(cDat),]
+      cDat = cbind(cDat, data)
+      success = TRUE
     }
   }
   cDat$sampleNames <- factor(cDat$sampleNames)
   colData(scEx) <- cDat
   rowData(scEx) <- rDat
+  if(!success){
+    showNotification(
+      "loading annotations didn't result in any added annotations",
+      type = "error",
+      duration = NULL
+    )
+    
+  }
   if (DEBUG) {
     cat(file = stderr(), "appendAnnotation done\n")
   }
   return(scEx)
 }
 
+
+### dataFile reactive ----
 dataFile <- reactive({
   deepDebug()
   if(.schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
@@ -747,6 +811,69 @@ inputData <- reactive({
   return(retVal)
 })
 
+# gmtData ----
+# load RData file with singlecellExperiment object
+# internal, should not be used by plug-ins
+gmtData <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "gmtData started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "gmtData")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "gmtData")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("gmtData", id = "gmtData", duration = NULL)
+  }
+  
+  gmtFile <- input$geneSetFile
+  scEx = scEx() # needed to validate input
+  
+  if (is.null(gmtFile) |is.null(scEx)) {
+    if (DEBUG) {
+      cat(file = stderr(), "gmtData: NULL\n")
+    }
+    return(NULL)
+  }
+  
+  if (DEBUG) cat(file = stderr(), paste("gmtFile.", gmtFile$datapath[1], "\n"))
+  if (!file.exists(gmtFile$datapath[1])) {
+    if (DEBUG) {
+      cat(file = stderr(), "gmtData: ", gmtFile$datapath[1], " doesn't exist\n")
+    }
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gmtData.RData", list = c(ls()))
+  }
+  # cp =load(file='~/SCHNAPPsDebug/gmtData.RData')
+  
+  # gmtFile$datapath = "data/sessionData.RData"
+  # annFile$datapath = "data/selectedCells.csv"
+  # TODO either multiple files with rdata/rds or single file of csv/other
+  fpExtension <- tools::file_ext(gmtFile$datapath[1])
+  retVal <- tryCatch({readGMT(gmtFile, scEx)},
+                     error = function(e){
+                       cat(file = stderr(), paste("gmtData: NULL", e,"\n"))
+                       return(NULL)}
+  )
+  
+  
+  if (is.null(retVal)) {
+    return(NULL)
+  }
+  
+
+  exportTestValues(gmtData = {
+    list(
+      retVal
+    )
+  })
+  return(retVal)
+})
 
 
 medianENSGfunc <- function(scEx) {
@@ -838,7 +965,7 @@ medianUMI <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("medianUMI", id = "medianUMI", duration = NULL)
   }
-  
+  gmtData()
   scEx <- scEx()
   if (is.null(scEx)) {
     if (DEBUG) {
@@ -1606,6 +1733,8 @@ rawNormalization <- reactive({
   })
   return(scEx)
 })
+
+
 
 # scEx_log ----
 scEx_log <- reactive({

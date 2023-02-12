@@ -1,3 +1,4 @@
+suppressMessages(require(shinyjqui))
 suppressMessages(require(shiny))
 # require(shinyMCE)
 
@@ -98,6 +99,21 @@ inputTab <- function() {
                 placeholder = "no file selected",
                 multiple = TRUE
               ) %>% setId(id="fileInputAnnotation"), checkbsTT("annoFile")
+            )
+          ),
+          fluidRow(
+            column(
+              6,
+              offset = 3,
+              fileInput(
+                "geneSetFile",
+                "gene set file (GMT)",
+                accept = c(
+                  ".txt", ".csv", ".gmt"
+                ),
+                placeholder = "no file selected",
+                multiple = TRUE
+              ) %>% setId(id="fileInputGMT"), checkbsTT("gmtFile")
             )
           )
           
