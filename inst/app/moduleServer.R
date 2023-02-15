@@ -1785,25 +1785,31 @@ pHeatMapModule <- function(input, output, session,
     }
     # cp = load("~/SCHNAPPsDebug/pHeatMapAreaNULL.RData")
     
-    
-    output$pHeatMapPlotSelection = renderPrint({
-      print(selection)
-    })
+    if (!is.null(selection)){
+      output$pHeatMapPlotSelection = renderPrint({
+        print(selection)
+      })
+      
+    }
     
     if ("ht_list" %in% slotNames(htDat)) {
       htMat = htDat@ht_list[[1]]@matrix
     } else if("matrix" %in% slotNames(htDat)) {
       htMat = htDat@matrix
+    } else {
+      save(file = "~/SCHNAPPsDebug/pHeatMaphtDat.RData", list = c( ls()  ))
+      return(NULL)
     }
-    r_index = selection$row_index[[1]]
-    geneName = rowData(scEx_log)[rownames(htMat)[r_index],"symbol"]
-    
-    # clusterServer - output$heatmapSelectedGenes ----
-    output$heatmapSelectedGenes <- renderText({
-      retVal <- paste(geneName, collapse = ", ")
-      return(retVal)
-    })
-    
+    if(!is.null(selection)){
+      r_index = selection$row_index[[1]]
+      geneName = rowData(scEx_log)[rownames(htMat)[r_index],"symbol"]
+      
+      # clusterServer - output$heatmapSelectedGenes ----
+      output$heatmapSelectedGenes <- renderText({
+        retVal <- paste(geneName, collapse = ", ")
+        return(retVal)
+      })
+    }
     
   }) 
   
