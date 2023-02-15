@@ -466,9 +466,11 @@ emptyImage = list(
 
 createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL, DEBUG, outfile) {
   if (DEBUG) cat(file = stderr(), "function: createScaterPNG\n")
-  # save(file = "~/SCHNAPPsDebug/createScaterPNG.RData", list = c(ls()))
+  save(file = "~/SCHNAPPsDebug/createScaterPNG.RData", list = c(ls()))
   # cp=load(file='~/SCHNAPPsDebug/createScaterPNG.RData')
+  if (DEBUG) cat(file = stderr(), "function: createScaterPNG2\n")
   p1 = pltHighExp( scaterReads, n, scols) 
+  if (DEBUG) cat(file = stderr(), "function: createScaterPNG3\n")
   # calculations
   if (is.null(width)) {
     width <- 96 * 7
@@ -479,6 +481,7 @@ createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL, DEBU
   myPNGwidth <- width / 96
   myPNGheight <- height / 96
   
+  if (DEBUG) cat(file = stderr(), "function: createScaterPNG4\n")
   tryCatch(
     ggsave(file = normalizePath(outfile, mustWork = FALSE), plot = p1, width = myPNGwidth, height = myPNGheight, units = "in"),
     error = function(e) {
@@ -495,6 +498,7 @@ createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL, DEBU
     height = height,
     alt = "Scater plot should be here"
   )
+  if (DEBUG) cat(file = stderr(), "function: createScaterPNG5\n")
   
   return(retVal)
 }
@@ -596,6 +600,7 @@ detachedProc$obs <- observe({
   # if(!is.null(detachedProc$process))
   if(activateObserver()>0)
     invalidateLater(500, session)
+  if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process2\n")
   isolate({
     if(resolved(detachedProc$process))
       if(!is.null(detachedProc$process)){
@@ -605,13 +610,17 @@ detachedProc$obs <- observe({
         # save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
         # cp=load(file='~/SCHNAPPsDebug/createScaterPNGprocess.RData')
         detachedProc$process <- NULL
+        detachedProc$PID = NULL
         activateObserver(0)
+        if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process3\n")
         printTimeEnd(detachedProc$startTime, "DE_scaterPNG")
+        if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process4\n")
         if (!is.null(getDefaultReactiveDomain())) {
           removeNotification( id = "DE_scaterPNG")
         }
         
       }
+    if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process5\n")
     
   })
 })
