@@ -1670,18 +1670,18 @@ pHeatMapModule <- function(input, output, session,
         cat(file = stderr(), paste("inputData: NULL", e,"\n"))
         return(NULL)}
     )
-    # cat(file=stderr(), paste("\n\n",current.viewport()$name,"\n\n"))
-    if (is.null(selection)) {
-      save(file = "~/SCHNAPPsDebug/pHeatMapClickNULL.RData", list = c( ls()  ))
-      return(NULL)
-      # cp = load("~/SCHNAPPsDebug/pHeatMapClickNULL.RData")
-    }
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData",
            list = ls()
       )
     }
     # cp = load(file="~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData")
+    # cat(file=stderr(), paste("\n\n",current.viewport()$name,"\n\n"))
+    if (is.null(selection)) {
+      # save(file = "~/SCHNAPPsDebug/pHeatMapClickNULL.RData", list = c( ls()  ))
+      return(NULL)
+      # cp = load("~/SCHNAPPsDebug/pHeatMapClickNULL.RData")
+    }
     output$pHeatMapPlotSelection = renderPrint({
       print(selection)
     })
