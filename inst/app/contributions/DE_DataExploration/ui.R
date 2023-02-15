@@ -224,18 +224,18 @@ tabList <- list(
                actionButton("stopScater", "stop calculations", width = "20%", class = "btn-danger")
         )
       ),
-      br(),
-      fluidRow(
-        column(
-          12,
-          offset = 0, 
-          div(style = "height:672px;",
-              imageOutput("DE_scaterQC") 
-          ) # PNG output with temp file
-        )
-      ),
-      br(),
-      actionButton("save2HistScater", "save to history")
+      br()#,
+      # fluidRow(
+      #   column(
+      #     12,
+      #     offset = 0, 
+      #     div(style = "height:672px;",
+      #         imageOutput("DE_scaterQC") 
+      #     ) # PNG output with temp file
+      #   )
+      # ),
+      # br(),
+      # actionButton("save2HistScater", "save to history")
     )
     
     
