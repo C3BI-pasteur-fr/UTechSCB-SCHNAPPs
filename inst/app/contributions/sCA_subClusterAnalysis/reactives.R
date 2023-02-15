@@ -143,8 +143,13 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
     return(NULL)
   }
   
+  # change "_" to "-"
+  rowNameLookup = data.frame(org = rownames(scEx), seurat = stringr::str_replace_all(rownames(scEx),"_","-"))
+  rownames(rowNameLookup) = rowNameLookup$org
+  # rownames(scEx) = stringr::str_replace_all(rownames(scEx),"_","-")
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
+  useGenes = rowNameLookup[which(rowNameLookup$seurat %in% rownames(seurDat@assays$RNA@data)),"seurat"]
+  rownames(scEx) = rowNameLookup[rownames(scEx),"seurat"]
   seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
   seurDat@assays$RNA@scale.data = as.matrix(seurDat@assays$RNA@data)
   
@@ -155,9 +160,9 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
     Seurat::FindMarkers(seurDat, 
                         ident.1 = cells.1,
                         ident.2 = cells.2,
-                        min.pct = 0.0000001,
+                        min.pct = 0.00000000001,
                         test.use = test,
-                        logfc.threshold = 0.001
+                        logfc.threshold = 0.000001
                         # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
                         # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
                         # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
@@ -171,6 +176,8 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   
   if (is(markers$value , "data.frame")) {
     markers = markers$value
+    rownames(rowNameLookup) = rowNameLookup$seurat
+    rownames(markers) = rowNameLookup[rownames(markers),"org"]
   }else {
     cat(file = stderr(), "something went wrong with seurat find markers\n")
     cat(file = stderr(), as.character(markers$value))
@@ -482,7 +489,7 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
+  #cp = load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
   
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
