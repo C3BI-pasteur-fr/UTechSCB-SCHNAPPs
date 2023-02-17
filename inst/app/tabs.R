@@ -169,6 +169,26 @@ inputTab <- function() {
   )
 }
 
+# shortCustTab ----
+
+shortCustTab <- function() {
+  shinydashboard::tabItem(
+    tabName = "shortCustTab",
+    fluidRow(div(h3("Click on a figure to get to the that representation in the app"), align = "center")),
+    fluidRow(
+      column(width = 4,
+        tags$img(
+          src =  normalizePath("www/images/schnappsLogo.png",mustWork = F),
+          contentType = "image/png",
+          width = 500,
+          height = 500,
+          alt = "Scater plot will be here when 'apply changes' is checked"
+        )
+      )
+    )
+    )
+}
+
 # geneSelectionTab ----
 geneSelectionTab <- function() {
   shinydashboard::tabItem(

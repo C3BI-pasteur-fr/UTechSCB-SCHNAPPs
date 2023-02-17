@@ -457,7 +457,7 @@ output$DE_panelPlot <- renderPlot({
 # 
 
 emptyImage = list(
-  src =  normalizePath("/Users/bernd/Rstudio/UTechSCB-SCHNAPPs/inst/www/images/schnappsLogo.png",mustWork = F),
+  src =  normalizePath("www/images/schnappsLogo.png",mustWork = F),
   contentType = "image/png",
   width = 500,
   height = 500,

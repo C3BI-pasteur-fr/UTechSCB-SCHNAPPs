@@ -1,0 +1,265 @@
+---
+title: "meta cell"
+author: "Bernd Jagla"
+date: "6/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r install, eval=FALSE}
+BiocManager::install("tanaylab/metacell", vignette=T)
+```
+
+```{r}
+library("metacell")
+if(!dir.exists("metaDataDbscEx")) dir.create("metaDataDbscEx/")
+scdb_init("metaDataDbscEx", force_reinit=T)
+# mcell_import_scmat_10x("test", base_dir="http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k/")
+
+# wget http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k//matrix.mtx
+# wget http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k//features.tsv
+# wget http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k//barcodes.tsv
+
+cp = load("~/Rstudio/scShinyHubData/GSE168704.schnapps.RData")
+
+scm = scm_import_sce_to_mat(scEx, counts_slot = "counts")
+scdb_add_mat("metaDataDb", scm)
+#> remote mode
+#> summing up total of 0 paralog genes into 0 unique genes
+#> [1] TRUE
+mat = scdb_mat("metaDataDb")
+print(dim(mat@mat))
+
+if(!dir.exists("metaDataScExFigs")) dir.create("metaDataScExFigs/")
+scfigs_init("metaDataScExFigs/")
+
+
+```
+
+```{r}
+
+mcell_plot_umis_per_cell("metaDataDb")
+```
+
+We want to clean some known issues from the matrix before starting to work with it. We generate a list of mitochondrial genes that typically mark cells as being stressed or dying, as well as immunoglobulin genes that may represent strong clonal signatures in plasma cells, rather than cellular identity.
+
+```{r}
+mat = scdb_mat("metaDataDb")
+nms = c(rownames(mat@mat), rownames(mat@ignore_gmat))
+ig_genes = c(grep("^IGJ|^IGH", nms, value = T), 
+                grep("^IGH",nms,value = T),
+                grep("^IGK", nms, value =T), 
+                grep("^IGL", nms, value =T))
+
+bad_genes = unique(c(grep("^MT-", nms, value = T), grep("^MTMR", nms, value = T), grep("^MTND", nms, value = T),"NEAT1","TMSB4X", "TMSB10", ig_genes))
+
+bad_genes
+```
+
+We will next ask the package to ignore the above genes:
+
+* not needed for schnapps as it will use the scEx object that is already filtered.
+
+```{r, eval=FALSE}
+mcell_mat_ignore_genes(new_mat_id="metaDataDb", mat_id="metaDataDb", bad_genes, reverse=F) 
+```
+
+Ignored genes are kept in the matrix for reference, but all downstream analysis will disregard them. This means that the number of UMIs from these genes cannot be used to distinguish between cells.
+
+In the current example we will also eliminate cells with less than 800 UMIs (threshold can be set based on examination of the UMI count distribution):
+
+* not needed for schnapps as it will use the scEx object that is already filtered.
+
+```{r, eval=FALSE}
+mcell_mat_ignore_small_cells("metaDataDb", "metaDataDb", 800)
+```
+
+We move on to computing statistics on the distributions of each gene in the data, which are going to be our main tool for selecting feature genes for MetaCell analysis:
+
+```{r important1}
+mcell_add_gene_stat(gstat_id="metaDataDb", mat_id="metaDataDb", force=T)
+```
+
+
+This generates a new object of type gstat under the name "test", by analyzing the count matrix with id "test". We can explore interesting genes and their distributions, or move directly to select a gene set for downstream analysis. For now, let's to the latter.
+
+We create a new object of type gset (gene set), to which all genes whose scaled variance (variance divided by mean) exceeds a given threshold are added:
+
+```{r important2}
+mcell_gset_filter_varmean(gset_id="metaDataDb_feats", gstat_id="metaDataDb", T_vm=0.08, force_new=T)
+mcell_gset_filter_cov(gset_id = "metaDataDb_feats", gstat_id="metaDataDb", T_tot=100, T_top3=2)
+ # mcell_gset_filter_multi
+```
+
+The first command creates a new gene set with all genes for which the scaled variance is 0.08 and higher. The second command restrict this gene set to genes with at least 100 UMIs across the entire dataset, and also requires selected genes to have at least three cells for more than 2 UMIs were recorded.
+
+We can refine our parameters by plotting all genes and our selected gene set given the mean and variance statistics:
+
+```{r important QC}
+mcell_plot_gstats(gstat_id="metaDataDb", gset_id="metaDataDb_feats")
+ 
+```
+
+Assuming we are happy with the selected genes (some strategies for studying them will be discussed in another vignette), we will move forward to create a similarity graph (cgraph), using a construction called balanced K-nn graph:
+
+```{r important4}
+mcell_add_cgraph_from_mat_bknn(mat_id="metaDataDb", 
+                gset_id = "metaDataDb_feats", 
+                graph_id="metaDataDb_graph",
+                K=100,
+                dsamp=T)
+```
+
+This adds to the database a new cgraph object named test_graph. The K=100 parameter is important, as it affects the size distribution of the derived metacells. Note that constructing the graph can become computationally intensive if going beyond 20-30,000 cells. The system is currently limited by memory, and we have generated a graph on 160,000 cells on machines with 0.5TB RAM. For more modest data sets (e.g. few 10x lanes or MARS-seq experiments), things will run very quickly.
+
+The next step will use the cgraph to sample five hundred metacell partitions, each covering 75% of the cells and organizing them in dense subgraphs:
+
+```{r}
+mcell_coclust_from_graph_resamp(
+                coc_id="metaDataDb_coc500", 
+                graph_id="metaDataDb_graph",
+                min_mc_size=20, 
+                p_resamp=0.75, n_resamp=500)
+```
+
+
+The metacell size distribution of the resampled partitions will be largely determined by the K parameter used for computing the cgraph. The resampling process may take a while if the graphs are very large. You can modify n_resamp to generate fewer resamples.
+
+The resampling procedure creates a new coclust object in the database named test_coc500, and stores the number of times each pair of cells ended up being part of the same metacell. The co-clustering statistics are used to generate a new similarity graph, based on which accurate calling of the final set of metacells is done:
+
+```{r}
+mcell_mc_from_coclust_balanced(
+                coc_id="metaDataDb_coc500", 
+                mat_id= "metaDataDb",
+                mc_id= "metaDataDb_mc", 
+                K=30, min_mc_size=30, alpha=2)
+```
+
+We created a metacell object test_mc based on analysis of the co-clustering graph. The parameter K determines the number of neighbors we wish to minimally associate with each cell. Prior to partitioning the co-cluster graph is filtered to eliminate highly unbalanced edges, with smaller alpha resulting in harsher filtering.
+
+We now have a preliminary metacell object. It is a good practice to make sure all metacells within it are homogeneous. This is done by the outlier scan procedure, which splits metacells whose underlying similarity structure supports the existence of multiple sub-clusters, and removes outlier cells that strongly deviate from their metacell's expression profile.
+
+```{r}
+
+mcell_plot_outlier_heatmap(mc_id="metaDataDb_mc", mat_id = "metaDataDb", T_lfc=3)
+mcell_mc_split_filt(new_mc_id="metaDataDb_mc_f", 
+            mc_id="metaDataDb_mc", 
+            mat_id="metaDataDb",
+            T_lfc=3, plot_mats=F)
+
+```
+
+The first command generates a heat map summarizing the detected outlier behaviors. This is possible only for data sets of modest size.
+
+The filtered metacell object test_mc_f can now be visualized. In order to do this effectively, we usually go through one or two iterations of selecting informative marker genes. The package can select markers for you automatically - by simply looking for genes that are strongly enriched in any of the metacells:
+
+
+```{r extract marker genes }
+mcell_gset_from_mc_markers(gset_id="metaDataDb_markers", mc_id="metaDataDb_mc_f")
+```
+
+
+```{r}
+mcell_mc2d_force_knn(mc2d_id="metaDataDb_2dproj",mc_id="metaDataDb_mc", graph_id="metaDataDb_graph")
+tgconfig::set_param("mcell_mc2d_height",1000, "metacell")
+tgconfig::set_param("mcell_mc2d_width",1000, "metacell")
+mcell_mc2d_plot(mc2d_id="metaDataDb_2dproj")
+```
+
+```{r}
+mc_hc = mcell_mc_hclust_confu(mc_id="metaDataDb_mc_f", 
+                                            graph_id="metaDataDb_graph")
+mc_sup = mcell_mc_hierarchy(mc_id="metaDataDb_mc_f",
+                                                    mc_hc=mc_hc, T_gap=0.04)
+mcell_mc_plot_hierarchy(mc_id="metaDataDb_mc_f", 
+                   graph_id="metaDataDb_graph", 
+                    mc_order=mc_hc$order, 
+                    sup_mc = mc_sup, 
+                    width=2800, heigh=2000, min_nmc=2)
+```
+
+
+
+```{r}
+library(SingleCellExperiment)
+sce = scm_export_mat_to_sce("metaDataDb", add_log_counts=TRUE, scale_to=10000)
+unique(sce@colData$spike_count) %>% length()
+colData(sce)
+class(sce)
+```
+
+
+```{r}
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/gset.metaDataDb_feats.Rda")
+gset.metaDataDb_feats = object
+unique(gset.metaDataDb_feats@gene_set)
+unique(gset.metaDataDb_feats@gene_set)
+
+#rowData
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/gstat.metaDataDb.Rda")
+gstat = object
+head(gstat)
+
+# Representing a meta cell cover of a given cell graph (or more generally of a scRNA data matrix)
+# colData with some cluster annotations per cell
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/mc.metaDataDb_mc_f.Rda")
+mc_f = object
+# assignment of cells to metacell id
+sort(unique(mc_f@mc))
+# a matrix showing for each gene (row) the relative enrichment of umis
+head(mc_f@mc_fp)
+# a matrix detemrining for each batch (row) the meta cell breakdown
+unique(rowSums(mc_f@n_bc))
+
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/mc.metaDataDb_mc.Rda")
+mc = object
+mc@annots
+
+# Represent coclustering data derived by resmapling iteration and graph cover (or any other coverage/clustering heuristic)
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/coclust.metaDataDb_coc500.Rda")
+coc500 = object
+
+
+
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/cgraph.metaDataDb_graph.Rda")
+cgraph = object
+
+length(cgraph@cell_names)
+head(cgraph@edges)
+nrow(cgraph@edges)
+length(unique(cgraph@edges$mc1))
+
+# !!!!!!
+# maybe use tempora2DPlotFunc to plot
+# 2D coordinates
+ load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/mc2d.metaDataDb_2dproj.Rda")
+mc2d = object
+
+load("~/Rstudio/UTechSCB-SCHNAPPs/inst/develo/metaDataDb/mat.metaDataDb.Rda")
+mat = object
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
