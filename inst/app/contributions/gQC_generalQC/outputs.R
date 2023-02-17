@@ -872,6 +872,8 @@ output$gQC_windHC <- renderPlot({
   if ("xbioc" %in% rownames(installed.packages())){
     require(xbioc)}  else {
       is_logscale <- function(x) {return(T)}
+    }else {
+      cat(file = stderr(), "Please install xbioc: remotes::install_github('renozao/xbioc')")
     }
   if (DEBUG) cat(file = stderr(), "gQC_windHC started.\n")
   start.time <- base::Sys.time()

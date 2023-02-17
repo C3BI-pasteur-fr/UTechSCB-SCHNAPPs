@@ -48,10 +48,11 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # source('tabs.R',  local = TRUE)
 
 # "introjsUI"
-if ("introjsUI" %in% rownames(installed.packages())) {
-  suppressMessages(require(introjsUI))
+if ("rintrojs" %in% rownames(installed.packages())) {
+  suppressMessages(require(rintrojs))
 } else {
   introjsUI = function(...) {}
+  cat(file = stderr(), "Please install introjsUI: install.packages('rintrojs')")
 }
 
 
@@ -74,6 +75,7 @@ scShinyUI <- function(request) {
   # general tabs
   allTabs <- list(
     inputTab(),
+    shortCustTab(),
     geneSelectionTab(),
     cellSelectionTab(),
     clusterParametersTab() %>% checkAllowed(env = .schnappsEnv)

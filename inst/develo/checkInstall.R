@@ -9,17 +9,34 @@
 # dtupdate::github_update()
 
 checkIfLibrariesInstalled <- function() {
-  pkgList = c('devtools', 'BiocManager', 'pdftools', 'ggplotify', 'BiocSingular', 'SingleR', 'GSVA', 'GSEABase',
-              'multtest', 'limma', 'Biobase', 'monocle', 'rtracklayer', 'IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics',
-              'DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment', 'S4Vectors', 'spatstat', 'Seurat',
-              'Tempora', 'SCHNAPPs', 'shiny', 'rmarkdown', 'shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 
-              'shinydashboard', 'hdf5r', 'CellID', 'Wind', 'BiocParallel', 'ggnetwork', 'destiny')
+  pkgList = c("archivist", "Biobase", "BiocGenerics", "BiocManager", "BiocParallel", 
+              "BiocSingular", "callr", "colourpicker", "ComplexHeatmap", 
+              "cowplot", "crayon", "debugme", "dendsort", "DESeq2",  "devtools", 
+              "digest", "doParallel", "dplyr", "DT", "edgeR", "evaluate", "future",
+              "GenomeInfoDb", "GenomicRanges", "ggalluvial", "ggnetwork", "ggplot2",
+              "ggplotify", "ggpubr", "glue", "GSEABase", "GSVA", "gtools", "hdf5r",
+              "heatmaply", "Hmisc", "hms", "igraph", "InteractiveComplexHeatmap", 
+              "IRanges", "irlba", "kableExtra", "knitr", "kohonen", 
+              "limma", "magrittr", "manhattanly", "MASS", "MAST", "Matrix", "mclust",
+              "monocle", "multtest", "network", "orca", "parallel", "pdftools", 
+              "pheatmap", "plotly", "plyr", "profvis", "pryr", "psychTools", 
+              "RColorBrewer", "reactlog", "reactlog", "reshape2", "rintrojs", 
+              "rmarkdown", "Rsomoclu", "rtracklayer", "Rtsne", "S4Vectors", "scater",
+              "scDEA", "SCHNAPPs", "scran", "Seurat", "shiny", "shinyBS", 
+              "shinycssloaders", "shinydashboard", "shinydashboardPlus", "shinyjqui",
+              "shinyjs",  "shinytest", "shinythemes", "shinyTree",
+              "shinyWidgets", "SIMLR", "SingleCellExperiment", "SingleR", "spatstat", 
+              "stringr", "SummarizedExperiment", "Tempora", "threejs", "tibble", 
+              "tidyr", "tidySingleCellExperiment", "tidyverse", "tools", "uwot", 
+              "Wind", "xbioc") 
+  
+
   
   missing = pkgList[!pkgList %in% installed.packages()]
   if(length(missing) == 0) {
     print("all should be good")
   } else {
-    print(paste("The following packages are missin:" , missing))
+    print(paste("The following packages are missing:" , missing))
   }
   for (pg in pkgList){
     library(pg,character.only = TRUE)
