@@ -107,34 +107,6 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
 }
 
 
-# save to history dotplot ---d-
-observe(label = "save2histDotPlot", {
-  clicked  = input$save2HistVio
-  if (DEBUG) cat(file = stderr(), "observe save2histDotPlot \n")
-  start.time <- base::Sys.time()
-  on.exit(
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "save2Hist")
-    }
-  )
-  # show in the app that this is running
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("save2Hist", id = "save2Hist", duration = NULL)
-  }
-  if (is.null(clicked)) return()
-  if (clicked < 1) return()
-  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
-              comment = paste("# DotPlot genes \n",
-                              "fun = plotData$plotData$plotFunc\n", 
-                              "environment(fun) = environment()\n",
-                              "plotData$plotData$outfile=NULL\n",
-                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
-              ),
-              plotData = .schnappsEnv[["coE_dotPlot_GeneSets"]])
-  
-})
-
-
 # coE_dotPlot_GeneSetsFunc ----
 coE_dotPlot_GeneSets <- function(projections = projections,
                                  scEx_log = scEx_log,
