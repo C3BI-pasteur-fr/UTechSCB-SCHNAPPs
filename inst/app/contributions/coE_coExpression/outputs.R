@@ -203,7 +203,7 @@ coeMinMax = reactive({
 
 
 # coE_dotPlot_GeneSets ----
-output$coE_dotPlot_GeneSets <- renderPlot({
+output$coE_dotPlot_GeneSets <- renderPlotly({
   # output$coE_dotPlot_GeneSets <- renderPlotly({
     if (DEBUG) cat(file = stderr(), "coE_dotPlot_GeneSets started.\n")
   start.time <- base::Sys.time()
@@ -254,7 +254,7 @@ output$coE_dotPlot_GeneSets <- renderPlot({
   
 
   if(is.null(retVal)) return(NULL)
-  af = coE_geneGrp_vioFunc
+  af = coE_dotPlot_GeneSets
   # remove env because it is too big
   specEnv = emptyenv()
   environment(af) = new.env(parent = specEnv)
@@ -265,7 +265,7 @@ output$coE_dotPlot_GeneSets <- renderPlot({
                                                  geneSets = geneSets
                                                  
   )
-  return(retVal)
+  return(retVal %>% ggplotly())
 })
 
 

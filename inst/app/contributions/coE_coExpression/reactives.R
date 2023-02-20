@@ -173,8 +173,9 @@ coE_dotPlot_GeneSets <- function(projections = projections,
   }
   cellOrder = ggplot_build(p)$layout$panel_params[[1]]$y$breaks %>% stringr::str_replace("SeuratProject_","")
   # }
-  p= p + scale_x_discrete(labels = featureDat[geneOrder,"symbol"]) +
-    scale_y_discrete(labels = cellOrder) +
+  # p= p + #scale_x_discrete(labels = featureDat[geneOrder,"symbol"]) +
+    p= p + #scale_x_discrete(labels = featureDat[geneOrder,"symbol"]) +
+    # scale_y_discrete(labels = cellOrder) +
     ylab(clusters) + theme(axis.text.x = element_text(angle = 25, vjust = 0.5),
                            strip.text.x = element_text(angle=5))
   # ggplotly(p)
