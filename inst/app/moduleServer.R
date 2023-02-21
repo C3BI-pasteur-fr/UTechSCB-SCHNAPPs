@@ -1172,7 +1172,7 @@ tableSelectionServer <- function(input, output, session,
       )
     }
     #cp =  load(file=paste0("~/SCHNAPPsDebug/cellNameTable-sCA_dgeTable--.RData", collapse = "."))
-    
+    # cp =  load(file="~/SCHNAPPsDebug/cellNameTable-gQC_projCombTableMod--.RData")
     
     maxCol <- min(20, ncol(dataTables))
     if (dim(dataTables)[1] > 1) {

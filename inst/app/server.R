@@ -46,7 +46,15 @@ if (!exists(".schnappsEnv")) {
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+    if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
+      packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+    } else {
+      if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
+        packagePath <- "~/Rstudio/Schnapps/inst/app/"
+      } else {
+        stop("package path not found\n")
+      }
+    }
     # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
   }
 } else {
@@ -140,7 +148,15 @@ scShinyServer <- function(input, output, session) {
   # in development mode, called not from package? ----
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
-      packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
+        packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      } else {
+        if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
+          packagePath <- "~/Rstudio/Schnapps/inst/app/"
+      } else {
+        stop("package path not found\n")
+      }
+      }
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
