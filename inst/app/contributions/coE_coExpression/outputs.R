@@ -262,7 +262,14 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
                                                  projections = projections,
                                                  scEx_log = scEx_log,
                                                  clusters = clusters,
-                                                 geneSets = geneSets
+                                                 geneSets = geneSets,
+                                                 gmtData = gmtData,
+                                                 col = col,
+                                                 col.min = col.min,
+                                                 col.max = col.max,
+                                                 dot.min = dot.min,
+                                                 dot.scale = dot.scale,
+                                                 scale.by = scale.by
                                                  
   )
   return(retVal %>% ggplotly())
