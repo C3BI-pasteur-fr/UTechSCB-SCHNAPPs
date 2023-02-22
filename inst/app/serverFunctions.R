@@ -37,6 +37,10 @@ printTimeEnd <- function(start.time, messtr) {
   end.time <- base::Sys.time()
   if (DEBUG) {
     duration = difftime(end.time, start.time, units = "min")
+    save(file = "~/SCHNAPPsDebug/printTimeEnd.RData",
+         list = c(ls())
+    )
+    # cp = load("~/SCHNAPPsDebug/printTimeEnd.RData")
     cat(file = stderr(), paste("---", round_hms(as_hms(duration),0.25), "--- done:", messtr, "\n"))
   }
 }
@@ -1260,7 +1264,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     return(NULL)
   }
   # deepDebug()
-  
+  sessionI = sessionInfo()
   defaultValues = .schnappsEnv$defaultValues
   dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
   if (DEBUG) cat(file = stderr(), paste0("add2history: saving default Values to", dvFile, "\n"))
@@ -1290,7 +1294,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     if (file.exists(tfile)){}
     assign(names(varnames[1]), arg[1])
-    save(file = tfile, list = c(names(varnames[1]), "inp","schnappsEnv"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp","schnappsEnv", "sessionI"), compress = F)
     if (DEBUG) cat(file = stderr(), paste0("add2history: inp, schnappsEnv to", tfile, "\n"))
     # the load is commented out because it is not used at the moment and only takes time to load
     if(comment %in% c("scEx", "scEx_log")) {
@@ -1331,7 +1335,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv", "sessionI"), compress = F)
     if (DEBUG) cat(file = stderr(), paste0("add2history: tronco data to", tfile, "\n"))
     
     line <- paste0(
@@ -1347,7 +1351,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv", "sessionI"), compress = F)
     if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderPlot to", tfile, "\n"))
     
     line <- paste0(
@@ -1363,7 +1367,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
     assign(names(varnames[1]), arg[[1]])
     # report.env <- getReactEnv(DEBUG = .schnappsEnv$DEBUG)
-    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv"), compress = F)
+    save(file = tfile, list = c(names(varnames[1]), "inp", "schnappsEnv", "sessionI"), compress = F)
     if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderDT to", tfile, "\n"))
     
     line <- paste0(
