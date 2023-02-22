@@ -862,6 +862,11 @@ output$ColorSelection <- renderUI({
 #   showModal(askComment())
 # })
 
+observe({
+  gmtData = gmtData()
+  add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "gmtData", gmtData = gmtData)
+})
+
 # observe: input$updateColors ----
 observeEvent(
   label = "ob22",
