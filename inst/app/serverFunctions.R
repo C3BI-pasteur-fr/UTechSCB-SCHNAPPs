@@ -35,11 +35,13 @@ tryCatch.W.E <- function(expr){
 printTimeEnd <- function(start.time, messtr) {
   require(hms)
   end.time <- base::Sys.time()
-  if (DEBUG) {
+  if (.schnappsEnv$DEBUG) {
     duration = difftime(end.time, start.time, units = "min")
-    save(file = "~/SCHNAPPsDebug/printTimeEnd.RData",
-         list = c(ls())
-    )
+    if(.schnappsEnv$DEBUGSAVE){
+      save(file = "~/SCHNAPPsDebug/printTimeEnd.RData",
+           list = c(ls())
+      )
+    }
     # cp = load("~/SCHNAPPsDebug/printTimeEnd.RData")
     cat(file = stderr(), paste("---", round_hms(as_hms(duration),0.25), "--- done:", messtr, "\n"))
   }
@@ -1307,7 +1309,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
-    if (DEBUG) cat(file = stderr(), paste0("add2history: saving stuff to", .schnappsEnv$historyFile, "\n"))
+    if (DEBUG) cat(file = stderr(), paste0("add2history: saving stuff to ", .schnappsEnv$historyFile, "\n"))
   }
   
   if (type == "renderPlotly") {
