@@ -1923,17 +1923,17 @@ createHistory <- function(.schnappsEnv) {
   }
   .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
   line=paste0("---
-  title: \"history\"
-  output:
-    bookdown::html_document2:
-      toc: true
-      toc_depth: 3
-      toc_float: true
-      number_sections: true
-      code_folding: hide
-  ---
+title: \"history\"
+output:
+  bookdown::html_document2:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: hide
+---
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
   knitr::opts_chunk$set(echo = TRUE)
   suppressMessages(require(shiny))
   suppressMessages(require(shinyTree))
@@ -1978,7 +1978,7 @@ createHistory <- function(.schnappsEnv) {
   .schnappsEnv$DEBUGSAVE = FALSE
   source(system.file(\"app\", \"serverFunctions.R\", package = \"SCHNAPPs\"))
   DEBUG=FALSE
-  ```\n" )
+```\n" )
   write(line,file=.schnappsEnv$historyFile,append=FALSE)
 }
 
