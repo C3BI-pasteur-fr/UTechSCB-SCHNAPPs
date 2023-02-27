@@ -70,7 +70,7 @@ colData: sampleNames <factor>, and barcode <factor>
 rowData: Description <character>, symbol<character>, id (unique)<character>
 
     data("scEx", package = "SCHNAPPs")
-    save(file = "scEx.Rdata", list = "scEx")
+    save(file = "scEx.Rdata", list = "scExOrg")
 
 ### history functionality
 

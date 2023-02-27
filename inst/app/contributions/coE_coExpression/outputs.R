@@ -203,7 +203,7 @@ coeMinMax = reactive({
 
 
 # coE_dotPlot_GeneSets ----
-output$coE_dotPlot_GeneSets <- renderPlot({
+output$coE_dotPlot_GeneSets <- renderPlotly({
   # output$coE_dotPlot_GeneSets <- renderPlotly({
     if (DEBUG) cat(file = stderr(), "coE_dotPlot_GeneSets started.\n")
   start.time <- base::Sys.time()
@@ -254,7 +254,7 @@ output$coE_dotPlot_GeneSets <- renderPlot({
   
 
   if(is.null(retVal)) return(NULL)
-  af = coE_geneGrp_vioFunc
+  af = coE_dotPlot_GeneSets
   # remove env because it is too big
   specEnv = emptyenv()
   environment(af) = new.env(parent = specEnv)
@@ -262,12 +262,47 @@ output$coE_dotPlot_GeneSets <- renderPlot({
                                                  projections = projections,
                                                  scEx_log = scEx_log,
                                                  clusters = clusters,
-                                                 geneSets = geneSets
+                                                 geneSets = geneSets,
+                                                 gmtData = gmtData,
+                                                 col = col,
+                                                 col.min = col.min,
+                                                 col.max = col.max,
+                                                 dot.min = dot.min,
+                                                 dot.scale = dot.scale,
+                                                 scale.by = scale.by
                                                  
   )
-  return(retVal)
+  return(retVal %>% ggplotly())
 })
 
+
+
+# save to history dotplot ---d-
+observe(label = "save2histDotPlot", {
+  clicked  = input$save2histDotPlot
+  if (DEBUG) cat(file = stderr(), "observe save2histDotPlot \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# DotPlot genes \n",
+                              "fun = plotData$plotData$plotFunc\n", 
+                              "environment(fun) = environment()\n",
+                              "plotData$plotData$outfile=NULL\n",
+                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["coE_dotPlot_GeneSets"]])
+  
+})
 
 output$coE_geneGrp_vio_plot <- renderPlot({
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot started.\n")

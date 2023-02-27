@@ -2,7 +2,9 @@
 
 require(shiny)
 require(plotly)
-
+require(shinyjqui)
+library(ComplexHeatmap)
+library("InteractiveComplexHeatmap")
 #---- plotly variables ----
 
 my_bar_color       <- '#60809f'
@@ -32,8 +34,10 @@ ui <- fluidPage(
   fluidRow(
     column(
       width = 6,
-      h4("Hover over a bar and it's data will be highlighted in the line graph on the right! But how does it work?")
-    )
+      h4("Hover over a bar and it's data will be highlighted in the line graph on the right! But how does it work?"),
+      tags$head(tags$style(".butt{color: black !important;}")) #  font color; otherwise the text on these buttons is gray
+      
+    ), actionButton(inputId = "inputHelp", label = "help", icon = icon("fas fa-question"))
   ),
   br(),
   fluidRow(
@@ -43,7 +47,7 @@ ui <- fluidPage(
     ),
     column(
       width = 6,
-      plotlyOutput("graph2")
+      plotlyOutput("graph2") %>% shinyjqui::jqui_resizable()
     )
   ),
   br(),
@@ -52,12 +56,17 @@ ui <- fluidPage(
     column(
       width = 6,
       h6("Just the ouput of the plotly hover event in case you need to see it"),
-      verbatimTextOutput("hover_stuff")
+      verbatimTextOutput("hover_stuff"),
+      InteractiveComplexHeatmapOutput("ht2")
     )
   )
 )
 
 #---- server ----
+#
+m = matrix(rnorm(100*100), nrow = 100)
+ht = ComplexHeatmap::pheatmap(m)
+# ht = draw(ht)
 
 server <- function(input, output, session) {
   
@@ -72,6 +81,8 @@ server <- function(input, output, session) {
     )
     
   })
+  
+  
   
   
   search <- rnorm(25, mean = 1)

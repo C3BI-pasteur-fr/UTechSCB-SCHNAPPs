@@ -283,6 +283,7 @@ clusterServer <- function(input, output, session,
       scEx = scEx_log[, rownames(projections)], projections = projections
     )
     
+    cells.names <- unlist(brushedPs$key)
     if (!is.null(namedGroup)) {
       if (namedGroup == "none") {
         if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: namedGroup none\n")
@@ -290,7 +291,8 @@ clusterServer <- function(input, output, session,
       }
       if (!namedGroup == "plot") {
         if (namedGroup %in% colnames(grpNs)) {
-          return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ]))
+          grpNs = grpNs[unique(cells.names),]
+          return(rownames(grpNs[grpNs[, namedGroup] == "TRUE", ,drop=FALSE]))
         } else {
           # TODO message about setting plot
           showNotification("Make sure 'the'group names' is set correctly ", id = "selectedCellNamesProbl", duration = 10)
@@ -307,7 +309,6 @@ clusterServer <- function(input, output, session,
     # }
     # cells.names <- rownames(projections)[subset(brushedPs, curveNumber == 0)$pointNumber + 1]
     # cells.names <- rownames(projections)[subset(brushedPs)$pointNumber + 1]
-    cells.names <- unlist(brushedPs$key)
     if (is.null(cells.names) )
       if (length(brushedPs) >0)
         if (nrow(brushedPs) > 0) { 
@@ -638,8 +639,8 @@ clusterServer <- function(input, output, session,
       if (DEBUG) cat(file = stderr(), "     input$changeGroups not clicked\n")
       return(NULL)
     }
-    addToSelection <- .schnappsEnv[[ns("addToGroupValue")]]
-    
+    addToSelection <- isolate(input$addToGroup)
+    inpGroupName = isolate(input$groupNames)
     # we isolate here because we only want to change if the button is clicked.
     # TODO what happens if new file is loaded??? => problem!
     isolate({
@@ -685,12 +686,12 @@ clusterServer <- function(input, output, session,
     }
     grpNs[, grpN] = as.logical(grpNs[, grpN])
     if (!addToSelection) {
-      grpNs[rownames(visibleCells), grpN] <- "FALSE"
+      grpNs[rownames(visibleCells), grpN] <- FALSE
     }
     if (class(cells.names) == "list") {
       cells.names = unlist(cells.names)
     }
-    grpNs[cells.names, grpN] <- "TRUE"
+    grpNs[cells.names, grpN] <- TRUE
     grpNs[, grpN] = as.factor(as.character(grpNs[, grpN]))
     # grpNs[, grpN] <- as.factor(grpNs[, grpN])
     # Set  reactive value
@@ -700,7 +701,7 @@ clusterServer <- function(input, output, session,
     updateSelectInput(session, "groupNames",
                       choices = c("plot", colnames(grpNs)),
                       # selected = grpN
-                      selected = "plot"
+                      selected = inpGroupName
     )
     updateTextInput(
       session = session, inputId = "groupName",
@@ -1171,7 +1172,7 @@ tableSelectionServer <- function(input, output, session,
       )
     }
     #cp =  load(file=paste0("~/SCHNAPPsDebug/cellNameTable-sCA_dgeTable--.RData", collapse = "."))
-    
+    # cp =  load(file="~/SCHNAPPsDebug/cellNameTable-gQC_projCombTableMod--.RData")
     
     maxCol <- min(20, ncol(dataTables))
     if (dim(dataTables)[1] > 1) {
