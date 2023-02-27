@@ -120,7 +120,7 @@ tabList <- list(
         column(
           width = 12,
           # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
-          jqui_resizable(plotOutput("coE_dotPlot_GeneSets"))
+          jqui_resizable(plotlyOutput("coE_dotPlot_GeneSets"))
         )
       ),
       br(),

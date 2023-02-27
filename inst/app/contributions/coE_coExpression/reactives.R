@@ -107,34 +107,6 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
 }
 
 
-# save to history dotplot ---d-
-observe(label = "save2histDotPlot", {
-  clicked  = input$save2HistVio
-  if (DEBUG) cat(file = stderr(), "observe save2histDotPlot \n")
-  start.time <- base::Sys.time()
-  on.exit(
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "save2Hist")
-    }
-  )
-  # show in the app that this is running
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("save2Hist", id = "save2Hist", duration = NULL)
-  }
-  if (is.null(clicked)) return()
-  if (clicked < 1) return()
-  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
-              comment = paste("# DotPlot genes \n",
-                              "fun = plotData$plotData$plotFunc\n", 
-                              "environment(fun) = environment()\n",
-                              "plotData$plotData$outfile=NULL\n",
-                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
-              ),
-              plotData = .schnappsEnv[["coE_dotPlot_GeneSets"]])
-  
-})
-
-
 # coE_dotPlot_GeneSetsFunc ----
 coE_dotPlot_GeneSets <- function(projections = projections,
                                  scEx_log = scEx_log,
@@ -194,18 +166,14 @@ coE_dotPlot_GeneSets <- function(projections = projections,
               scale.min = NA,
               scale.max = NA
   )
-  geneOrder = c()
-  cellOrder = c()
-  for(gIdx in seq(length(ggplot_build(p)$layout$panel_params))){
-    geneOrder = c(geneOrder,ggplot_build(p)$layout$panel_params[[gIdx]]$x$breaks)
-  }
-  cellOrder = ggplot_build(p)$layout$panel_params[[1]]$y$breaks %>% stringr::str_replace("SeuratProject_","")
-  # }
-  p= p + scale_x_discrete(labels = featureDat[geneOrder,"symbol"]) +
-    scale_y_discrete(labels = cellOrder) +
-    ylab(clusters) + theme(axis.text.x = element_text(angle = 25, vjust = 0.5),
+  labFun <- function(breakval){featureDat[breakval,"symbol"]}
+  ylabFun <- function(val){stringr::str_replace(val,"SeuratProject_","bla")}
+  p= p + scale_x_discrete(labels = labFun) +
+    scale_y_discrete(labels = ylabFun) +
+    ylab(clusters) +
+    theme(axis.text.x = element_text(angle = 25, vjust = 0.5),
                            strip.text.x = element_text(angle=5))
-  # ggplotly(p)
+  ggplotly(p)
   p
 }
 
