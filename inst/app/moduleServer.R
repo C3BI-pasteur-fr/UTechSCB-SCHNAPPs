@@ -1378,7 +1378,10 @@ pHeatMapModule <- function(input, output, session,
   })
 
   addOptions <- reactive(
-    {req(pheatmapList())
+   
+    {
+      ph = pheatmapList()
+      req(ph)
       list(
         sortingCols = input$sortingCols,
         normRow = input$normRow,
