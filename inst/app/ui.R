@@ -48,10 +48,11 @@ DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # source('tabs.R',  local = TRUE)
 
 # "introjsUI"
-if ("introjsUI" %in% rownames(installed.packages())) {
-  suppressMessages(require(introjsUI))
+if ("rintrojs" %in% rownames(installed.packages())) {
+  suppressMessages(require(rintrojs))
 } else {
   introjsUI = function(...) {}
+  cat(file = stderr(), "Please install introjsUI: install.packages('rintrojs')")
 }
 
 
@@ -74,6 +75,7 @@ scShinyUI <- function(request) {
   # general tabs
   allTabs <- list(
     inputTab(),
+    shortCutsTab(),
     geneSelectionTab(),
     cellSelectionTab(),
     clusterParametersTab() %>% checkAllowed(env = .schnappsEnv)
@@ -90,6 +92,9 @@ scShinyUI <- function(request) {
     shinydashboard::menuItem("input",
                              # id="inputID",
                              tabName = "input", icon = icon("folder")
+    ),
+    shinydashboard::menuItem("short cuts",
+                             tabName = "shortCuts", icon = icon("gopuram")
     ),
     shinydashboard::menuItem("Parameters",
                              # id="parametersID",
@@ -139,7 +144,7 @@ scShinyUI <- function(request) {
     mListNames[menuListItem] <- allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
   }
   sollOrder <- c(
-    "input", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
+    "input", "short cuts", "Parameters", "General QC", " Cell selection", "Gene selection", "Co-expression",
     "Data Exploration", "Subcluster analysis"
   )
   sollOrderIdx <- c()

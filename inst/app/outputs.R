@@ -29,7 +29,7 @@ for (fp in parFiles) {
   source(fp, local = TRUE)
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
-      list = c("normaliztionParameters", ls())
+         list = c("normaliztionParameters", ls())
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParameters.RData')
@@ -290,7 +290,7 @@ output$normalizationsParametersDynamic <- renderUI({
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
-      list = c("normaliztionParameters", ls())
+         list = c("normaliztionParameters", ls())
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParametersDynamic.RData')
@@ -478,7 +478,7 @@ output$summaryStatsSideBar <- renderUI({
   normalizationRadioButton <- input$normalizationRadioButton
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
-      list = c("normaliztionParameters", ls())
+         list = c("normaliztionParameters", ls())
     )
   }
   # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
@@ -744,7 +744,7 @@ output$ColorSelection <- renderUI({
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
-      list = c("normaliztionParameters", ls())
+         list = c("normaliztionParameters", ls())
     )
   }
   # cp = load("~/SCHNAPPsDebug/sampleColorSelection.RData")
@@ -1414,7 +1414,7 @@ callModule(
   clusterBootstrapReactive
 )
 
-
+source(paste0(packagePath, "/shortCuts.R"), local = TRUE)
 
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))
