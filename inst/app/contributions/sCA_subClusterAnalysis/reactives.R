@@ -91,6 +91,22 @@ myDiffExpFunctions <- list(
 
 if("scDEA" %in% rownames(installed.packages())){
   myDiffExpFunctions[[length(myDiffExpFunctions)+1]] = c("scDEA - !! this might take hours !!","sCA_scDEA")
+} else {
+  cat(file = stderr(), "Please install scDEA:
+      devtools::install_github('nghiavtr/BPSC')
+      BiocManager::install('DEsingle')
+      devtools::install_github('nghiavtr/BPSC')
+      BiocManager::install('DESeq2')
+      BiocManager::install('edgeR')
+      BiocManager::install('MAST')
+      BiocManager::install('monocle')
+      BiocManager::install('limma')
+      BiocManager::install('Seurat')
+      devtools::install_github('statOmics/zingeR')
+      BiocManager::install('SingleCellExperiment')
+      BiocManager::install('scater')
+      devtools::install_github('Zhangxf-ccnu/scDEA')
+  ")
 }
 
 

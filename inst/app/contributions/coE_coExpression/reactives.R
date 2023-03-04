@@ -566,6 +566,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
           duration = NULL
         )
       }
+      cat(file = stderr(), "Please install gtools: install.packages('gtools')")
       return(NULL)
     }
   }
