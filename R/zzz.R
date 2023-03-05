@@ -1,4 +1,5 @@
 .onLoad <- function(libname, pkgname) {
+  cat(file = stderr(),"\n\non Load\n\n")
   shiny::addResourcePath(
     prefix = "www",
     directoryPath = system.file(

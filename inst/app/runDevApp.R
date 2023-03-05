@@ -31,7 +31,8 @@
     DEBUGSAVE = F
     historyPath = "/Volumes/LaCie2022/RStudio_history/katja/"
     historyPath = "/Volumes/LaCie2022/RStudio_history/katja/hist_2022-Jul-30.14.57/"
-    historyPath = NULL
+    historyPath = "~/SCHNAPPsDebug/devDirHistory"
+    # historyPath = NULL
 
     assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
     assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -91,7 +92,6 @@
     packagePath <<- "inst/app/"
     source(paste0(packagePath,  "/ui.R"))
     source(paste0(packagePath,  "/server.R"))
-
 
     app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
     options(shiny.reactlog=TRUE)

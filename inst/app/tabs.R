@@ -628,6 +628,30 @@ clusterParametersTab <- function() {
   )
 }
 
+
+# submenu items for the meta clustering
+
+metaClusterItems <- function() {
+  if(any(c("metacell", "Rsomoclu", "kohonen") %in% installed.packages() ))
+   
+  
+  list(
+    # shinydashboard::menuSubItem("Meta Clustering", tabName = "mClustParams"),
+    if (all(c("Rsomoclu", "kohonen") %in% installed.packages() )) 
+      shinydashboard::menuSubItem("SOM", tabName = "SOMcluster")
+    else{
+      cat(file = stderr(), "\n\nplease install metacell, Rsomoclu, kohonen\n
+              BiocManager::install(\"tanaylab/metacell\")\n\n\n\n
+          ")
+    },
+    shinydashboard::menuSubItem("MetaCell", tabName = "metaCell")
+  )
+}
+
+
+
+
+
 if (DEBUG) {
   cat(file = stderr(), paste("end: tabs.R\n"))
 }

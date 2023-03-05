@@ -2053,7 +2053,7 @@ cellSelectionModule <- function(input, output, session) {
   .schnappsEnv[[ns("Mod_clusterPP")]] = "dbCluster"
   observe(label = "Mod_clusterPP", 
           {
-            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP\n"))
+            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_clusterPP",ns("."),"\n"))
             # assign(ns("Mod_clusterPP"), input$Mod_clusterPP, envir = .schnappsEnv)
             # browser()
             # initialization by history

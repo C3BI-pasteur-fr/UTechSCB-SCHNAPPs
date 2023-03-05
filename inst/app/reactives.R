@@ -678,6 +678,8 @@ appendAnnotation <- function(scEx, annFile) {
 ### dataFile reactive ----
 dataFile <- reactive({
   deepDebug()
+  # req(.schnappsEnv)
+  # req(.schnappsEnv$restoreHistory)
   if(.schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
     iFile = .schnappsEnv$inputFile
   }else{

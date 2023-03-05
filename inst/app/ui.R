@@ -109,11 +109,12 @@ scShinyUI <- function(request) {
                              # id="geneSelectionID",
                              tabName = "geneSelection", icon = icon("atom")
     )
-    # ,
-    # shinydashboard::menuItem("rename projections",
-    #   # id="geneSelectionID",
-    #   tabName = "modifyProj", icon = icon("signature")
-    # )
+    ,
+    shinydashboard::menuItem("Meta clustering",
+      # id="geneSelectionID",
+      tabName = "metaCluster", icon = icon("signature"),
+      metaClusterItems()
+    )
   )
   
   

@@ -16,15 +16,18 @@ BiocManager::install("tanaylab/metacell", vignette=T)
 
 ```{r}
 library("metacell")
-if(!dir.exists("metaDataDbscEx")) dir.create("metaDataDbscEx/")
-scdb_init("metaDataDbscEx", force_reinit=T)
+metacellDir = file.path(.schnappsEnv$historyPath,"metaDataDbscEx")
+metacellFigsDir = file.path(metacellDir,"metaDataScExFigs")
+# metaDataScExFigs
+if(!dir.exists(metacellDir)) dir.create(metacellDir)
+scdb_init(metacellDir, force_reinit=T)
 # mcell_import_scmat_10x("test", base_dir="http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k/")
 
 # wget http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k//matrix.mtx
 # wget http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k//features.tsv
 # wget http://www.wisdom.weizmann.ac.il/~atanay/metac_data/pbmc_8k//barcodes.tsv
 
-cp = load("~/Rstudio/scShinyHubData/GSE168704.schnapps.RData")
+cp = load("~/Rstudio/UTechSCB-SCHNAPPs/data/scEx.RData")
 
 scm = scm_import_sce_to_mat(scEx, counts_slot = "counts")
 scdb_add_mat("metaDataDb", scm)
@@ -34,22 +37,24 @@ scdb_add_mat("metaDataDb", scm)
 mat = scdb_mat("metaDataDb")
 print(dim(mat@mat))
 
-if(!dir.exists("metaDataScExFigs")) dir.create("metaDataScExFigs/")
-scfigs_init("metaDataScExFigs/")
+if(!dir.exists(metacellFigsDir)) dir.create(metacellFigsDir)
+scfigs_init(metacellFigsDir)
 
 
 ```
 
 ```{r}
 
-mcell_plot_umis_per_cell("metaDataDb")
+mcell_plot_umis_per_cell(mat_id = "metaDataDb", bin_for_cutoff = 5)
 ```
 
 We want to clean some known issues from the matrix before starting to work with it. We generate a list of mitochondrial genes that typically mark cells as being stressed or dying, as well as immunoglobulin genes that may represent strong clonal signatures in plasma cells, rather than cellular identity.
 
 ```{r}
 mat = scdb_mat("metaDataDb")
+
 nms = c(rownames(mat@mat), rownames(mat@ignore_gmat))
+
 ig_genes = c(grep("^IGJ|^IGH", nms, value = T), 
                 grep("^IGH",nms,value = T),
                 grep("^IGK", nms, value =T), 
@@ -136,7 +141,7 @@ mcell_mc_from_coclust_balanced(
                 coc_id="metaDataDb_coc500", 
                 mat_id= "metaDataDb",
                 mc_id= "metaDataDb_mc", 
-                K=30, min_mc_size=30, alpha=2)
+                K=10, min_mc_size=30, alpha=2)
 ```
 
 We created a metacell object test_mc based on analysis of the co-clustering graph. The parameter K determines the number of neighbors we wish to minimally associate with each cell. Prior to partitioning the co-cluster graph is filtered to eliminate highly unbalanced edges, with smaller alpha resulting in harsher filtering.

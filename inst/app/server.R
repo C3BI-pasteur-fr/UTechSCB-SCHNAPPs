@@ -312,6 +312,7 @@ scShinyServer <- function(input, output, session) {
   # TODO put in function
   # can this be done just with bookmarking?
   if (exists("historyPath", envir = .schnappsEnv)) {
+    cat(file = stderr(), paste("history path given\n"))
     
     .schnappsEnv$restoreHistory = FALSE
     if (!is.null(x = .schnappsEnv$historyPath)) {
@@ -328,6 +329,7 @@ scShinyServer <- function(input, output, session) {
       if(length(rmdFiles)>0 & length(projFiles)>0 & 
          length(sxFiles)>0 & length(sxLogFiles)>0 & 
          length(scolFiles)>0){
+        cat(file = stderr(), paste("some history information available\n"))
         deepDebug()
         # browser()
         # this will be overwritten but should be session specific
@@ -337,6 +339,7 @@ scShinyServer <- function(input, output, session) {
         latestFile = fileInfo %>% pull("birth_time") %>% order()  %>% last()
         # this should load inp, i.e. the old input variable with all parameters
         tempEnv =  new.env(parent=emptyenv())
+        cat(file = stderr(), paste("reading:", fileInfo[latestFile, "path"] %>% as.character(), "\n"))
         cp = load(fileInfo[latestFile, "path"] %>% as.character(), envir = tempEnv)
         
         if(!"schnappsEnv" %in% cp){
@@ -372,6 +375,7 @@ scShinyServer <- function(input, output, session) {
         fileInfo = scolFiles %>% file.info()
         latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
         tempEnv =  new.env(parent=emptyenv())
+        cat(file = stderr(), paste("reading:", rownames(fileInfo)[latestFile], "\n"))
         cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
         if("scol" %in% cp) {
           sampleCols$colPal <- unlist(tempEnv$scol$scol)
@@ -380,6 +384,7 @@ scShinyServer <- function(input, output, session) {
         fileInfo = ccolFiles %>% file.info()
         latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
         tempEnv =  new.env(parent=emptyenv())
+        cat(file = stderr(), paste("reading:", rownames(fileInfo)[latestFile], "\n"))
         cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
         if("ccol" %in% cp) {
           clusterCols$colPal <- unlist(tempEnv$ccol$ccol)
@@ -389,6 +394,7 @@ scShinyServer <- function(input, output, session) {
         cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
         cat(file = stderr(),  "\n")
         tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
+        cat(file = stderr(), paste("reading:", tfile, "\n"))
         cp = load(file = tfile)
         if(all(c("prjs", "newPrjs") %in% cp)){
           sessionProjections$prjs = prjs
@@ -402,6 +408,8 @@ scShinyServer <- function(input, output, session) {
 
       } else { 
         # create directory with name and Rmd file
+        cat(file = stderr(), paste("no history information available. creating new\n"))
+        
         createHistory(.schnappsEnv)
       }
       
