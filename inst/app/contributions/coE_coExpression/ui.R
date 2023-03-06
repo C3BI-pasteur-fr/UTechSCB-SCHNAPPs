@@ -12,8 +12,11 @@ menuList <- list(
                            shinydashboard::menuSubItem("Gene sets", tabName = "geneSets"),
                            shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
                            shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
-                           if(("ggalluvial" %in% rownames(installed.packages())))
+                           if(("ggalluvial" %in% rownames(installed.packages()))){
                              shinydashboard::menuSubItem("alluvialTab", tabName = "alluvialTab")
+                           }else {
+                             cat(file = stderr(), "Please install ggalluvial: install.packages('ggalluvial')")
+                             }
                            # shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )

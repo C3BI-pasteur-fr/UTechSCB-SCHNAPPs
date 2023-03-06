@@ -169,6 +169,8 @@ inputTab <- function() {
   )
 }
 
+source(paste0(packagePath, "/shortCutsTab.R"), local = TRUE)
+
 # geneSelectionTab ----
 geneSelectionTab <- function() {
   shinydashboard::tabItem(
