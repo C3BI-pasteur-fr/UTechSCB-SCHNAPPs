@@ -219,23 +219,26 @@ tabList <- list(
       title = "Quality control plot from the scater package", solidHeader = TRUE, 
       width = 12, status = "primary", height = "1627px",
       fluidRow(
-        column(12, offset = 1,
-               actionButton("runScater", "apply changes", width = "50%"),
-               actionButton("stopScater", "stop calculations", width = "20%", class = "btn-danger")
+        column(10, offset = 0,
+               actionButton("runScater", "apply changes", width = "40%"),
+               actionButton("stopScater", "stop calculations", width = "40%", class = "btn-danger")
+        ),
+        column(width = 2,
+               sc_numericInput("maxMemory", "max memory to be used in GB",
+                               min = 1, max = 2000, step = 1, value = 2))
+      ),
+      br(),
+      fluidRow(
+        column(
+          12,
+          offset = 0,
+          div(style = "height:672px;",
+              imageOutput("DE_scaterQC")
+          ) # PNG output with temp file
         )
       ),
-      br()#,
-      # fluidRow(
-      #   column(
-      #     12,
-      #     offset = 0, 
-      #     div(style = "height:672px;",
-      #         imageOutput("DE_scaterQC") 
-      #     ) # PNG output with temp file
-      #   )
-      # ),
-      # br(),
-      # actionButton("save2HistScater", "save to history")
+      br(),
+      actionButton("save2HistScater", "save to history")
     )
     
     

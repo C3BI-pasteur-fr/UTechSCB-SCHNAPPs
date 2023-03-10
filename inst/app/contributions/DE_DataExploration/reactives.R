@@ -146,8 +146,6 @@ observe(label = "save2HistPanel", {
 detachedProc <- reactiveValues()
 detachedProc$process <- NULL
 detachedProc$msg <- ""
-detachedProc$obs <- NULL
-detachedProc$startTime= base::Sys.time()
 detachedProc$result = NULL
 
 activateObserver <- reactiveVal(0)
