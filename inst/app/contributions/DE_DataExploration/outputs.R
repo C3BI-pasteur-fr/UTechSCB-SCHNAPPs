@@ -508,19 +508,21 @@ observeEvent(input$runScater,{
   if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$runScater\n")
   if (!is.null(detachedProc$process)){
     return()
-    }
+  }
   start.time <- base::Sys.time()
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
+    removeNotification(id="DE_scaterPNG_Error")
   }
   scaterReads <- isolate(scaterReads())
   scols <- isolate(sampleCols$colPal)
+  maxMemory = isolate(input$maxMemory)
   
   if (is.null(scaterReads)){
     removeNotification(id="DE_scaterPNG")
     detachedProc$result <- emptyImage
     return()
-    }
+  }
   # width <- session$clientData$output_plot_width
   # height <- session$clientData$output_plot_height
   width <- NULL
@@ -529,7 +531,7 @@ observeEvent(input$runScater,{
   outfile <- paste0(tempdir(), "/scaterPlot.png")
   
   n <- min(nrow(scaterReads), 50)
-# browser()
+  # browser()
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/scater.RData", list = c(ls()))
   }
@@ -541,16 +543,28 @@ observeEvent(input$runScater,{
   #   createScaterPNG(scaterReads, n, scols, width=width, height=height)
   # })
   #span the process/function call
-  detachedProc$process <- future({
-    # detachedProc$process$pid = Sys.getpid()
-    createScaterPNG(scaterReads=scaterReads, n=n, scols=scols, width=NULL, height=NULL, DEBUG = DEBUG, outfile=outfile)
-  },seed=NULL,
-  packages = "scater",
-  globals = list(createScaterPNG=createScaterPNG, emptyImage=emptyImage, DEBUG=.schnappsEnv$DEBUG, pltHighExp=pltHighExp,
-                 scaterReads=scaterReads, n=n, scols=scols, width=NULL, height=NULL, outfile=outfile), # we specify all variables with the function call
-  lazy = FALSE, #start immediatly
-  stdout = structure(TRUE, drop = TRUE)
+  options(future.globals.maxSize= maxMemory * 1024^3)
+  
+  detachedProc$process <- tryCatch({
+    future({
+      # detachedProc$process$pid = Sys.getpid()
+      createScaterPNG(scaterReads=scaterReads, n=n, scols=scols, width=NULL, height=NULL, DEBUG = DEBUG, outfile=outfile)
+    },seed=NULL,
+    packages = "scater",
+    globals = list(createScaterPNG=createScaterPNG, emptyImage=emptyImage, DEBUG=.schnappsEnv$DEBUG, pltHighExp=pltHighExp,
+                   scaterReads=scaterReads, n=n, scols=scols, width=NULL, height=NULL, outfile=outfile), # we specify all variables with the function call
+    lazy = FALSE, #start immediatly
+    stdout = structure(TRUE, drop = TRUE)
+    )},
+    error = function(e) {
+      cat(file = stderr(), paste("\n\n!!!Error during detach process:", e, "\n\nDo you need to increase the memory?\n\n"))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("DE_scaterPNG ERROR", id = "DE_scaterPNG_Error", duration = NULL, type = "error")
+      }
+      return(NULL)
+    }
   )
+  if(is.null(detachedProc$process)) return(NULL)
   activateObserver(1)
   cat(file = stderr(), paste("input$start",detachedProc$process$process$get_pid(),"me:",Sys.getpid(),"\n"))
   if("callr" %in% class(pl)){
@@ -594,7 +608,7 @@ observeEvent(input$stopScater, {
 #
 # Handle process event
 #
-detachedProc$obs <- observe({
+observe({
   if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process\n")
   # this will re-execute the collection process of mcparallel
   # if(!is.null(detachedProc$process))
