@@ -188,4 +188,14 @@ Reports take even longer. Wait times of an hour or more are not uncommon. Then a
 
 When saving files or generating a report Shiny opens a new window and doesn't close it. You can safely close it after the operation is completed.
 
+## Installation issues
+
+### running Docker
+
+* install the Docker daemon (https://docs.docker.com/engine/install/) 
+* run Docker.app
+*
+* docker run --rm -p 3838:3838 pf2dock/schnapps
+* open browser at: http://0.0.0.0:3838
+
 

@@ -118,15 +118,21 @@ tabList = list(
              title = "QC", width = 12, value = "mc_QCtab",
              fluidRow(
                column(width = 12,
-                      plotOutput("mc_metaDataDb_2dproj.2d_graph_proj")
+                      plotOutput("mc_metaDataDb_2dproj.2d_graph_proj") %>% jqui_resizable()
                )
              )
            ),
            tabPanel(
              title = "outliers", width = 12, value = "mc_outliertab",
              fluidRow(
+               column(
+                 width = 5, offset = 1,
+                 actionButton("updateMetaCellOutliers", "update figures", width = "80%")
+               )),
+             br(),
+             fluidRow(
                column(width = 12,
-                      uiOutput("mc_outliers")
+                      uiOutput("mc_outliers") %>% jqui_resizable()
                )
              )
            )

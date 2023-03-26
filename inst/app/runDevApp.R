@@ -18,7 +18,7 @@
     plan(sequential)
     library("BiocParallel")
     # register(MulticoreParam(6))
-    register(SerialParam())
+    # register(SerialParam())
 
     localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
     localContributionDir = ""
@@ -32,6 +32,7 @@
     historyPath = "/Volumes/LaCie2022/RStudio_history/katja/"
     historyPath = "/Volumes/LaCie2022/RStudio_history/katja/hist_2022-Jul-30.14.57/"
     historyPath = "~/SCHNAPPsDebug/devDirHistory"
+    historyPath = "/Volumes/LaCie2022/RStudio_history/celia/"
     # historyPath = NULL
 
     assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)

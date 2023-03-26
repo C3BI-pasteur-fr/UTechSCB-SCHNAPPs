@@ -34,15 +34,15 @@ source("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/serverFunctions.R", echo=F)
 # coE_somTrainReact = coE_somTrainReact()
 # coE_somGenesReact = coE_somGenesReact()
 # coE_heatmapSOMReactive = coE_heatmapSOMReactive()
-
-genesin <- input$coE_geneSOM
-
-featureData <- rowData(scEx_log)
-geneName = geneName2Index(genesin, featureData)
-
-# coE_SOMcodebook = output$coE_SOMcodebook()
-endpoints <- traj_endpoints()
-save(file = "test.RData", list = c(ls(),".schnappsEnv"))
-
+# 
+# genesin <- input$coE_geneSOM
+# 
+# featureData <- rowData(scEx_log)
+# geneName = geneName2Index(genesin, featureData)
+# 
+# # coE_SOMcodebook = output$coE_SOMcodebook()
+# endpoints <- traj_endpoints()
+# save(file = "test.RData", list = c(ls(),".schnappsEnv"))
+names(get("output", envir = parent.env(env = environment())))
 
 ```
