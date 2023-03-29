@@ -1,3 +1,5 @@
+# inst/app/tabs.R
+
 suppressMessages(require(shinyjqui))
 suppressMessages(require(shiny))
 # require(shinyMCE)

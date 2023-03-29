@@ -106,6 +106,7 @@ tabList <- list(
                  closable = FALSE,
                  enable_dropdown = T,
                  collapsible = TRUE, collapsed = TRUE,
+                 id = "dgeAddOptions",
                  box(title = "scDEA parameters", width = 12,solidHeader = TRUE, 
                      fluidRow(
                        column(width = 3,

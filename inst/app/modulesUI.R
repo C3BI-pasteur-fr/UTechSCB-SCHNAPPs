@@ -71,6 +71,7 @@ clusterUI <- function(id) {
       shinydashboard::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
         # helpID = "twoDselectedAddOpt",
+        id = ns("clusterAddOpt"),
         dropdown_icon = NULL,
         closable = FALSE,
         enable_dropdown = T,
@@ -211,9 +212,10 @@ pHeatMapUI <- function(id) {
                verbatimTextOutput(ns("pHeatMapPlotSelection"))
                )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
+        id=ns("heatmapAddOpt"),
         fluidRow(
           column(
             width = 12,

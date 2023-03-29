@@ -418,7 +418,7 @@ observeEvent(
     
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
-        list = c("normaliztionParameters", ls())
+           list = c("normaliztionParameters", ls())
       )
     }
     # cp = load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
@@ -479,7 +479,7 @@ observeEvent(
     # deepDebug()
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/delPrjsButton.RData",
-        list = c("normaliztionParameters", ls())
+           list = c("normaliztionParameters", ls())
       )
     }
     # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
@@ -511,7 +511,7 @@ observeEvent(
     
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData",
-        list = c("normaliztionParameters", ls())
+           list = c("normaliztionParameters", ls())
       )
     }
     # cp=  load(file="~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData")
@@ -587,13 +587,13 @@ observeEvent(eventExpr = input$gQC_raProj,
                if(is.null(projections)) return()
                if(is.null(projFactors)) return()
                if(input$gQC_raProj %in% projFactors){
-               
-               projLevels = levels(projections[,input$gQC_raProj])
-               updateOrderInput(
-                 session,
-                 'gQC_newRaLev',
-                 items = projLevels
-               )
+                 
+                 projLevels = levels(projections[,input$gQC_raProj])
+                 updateOrderInput(
+                   session,
+                   'gQC_newRaLev',
+                   items = projLevels
+                 )
                }else{
                  updateOrderInput(
                    session,
@@ -619,7 +619,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                }
                if (.schnappsEnv$DEBUGSAVE) {
                  save(file = "~/SCHNAPPsDebug/gQC_rearrangeButton.RData",
-                   list = c("normaliztionParameters", ls())
+                      list = c("normaliztionParameters", ls())
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_rearrangeButton.RData")
@@ -699,7 +699,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                
                if (.schnappsEnv$DEBUGSAVE) {
                  save(file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
-                   list = c("normaliztionParameters", ls())
+                      list = c("normaliztionParameters", ls())
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
@@ -892,8 +892,8 @@ output$gQC_windHC <- renderPlot({
   projections <- projections()
   pca = pcaReact()
   gQC_windProj <- input$gQC_windProj
-  
-  if (is.null(projections) | is.null(scEx)) {
+  # browser()
+  if (is.null(projections) | is.null(scEx) | !gQC_windProj %in% colnames(projections)) {
     return(NULL)
   }
   if (length(levels(projections[,gQC_windProj]))<3) {
@@ -911,6 +911,16 @@ output$gQC_windHC <- renderPlot({
   # }
   
   trueclass <- projections[,gQC_windProj]
-  ctStruct = createRef(Y, trueclass)
+  ctStruct = tryCatch({
+    createRef(Y, classes = trueclass)
+    },error = function(e) {
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("Problem with WIND", type = "warning", duration = NULL)
+      }
+      cat(file = stderr(), paste("\n+++++ Error in WIND\n\t", e, "\n"))
+      return(NULL)
+    }
+  )
+  if(is.null(ctStruct)) return(NULL)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
 })
