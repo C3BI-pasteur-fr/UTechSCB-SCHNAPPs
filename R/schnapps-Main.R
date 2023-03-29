@@ -97,4 +97,4 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
 #'
 #' @format A data frame with 53940 rows and 10 variables
 #' @source <http://www.diamondse.info/>
-"scEx"
+"scExOrg"

@@ -1,3 +1,5 @@
+# inst/app/reactives.R
+
 suppressMessages(require(tibble))
 suppressMessages(require(Seurat))
 suppressMessages(require(scran))
@@ -91,6 +93,7 @@ observeEvent(input$Quit, {
 observeEvent(input$openBrowser, {
   deepDebug()
   require(rmarkdown)
+  browser()
   knitr::opts_chunk$set(
     message = FALSE,
     warning = FALSE,

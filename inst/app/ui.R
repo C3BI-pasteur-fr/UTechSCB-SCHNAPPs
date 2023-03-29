@@ -1,4 +1,5 @@
-
+# inst/app/ui.R
+# 
 # This is the user-interface definition of a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -158,7 +159,8 @@ scShinyUI <- function(request) {
   # todo
   # parse all parameters.R files under contributions to include in application
   # allTabs holds all tabs regardsless of their location in the GUI
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R",
+                  full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     tabList <- list()
     source(fp, local = TRUE)
