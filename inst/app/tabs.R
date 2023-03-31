@@ -81,6 +81,7 @@ inputTab <- function() {
         ),
         shinydashboardPlus::box(
           title = "Additional annotations", status = "primary", solidHeader = TRUE, width = 12,
+          id = "addOptInput",
           # helpID = "inputHelpAdd",
           closable = FALSE,
           dropdown_icon = NULL,
