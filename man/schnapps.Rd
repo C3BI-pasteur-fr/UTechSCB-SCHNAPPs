@@ -6,8 +6,9 @@
 \usage{
 schnapps(
   localContributionDir = "~/Rstudio/shHubgit/Dummy/",
-  defaultValueSingleGene = "CD52",
-  defaultValueMultiGenes = "CD52, S100A4, S100A9, S100A8",
+  defaultValueSingleGene = "CD3g",
+  defaultValueMultiGenes =
+    "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA",
   defaultValueRegExGene = "",
   DEBUG = FALSE,
   DEBUGSAVE = FALSE,

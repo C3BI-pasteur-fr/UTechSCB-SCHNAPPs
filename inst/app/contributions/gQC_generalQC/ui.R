@@ -156,7 +156,7 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               sc_selectInput("gQC_windProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
+               sc_selectInput("gQC_windProj", "Projection to use", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
              )
            ),
            fluidRow(
@@ -202,7 +202,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 0,
-      plotOutput("gQC_variancePCA") %>% withSpinner()
+      plotOutput("gQC_variancePCA") %>% jqui_resizable()
     )),
     br(),
     actionButton("save2Histvar", "save to history")
@@ -343,6 +343,7 @@ tabList <- list(
       shinydashboard::box(
         title = "Addition UMAP options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
+        id="addUMAPoptions",
         fluidRow(
           column(
             width = 3,

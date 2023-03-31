@@ -178,6 +178,70 @@ coE_dotPlot_GeneSets <- function(projections = projections,
 }
 
 
+# coE_dotPlot_GeneSetsModuleScore ----
+# same as coE_dotPlot_GeneSets, only that the X labels are already set inside the function and adds ModuleScore.
+coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
+                                 scEx_log = scEx_log,
+                                 clusters = clusters,
+                                 geneSets = geneSets,
+                                 gmtData = gmtData,
+                                 summarize = T,
+                                 col = "RdBu",
+                                 col.min = col.min,
+                                 col.max = col.max,
+                                 dot.min = dot.min,
+                                 dot.scale = dot.scale,
+                                 scale.by = scale.by
+){
+  # replace "_", with "."
+  newRN = stringr::str_replace_all(rownames(scEx_log),"_",".")
+  rownames(scEx_log) = newRN
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx_log)[[1]]
+  )
+  Idents(seurDat) <- as.factor(projections[,clusters])
+  featureDat = rowData(scEx_log)
+  if(length(geneSets) == 1){
+    features = geneName2Index(paste(gmtData[[geneSets]]$genes,collapse = ", "), featureDat)
+  } else {
+    FUN = function(x){
+      geneName2Index(paste(gmtData[[x]]$genes,collapse = ", "), featureDat)
+    }
+    features = lapply(geneSets, FUN = FUN)
+    names(features) = geneSets
+  }
+  # handle duplicated gene names
+  ulFeatures = unlist(features)
+  FUN = function(x,g){
+    # cat(file = stderr(), g)
+    if(length(which(x==g)>0)) x = x[-which(x==g)]
+    x
+  }
+  for(dupGene in ulFeatures[which(ulFeatures %>% duplicated())]){
+    features =lapply(features,FUN = FUN,g=dupGene)
+    features$common =c(features$common, dupGene)
+  }
+  p = DotPlotwithModuleScore(seurDat, 
+              assay="RNA", 
+              features = features, 
+              cols = col,
+              col.min = col.min,
+              col.max = col.max,
+              dot.min = dot.min,
+              dot.scale = dot.scale,
+              idents = NULL,
+              group.by = NULL,
+              split.by = NULL,
+              cluster.idents = FALSE,
+              scale = TRUE,
+              scale.by = scale.by,
+              scale.min = NA,
+              scale.max = NA
+  )
+  p
+}
+
+
 # coE_heatmapSelectedReactive ----
 # reactive function for selected heatmap
 coE_heatmapSelectedReactive <- reactive({

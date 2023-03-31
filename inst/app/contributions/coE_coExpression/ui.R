@@ -1,3 +1,5 @@
+# inst/app/contributions/coE_coExpression/ui.R
+# 
 suppressMessages(library(magrittr))
 
 source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
@@ -16,7 +18,7 @@ menuList <- list(
                              shinydashboard::menuSubItem("alluvialTab", tabName = "alluvialTab")
                            }else {
                              cat(file = stderr(), "Please install ggalluvial: install.packages('ggalluvial')")
-                             }
+                           }
                            # shinydashboard::menuSubItem("SOM cluster", tabName = "SOMcluster")
   )
 )
@@ -61,70 +63,145 @@ tabList <- list(
   # geneSetsTab ----
   geneSetsTab = shinydashboard::tabItem(
     "geneSets",
-    shinydashboard::box(
-      title = "Dot plot", solidHeader = TRUE, width = 12, status = "primary",
-      fluidRow(
-        column(
-          width = 4,
-          sc_selectInput("coE_dotPlot_geneSets", label = "Gene sets for y axis", 
-          choices = c("please load GMT file"),
-          selected = .schnappsEnv$coE_dotPlot_geneSets,
-          multiple = T),
-          sc_numericInput("coE_dotPlot_col.min", "Minimum scaled average expression threshold",
-                          defaultValue("coE_dotPlot_col.min", -2.5),
-                          min = -10, max = 10, step = 0.1
-          ),
-          sc_numericInput("coE_dotPlot_col.max", "Maximum scaled average expression threshold",
-                          defaultValue("coE_dotPlot_col.max", 2.5),
-                          min = -10, max = 10, step = 0.1
-          )
-         ),column(
-          width = 4,
-          sc_selectInput(
-            "coE_dimension_ydotPlotClusters",
-            label = "Y",
-            choices = c(defaultValue("coE_dimension_ydotPlotClusters", "dbCluster"), "sampleName", "tsne3"),
-            selected = defaultValue("coE_dimension_ydotPlotClusters", "dbCluster")
-          ),
-          sc_numericInput("coE_dotPlot_dot.min", "The fraction of cells at which to draw the smallest dot",
-                          defaultValue("coE_dotPlot_dot.min", 0),
-                          min = 0, max = 1, step = 0.1
-          ),
-          sc_numericInput("coE_dotPlot_dot.scale", "Scale the size of the points",
-                          defaultValue("coE_dotPlot_dot.scale", 6),
-                          min = 1, max = 20, step = 0.1
-          )
-         ),column(
-          width = 4,
-          sc_selectInput(
-            "coE_dotPlot_col",
-            label = "col",
-            choices = rownames(x = brewer.pal.info),
-            selected = "RdBu"
-          ),
-          sc_selectInput(
-            "coE_dotPlot_scale.by",
-            label = "Scale the size of the points",
-            choices = c("size", "radius"),
-            selected = "radius"
-          )
-          # not needed? :
-          #' @param scale.by Scale the size of the points by 'size' or by 'radius'
-          #' @param scale.min Set lower limit for scaling, use NA for default
-          #' @param scale.max Set upper limit for scaling, use NA for default
-          
-        )
-      ),
-      
-      fluidRow(
-        column(
-          width = 12,
-          # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
-          jqui_resizable(plotlyOutput("coE_dotPlot_GeneSets"))
-        )
-      ),
-      br(),
-      actionButton("save2histDotPlot", "save to history")
+    tabBox(title = "Gene set plots", width = 12, id = "geneSetPlotsTabBox",
+           tabPanel(
+             title = "Dot plot",
+             
+             shinydashboard::box(
+               title = "Dot plot", solidHeader = TRUE, width = 12, status = "primary",
+               fluidRow(
+                 column(
+                   width = 4,
+                   sc_selectInput("coE_dotPlot_geneSets", label = "Gene sets for y axis", 
+                                  choices = c("please load GMT file"),
+                                  selected = .schnappsEnv$coE_dotPlot_geneSets,
+                                  multiple = T),
+                   sc_numericInput("coE_dotPlot_col.min", "Minimum scaled average expression threshold",
+                                   defaultValue("coE_dotPlot_col.min", -2.5),
+                                   min = -10, max = 10, step = 0.1
+                   ),
+                   sc_numericInput("coE_dotPlot_col.max", "Maximum scaled average expression threshold",
+                                   defaultValue("coE_dotPlot_col.max", 2.5),
+                                   min = -10, max = 10, step = 0.1
+                   )
+                 ),column(
+                   width = 4,
+                   sc_selectInput(
+                     "coE_dimension_ydotPlotClusters",
+                     label = "Y",
+                     choices = c(defaultValue("coE_dimension_ydotPlotClusters", "dbCluster"), "sampleNames", "tsne3"),
+                     selected = defaultValue("coE_dimension_ydotPlotClusters", "dbCluster")
+                   ),
+                   sc_numericInput("coE_dotPlot_dot.min", "The fraction of cells at which to draw the smallest dot",
+                                   defaultValue("coE_dotPlot_dot.min", 0),
+                                   min = 0, max = 1, step = 0.1
+                   ),
+                   sc_numericInput("coE_dotPlot_dot.scale", "Scale the size of the points",
+                                   defaultValue("coE_dotPlot_dot.scale", 6),
+                                   min = 1, max = 20, step = 0.1
+                   )
+                 ),column(
+                   width = 4,
+                   sc_selectInput(
+                     "coE_dotPlot_col",
+                     label = "col",
+                     choices = rownames(x = brewer.pal.info),
+                     selected = "RdBu"
+                   ),
+                   sc_selectInput(
+                     "coE_dotPlot_scale.by",
+                     label = "Scale the size of the points",
+                     choices = c("size", "radius"),
+                     selected = "radius"
+                   )
+                   # not needed? :
+                   #' @param scale.by Scale the size of the points by 'size' or by 'radius'
+                   #' @param scale.min Set lower limit for scaling, use NA for default
+                   #' @param scale.max Set upper limit for scaling, use NA for default
+                   
+                 )
+               ),
+               
+               fluidRow(
+                 column(
+                   width = 12,
+                   # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
+                   jqui_resizable(plotlyOutput("coE_dotPlot_GeneSets"))
+                 )
+               ),
+               br(),
+               actionButton("save2histDotPlot", "save to history")
+             )
+           ),
+           tabPanel(
+             title = "Dot plot with Module Score",
+             
+             shinydashboard::box(
+               title = "Dot plot with Module Score", solidHeader = TRUE, width = 12, status = "primary",
+               fluidRow(
+                 column(
+                   width = 4,
+                   sc_selectInput("coE_dotPlotModuleScore_geneSets", label = "Gene sets for y axis", 
+                                  choices = c("please load GMT file"),
+                                  selected = .schnappsEnv$coE_dotPlotModuleScore_geneSets,
+                                  multiple = T),
+                   sc_numericInput("coE_dotPlotModuleScore_col.min", "Minimum scaled average expression threshold",
+                                   defaultValue("coE_dotPlotModuleScore_col.min", -2.5),
+                                   min = -10, max = 10, step = 0.1
+                   ),
+                   sc_numericInput("coE_dotPlotModuleScore_col.max", "Maximum scaled average expression threshold",
+                                   defaultValue("coE_dotPlotModuleScore_col.max", 2.5),
+                                   min = -10, max = 10, step = 0.1
+                   )
+                 ),column(
+                   width = 4,
+                   sc_selectInput(
+                     "coE_dimension_ydotPlotModuleScoreClusters",
+                     label = "Y",
+                     choices = c(defaultValue("coE_dimension_ydotPlotModuleScoreClusters", "dbCluster"), "sampleNames", "tsne3"),
+                     selected = defaultValue("coE_dimension_ydotPlotModuleScoreClusters", "dbCluster")
+                   ),
+                   sc_numericInput("coE_dotPlotModuleScore_dot.min", "The fraction of cells at which to draw the smallest dot",
+                                   defaultValue("coE_dotPlotModuleScore_dot.min", 0),
+                                   min = 0, max = 1, step = 0.1
+                   ),
+                   sc_numericInput("coE_dotPlotModuleScore_dot.scale", "Scale the size of the points",
+                                   defaultValue("coE_dotPlotModuleScore_dot.scale", 6),
+                                   min = 1, max = 20, step = 0.1
+                   )
+                 ),column(
+                   width = 4,
+                   sc_selectInput(
+                     "coE_dotPlotModuleScore_col",
+                     label = "col",
+                     choices = rownames(x = brewer.pal.info),
+                     selected = "RdBu"
+                   ),
+                   sc_selectInput(
+                     "coE_dotPlotModuleScore_scale.by",
+                     label = "Scale the size of the points",
+                     choices = c("size", "radius"),
+                     selected = "radius"
+                   )
+                   # not needed? :
+                   #' @param scale.by Scale the size of the points by 'size' or by 'radius'
+                   #' @param scale.min Set lower limit for scaling, use NA for default
+                   #' @param scale.max Set upper limit for scaling, use NA for default
+                   
+                 )
+               ),
+               
+               fluidRow(
+                 column(
+                   width = 12,
+                   # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
+                   jqui_resizable(plotlyOutput("coE_dotPlot_GeneSetsModuleScore"))
+                 )
+               ),
+               br(),
+               actionButton("save2histDotPlotModuleScore", "save to history")
+             )
+           )
     )
   ),
   # coexpression selected -----
@@ -147,7 +224,8 @@ tabList <- list(
                       column( width = 12,
                               fluidRow(column(
                                 width = 12,
-                                sc_textInput("coE_heatmapselected_geneids", "Comma separated gene names", value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
+                                sc_textInput("coE_heatmapselected_geneids", "Comma separated gene names", 
+                                             value = defaultValue("coE_heatmapselected_geneids", defaultValueMultiGenes))
                               )),
                               br(),
                               # fluidRow(sc_checkboxInput(inputId = "coE_heatmapSelectedModuleShow", label = "calc heatmap", value = FALSE)),
@@ -286,7 +364,7 @@ tabList <- list(
                  sc_selectInput(
                    "coE_dimension_xVioiGrp",
                    label = "X",
-                   choices = c(defaultValue("coE_dimension_xVioiGrp", "dbCluster"), "sampleName", "tsne3"),
+                   choices = c(defaultValue("coE_dimension_xVioiGrp", "dbCluster"), "sampleNames", "tsne3"),
                    selected = defaultValue("coE_dimension_xVioiGrp", "dbCluster")
                  )
                ),
@@ -326,7 +404,7 @@ tabList <- list(
                    "coE_dimension_xVioiGrp2",
                    label = "X",
                    multiple = TRUE,
-                   choices = c(defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), "sampleName", "tsne3"),
+                   choices = c(defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), "sampleNames", "tsne3"),
                    selected = defaultValue("coE_dimension_xVioiGrp2", "dbCluster"), 
                    options = list(maxItems = 2)
                  )
@@ -367,7 +445,7 @@ tabList <- list(
             ),
             fluidRow(
               column(width = 12, 
-                     plotOutput("alluvial_plot") # %>% withSpinner()
+                     plotOutput("alluvial_plot")  %>% jqui_resizable()
               )
             ),
             br(),
