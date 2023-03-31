@@ -1,3 +1,4 @@
+# coExpression outputs.R
 
 myZippedReportFiles <- c("output_coE_topExpGenes.csv")
 

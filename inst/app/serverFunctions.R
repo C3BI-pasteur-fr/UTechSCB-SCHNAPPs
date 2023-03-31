@@ -1772,7 +1772,8 @@ defaultValue <- function(param = "coEtgMinExpr", val ) {
 # dheader ----
 # it is used in ui.R and ui-lite.R and is still being developped
 dheader <- function() {
-  shinydashboard::dashboardHeader(
+  shinydashboardPlus::dashboardHeader(
+    controlbarIcon = "Wkfl",
     title = paste("SCHNAPPs", packageVersion("SCHNAPPs")),
     shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-question"),badgeStatus = NULL,
                                  headerText = "Help",

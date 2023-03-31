@@ -138,6 +138,10 @@
   options("future.globals.maxSize")
   options(future.globals.maxSize= 2024^3)
   options(shinyjqui.debug = TRUE)
+  shiny::addResourcePath(
+    prefix = "www",
+    directoryPath = "./inst/www/"
+  )
   
   runApp(app, port=3840)
 

@@ -26,7 +26,8 @@ lapply(names(shortCutsList),FUN = function(nam){
     divFunc = function(x, session, ...){
       x(session)
     }
-    onclick(paste0("sCOut.", make.names(namItem),".click"),divFunc(event, x=fun, session=session))
+    cat(file = stderr(), paste0("========= sCOut.", make.names(namItem),".click\n"))
+    onclick(paste0("sCOut.", make.names(namItem),".click"),divFunc( x=fun, session=session))
   })
 })
 

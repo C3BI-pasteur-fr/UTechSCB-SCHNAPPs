@@ -199,12 +199,14 @@ scShinyUI <- function(request) {
   getallMenus <- function() {
     allMenus
   }
-  
+  controlbarContext =NULL
+  if(file.exists("inst/app/controlbarContext.R")) 
+    source(file = paste0(packagePath, "/controlbarContext.R"), local = TRUE)
   
   shinyUI(
-    shinydashboard::dashboardPage(
+    shinydashboardPlus::dashboardPage(
       dheader(),
-      shinydashboard::dashboardSidebar(
+      shinydashboardPlus::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sideBarID",
           getallMenus(),
@@ -267,7 +269,10 @@ scShinyUI <- function(request) {
         #          class = "tab-content"
         # )  ,
         # h4("Sum of all previous slider values:", textOutput("sum"))
-      ) # dashboard body
+      ), # dashboard body
+      
+      options = list(sidebarExpandOnHover = TRUE),
+    controlbar = controlbarContext
     ) # main dashboard
   )
 }

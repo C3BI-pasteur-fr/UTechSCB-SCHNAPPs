@@ -1368,7 +1368,11 @@ observeEvent(input$AboutApp,{
   deepDebug()
   showModal(modalDialog(
     title = "About SCHNAPPs",
-    tags$a(tags$b("Here comes the about text")),
+    tags$a(tags$b("When using SCHNAPPs, please cite Journal of Immunological Methods doi: 10.1016/j.jim.2021.113176")),
+    p("the github repository can be found here: https://github.com/C3BI-pasteur-fr/UTechSCB-SCHNAPPs"),
+    p("The software is patented under IDDN1 .FR2 .0013 .3600164 .0005 .S6 .P7 .20208 .0009 .3123510"),
+    p("further documentation including FAQs, and example workflows can be found here: https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/"),
+    p("some youtube presentations can be found here: https://www.youtube.com/playlist?list=PL__mZTR-JcdOpa8Llz2Dfcu_mCk8iBCpC"),
     easyClose = TRUE,
     footer = NULL
   ))
@@ -1417,6 +1421,7 @@ callModule(
 )
 
 source(paste0(packagePath, "/shortCuts.R"), local = TRUE)
+source(paste0(packagePath, "/controlbarObservers.R"), local = TRUE)
 
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))
