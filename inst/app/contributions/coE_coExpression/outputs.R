@@ -229,7 +229,7 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
   
   gmtData = gmtData()
   
-  if (is.null(projections) | is.null(scEx_log) | is.null(gmtData) | !all(geneSets %in% names(gmtData))) {
+  if (is.null(projections) | is.null(scEx_log) | is.null(gmtData) | isEmpty(gmtData) | isEmpty(geneSets) | !all(geneSets %in% names(gmtData))) {
     if (DEBUG) cat(file = stderr(), "output$coE_dotPlot_GeneSets:NULL\n")
     return(NULL)
   }
@@ -275,7 +275,78 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
   return(retVal %>% ggplotly())
 })
 
-
+# coE_dotPlot_GeneSetsModuleScore ----
+output$coE_dotPlot_GeneSetsModuleScore <- renderPlotly({
+  # output$coE_dotPlot_GeneSets <- renderPlotly({
+  if (DEBUG) cat(file = stderr(), "coE_dotPlot_GeneSetsModuleScore started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_dotPlotModuleScore_GeneSets")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_dotPlotModuleScore_GeneSets")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_dotPlotModuleScore_GeneSets", id = "coE_dotPlotModuleScore_GeneSets", duration = NULL)
+  }
+  projections <- projections()
+  scEx_log <- scEx_log()
+  clusters = input$coE_dimension_ydotPlotModuleScoreClusters
+  geneSets = input$coE_dotPlotModuleScore_geneSets
+  col = input$coE_dotPlotModuleScore_col
+  col.min = input$coE_dotPlotModuleScore_col.min
+  col.max = input$coE_dotPlotModuleScore_col.max
+  dot.min = input$coE_dotPlotModuleScore_dot.min
+  dot.scale = input$coE_dotPlotModuleScore_dot.scale
+  scale.by = input$coE_dotPlotModuleScore_scale.by
+  
+  gmtData = gmtData()
+  
+  if (is.null(projections) | is.null(scEx_log) | is.null(gmtData) | isEmpty(gmtData) | isEmpty(geneSets) | !all(geneSets %in% names(gmtData))) {
+    if (DEBUG) cat(file = stderr(), "output$coE_dotPlotModuleScore_GeneSets:NULL\n")
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/coE_dotPlotModuleScore_GeneSets.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/coE_dotPlotModuleScore_GeneSets.RData")
+  featureData <- rowData(scEx_log)
+  retVal <- coE_dotPlot_GeneSetsModuleScore(
+    projections = projections,
+    scEx_log <- scEx_log,
+    clusters = clusters,
+    geneSets = geneSets,
+    gmtData = gmtData,
+    col = col,
+    col.min = col.min,
+    col.max = col.max,
+    dot.min = dot.min,
+    dot.scale = dot.scale,
+    scale.by = scale.by
+  )
+  
+  
+  if(is.null(retVal)) return(NULL)
+  af = coE_dotPlot_GeneSetsModuleScore
+  # remove env because it is too big
+  specEnv = emptyenv()
+  environment(af) = new.env(parent = specEnv)
+  .schnappsEnv[["coE_dotPlotModuleScore_GeneSets"]] <- list(plotFunc = af,
+                                                 projections = projections,
+                                                 scEx_log = scEx_log,
+                                                 clusters = clusters,
+                                                 geneSets = geneSets,
+                                                 gmtData = gmtData,
+                                                 col = col,
+                                                 col.min = col.min,
+                                                 col.max = col.max,
+                                                 dot.min = dot.min,
+                                                 dot.scale = dot.scale,
+                                                 scale.by = scale.by
+                                                 
+  )
+  return(retVal %>% ggplotly())
+})
 
 # save to history dotplot ---d-
 observe(label = "save2histDotPlot", {
@@ -301,6 +372,33 @@ observe(label = "save2histDotPlot", {
                               "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
               ),
               plotData = .schnappsEnv[["coE_dotPlot_GeneSets"]])
+  
+})
+
+# save to history dotplot ---d-
+observe(label = "save2histDotPlotModuleScore", {
+  clicked  = input$save2histDotPlotModuleScore
+  if (DEBUG) cat(file = stderr(), "observe save2histDotPlotModuleScore \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# DotPlotModuleScore\n",
+                              "fun = plotData$plotData$plotFunc\n", 
+                              "environment(fun) = environment()\n",
+                              "plotData$plotData$outfile=NULL\n",
+                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["coE_dotPlotModuleScore_GeneSets"]])
   
 })
 
@@ -532,9 +630,14 @@ observe({
   if (DEBUG) cat(file = stderr(), "observe gmtData: coE_dotPlot_geneSets\n")
   
   gmtList = gmtData()
+  
   updateSelectInput(session, "coE_dotPlot_geneSets",
                     choices = names(gmtList),
                     selected = .schnappsEnv$coE_dotPlot_geneSets
+  )
+  updateSelectInput(session, "coE_dotPlotModuleScore_geneSets",
+                    choices = names(gmtList),
+                    selected = .schnappsEnv$coE_dotPlotModuleScore_geneSets
   )
 })
 
@@ -552,6 +655,9 @@ observe({
   updateSelectInput(session, "coE_dimension_ydotPlotClusters",
                     choices = projF,
                     selected = .schnappsEnv$coE_dimension_ydotPlotClusters)
+  updateSelectInput(session, "coE_dimension_ydotPlotModuleScoreClusters",
+                    choices = projF,
+                    selected = .schnappsEnv$coE_dimension_ydotPlotModuleScoreClusters)
 })
 
 

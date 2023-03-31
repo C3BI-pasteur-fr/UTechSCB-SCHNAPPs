@@ -1,3 +1,5 @@
+# inst/app.outputs.R
+# 
 if (DEBUG) cat(file = stderr(), "outputs.R started.\n")
 suppressMessages(require(shinyTree))
 suppressMessages(require(stringr))
