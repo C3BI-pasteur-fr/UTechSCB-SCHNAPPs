@@ -706,7 +706,9 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                # deepDebug()
                # sampe projections as displayed, i.e. only those available for the cells
                # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
-               projections[,rnProj] =  factor(projections[,rnProj])
+               proj2Add =  projections[,rnProj,drop=FALSE]
+               proj2Add[,rnProj] = factor(proj2Add[,rnProj])
+               
                if(is.null(
                  tryCatch({
                    
@@ -734,17 +736,6 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      naPos = which ("NA" == newLevelNames)
                      newLbVec = newLbVec[newLevelNames]
                      newLbVec[which(is.na(newLbVec))] = "NA"
-                     # if ( naPos == length(newLevelNames)){
-                     #   newLbVec = c(newLbVec, "NA")
-                     # } else { 
-                     #   if (naPos == 1) {
-                     #     newLbVec = c("NA", newLbVec)
-                     #   } else {
-                     #     cat(file = stderr(), paste("NA is neither in front nor last \n"))
-                     #     showNotification("NA is neither in front nor last ", id = "renameProbl2", duration = NULL, type = "error")
-                     #     return(NULL)
-                     #   }
-                     # }
                    }
                    if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(stringr::str_trim(newLbVec)) ){
                      cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
