@@ -274,6 +274,12 @@ shortCutsList = list(
 ) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
 
 
+# scaterPlot.png
+# UMAPwParameters.png
+# UMIhistogram.png
+# WINDdendrogram.png
+
+
 # shortCutsList = list(
 #   Head = ,
 #   Descr = ,

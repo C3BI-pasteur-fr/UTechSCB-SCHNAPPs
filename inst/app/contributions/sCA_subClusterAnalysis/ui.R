@@ -40,7 +40,7 @@ tabList <- list(
                    
                  )},
                cellSelectionUI("sCA_dataInput"),
-               shinydashboard::box(width = 6,
+               shinydashboardPlus::box(width = 6,
                                    title = "Dimensions for plot",
                                    fluidRow(
                                      column(width = 6,
@@ -81,7 +81,7 @@ tabList <- list(
                
                
                br(),
-               shinydashboard::box(width = 12,
+               shinydashboardPlus::box(width = 12,
                                    fluidRow(
                                      
                                      column(width = 6,
@@ -100,14 +100,14 @@ tabList <- list(
                                    )
                ),
                br(),
-               shinydashboard::box(
+               shinydashboardPlus::box(
                  title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
                  dropdown_icon = NULL,
                  closable = FALSE,
                  enable_dropdown = T,
                  collapsible = TRUE, collapsed = TRUE,
                  id = "dgeAddOptions",
-                 box(title = "scDEA parameters", width = 12,solidHeader = TRUE, 
+                 shinydashboardPlus::box(title = "scDEA parameters", width = 12,solidHeader = TRUE, 
                      fluidRow(
                        column(width = 3,
                               sc_checkboxInput("scDEA_parallel", "use parallel implementations", value = defaultValue("scDEA_parallel", TRUE)),
@@ -135,18 +135,7 @@ tabList <- list(
                  )
                )
       ),
-      # ,
-      # shinydashboard::box(
-      #   title = "DGE method", solidHeader = TRUE, width = 12, status = "primary",
-      #   collapsible = TRUE, collapsed = FALSE,
-      #   
-      # )
-      
-      # br(),
-      # shinydashboard::box(width = 12,
-      #     ),
-      # br(),
-      
+
       if ("manhattanly" %in% rownames(installed.packages()))
         tabPanel(
           title = "Volcano plot",  width = 12, 

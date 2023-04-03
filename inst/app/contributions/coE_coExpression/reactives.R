@@ -1,3 +1,5 @@
+# coExpression reactives.R
+
 # heatmapFunc ---------------------------------
 # used by both selection and all to create input for heatmap module
 coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cells, sampCol, ccols) {

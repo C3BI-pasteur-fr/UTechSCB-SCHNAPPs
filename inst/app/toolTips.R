@@ -66,6 +66,9 @@ if ("shinyBS" %in% rownames(installed.packages())) {
   .schnappsEnv$sbTT_temporaPval_thresh  <-  bsPopover("temporaPval_thresh", title = "", "P-value threshold to determine the significance of pathway enrichment over time. Set rel. high because filtering is done later. Default to 0.5.")
   
   
+  .schnappsEnv$sbTT_temporaCluster <-  bsPopover("gQC_tsneTheta", title = "", "Speed/accuracy trade-off (increase for less accuracy), set to 0.0 for exact TSNE (default: 0.5)")
+  
+  
   checkbsTT <- function(item) {
     if (exists(".schnappsEnv")) 
       if (is.environment(.schnappsEnv)) {

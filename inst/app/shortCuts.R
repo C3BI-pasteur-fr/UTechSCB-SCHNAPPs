@@ -40,9 +40,8 @@ observeEvent(eventExpr = input$expandAllShortCuts, label = "expandAllShortCuts",
   lapply(names(shortCutsList),FUN = function(nam){
     lapply(names(shortCutsList[[nam]]),FUN = function(namItem){
       cat(file = stderr(),  paste("====", paste0("sCOut.", make.names(namItem),".plus"),"\n"))
-      updateBox(paste0("sCOut.", make.names(namItem),".plus"), action = "update", options = list(collapsed = F), session = session)
+      updateBox(paste0("sCOut.", make.names(namItem),".plus"), action = "toggle")
     })
-
   })
   # updateBox("sCOut.Gene.selection.plus", action = "remove", session = session)
   # updateBox("sCOut.Gene.selection.plus", action = "toggle", session = session)

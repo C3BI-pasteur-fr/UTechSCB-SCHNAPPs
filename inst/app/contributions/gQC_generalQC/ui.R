@@ -1,3 +1,5 @@
+# gQC_generalQC/ui.R
+
 suppressMessages(require(magrittr))
 source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 menuList <- list(
@@ -23,6 +25,7 @@ modTab <- shinydashboard::tabItem(
   tabBox(title = "modify projections", width = 12, id = "modProj",
          tabPanel(
            title = "Rename projections", solidHeader = TRUE, width = 12, value = "renameProj",
+           id = "rename.Proj.Tab",
            fluidRow(
              column(
                width = 6,
@@ -62,6 +65,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "combine projections", solidHeader = TRUE, width = 12, value = "gQC_combProj",
+           id = "combine.Proj.Tab",
            tags$p("Two factors can be combined by pasting the values per row and re-leveling"),
            br(),
            fluidRow(
@@ -90,6 +94,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "rename levels", width = 12, value = "gQC_renameLev",
+           id = "rename.Levels.Tab",
            tags$p("rename the levels of a factor"),
            br(),
            
@@ -126,6 +131,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "rearrange levels", width = 12, value = "gQC_rearrangeLev",
+           id = "rearrange.Levels.Tab",
            tags$p("rearrange the levels of a factor"),
            br(),
            fluidRow(
@@ -150,6 +156,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "WIND", width = 12, value = "gQC_wind",
+           id = "wind.Tab",
            tags$p("from WIND package compute hierachy of projection (https://github.com/haowulab/Wind)"),
            tags$p("to compute weighted normalized mutual information (wNMI) and weighted Rand index (wRI) to evaluate the clustering results by comparing a clustering output with a reference which has a hierarchical structure."),
            br(),
@@ -208,12 +215,13 @@ tabList <- list(
     actionButton("save2Histvar", "save to history")
   ),
   
-  tsnePlotTab = shinydashboard::tabItem(
+  shinydashboard::tabItem(
     tabName = "gQC_tsnePlot",
+    # id = "gQC_tsneTab",
     shinyjs::useShinyjs(),
     fluidRow(div(h3("tSNE Plot"), align = "center")),
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "tSNE  parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -225,8 +233,9 @@ tabList <- list(
           sc_numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 10), min = 1, max = 100)
         )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "tSNE additional parameters", solidHeader = TRUE, width = 12, status = "primary",
+        id = "tSNEParametersToggle",
         collapsible = TRUE, collapsed = TRUE,
         column(
           width = 6,
@@ -237,6 +246,7 @@ tabList <- list(
           sc_numericInput("gQC_tsneSeed", "Seed", defaultValue("gQC_tsneSeed", 1), min = 1, max = 10000)
         )
       ),
+      checkbsTT(item = "gQC_tsneTheta"),
       fluidRow(
         column(
           width = 12, offset = 1,
@@ -247,7 +257,7 @@ tabList <- list(
         )
       )
     ),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "3D plot", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = FALSE,
       fluidRow(
@@ -299,10 +309,12 @@ tabList <- list(
       ))
     )
   ),
-  umapTab <- shinydashboard::tabItem(
+  shinydashboard::tabItem(
     tabName = "gQC_umapPlot",
-    shinydashboard::box(
+    
+    shinydashboardPlus::box(
       title = "UMAP parameters", solidHeader = TRUE, width = 12, status = "primary",
+      # id = "gQC_umapTab",
       fluidRow(
         column(
           width = 12, offset = 1,
@@ -340,7 +352,7 @@ tabList <- list(
           )
         )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "Addition UMAP options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
         id="addUMAPoptions",
@@ -394,11 +406,11 @@ tabList <- list(
               label = "bandwidth",
               choices = c(1:20), selected = defaultValue("gQC_um_bandwidth", "1")
             )
-          ),
+          )
         )
-      ), # additional options box
+      ) # additional options box
     ),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       width = 12,
       fluidRow(column(
         width = 12,

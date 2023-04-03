@@ -64,7 +64,7 @@ shortCutsTab <- function(){
     fluidRow(div(h3(.generalExplain), 
                  align = "center")),
     div(h6(.generalDescr)),
-    actionButton("expandAllShortCuts","toggle all short cuts (not working)"),
+    actionButton("expandAllShortCuts","toggle all short cuts"),
     shortCutsTabFunc(shortCutsList)
   )
 }

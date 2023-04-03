@@ -30,7 +30,7 @@ tabList <- list(
   # coexpressionAll ----
   coexpressionAllTab = shinydashboard::tabItem(
     "coexpressionAll",
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Heatmap of all cells", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -67,7 +67,7 @@ tabList <- list(
            tabPanel(
              title = "Dot plot",
              
-             shinydashboard::box(
+             shinydashboardPlus::box(
                title = "Dot plot", solidHeader = TRUE, width = 12, status = "primary",
                fluidRow(
                  column(
@@ -136,7 +136,7 @@ tabList <- list(
            tabPanel(
              title = "Dot plot with Module Score",
              
-             shinydashboard::box(
+             shinydashboardPlus::box(
                title = "Dot plot with Module Score", solidHeader = TRUE, width = 12, status = "primary",
                fluidRow(
                  column(
@@ -435,7 +435,7 @@ tabList <- list(
     )
   ),
   tabItem("alluvialTab",
-          shinydashboard::box(
+          shinydashboardPlus::box(
             title = "alluvial plot", solidHeader = TRUE, width = 12, status = 'primary', 
             fluidRow(
               column(width = 6, 
