@@ -35,11 +35,11 @@
   DEBUGSAVE = F
   historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Jan-18.09.02"
   historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Feb-22.17.42/"
-  historyPath = "/Volumes/LaCie2022/RStudio_history/celia/"
+  historyPath = "/Volumes/LaCie2022/RStudio_history/scCourse/"
   # historyPath = "/Volumes/LaCie2022/RStudio_history/katja/hist_2022-Dec-26.17.05"
   # historyPath = "demoHistory/hist_2023-Feb-15.10.13/"
   # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
-  historyPath = NULL
+  # historyPath = NULL
   assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
   assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)

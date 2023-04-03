@@ -21,7 +21,7 @@ source(paste0(packagePath, "/toolTips.R"), local = TRUE)
 inputTab <- function() {
   shinydashboard::tabItem(
     tabName = "input",
-    shinydashboard::box(
+    shinydashboardPlus::box(
       width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
       fluidRow(
         div(h3("SCHNAPPs Input"), align = "center")
@@ -33,7 +33,7 @@ inputTab <- function() {
         ),
         align = "center"
       )),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         width = 12, solidHeader = FALSE, collapsible = FALSE, collapsed = FALSE,
         fluidRow(
           column(
@@ -125,7 +125,7 @@ inputTab <- function() {
     ),
     
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Input options", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -160,7 +160,7 @@ inputTab <- function() {
     ),
     
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "before-filter counts", width = 12, solidHeader = TRUE, status = "primary",
       footer = "This regular expression will be used before filtering out genes. It is meant to keep track of genes that were removed from gene filtering. This will generate a projection called 'before.filter'.",
       fluidRow(column(
@@ -187,7 +187,7 @@ geneSelectionTab <- function() {
     ),
     checkbsTT("updateGeneSelectionParameters"),
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Gene selection parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -219,7 +219,7 @@ geneSelectionTab <- function() {
         title = "Gene selection tables", width = 12, id = "geneselectiontb",
         tabPanel("Genes kept",
                  height = "250px", width = 12, value = "Genes kept",
-                 # shinydashboard::box(
+                 # shinydashboardPlus::box(
                  #   title = "Genes kept, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
                  #   collapsible = FALSE, collapsed = TRUE,
                  fluidRow(
@@ -232,7 +232,7 @@ geneSelectionTab <- function() {
         ),
         tabPanel("genes removed",
                  height = "250px", value = "genes removed",
-                 # shinydashboard::box(
+                 # shinydashboardPlus::box(
                  #   title = "Genes removed, with mean Expression, and number of cells expressing min 1", solidHeader = TRUE, width = 12, status = "primary",
                  #   collapsible = FALSE, collapsed = TRUE,
                  fluidRow(
@@ -262,7 +262,7 @@ cellSelectionTab <- function() {
     ),
     checkbsTT("updateCellSelectionParameters"),
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Cell selection parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -277,8 +277,9 @@ cellSelectionTab <- function() {
         )
       )
     ),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Additional parameters", solidHeader = TRUE, width = 12, status = "primary",
+      id = "cellSelectionParameters",
       collapsible = TRUE, collapsed = TRUE,
       fluidRow(
         column(
@@ -301,9 +302,9 @@ cellSelectionTab <- function() {
     checkbsTT("cellKeepOnly"),
     checkbsTT("cellsFiltersOut"),
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Cell table", solidHeader = TRUE, width = 12, status = "primary",
-      collapsible = FALSE, collapsed = TRUE,
+      collapsible = FALSE, 
       tableSelectionUi("cellSelectionMod")
     ),
     checkbsTT("cellSelectionMod"), br()

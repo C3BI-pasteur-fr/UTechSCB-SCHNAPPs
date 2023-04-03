@@ -12,7 +12,7 @@ allTabs[[length(allTabs) + 1]] <- list(
     #   collapsible = FALSE, collapsed = TRUE,
     #   
     # )
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = TRUE,
       fluidRow(column(
