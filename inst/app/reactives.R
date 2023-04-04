@@ -29,6 +29,9 @@ sampleCols <- reactiveValues(colPal = allowedColors)
 # colors for clusters
 clusterCols <- reactiveValues(colPal = allowedColors)
 
+gmtData <- reactiveVal()
+gmtUserData <- reactiveVal()
+
 # Here, we store projections that are created during the session. These can be selections of cells or other values that
 # are not possible to precalculate.
 sessionProjections <- reactiveValues(
@@ -113,8 +116,8 @@ observeEvent(input$openBrowser, {
                         input = inputList,
                         scEx_log = scEx_log,
                         projections = projections(),
-                        ccols = clusterCols$colPal,
-                        scols = sampleCols$colPal
+                        ccols = isoloate(clusterCols$colPal),
+                        scols = isoloate(sampleCols$colPal)
                       )
     ),
     error = function(e) {cat(file = stderr(),paste("Error\n",e,"\n")); NULL}
@@ -767,7 +770,8 @@ inputData <- reactive({
   
   isolate({
     if (is.null(names(sampleCols$colPal)) | !all(names(sampleCols$colPal) %in% sampNames)){
-      sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
+      sampleCols$colPal <- rev(allowedColors[rep(1:length(allowedColors),ceiling(length(sampNames) / length(allowedColors)))[1:length(sampNames)]])
+      # sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
       names(sampleCols$colPal) <- sampNames
       add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
     }
@@ -817,7 +821,27 @@ inputData <- reactive({
 # gmtData ----
 # load RData file with singlecellExperiment object
 # internal, should not be used by plug-ins
-gmtData <- reactive({
+
+# combine user defined and file defined GMT lists
+observe({
+  gmtfDat = gmtFileData()
+  gmtuDat = gmtUserData() 
+  
+  if(is.null(gmtfDat) & is.null(gmtuDat)){
+    return(NULL)
+  }
+  retVal = append(gmtfDat, gmtuDat) %>% compact
+  gmtData(retVal)
+  gmt = gmtData()
+  # if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gmtFileData.RData", list = c(ls()))
+  # }
+  # cp =load(file='~/SCHNAPPsDebug/gmtFileData.RData')
+
+})
+
+
+gmtFileData <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "gmtData started.\n")
   }
@@ -850,9 +874,9 @@ gmtData <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gmtData.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/gmtFileData.RData", list = c(ls()))
   }
-  # cp =load(file='~/SCHNAPPsDebug/gmtData.RData')
+  # cp =load(file='~/SCHNAPPsDebug/gmtFileData.RData')
   
   # gmtFile$datapath = "data/sessionData.RData"
   # annFile$datapath = "data/selectedCells.csv"
@@ -869,7 +893,7 @@ gmtData <- reactive({
     return(NULL)
   }
   
-
+  
   exportTestValues(gmtData = {
     list(
       retVal
@@ -2712,13 +2736,15 @@ dbCluster <- reactive({
   inCols <- list()
   lev <- levels(dbCluster)
   
-  inCols <- allowedColors[1:length(lev)]
+  inCols <- allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
+  # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
-  
-  if(is.null(names(clusterCols$colPal)) | !all(names(clusterCols$colPal) %in% levels(dbCluster))){
-    clusterCols$colPal <- unlist(inCols)
-    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
-  }
+  isolate(
+    if(is.null(names(clusterCols$colPal)) | !all(names(clusterCols$colPal) %in% levels(dbCluster))){
+      clusterCols$colPal <- unlist(inCols)
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
+    }
+  )
   setRedGreenButton(
     vars = list(
       c("sampleNamecol", isolate(sampleCols$colPal)),

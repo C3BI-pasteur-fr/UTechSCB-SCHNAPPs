@@ -16,6 +16,57 @@ menuList <- list(
 )
 
 
+# geneSetModTab -----
+
+geneSetModTab <- shinydashboard::tabItem(
+  tabName = "modifyGeneSets",
+  fluidRow(div(h3("work with gene sets"), align = "center")),
+  br(),
+  tabBox(title = "modify gene sets", width = 12, id = "modGS",
+         tabPanel(
+           title = "Rename gene set", solidHeader = TRUE, width = 12, value = "renameGS",
+           id = "rename.GS.Tab",
+           fluidRow(
+             column(
+               width = 6,
+               sc_selectInput("oldGS", "gene sets to copy + rename", choices = defaultValue("oldGS", "notyet"), selected = defaultValue("oldGS", "notyet"))
+             ),
+             column(
+               width = 6,
+               fluidRow(
+                 column(
+                   width = 8,
+                   sc_textInput("newGS", "new name of gene set", value = defaultValue("newGS", ""))
+                 ),
+                 column(
+                   width = 4,
+                   actionButton("updateGSButton", "rename")
+                 )
+               ),
+               fluidRow(
+                 column(
+                   width = 8,
+                   sc_selectInput("delGS", "gene set to delete", choices = defaultValue("delGS", "notyet"), selected = defaultValue("delGS", "notyet"))
+                 ),
+                 column(
+                   width = 4,
+                   actionButton("delGSButton", "delete")
+                 ),
+                 tags$style(type = "text/css", "#updateGSButton { width:100%; margin-top: 25px;}"),
+                 tags$style(type = "text/css", "#delGSButton { width:100%; margin-top: 25px;}")
+               )
+             )
+           ) 
+         ),
+         tabPanel(
+           title = "edit gene set", solidHeader = TRUE, width = 12, value = "gQC_editGS",
+           id = "gQC_editGS.Tab",
+           tags$p("Select a gene set and then edit it"),
+           br()
+         )
+  )
+)
+
 
 # modTab ----
 modTab <- shinydashboard::tabItem(
@@ -104,7 +155,7 @@ modTab <- shinydashboard::tabItem(
                sc_selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
              ),
              column(width = 6, 
-                     sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
+                    sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
            ),
            
            fluidRow(
@@ -264,33 +315,33 @@ tabList <- list(
         column(
           width = 3,
           sc_selectInput("gQC_dim3D_x",
-                      label = "X",
-                      choices = c(defaultValue("gQC_dim3D_x", "tsne1"), "tsne2", "tsne3"),
-                      selected = defaultValue("gQC_dim3D_x", "tsne1")
+                         label = "X",
+                         choices = c(defaultValue("gQC_dim3D_x", "tsne1"), "tsne2", "tsne3"),
+                         selected = defaultValue("gQC_dim3D_x", "tsne1")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_dim3D_y",
-                      label = "Y",
-                      choices = c("tsne1", defaultValue("gQC_dim3D_y", "tsne2"), "tsne3"),
-                      selected = defaultValue("gQC_dim3D_y", "tsne2")
+                         label = "Y",
+                         choices = c("tsne1", defaultValue("gQC_dim3D_y", "tsne2"), "tsne3"),
+                         selected = defaultValue("gQC_dim3D_y", "tsne2")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_dim3D_z",
-                      label = "Z",
-                      choices = c("tsne1", "tsne2", defaultValue("gQC_dim3D_z", "tsne3")),
-                      selected = defaultValue("gQC_dim3D_z", "tsne3")
+                         label = "Z",
+                         choices = c("tsne1", "tsne2", defaultValue("gQC_dim3D_z", "tsne3")),
+                         selected = defaultValue("gQC_dim3D_z", "tsne3")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_col3D",
-                      label = "color",
-                      choices = defaultValue("gQC_col3D", "sampleNames"),
-                      selected = defaultValue("gQC_col3D", "sampleNames")
+                         label = "color",
+                         choices = defaultValue("gQC_col3D", "sampleNames"),
+                         selected = defaultValue("gQC_col3D", "sampleNames")
           )
         )
       ),
@@ -325,30 +376,30 @@ tabList <- list(
       fluidRow(
         column(
           width = 3,
-            sc_selectInput("gQC_um_n_neighbors",
-                      label = "N Neighbors",
-                      choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "10")
+          sc_selectInput("gQC_um_n_neighbors",
+                         label = "N Neighbors",
+                         choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "10")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_um_n_components",
-                      label = "N components",
-                      choices = c(2:20), selected = defaultValue("gQC_um_n_components", "3")
+                         label = "N components",
+                         choices = c(2:20), selected = defaultValue("gQC_um_n_components", "3")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_um_spread",
-                      label = "spread",
-                      choices = c(1:10), selected = defaultValue("gQC_um_spread", "10")
+                         label = "spread",
+                         choices = c(1:10), selected = defaultValue("gQC_um_spread", "10")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_um_local_connectivity",
-                      label = "local connectivity",
-                      choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "5")
+                         label = "local connectivity",
+                         choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "5")
           )
         )
       ),
@@ -360,12 +411,12 @@ tabList <- list(
           column(
             width = 3,
             sc_selectInput("gQC_um_randSeed",
-                        label = "random seed",
-                        choices = c(1:100), selected = defaultValue("gQC_um_randSeed", "1")
+                           label = "random seed",
+                           choices = c(1:100), selected = defaultValue("gQC_um_randSeed", "1")
             ),
             sc_selectInput("gQC_um_init",
-                        label = "init",
-                        choices = c("spectral", "random"), selected = defaultValue("gQC_um_init", "spectral")
+                           label = "init",
+                           choices = c("spectral", "random"), selected = defaultValue("gQC_um_init", "spectral")
             )
           ),
           column(
@@ -376,26 +427,26 @@ tabList <- list(
               choices = c(1:50), selected = defaultValue("gQC_um_negative_sample_rate", "5")
             ),
             sc_selectInput("gQC_um_min_dist",
-                        label = "min dist",
-                        choices = seq(0.05, 0.5, 0.01), selected = defaultValue("gQC_um_min_dist", "0.01")
+                           label = "min dist",
+                           choices = seq(0.05, 0.5, 0.01), selected = defaultValue("gQC_um_min_dist", "0.01")
             )
           ),
           column(
             width = 3,
             sc_selectInput("gQC_um_metric",
-                        label = "metric",
-                        choices = c("euclidean", "manhattan", "cosine", "hamming"),
-                        selected = defaultValue("gQC_um_metric", "euclidean")
+                           label = "metric",
+                           choices = c("euclidean", "manhattan", "cosine", "hamming"),
+                           selected = defaultValue("gQC_um_metric", "euclidean")
             ),
             sc_selectInput("gQC_um_set_op_mix_ratio",
-                        label = "set op mix ratio",
-                        choices = seq(0, 1, 0.1), selected = defaultValue("gQC_um_set_op_mix_ratio", "1")
+                           label = "set op mix ratio",
+                           choices = seq(0, 1, 0.1), selected = defaultValue("gQC_um_set_op_mix_ratio", "1")
             )
           ),
           column(
             width = 3,
             sc_numericInput(inputId = "gQC_um_n_epochs", label = "epochs:", 
-                         value = as.numeric(defaultValue("gQC_um_n_epochs", 200)), min = 1, max = 1000),
+                            value = as.numeric(defaultValue("gQC_um_n_epochs", 200)), min = 1, max = 1000),
             
             # selectizeInput("gQC_um_n_epochs",
             #             label = "epochs",
@@ -418,6 +469,7 @@ tabList <- list(
       ))
     )
   ),
-  modTab
+  modTab,
+  geneSetModTab
   
 )

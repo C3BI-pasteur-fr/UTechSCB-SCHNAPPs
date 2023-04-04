@@ -1730,14 +1730,16 @@ loadLiteData <- function(fileName = NULL) {
     # cluster colors
     inCols <- list()
     lev <- levels(dbCluster)
-    inCols <- allowedColors[1:length(lev)]
+    # inCols <- allowedColors[1:length(lev)]
+    inCols <-  allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
     names(inCols) <- lev
     ccol <- unlist(inCols)
   }
   projections$sampleNames = factor(projections$sampleNames)
   if (!exists("scol", inherits = F)) {
     sampNames = levels(projections$sampleNames)
-    scol <- rev(allowedColors)[seq_along(sampNames)]
+    scol <-  rev(allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]])
+    # scol <- rev(allowedColors)[seq_along(sampNames)]
     names(scol) <- sampNames
   }
   # pcaReact = reducedDims(scEx)[["PCA"]] # now stored separately
