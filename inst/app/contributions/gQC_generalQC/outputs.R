@@ -400,6 +400,28 @@ output$gQC_variancePCA <- renderPlot({
   # barplot(pca$var_pcs, main = "Variance captured by first PCs")
 })
 
+# gene set related
+
+observe({
+  gd = gmtData()
+  updateSelectizeInput(session, inputId = "oldGS",choices = names(gd))
+})
+
+observeEvent(input$updateGSButton,{
+  userData = gmtUserData()
+  gd = gmtData()
+  name = input$oldGS
+  newName = input$newGS
+  if(!name %in% names(gd)) return(NULL)
+  li = gd[name]
+  names(li) = newName
+  gmtUserData(append(userData, li))
+  save(file = "~/SCHNAPPsDebug/updateGSButton.RData", list = c(ls()))
+  # }
+  # cp =load(file='~/SCHNAPPsDebug/updateGSButton.RData')
+  
+})
+
 # rename projections observers ----
 
 observeEvent(

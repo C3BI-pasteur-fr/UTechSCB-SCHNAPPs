@@ -341,7 +341,8 @@ parameterItems <- function() {
     shinydashboard::menuSubItem("Cluster Parameters", tabName = "clusterParameters"),
     shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
     shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot"),
-    shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
+    shinydashboard::menuSubItem("Projections", tabName = "modifyProj"),
+    shinydashboard::menuSubItem("Gene sets", tabName = "modifyGeneSets")
   )
 }
 
