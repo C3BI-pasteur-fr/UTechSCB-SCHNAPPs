@@ -939,3 +939,77 @@ output$gQC_windHC <- renderPlot({
   if(is.null(ctStruct)) return(NULL)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
 })
+
+
+# DoubletFinder related ----
+## 
+
+
+observe({
+  if (DEBUG) cat(file = stderr(), "GS_DF_pk update\n")
+  scEx = scEx()
+  updateNumericInput(session = session, inputId = "GS_DF_pk", value=20/ncol(scEx))
+})
+
+observeEvent(input$GS_DF_button,{
+  if (DEBUG) cat(file = stderr(), "GS_DF_button started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "GS_DF_button")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "GS_DF_button")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("GS_DF_button", id = "GS_DF_button", duration = NULL)
+    removeNotification(id = "GS_DF_buttonERROR")
+  }
+  
+  scEx = scEx()
+  dims = input$GS_DF_dims
+  nRecover = input$GS_DF_nRecover
+  pK = input$GS_DF_pk
+  pN = input$GS_DF_pN
+  projections <- as.data.frame(projections)
+  newPrjs <- sessionProjections$prjs 
+  acn = allCellNames()
+  
+  if (is.null(scEx)) {
+    return(NULL)
+  }
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/GS_DF_button.RData", list = c(ls()))
+  }
+  # cp = load(file = "~/SCHNAPPsDebug/GS_DF_button.RData")
+  
+  dubs = tryCatch({
+    find_doublets(scEx, dims=1:dims, n_recovered=nRecover, pK=pK, pN=pN)
+  }, 
+  error = function(e) {
+    cat(file = stderr(), paste("\n\n!!!Error during detach process:", e, "\n\nDo you need to increase the memory?\n\n"))
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("DE_scaterPNG ERROR", id = "DE_scaterPNG_Error", duration = NULL, type = "error")
+    }
+    return(NULL)
+  }
+  )
+  
+  if (ncol(newPrjs) == 0) {
+    newPrjs = data.frame(row.names = acn)
+  } 
+  newPrjs[,colnames(dubs)] = 0
+  newPrjs[rownames(dubs),colnames(dubs)] = dubs
+  sessionProjections$prjs <- newPrjs
+})
+
+# gc_DF_2D <-
+  callModule(
+    clusterServer,
+    "GS_DF_plot",
+    projections # ,
+    # reactive(input$coE_gene_id_sch)
+  )
+
