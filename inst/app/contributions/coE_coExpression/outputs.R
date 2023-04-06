@@ -611,7 +611,7 @@ output$alluvial_plot <- renderPlot({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/alluvial_plot.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/alluvial_plot.RData")
+  # cp =load(file="~/SCHNAPPsDebug/alluvial_plot.RData")
   
   dat = projections[,c(alluiv1, alluiv2)]
   # dat$cells = rownames(projections)
@@ -660,5 +660,4 @@ observe({
                     choices = projF,
                     selected = .schnappsEnv$coE_dimension_ydotPlotModuleScoreClusters)
 })
-
 

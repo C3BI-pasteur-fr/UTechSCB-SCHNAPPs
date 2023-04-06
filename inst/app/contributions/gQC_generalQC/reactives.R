@@ -536,3 +536,68 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, scols, ccols) {
     )
   return(p)
 }
+
+# cp = load("/Volumes/LaCie2022/downloads/project.2023-04-03.RData")
+# scEx_log = scEx
+
+### DoubletFinder related -----
+require(DoubletFinder)
+require(Seurat)
+require(SingleCellExperiment)
+
+# estimation of multiplet rate from a Poisson distribution
+# - mu = probability of loading a cell
+# - n = number of droplets containing at least one cell
+# - N = total number of droplets
+# - P(c>=1) = 1 - exp(-mu)
+# - P(c>=2) = 1 - exp(-mu) - mu*exp(-mu)
+# - P(c>=1) = n/N -> mu = -log(1-n/N)
+# - multiplet rate = P(c>=2)/P(c>=1)
+# - note that N was estimated by fitting the 10X data 
+multiplet_rate = function(n_recovered, total_droplets=6.8e4) {
+  # total droplet estimation from 10X data
+  #n_recovered = seq(1000, 10000, by=1000)
+  #f_doublets = c(0.8, 1.5, 2.3, 3.0, 3.8, 4.6, 5.3, 6.1, 6.8, 8.1)/100
+  # total_droplets ~ 6.8e4
+  mu = -log(1-n_recovered/total_droplets)
+  return(1-mu*exp(-mu)/(1-exp(-mu)))
+}
+
+# pN -> number of artificial doublets generated (expressed as fraction of merged real-artifical data)
+# pK -> neighborhood size to estimate likelihood of being doublet (expressed as fraction of merged real-artifical data)
+# n_recovered -> number of cells recovered by CellRanger (before QC) -> estimate from #cells in srt object by default?
+find_doublets = function(scEx, dims=1:20, n_recovered=10000, pK=20/ncol(srt), pN=0.25) {
+  ## pK Identification (no ground-truth)
+  # a) author suggested
+  #my_params = paramSweep_v3(srt, PCs = dims, sct = FALSE)
+  #my_params = summarizeSweep(my_params, GT = FALSE)
+  #my_pk = find.pK(my_params) #0.005
+  # b) my suggestion -> 20 nearest neighors (default)
+  
+  # create Seurat object
+  require(Seurat)
+  srt = CreateSeuratObject(counts = assays(scEx)[["counts"]])
+  
+  # cellMeta <- colData(scEx_log)
+  # meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
+  # seurDat <- CreateSeuratObject(
+  #   RNA = assays(scEx_log)[[1]],
+  #   meta.data = meta.data
+  # )
+  # Mm_H_E18_filt@meta.data
+  # 
+  ## Homotypic Doublet Proportion Estimate
+  homotypic_prop = modelHomotypic(Idents(srt))
+  nExp_poi = round(multiplet_rate(n_recovered)*ncol(srt))
+  nExp_poi_adj = round(nExp_poi*(1-homotypic_prop))
+  
+  
+  ## Run DoubletFinder
+  pann_name = paste0("pANN_",pN, "_", pK, "_", nExp_poi_adj)
+  df_name = paste0("DF.classifications_",pN,"_", pK, "_", nExp_poi_adj)
+  srt = doubletFinder_v3(srt, PCs = dims, pN = pN, pK = pK, nExp = nExp_poi_adj,sct = T)
+  result = srt[[c(pann_name, df_name)]]
+  # colnames(result) = c("DF.score", "DF.class")
+  return(result)
+}
+

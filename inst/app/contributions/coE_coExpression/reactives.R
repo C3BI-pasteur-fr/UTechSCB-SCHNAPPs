@@ -1098,7 +1098,7 @@ alluvialPlotFunc <- function(dat, alluiv1, alluiv2) {
     geom_stratum(width = 1/12, fill = "black", color = "grey") +
     geom_label(stat = "stratum", infer.label = TRUE) +
     scale_x_discrete(limits = c(alluiv1, alluiv2), expand = c(.05, .05)) +
-    scale_fill_brewer(type = "qual", palette = "Set1") +
+    # scale_fill_brewer(type = "qual", palette = "Set1") +
     ggtitle(paste("Alluvial plot of ", alluiv1, "and", alluiv2))
 }
 
