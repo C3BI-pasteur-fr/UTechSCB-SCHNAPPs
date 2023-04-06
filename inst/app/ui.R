@@ -200,7 +200,7 @@ scShinyUI <- function(request) {
     allMenus
   }
   controlbarContext =NULL
-  if(file.exists("inst/app/controlbarContext.R")) 
+  if(file.exists(paste0(packagePath, "/controlbarContext.R"))) 
     source(file = paste0(packagePath, "/controlbarContext.R"), local = TRUE)
   
   shinyUI(

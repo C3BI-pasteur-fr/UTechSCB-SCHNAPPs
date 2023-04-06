@@ -17,8 +17,8 @@
   # }
   #
   library(future)
-  # plan("multiprocess", workers = 6)
-  plan(callr, workers = 6)
+  plan("multisession", workers = 6)
+  # plan(callr, workers = 6)
   
   library("BiocParallel")
   register(MulticoreParam(6))

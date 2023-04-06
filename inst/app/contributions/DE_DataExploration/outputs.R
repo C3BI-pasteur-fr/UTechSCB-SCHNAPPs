@@ -564,9 +564,15 @@ observeEvent(input$runScater,{
       return(NULL)
     }
   )
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scater2.RData", list = c(ls()))
+  }
+  # cp=load(file='~/SCHNAPPsDebug/scater2.RData')
+  # browser()
   if(is.null(detachedProc$process)) return(NULL)
   activateObserver(1)
-  cat(file = stderr(), paste("input$start",detachedProc$process$process$get_pid(),"me:",Sys.getpid(),"\n"))
+  if(!is.null(detachedProc$process$process))
+    cat(file = stderr(), paste("input$start",detachedProc$process$process$get_pid(),"me:",Sys.getpid(),"\n"))
   if("callr" %in% class(pl)){
     detachedProc$PID = detachedProc$process$process$get_pid()
   }else{
@@ -576,6 +582,7 @@ observeEvent(input$runScater,{
     #
     # please use callr otherwise we cannot kill process (for now)
     # 
+    detachedProc$PID = NULL
   }
   
   detachedProc$startTime = start.time
@@ -586,6 +593,11 @@ observeEvent(input$runScater,{
 #
 observeEvent(input$stopScater, {
   if(.schnappsEnv$DEBUG) cat(file = stderr(), "input$stopScater\n")
+
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/stopScater.RData", list = c(ls()))
+  }
+  # cp=load(file='~/SCHNAPPsDebug/stopScater.RData')
   if (!is.null(detachedProc$PID)) {
     if("running" == detachedProc$process$state){
       #For windows
@@ -614,14 +626,20 @@ observe({
   # if(!is.null(detachedProc$process))
   if(activateObserver()>0)
     invalidateLater(500, session)
+  # browser()
   if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process2\n")
-  isolate({
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/processScater.RData", list = c(ls()))
+  }
+  # cp=load(file='~/SCHNAPPsDebug/processScater.RData')
+  
+    isolate({
     if(resolved(detachedProc$process))
       if(!is.null(detachedProc$process)){
         # browser()
         detachedProc$result <- value(detachedProc$process)
         result = detachedProc$result
-        # save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
+        save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
         # cp=load(file='~/SCHNAPPsDebug/createScaterPNGprocess.RData')
         detachedProc$process <- NULL
         detachedProc$PID = NULL
@@ -652,10 +670,19 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
   if (DEBUG) cat(file = stderr(), "renderImage. output$DE_scaterQC\n")
   # browser()
   result = detachedProc$result
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/result1Scater.RData", list = c(ls()))
+  }
+  # cp=load(file='~/SCHNAPPsDebug/result1Scater.RData')
+  
   scaterReads <- isolate(scaterReads())
   if (is.null(scaterReads) | is.null(result)) {
     return(emptyImage)
   }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/result2Scater.RData", list = c(ls()))
+  }
+  # cp=load(file='~/SCHNAPPsDebug/result2Scater.RData')
   af = pltHighExp
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
