@@ -9,12 +9,57 @@ menuList <- list(
                            shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
                            shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
                            shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
+                           shinydashboard::menuSubItem("Doublet Finder", tabName = "gQC_doubletFinder"),
                            shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
                            # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
                            # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
   )
 )
 
+# gQC_doubletFinder ----
+
+DoubletFinderTab <- shinydashboard::tabItem(
+  tabName = "gQC_doubletFinder",
+  fluidRow(div(h3("DoubletFinder"), align = "center")),
+  br(),
+  tabBox(title = "", width = 12, id = "doubletFinderBox",
+         fluidRow(
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_dims", "PC imensions to use", min = 0, max = 200, step = 1, value = defaultValue("GS_DF_dims", 20))
+           ),
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_nRecover", "number of cells recovered by CellRanger (before QC)", min = 100, max = 20000000, step = 1000, value = defaultValue("GS_DF_nRecover", 10000))
+           )
+         ),
+         fluidRow(
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_pk", "neighborhood size to estimate likelihood of being doublet \n
+                             (expressed as fraction of merged real-artifical data)", min = 0, max = Inf, step = 1, value = defaultValue("GS_DF_pk", 20))
+           ),
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_pN", "number of artificial doublets generated \n
+                             (expressed as fraction of merged real-artifical data)", min = 0, max = 1, step = 0.01, value = defaultValue("GS_DF_pN", 0.10))
+           )
+         ),
+         br(),
+         fluidRow(
+           column(
+             width = 12, offset = 1,
+             actionButton("GS_DF_button", "apply changes", width = "80%")
+           )
+         ),
+         fluidRow(
+           column(
+             width = 12,
+             clusterUI("GS_DF_plot")
+           )
+         )
+  )
+)
 
 # geneSetModTab -----
 
@@ -470,6 +515,7 @@ tabList <- list(
     )
   ),
   modTab,
-  geneSetModTab
+  geneSetModTab,
+  DoubletFinderTab
   
 )
