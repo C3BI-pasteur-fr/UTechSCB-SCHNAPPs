@@ -37,7 +37,7 @@ menuList <- list(
 tabList <- list(
   tabItem(
     "scorpiusTab",
-    box(
+    shinydashboardPlus::box(
       title = "Scorpius trajectory inference", solidHeader = TRUE, width = 12, status = "primary",
       
       fluidRow(
@@ -125,7 +125,7 @@ tabList <- list(
   ),
   tabItem(
     "elpiGraphTab",
-    box(
+    shinydashboardPlus::box(
       title = "ElpiGraph trajectory inference", solidHeader = TRUE, width = 12, status = "primary",
       # tags$h3("trajectory by ElpiGraph"),
       # fluidRow(column(12,
@@ -291,7 +291,7 @@ tabList <- list(
           )
         )
       ),
-      box(
+      shinydashboardPlus::box(
         which = "plot", width = 12,
         fluidRow(column(
           12,

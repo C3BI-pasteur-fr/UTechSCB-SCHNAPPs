@@ -1,4 +1,5 @@
-
+# inst/app/ui.R
+# 
 # This is the user-interface definition of a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -158,7 +159,8 @@ scShinyUI <- function(request) {
   # todo
   # parse all parameters.R files under contributions to include in application
   # allTabs holds all tabs regardsless of their location in the GUI
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R",
+                  full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     tabList <- list()
     source(fp, local = TRUE)
@@ -197,12 +199,14 @@ scShinyUI <- function(request) {
   getallMenus <- function() {
     allMenus
   }
-  
+  controlbarContext =NULL
+  if(file.exists(paste0(packagePath, "/controlbarContext.R"))) 
+    source(file = paste0(packagePath, "/controlbarContext.R"), local = TRUE)
   
   shinyUI(
-    shinydashboard::dashboardPage(
+    shinydashboardPlus::dashboardPage(
       dheader(),
-      shinydashboard::dashboardSidebar(
+      shinydashboardPlus::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sideBarID",
           getallMenus(),
@@ -265,7 +269,10 @@ scShinyUI <- function(request) {
         #          class = "tab-content"
         # )  ,
         # h4("Sum of all previous slider values:", textOutput("sum"))
-      ) # dashboard body
+      ), # dashboard body
+      
+      options = list(sidebarExpandOnHover = TRUE),
+    controlbar = controlbarContext
     ) # main dashboard
   )
 }

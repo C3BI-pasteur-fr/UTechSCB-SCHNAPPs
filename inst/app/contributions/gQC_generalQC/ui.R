@@ -1,3 +1,5 @@
+# gQC_generalQC/ui.R
+
 suppressMessages(require(magrittr))
 source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 menuList <- list(
@@ -6,14 +8,109 @@ menuList <- list(
                            tabName = "generalQC", icon = icon("thumbs-up"), startExpanded = FALSE,
                            shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
                            shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
-                           shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC")#,
-                           # shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
-                           # ,
+                           shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
+                           shinydashboard::menuSubItem("Doublet Finder", tabName = "gQC_doubletFinder"),
+                           shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
                            # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
                            # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
   )
 )
 
+# gQC_doubletFinder ----
+
+DoubletFinderTab <- shinydashboard::tabItem(
+  tabName = "gQC_doubletFinder",
+  fluidRow(div(h3("DoubletFinder"), align = "center")),
+  br(),
+  tabBox(title = "", width = 12, id = "doubletFinderBox",
+         fluidRow(
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_dims", "PC imensions to use", min = 0, max = 200, step = 1, value = defaultValue("GS_DF_dims", 20))
+           ),
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_nRecover", "number of cells recovered by CellRanger (before QC)", min = 100, max = 20000000, step = 1000, value = defaultValue("GS_DF_nRecover", 10000))
+           )
+         ),
+         fluidRow(
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_pk", "neighborhood size to estimate likelihood of being doublet \n
+                             (expressed as fraction of merged real-artifical data)", min = 0, max = Inf, step = 1, value = defaultValue("GS_DF_pk", 20))
+           ),
+           column(
+             width = 6,
+             sc_numericInput("GS_DF_pN", "number of artificial doublets generated \n
+                             (expressed as fraction of merged real-artifical data)", min = 0, max = 1, step = 0.01, value = defaultValue("GS_DF_pN", 0.10))
+           )
+         ),
+         br(),
+         fluidRow(
+           column(
+             width = 12, offset = 1,
+             actionButton("GS_DF_button", "apply changes", width = "80%")
+           )
+         ),
+         fluidRow(
+           column(
+             width = 12,
+             clusterUI("GS_DF_plot")
+           )
+         )
+  )
+)
+
+# geneSetModTab -----
+
+geneSetModTab <- shinydashboard::tabItem(
+  tabName = "modifyGeneSets",
+  fluidRow(div(h3("work with gene sets"), align = "center")),
+  br(),
+  tabBox(title = "modify gene sets", width = 12, id = "modGS",
+         tabPanel(
+           title = "Rename gene set", solidHeader = TRUE, width = 12, value = "renameGS",
+           id = "rename.GS.Tab",
+           fluidRow(
+             column(
+               width = 6,
+               sc_selectInput("oldGS", "gene sets to copy + rename", choices = defaultValue("oldGS", "notyet"), selected = defaultValue("oldGS", "notyet"))
+             ),
+             column(
+               width = 6,
+               fluidRow(
+                 column(
+                   width = 8,
+                   sc_textInput("newGS", "new name of gene set", value = defaultValue("newGS", ""))
+                 ),
+                 column(
+                   width = 4,
+                   actionButton("updateGSButton", "rename")
+                 )
+               ),
+               fluidRow(
+                 column(
+                   width = 8,
+                   sc_selectInput("delGS", "gene set to delete", choices = defaultValue("delGS", "notyet"), selected = defaultValue("delGS", "notyet"))
+                 ),
+                 column(
+                   width = 4,
+                   actionButton("delGSButton", "delete")
+                 ),
+                 tags$style(type = "text/css", "#updateGSButton { width:100%; margin-top: 25px;}"),
+                 tags$style(type = "text/css", "#delGSButton { width:100%; margin-top: 25px;}")
+               )
+             )
+           ) 
+         ),
+         tabPanel(
+           title = "edit gene set", solidHeader = TRUE, width = 12, value = "gQC_editGS",
+           id = "gQC_editGS.Tab",
+           tags$p("Select a gene set and then edit it"),
+           br()
+         )
+  )
+)
 
 
 # modTab ----
@@ -24,6 +121,7 @@ modTab <- shinydashboard::tabItem(
   tabBox(title = "modify projections", width = 12, id = "modProj",
          tabPanel(
            title = "Rename projections", solidHeader = TRUE, width = 12, value = "renameProj",
+           id = "rename.Proj.Tab",
            fluidRow(
              column(
                width = 6,
@@ -63,6 +161,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "combine projections", solidHeader = TRUE, width = 12, value = "gQC_combProj",
+           id = "combine.Proj.Tab",
            tags$p("Two factors can be combined by pasting the values per row and re-leveling"),
            br(),
            fluidRow(
@@ -91,6 +190,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "rename levels", width = 12, value = "gQC_renameLev",
+           id = "rename.Levels.Tab",
            tags$p("rename the levels of a factor"),
            br(),
            
@@ -100,7 +200,7 @@ modTab <- shinydashboard::tabItem(
                sc_selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
              ),
              column(width = 6, 
-                     sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
+                    sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
            ),
            
            fluidRow(
@@ -127,6 +227,7 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "rearrange levels", width = 12, value = "gQC_rearrangeLev",
+           id = "rearrange.Levels.Tab",
            tags$p("rearrange the levels of a factor"),
            br(),
            fluidRow(
@@ -151,13 +252,14 @@ modTab <- shinydashboard::tabItem(
          ),
          tabPanel(
            title = "WIND", width = 12, value = "gQC_wind",
+           id = "wind.Tab",
            tags$p("from WIND package compute hierachy of projection (https://github.com/haowulab/Wind)"),
            tags$p("to compute weighted normalized mutual information (wNMI) and weighted Rand index (wRI) to evaluate the clustering results by comparing a clustering output with a reference which has a hierarchical structure."),
            br(),
            fluidRow(
              column(
                width = 6,
-               sc_selectInput("gQC_windProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
+               sc_selectInput("gQC_windProj", "Projection to use", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
              )
            ),
            fluidRow(
@@ -203,18 +305,19 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 0,
-      plotOutput("gQC_variancePCA") %>% withSpinner()
+      plotOutput("gQC_variancePCA") %>% jqui_resizable()
     )),
     br(),
     actionButton("save2Histvar", "save to history")
   ),
   
-  tsnePlotTab = shinydashboard::tabItem(
+  shinydashboard::tabItem(
     tabName = "gQC_tsnePlot",
+    # id = "gQC_tsneTab",
     shinyjs::useShinyjs(),
     fluidRow(div(h3("tSNE Plot"), align = "center")),
     br(),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "tSNE  parameters", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -226,8 +329,9 @@ tabList <- list(
           sc_numericInput("gQC_tsnePerplexity", "Perplexity", defaultValue("gQC_tsnePerplexity", 10), min = 1, max = 100)
         )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "tSNE additional parameters", solidHeader = TRUE, width = 12, status = "primary",
+        id = "tSNEParametersToggle",
         collapsible = TRUE, collapsed = TRUE,
         column(
           width = 6,
@@ -238,6 +342,7 @@ tabList <- list(
           sc_numericInput("gQC_tsneSeed", "Seed", defaultValue("gQC_tsneSeed", 1), min = 1, max = 10000)
         )
       ),
+      checkbsTT(item = "gQC_tsneTheta"),
       fluidRow(
         column(
           width = 12, offset = 1,
@@ -248,40 +353,40 @@ tabList <- list(
         )
       )
     ),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "3D plot", solidHeader = TRUE, width = 12, status = "primary",
       collapsible = TRUE, collapsed = FALSE,
       fluidRow(
         column(
           width = 3,
           sc_selectInput("gQC_dim3D_x",
-                      label = "X",
-                      choices = c(defaultValue("gQC_dim3D_x", "tsne1"), "tsne2", "tsne3"),
-                      selected = defaultValue("gQC_dim3D_x", "tsne1")
+                         label = "X",
+                         choices = c(defaultValue("gQC_dim3D_x", "tsne1"), "tsne2", "tsne3"),
+                         selected = defaultValue("gQC_dim3D_x", "tsne1")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_dim3D_y",
-                      label = "Y",
-                      choices = c("tsne1", defaultValue("gQC_dim3D_y", "tsne2"), "tsne3"),
-                      selected = defaultValue("gQC_dim3D_y", "tsne2")
+                         label = "Y",
+                         choices = c("tsne1", defaultValue("gQC_dim3D_y", "tsne2"), "tsne3"),
+                         selected = defaultValue("gQC_dim3D_y", "tsne2")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_dim3D_z",
-                      label = "Z",
-                      choices = c("tsne1", "tsne2", defaultValue("gQC_dim3D_z", "tsne3")),
-                      selected = defaultValue("gQC_dim3D_z", "tsne3")
+                         label = "Z",
+                         choices = c("tsne1", "tsne2", defaultValue("gQC_dim3D_z", "tsne3")),
+                         selected = defaultValue("gQC_dim3D_z", "tsne3")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_col3D",
-                      label = "color",
-                      choices = defaultValue("gQC_col3D", "sampleNames"),
-                      selected = defaultValue("gQC_col3D", "sampleNames")
+                         label = "color",
+                         choices = defaultValue("gQC_col3D", "sampleNames"),
+                         selected = defaultValue("gQC_col3D", "sampleNames")
           )
         )
       ),
@@ -300,10 +405,12 @@ tabList <- list(
       ))
     )
   ),
-  umapTab <- shinydashboard::tabItem(
+  shinydashboard::tabItem(
     tabName = "gQC_umapPlot",
-    shinydashboard::box(
+    
+    shinydashboardPlus::box(
       title = "UMAP parameters", solidHeader = TRUE, width = 12, status = "primary",
+      # id = "gQC_umapTab",
       fluidRow(
         column(
           width = 12, offset = 1,
@@ -314,46 +421,47 @@ tabList <- list(
       fluidRow(
         column(
           width = 3,
-            sc_selectInput("gQC_um_n_neighbors",
-                      label = "N Neighbors",
-                      choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "10")
+          sc_selectInput("gQC_um_n_neighbors",
+                         label = "N Neighbors",
+                         choices = c(2:100), selected = defaultValue("gQC_um_n_neighbors", "10")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_um_n_components",
-                      label = "N components",
-                      choices = c(2:20), selected = defaultValue("gQC_um_n_components", "3")
+                         label = "N components",
+                         choices = c(2:20), selected = defaultValue("gQC_um_n_components", "3")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_um_spread",
-                      label = "spread",
-                      choices = c(1:10), selected = defaultValue("gQC_um_spread", "10")
+                         label = "spread",
+                         choices = c(1:10), selected = defaultValue("gQC_um_spread", "10")
           )
         ),
         column(
           width = 3,
           sc_selectInput("gQC_um_local_connectivity",
-                      label = "local connectivity",
-                      choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "5")
+                         label = "local connectivity",
+                         choices = 1:20, selected = defaultValue("gQC_um_local_connectivity", "5")
           )
         )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "Addition UMAP options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
+        id="addUMAPoptions",
         fluidRow(
           column(
             width = 3,
             sc_selectInput("gQC_um_randSeed",
-                        label = "random seed",
-                        choices = c(1:100), selected = defaultValue("gQC_um_randSeed", "1")
+                           label = "random seed",
+                           choices = c(1:100), selected = defaultValue("gQC_um_randSeed", "1")
             ),
             sc_selectInput("gQC_um_init",
-                        label = "init",
-                        choices = c("spectral", "random"), selected = defaultValue("gQC_um_init", "spectral")
+                           label = "init",
+                           choices = c("spectral", "random"), selected = defaultValue("gQC_um_init", "spectral")
             )
           ),
           column(
@@ -364,26 +472,26 @@ tabList <- list(
               choices = c(1:50), selected = defaultValue("gQC_um_negative_sample_rate", "5")
             ),
             sc_selectInput("gQC_um_min_dist",
-                        label = "min dist",
-                        choices = seq(0.05, 0.5, 0.01), selected = defaultValue("gQC_um_min_dist", "0.01")
+                           label = "min dist",
+                           choices = seq(0.05, 0.5, 0.01), selected = defaultValue("gQC_um_min_dist", "0.01")
             )
           ),
           column(
             width = 3,
             sc_selectInput("gQC_um_metric",
-                        label = "metric",
-                        choices = c("euclidean", "manhattan", "cosine", "hamming"),
-                        selected = defaultValue("gQC_um_metric", "euclidean")
+                           label = "metric",
+                           choices = c("euclidean", "manhattan", "cosine", "hamming"),
+                           selected = defaultValue("gQC_um_metric", "euclidean")
             ),
             sc_selectInput("gQC_um_set_op_mix_ratio",
-                        label = "set op mix ratio",
-                        choices = seq(0, 1, 0.1), selected = defaultValue("gQC_um_set_op_mix_ratio", "1")
+                           label = "set op mix ratio",
+                           choices = seq(0, 1, 0.1), selected = defaultValue("gQC_um_set_op_mix_ratio", "1")
             )
           ),
           column(
             width = 3,
             sc_numericInput(inputId = "gQC_um_n_epochs", label = "epochs:", 
-                         value = as.numeric(defaultValue("gQC_um_n_epochs", 200)), min = 1, max = 1000),
+                            value = as.numeric(defaultValue("gQC_um_n_epochs", 200)), min = 1, max = 1000),
             
             # selectizeInput("gQC_um_n_epochs",
             #             label = "epochs",
@@ -394,11 +502,11 @@ tabList <- list(
               label = "bandwidth",
               choices = c(1:20), selected = defaultValue("gQC_um_bandwidth", "1")
             )
-          ),
+          )
         )
-      ), # additional options box
+      ) # additional options box
     ),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       width = 12,
       fluidRow(column(
         width = 12,
@@ -406,6 +514,8 @@ tabList <- list(
       ))
     )
   ),
-  modTab
+  modTab,
+  geneSetModTab,
+  DoubletFinderTab
   
 )

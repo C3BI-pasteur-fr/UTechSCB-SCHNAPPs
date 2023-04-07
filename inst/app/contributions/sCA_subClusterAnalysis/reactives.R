@@ -565,6 +565,13 @@ sCA_dge <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
+  if(method==""){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("dge: NULL,did you select a method?", id = "dgewarning", 
+                       duration = NULL, type = "error")
+    }
+    return(NULL)
+  }
   # cp = load(file='~/SCHNAPPsDebug/sCA_dge.RData')
   # require(archivist)
   # library(tools)

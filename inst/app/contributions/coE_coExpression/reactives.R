@@ -1,3 +1,5 @@
+# coExpression reactives.R
+
 # heatmapFunc ---------------------------------
 # used by both selection and all to create input for heatmap module
 coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cells, sampCol, ccols) {
@@ -174,6 +176,70 @@ coE_dotPlot_GeneSets <- function(projections = projections,
     theme(axis.text.x = element_text(angle = 25, vjust = 0.5),
                            strip.text.x = element_text(angle=5))
   ggplotly(p)
+  p
+}
+
+
+# coE_dotPlot_GeneSetsModuleScore ----
+# same as coE_dotPlot_GeneSets, only that the X labels are already set inside the function and adds ModuleScore.
+coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
+                                 scEx_log = scEx_log,
+                                 clusters = clusters,
+                                 geneSets = geneSets,
+                                 gmtData = gmtData,
+                                 summarize = T,
+                                 col = "RdBu",
+                                 col.min = col.min,
+                                 col.max = col.max,
+                                 dot.min = dot.min,
+                                 dot.scale = dot.scale,
+                                 scale.by = scale.by
+){
+  # replace "_", with "."
+  newRN = stringr::str_replace_all(rownames(scEx_log),"_",".")
+  rownames(scEx_log) = newRN
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx_log)[[1]]
+  )
+  Idents(seurDat) <- as.factor(projections[,clusters])
+  featureDat = rowData(scEx_log)
+  if(length(geneSets) == 1){
+    features = geneName2Index(paste(gmtData[[geneSets]]$genes,collapse = ", "), featureDat)
+  } else {
+    FUN = function(x){
+      geneName2Index(paste(gmtData[[x]]$genes,collapse = ", "), featureDat)
+    }
+    features = lapply(geneSets, FUN = FUN)
+    names(features) = geneSets
+  }
+  # handle duplicated gene names
+  ulFeatures = unlist(features)
+  FUN = function(x,g){
+    # cat(file = stderr(), g)
+    if(length(which(x==g)>0)) x = x[-which(x==g)]
+    x
+  }
+  for(dupGene in ulFeatures[which(ulFeatures %>% duplicated())]){
+    features =lapply(features,FUN = FUN,g=dupGene)
+    features$common =c(features$common, dupGene)
+  }
+  p = DotPlotwithModuleScore(seurDat, 
+              assay="RNA", 
+              features = features, 
+              cols = col,
+              col.min = col.min,
+              col.max = col.max,
+              dot.min = dot.min,
+              dot.scale = dot.scale,
+              idents = NULL,
+              group.by = NULL,
+              split.by = NULL,
+              cluster.idents = FALSE,
+              scale = TRUE,
+              scale.by = scale.by,
+              scale.min = NA,
+              scale.max = NA
+  )
   p
 }
 
@@ -1032,7 +1098,7 @@ alluvialPlotFunc <- function(dat, alluiv1, alluiv2) {
     geom_stratum(width = 1/12, fill = "black", color = "grey") +
     geom_label(stat = "stratum", infer.label = TRUE) +
     scale_x_discrete(limits = c(alluiv1, alluiv2), expand = c(.05, .05)) +
-    scale_fill_brewer(type = "qual", palette = "Set1") +
+    # scale_fill_brewer(type = "qual", palette = "Set1") +
     ggtitle(paste("Alluvial plot of ", alluiv1, "and", alluiv2))
 }
 

@@ -1,3 +1,5 @@
+# generalQC outputs.R
+
 # source("moduleServer.R", local = TRUE)
 # source("reactives.R", local = TRUE)
 # TODO: verify that this anything and then integrate in DUMMY
@@ -398,6 +400,28 @@ output$gQC_variancePCA <- renderPlot({
   # barplot(pca$var_pcs, main = "Variance captured by first PCs")
 })
 
+# gene set related
+
+observe({
+  gd = gmtData()
+  updateSelectizeInput(session, inputId = "oldGS",choices = names(gd))
+})
+
+observeEvent(input$updateGSButton,{
+  userData = gmtUserData()
+  gd = gmtData()
+  name = input$oldGS
+  newName = input$newGS
+  if(!name %in% names(gd)) return(NULL)
+  li = gd[name]
+  names(li) = newName
+  gmtUserData(append(userData, li))
+  save(file = "~/SCHNAPPsDebug/updateGSButton.RData", list = c(ls()))
+  # }
+  # cp =load(file='~/SCHNAPPsDebug/updateGSButton.RData')
+  
+})
+
 # rename projections observers ----
 
 observeEvent(
@@ -418,7 +442,7 @@ observeEvent(
     
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
-        list = c("normaliztionParameters", ls())
+           list = c("normaliztionParameters", ls())
       )
     }
     # cp = load(file="~/SCHNAPPsDebug/updatePrjsButton.RData")
@@ -479,7 +503,7 @@ observeEvent(
     # deepDebug()
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/delPrjsButton.RData",
-        list = c("normaliztionParameters", ls())
+           list = c("normaliztionParameters", ls())
       )
     }
     # load(file="~/SCHNAPPsDebug/delPrjsButton.RData")
@@ -511,7 +535,7 @@ observeEvent(
     
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData",
-        list = c("normaliztionParameters", ls())
+           list = c("normaliztionParameters", ls())
       )
     }
     # cp=  load(file="~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData")
@@ -587,13 +611,13 @@ observeEvent(eventExpr = input$gQC_raProj,
                if(is.null(projections)) return()
                if(is.null(projFactors)) return()
                if(input$gQC_raProj %in% projFactors){
-               
-               projLevels = levels(projections[,input$gQC_raProj])
-               updateOrderInput(
-                 session,
-                 'gQC_newRaLev',
-                 items = projLevels
-               )
+                 
+                 projLevels = levels(projections[,input$gQC_raProj])
+                 updateOrderInput(
+                   session,
+                   'gQC_newRaLev',
+                   items = projLevels
+                 )
                }else{
                  updateOrderInput(
                    session,
@@ -619,7 +643,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                }
                if (.schnappsEnv$DEBUGSAVE) {
                  save(file = "~/SCHNAPPsDebug/gQC_rearrangeButton.RData",
-                   list = c("normaliztionParameters", ls())
+                      list = c("normaliztionParameters", ls())
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_rearrangeButton.RData")
@@ -699,14 +723,16 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                
                if (.schnappsEnv$DEBUGSAVE) {
                  save(file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
-                   list = c("normaliztionParameters", ls())
+                      list = c("normaliztionParameters", ls())
                  )
                }
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
                # deepDebug()
                # sampe projections as displayed, i.e. only those available for the cells
                # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
-               projections[,rnProj] =  factor(projections[,rnProj])
+               proj2Add =  projections[,rnProj,drop=FALSE]
+               proj2Add[,rnProj] = factor(proj2Add[,rnProj])
+               
                if(is.null(
                  tryCatch({
                    
@@ -734,17 +760,6 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      naPos = which ("NA" == newLevelNames)
                      newLbVec = newLbVec[newLevelNames]
                      newLbVec[which(is.na(newLbVec))] = "NA"
-                     # if ( naPos == length(newLevelNames)){
-                     #   newLbVec = c(newLbVec, "NA")
-                     # } else { 
-                     #   if (naPos == 1) {
-                     #     newLbVec = c("NA", newLbVec)
-                     #   } else {
-                     #     cat(file = stderr(), paste("NA is neither in front nor last \n"))
-                     #     showNotification("NA is neither in front nor last ", id = "renameProbl2", duration = NULL, type = "error")
-                     #     return(NULL)
-                     #   }
-                     # }
                    }
                    if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(stringr::str_trim(newLbVec)) ){
                      cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
@@ -892,8 +907,8 @@ output$gQC_windHC <- renderPlot({
   projections <- projections()
   pca = pcaReact()
   gQC_windProj <- input$gQC_windProj
-  
-  if (is.null(projections) | is.null(scEx)) {
+  # browser()
+  if (is.null(projections) | is.null(scEx) | !gQC_windProj %in% colnames(projections)) {
     return(NULL)
   }
   if (length(levels(projections[,gQC_windProj]))<3) {
@@ -911,6 +926,90 @@ output$gQC_windHC <- renderPlot({
   # }
   
   trueclass <- projections[,gQC_windProj]
-  ctStruct = createRef(Y, trueclass)
+  ctStruct = tryCatch({
+    createRef(Y, classes = trueclass)
+    },error = function(e) {
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("Problem with WIND", type = "warning", duration = NULL)
+      }
+      cat(file = stderr(), paste("\n+++++ Error in WIND\n\t", e, "\n"))
+      return(NULL)
+    }
+  )
+  if(is.null(ctStruct)) return(NULL)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
 })
+
+
+# DoubletFinder related ----
+## 
+
+
+observe({
+  if (DEBUG) cat(file = stderr(), "GS_DF_pk update\n")
+  scEx = scEx()
+  updateNumericInput(session = session, inputId = "GS_DF_pk", value=20/ncol(scEx))
+})
+
+observeEvent(input$GS_DF_button,{
+  if (DEBUG) cat(file = stderr(), "GS_DF_button started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "GS_DF_button")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "GS_DF_button")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("GS_DF_button", id = "GS_DF_button", duration = NULL)
+    removeNotification(id = "GS_DF_buttonERROR")
+  }
+  
+  scEx = scEx()
+  dims = input$GS_DF_dims
+  nRecover = input$GS_DF_nRecover
+  pK = input$GS_DF_pk
+  pN = input$GS_DF_pN
+  projections <- as.data.frame(projections)
+  newPrjs <- sessionProjections$prjs 
+  acn = allCellNames()
+  
+  if (is.null(scEx)) {
+    return(NULL)
+  }
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/GS_DF_button.RData", list = c(ls()))
+  }
+  # cp = load(file = "~/SCHNAPPsDebug/GS_DF_button.RData")
+  
+  dubs = tryCatch({
+    find_doublets(scEx, dims=1:dims, n_recovered=nRecover, pK=pK, pN=pN)
+  }, 
+  error = function(e) {
+    cat(file = stderr(), paste("\n\n!!!Error during detach process:", e, "\n\nDo you need to increase the memory?\n\n"))
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("DE_scaterPNG ERROR", id = "DE_scaterPNG_Error", duration = NULL, type = "error")
+    }
+    return(NULL)
+  }
+  )
+  
+  if (ncol(newPrjs) == 0) {
+    newPrjs = data.frame(row.names = acn)
+  } 
+  newPrjs[,colnames(dubs)] = 0
+  newPrjs[rownames(dubs),colnames(dubs)] = dubs
+  sessionProjections$prjs <- newPrjs
+})
+
+# gc_DF_2D <-
+  callModule(
+    clusterServer,
+    "GS_DF_plot",
+    projections # ,
+    # reactive(input$coE_gene_id_sch)
+  )
+
