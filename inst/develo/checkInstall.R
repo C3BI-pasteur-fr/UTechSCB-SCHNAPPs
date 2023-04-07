@@ -102,3 +102,6 @@ for (pg in gList) {
   require (`pg`,character.only = T)
 }
 
+remotes::install_github('chris-mcginnis-ucsf/DoubletFinder')
+
+

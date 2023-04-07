@@ -1,3 +1,5 @@
+# inst/app/reactives.R
+
 suppressMessages(require(tibble))
 suppressMessages(require(Seurat))
 suppressMessages(require(scran))
@@ -26,6 +28,9 @@ sampleCols <- reactiveValues(colPal = allowedColors)
 
 # colors for clusters
 clusterCols <- reactiveValues(colPal = allowedColors)
+
+gmtData <- reactiveVal()
+gmtUserData <- reactiveVal()
 
 # Here, we store projections that are created during the session. These can be selections of cells or other values that
 # are not possible to precalculate.
@@ -91,6 +96,7 @@ observeEvent(input$Quit, {
 observeEvent(input$openBrowser, {
   deepDebug()
   require(rmarkdown)
+  browser()
   knitr::opts_chunk$set(
     message = FALSE,
     warning = FALSE,
@@ -110,8 +116,8 @@ observeEvent(input$openBrowser, {
                         input = inputList,
                         scEx_log = scEx_log,
                         projections = projections(),
-                        ccols = clusterCols$colPal,
-                        scols = sampleCols$colPal
+                        ccols = isoloate(clusterCols$colPal),
+                        scols = isoloate(sampleCols$colPal)
                       )
     ),
     error = function(e) {cat(file = stderr(),paste("Error\n",e,"\n")); NULL}
@@ -764,7 +770,8 @@ inputData <- reactive({
   
   isolate({
     if (is.null(names(sampleCols$colPal)) | !all(names(sampleCols$colPal) %in% sampNames)){
-      sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
+      sampleCols$colPal <- rev(allowedColors[rep(1:length(allowedColors),ceiling(length(sampNames) / length(allowedColors)))[1:length(sampNames)]])
+      # sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
       names(sampleCols$colPal) <- sampNames
       add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
     }
@@ -811,69 +818,6 @@ inputData <- reactive({
   return(retVal)
 })
 
-# gmtData ----
-# load RData file with singlecellExperiment object
-# internal, should not be used by plug-ins
-gmtData <- reactive({
-  if (DEBUG) {
-    cat(file = stderr(), "gmtData started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "gmtData")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "gmtData")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("gmtData", id = "gmtData", duration = NULL)
-  }
-  
-  gmtFile <- input$geneSetFile
-  scEx = scEx() # needed to validate input
-  
-  if (is.null(gmtFile) |is.null(scEx)) {
-    if (DEBUG) {
-      cat(file = stderr(), "gmtData: NULL\n")
-    }
-    return(NULL)
-  }
-  
-  if (DEBUG) cat(file = stderr(), paste("gmtFile.", gmtFile$datapath[1], "\n"))
-  if (!file.exists(gmtFile$datapath[1])) {
-    if (DEBUG) {
-      cat(file = stderr(), "gmtData: ", gmtFile$datapath[1], " doesn't exist\n")
-    }
-    return(NULL)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gmtData.RData", list = c(ls()))
-  }
-  # cp =load(file='~/SCHNAPPsDebug/gmtData.RData')
-  
-  # gmtFile$datapath = "data/sessionData.RData"
-  # annFile$datapath = "data/selectedCells.csv"
-  # TODO either multiple files with rdata/rds or single file of csv/other
-  fpExtension <- tools::file_ext(gmtFile$datapath[1])
-  retVal <- tryCatch({readGMT(gmtFile, scEx)},
-                     error = function(e){
-                       cat(file = stderr(), paste("gmtData: NULL", e,"\n"))
-                       return(NULL)}
-  )
-  
-  
-  if (is.null(retVal)) {
-    return(NULL)
-  }
-  
-
-  exportTestValues(gmtData = {
-    list(
-      retVal
-    )
-  })
-  return(retVal)
-})
 
 
 medianENSGfunc <- function(scEx) {
@@ -2709,13 +2653,15 @@ dbCluster <- reactive({
   inCols <- list()
   lev <- levels(dbCluster)
   
-  inCols <- allowedColors[1:length(lev)]
+  inCols <- allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
+  # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
-  
-  if(is.null(names(clusterCols$colPal)) | !all(names(clusterCols$colPal) %in% levels(dbCluster))){
-    clusterCols$colPal <- unlist(inCols)
-    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
-  }
+  isolate(
+    if(is.null(names(clusterCols$colPal)) | !all(names(clusterCols$colPal) %in% levels(dbCluster))){
+      clusterCols$colPal <- unlist(inCols)
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
+    }
+  )
   setRedGreenButton(
     vars = list(
       c("sampleNamecol", isolate(sampleCols$colPal)),
@@ -3815,6 +3761,90 @@ reacativeReport <- function() {
   }
   return(outZipFile)
 }
+
+# gmtData ----
+# load RData file with singlecellExperiment object
+# internal, should not be used by plug-ins
+
+# combine user defined and file defined GMT lists
+observe({
+  gmtfDat = gmtFileData()
+  gmtuDat = gmtUserData() 
+  
+  if(is.null(gmtfDat) & is.null(gmtuDat)){
+    return(NULL)
+  }
+  retVal = append(gmtfDat, gmtuDat) %>% compact
+  gmtData(retVal)
+  gmt = gmtData()
+  # if (.schnappsEnv$DEBUGSAVE) {
+  save(file = "~/SCHNAPPsDebug/gmtFileData.RData", list = c(ls()))
+  # }
+  # cp =load(file='~/SCHNAPPsDebug/gmtFileData.RData')
+  
+})
+
+
+gmtFileData <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "gmtData started.\n")
+  }
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "gmtData")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "gmtData")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("gmtData", id = "gmtData", duration = NULL)
+  }
+  
+  gmtFile <- input$geneSetFile
+  scEx = scEx() # needed to validate input
+  
+  if (is.null(gmtFile) |is.null(scEx)) {
+    if (DEBUG) {
+      cat(file = stderr(), "gmtData: NULL\n")
+    }
+    return(NULL)
+  }
+  
+  if (DEBUG) cat(file = stderr(), paste("gmtFile.", gmtFile$datapath[1], "\n"))
+  if (!file.exists(gmtFile$datapath[1])) {
+    if (DEBUG) {
+      cat(file = stderr(), "gmtData: ", gmtFile$datapath[1], " doesn't exist\n")
+    }
+    return(NULL)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gmtFileData.RData", list = c(ls()))
+  }
+  # cp =load(file='~/SCHNAPPsDebug/gmtFileData.RData')
+  
+  # gmtFile$datapath = "data/sessionData.RData"
+  # annFile$datapath = "data/selectedCells.csv"
+  # TODO either multiple files with rdata/rds or single file of csv/other
+  fpExtension <- tools::file_ext(gmtFile$datapath[1])
+  retVal <- tryCatch({readGMT(gmtFile, scEx)},
+                     error = function(e){
+                       cat(file = stderr(), paste("gmtData: NULL", e,"\n"))
+                       return(NULL)}
+  )
+  
+  
+  if (is.null(retVal)) {
+    return(NULL)
+  }
+  
+  
+  exportTestValues(gmtData = {
+    list(
+      retVal
+    )
+  })
+  return(retVal)
+})
 
 
 if (DEBUG) {

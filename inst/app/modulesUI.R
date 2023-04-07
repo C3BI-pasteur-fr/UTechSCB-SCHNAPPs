@@ -60,7 +60,7 @@ clusterUI <- function(id) {
         )
       )
     ),
-    shinydashboard::box(
+    shinydashboardPlus::box(
       title = "plot", solidHeader = TRUE, width = 12, status = "primary",
       fluidRow(
         column(
@@ -68,9 +68,10 @@ clusterUI <- function(id) {
           jqui_resizable(plotly::plotlyOutput(ns("clusterPlot")))
         )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
         # helpID = "twoDselectedAddOpt",
+        id = ns("clusterAddOpt"),
         dropdown_icon = NULL,
         closable = FALSE,
         enable_dropdown = T,
@@ -137,7 +138,7 @@ tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
    jqui_resizable(
-     shinydashboard::box(
+     shinydashboardPlus::box(
       width = 12, height = 700,
       fluidRow(
         column(
@@ -193,7 +194,7 @@ tableSelectionUi <- function(id) {
 pHeatMapUI <- function(id) {
   ns <- NS(id)
   tagList(
-    shinydashboard::box(
+    shinydashboardPlus::box(
       width = 12,
       fluidRow(
         column(
@@ -211,9 +212,10 @@ pHeatMapUI <- function(id) {
                verbatimTextOutput(ns("pHeatMapPlotSelection"))
                )
       ),
-      shinydashboard::box(
+      shinydashboardPlus::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
         collapsible = TRUE, collapsed = TRUE,
+        id=ns("heatmapAddOpt"),
         fluidRow(
           column(
             width = 12,
@@ -331,7 +333,7 @@ pHeatMapUI <- function(id) {
 # cellSelectionUI --------------
 cellSelectionUI <- function(id) {
   ns <- NS(id)
-  shinydashboard::box(
+  shinydashboardPlus::box(
     width = 6, title = "Selection of input cells",
     fluidRow(
       column(
@@ -350,6 +352,6 @@ cellSelectionUI <- function(id) {
           choices = defaultValue(ns("Mod_PPGrp"), "1"), selected = defaultValue(ns("Mod_PPGrp"), "1"), multiple = TRUE
         )
       )
-    ),
+    )
   )
 }

@@ -35,7 +35,7 @@ tryCatch.W.E <- function(expr){
 printTimeEnd <- function(start.time, messtr) {
   require(hms)
   end.time <- base::Sys.time()
-  if (.schnappsEnv$DEBUG) {
+  if (.schnappsEnv$DEBUG & !is.null(start.time)) {
     duration = difftime(end.time, start.time, units = "min")
     if(.schnappsEnv$DEBUGSAVE){
       save(file = "~/SCHNAPPsDebug/printTimeEnd.RData",
@@ -43,14 +43,15 @@ printTimeEnd <- function(start.time, messtr) {
       )
     }
     # cp = load("~/SCHNAPPsDebug/printTimeEnd.RData")
-    cat(file = stderr(), paste("---", round_hms(as_hms(duration),0.25), "--- done:", messtr, "\n"))
+    cat(file = stderr(), paste("---", hms::round_hms(hms::as_hms(duration),0.25), "--- done:", messtr, "\n"))
   }
 }
 
 pltHighExp <- function( scaterReads, n, scols) {
-  # since we are saving without the environment, we need are storing
+  # since we are saving without the environment, we need require scater for storing
   require(scater)
   p1 <- scater::plotHighestExprs(scaterReads, colour_cells_by = "sampleNames", n = n) + scale_color_manual(values= scols)
+  p1
 }
 
 # some comments removed because they cause too much traffic ----
@@ -1730,14 +1731,16 @@ loadLiteData <- function(fileName = NULL) {
     # cluster colors
     inCols <- list()
     lev <- levels(dbCluster)
-    inCols <- allowedColors[1:length(lev)]
+    # inCols <- allowedColors[1:length(lev)]
+    inCols <-  allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
     names(inCols) <- lev
     ccol <- unlist(inCols)
   }
   projections$sampleNames = factor(projections$sampleNames)
   if (!exists("scol", inherits = F)) {
     sampNames = levels(projections$sampleNames)
-    scol <- rev(allowedColors)[seq_along(sampNames)]
+    scol <-  rev(allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]])
+    # scol <- rev(allowedColors)[seq_along(sampNames)]
     names(scol) <- sampNames
   }
   # pcaReact = reducedDims(scEx)[["PCA"]] # now stored separately
@@ -1772,7 +1775,8 @@ defaultValue <- function(param = "coEtgMinExpr", val ) {
 # dheader ----
 # it is used in ui.R and ui-lite.R and is still being developped
 dheader <- function() {
-  shinydashboard::dashboardHeader(
+  shinydashboardPlus::dashboardHeader(
+    controlbarIcon = "Wkfl",
     title = paste("SCHNAPPs", packageVersion("SCHNAPPs")),
     shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-question"),badgeStatus = NULL,
                                  headerText = "Help",
@@ -1923,17 +1927,17 @@ createHistory <- function(.schnappsEnv) {
   }
   .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
   line=paste0("---
-  title: \"history\"
-  output:
-    bookdown::html_document2:
-      toc: true
-      toc_depth: 3
-      toc_float: true
-      number_sections: true
-      code_folding: hide
-  ---
+title: \"history\"
+output:
+  bookdown::html_document2:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: hide
+---
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
   knitr::opts_chunk$set(echo = TRUE)
   suppressMessages(require(shiny))
   suppressMessages(require(shinyTree))
@@ -1978,7 +1982,7 @@ createHistory <- function(.schnappsEnv) {
   .schnappsEnv$DEBUGSAVE = FALSE
   source(system.file(\"app\", \"serverFunctions.R\", package = \"SCHNAPPs\"))
   DEBUG=FALSE
-  ```\n" )
+```\n\n" )
   write(line,file=.schnappsEnv$historyFile,append=FALSE)
 }
 
@@ -2103,6 +2107,60 @@ debugControl <- function( name = "cellSelectionModule", list = c(ls())){
     save(file = paste0("~/SCHNAPPsDebug/", name, ".RData"), list = list)
   }
 }
+
+
+# add2Projections ----
+#' add a column to the newPrjs oject
+#' 
+#' This functions makes sure that all rows from the original input data are used, the order of rows is correct
+#' that there are no name collisions in the columns
+#' 
+#' @param newPrjs is projectionsTable$newProjections, a reactive that holds user defined projections
+#' this is added to the predefined projections (projections())
+#' 
+#' @param proj2Add a data frame that should be added to newPrjs
+#' 
+#' @param acn output from allCellNames(), a reactive, (needed if newPrjs is empty)
+#' 
+#' @param projections the complete projections data frame from projections() reactive
+#' 
+#' @return newPrjs that can replace projectionsTable$newProjections
+#' 
+#' 
+add2Projections <- function(proj2Add, acn, newPrjs, projections){
+  if (is.null(proj2Add)) {
+    return(NULL)
+  }
+  if(!is.data.frame(newPrjs))
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/add2Projections.RData",
+           list = c( ls())
+      )
+    }
+  # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
+  which(colnames(proj2Add) %in% colnames(projections)) 
+  if(is.null(
+    tryCatch({
+      if (ncol(newPrjs) == 0) {
+        newPrjs = data.frame(row.names = acn)
+      }
+    # 2DO: what happes if newPrjs has more rows than original? How could this happen?
+      newPrjs <- dplyr::full_join(
+        tibble::rownames_to_column(newPrjs), 
+        tibble::rownames_to_column(proj2Add), 
+        by='rowname')
+      rownames(newPrjs) = newPrjs[,1]
+      newPrjs = newPrjs[,-1]
+    }, error=function(w){
+      cat(file = stderr(), paste("something went wrong during add2Projections", w,"\n"))
+      if (!is.null(getDefaultReactiveDomain()))
+        showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
+      return(NULL)
+    }))) return(NULL)
+ # what happens if NA is introduced by the join
+}
+
+
 
 if (.schnappsEnv$DEBUG) {
   cat(file = stderr(), "end severFunctions.R\n")
