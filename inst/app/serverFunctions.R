@@ -1068,11 +1068,11 @@ updateButtonColor <- function(buttonName, parameters) {
   # load(file='~/SCHNAPPsDebug/updateButtonColor.RData')
   modified <- valuesChanged(parameters)
   if (!modified) {
-    removeClass(buttonName, "red")
-    addClass(buttonName, "green")
+    shinyjs::removeClass(buttonName, "red")
+    shinyjs::addClass(buttonName, "green")
   } else {
-    removeClass(buttonName, "green")
-    addClass(buttonName, "red")
+    shinyjs::removeClass(buttonName, "green")
+    shinyjs::addClass(buttonName, "red")
   }
 }
 
@@ -1089,7 +1089,7 @@ setRedGreenButton <- function(vars = list(), button = "") {
     assign(paste0("calculated_", v1[1]), paste(v1[-1], collapse = "; "), envir = .schnappsEnv)
     # }
   }
-  addClass(button, "green")
+  shinyjs::addClass(button, "green")
 }
 
 # setRedGreenButtonCurrent ----
@@ -1661,6 +1661,10 @@ heatmapModuleFunction <- function(
   # heatmapData
   # do.call(ComplexHeatmap::pheatmap, heatmapData)
   # 
+  
+  # if modules are available don't do cluster rows
+  if(!is.null(heatmapData$gaps_row)) heatmapData$cluster_rows = FALSE
+  ht_opt$message = F
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
@@ -1780,9 +1784,9 @@ dheader <- function() {
     title = paste("SCHNAPPs", packageVersion("SCHNAPPs")),
     shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-question"),badgeStatus = NULL,
                                  headerText = "Help",
-                                 notificationItem(text =  actionButton("menuTour", label = "short Tour", icon = icon("fas fa-directions")),
-                                                  icon = icon("", verify_fa = FALSE)
-                                 ),
+                                 # notificationItem(text =  actionButton("menuTour", label = "short Tour", icon = icon("fas fa-directions")),
+                                 #                  icon = icon("", verify_fa = FALSE)
+                                 # ),
                                  notificationItem(text =  "online documentation",
                                                   href="https://c3bi-pasteur-fr.github.io/UTechSCB-SCHNAPPs/", 
                                                   icon("fas fa-book-medical")

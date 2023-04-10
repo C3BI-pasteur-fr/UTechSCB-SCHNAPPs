@@ -27,7 +27,7 @@ lapply(names(shortCutsList),FUN = function(nam){
       x(session)
     }
     cat(file = stderr(), paste0("========= sCOut.", make.names(namItem),".click\n"))
-    onclick(paste0("sCOut.", make.names(namItem),".click"),divFunc( x=fun, session=session))
+    shinyjs::onclick(paste0("sCOut.", make.names(namItem),".click"),divFunc( x=fun, session=session))
   })
 })
 

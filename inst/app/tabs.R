@@ -505,7 +505,7 @@ clusterParametersTab <- function() {
                fluidRow(
                  column(
                    width = 12,
-                   jqui_resizable(plotOutput("dimPlotPCA", height = "1400px"))
+                   plotOutput("dimPlotPCA", height = "1400px") %>% jqui_resizable()
                  )
                ),
                checkbsTT(item = "dimPlotPCA"),

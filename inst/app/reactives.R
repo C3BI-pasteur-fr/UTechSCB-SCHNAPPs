@@ -1671,7 +1671,7 @@ rawNormalization <- reactive({
   scEx <- scEx()
   names(assays(scEx)) <- "logcounts"
   
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   exportTestValues(rawNormalization = {
     str(scEx)
   })

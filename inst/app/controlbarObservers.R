@@ -8,7 +8,6 @@ add2workflowObsList <- function(li, wkfl, workflowObsList){
 # shortCutsTab ----
 workflowObsList = list()
 
-
 wkfl = "wkfl1"
 workflowObsList[[wkfl]] = list()
 
@@ -58,6 +57,13 @@ workflowObsList = list(
 workflowObsList = list(
   id = "nFeatureViolin",
   Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "coexpression"
+    )
+    # browser()
+    # js$showmenuItem("coexpressionSelected")
     updateTabItems(
       session = session,
       "sideBarID",
@@ -339,7 +345,7 @@ lapply(names(workflowObsList),FUN = function(nam){
       x(session)
     }
     cat(file = stderr(), paste0("=+++++++======== ", nam,".", make.names(namItem),".click\n"))
-    onclick(paste0(nam,".", make.names(namItem),".click"),divFunc(x=fun, session=session))
+    shinyjs::onclick(paste0(nam,".", make.names(namItem),".click"),divFunc(x=fun, session=session))
   })
 })
 

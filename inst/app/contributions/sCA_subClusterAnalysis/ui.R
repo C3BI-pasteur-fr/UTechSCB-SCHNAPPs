@@ -168,13 +168,13 @@ tabList <- list(
             column(
               width = 12,
               # https://stackoverflow.com/questions/44412382/clicking-same-plotly-marker-twice-does-not-trigger-events-twice
-              useShinyjs(),
+              # useShinyjs(),
               # code to reset plotlys event_data() to NULL -> executed upon action button click
               # note that "A" needs to be replaced with plotly source string if used
-              extendShinyjs(text = "shinyjs.sCA_volcanoPlot_resetClick = function() { Shiny.onInputChange('plotly_selected-A', 'null'); }", functions = "sCA_volcanoPlot_resetClick"),
+              # extendShinyjs(text = "shinyjs.sCA_volcanoPlot_resetClick = function() { Shiny.onInputChange('plotly_selected-A', 'null'); }", functions = "sCA_volcanoPlot_resetClick"),
               
               if ("manhattanly" %in% rownames(installed.packages()))
-                jqui_resizable(plotly::plotlyOutput("sCA_volcanoPlot"))
+                plotly::plotlyOutput("sCA_volcanoPlot") %>% jqui_resizable()
             )
           ),
           br(),

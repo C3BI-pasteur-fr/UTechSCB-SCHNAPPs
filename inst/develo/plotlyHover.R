@@ -47,7 +47,7 @@ ui <- fluidPage(
     ),
     column(
       width = 6,
-      plotlyOutput("graph2") %>% shinyjqui::jqui_resizable()
+      plotlyOutput("graph2") %>% jqui_resizable()
     )
   ),
   br(),

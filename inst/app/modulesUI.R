@@ -65,7 +65,8 @@ clusterUI <- function(id) {
       fluidRow(
         column(
           width = 12,
-          jqui_resizable(plotly::plotlyOutput(ns("clusterPlot")))
+          
+            plotly::plotlyOutput(ns("clusterPlot")) %>% jqui_resizable()
         )
       ),
       shinydashboardPlus::box(
@@ -137,7 +138,7 @@ clusterUI <- function(id) {
 tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
-   jqui_resizable(
+   # jqui_resizable(
      shinydashboardPlus::box(
       width = 12, height = 700,
       fluidRow(
@@ -187,7 +188,8 @@ tableSelectionUi <- function(id) {
       )
       )
     )
-    ))
+    # )
+     )
 }
 
 # pHeatMapUI --------------

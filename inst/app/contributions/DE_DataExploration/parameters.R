@@ -351,7 +351,7 @@ DE_seuratRefBased <- reactive({
   .schnappsEnv$calculated_DE_seuratRefBased_k.filter <- k.filter
   # .schnappsEnv$calculated_DE_seuratRefBased_scaleFactor <- scalingFactor
   
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   
   exportTestValues(DE_seuratSCtransform = {
     assays(retVal)[["logcounts"]]
@@ -556,7 +556,7 @@ DE_seuratSCtransform <- reactive({
   .schnappsEnv$calculated_DE_seuratSCtransform_k.filter <- k.filter
   # .schnappsEnv$calculated_DE_seuratSCtransform_scaleFactor <- scalingFactor
   
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratSCtransform = {
     assays(retVal)[["logcounts"]]
   })
@@ -710,7 +710,7 @@ DE_seuratStandard <- reactive({
   .schnappsEnv$calculated_DE_seuratStandard_kF <- kF
   .schnappsEnv$calculated_DE_seuratStandard_k.weight <- k.weight
   
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratStandard = {
     assays(retVal)[["logcounts"]]
   })
@@ -766,7 +766,7 @@ DE_seuratSCTnorm <- reactive({
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
   }
   
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratSCTnorm = {
     assays(retVal)[["logcounts"]]
   })
@@ -906,7 +906,7 @@ DE_seuratLogNorm <- reactive({
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
   }
   
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratLogNorm = {
     assays(retVal)[["logcounts"]]
   })
@@ -1045,7 +1045,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
   .schnappsEnv$calculated_DE_geneIds_norm <- inputGenes
   
   # turn normalization button green
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   
   #used for DGE for some of the methods
   .schnappsEnv$normalizationFactor <- sfactor
@@ -1141,7 +1141,7 @@ DE_scaterNormalization <- reactive(label = "scaterNorm", {
   retVal <- DE_scaterNormalizationfunc(scEx)
   
   # turn normalization button green
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_scaterNormalization = {
@@ -1229,7 +1229,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   retVal <- DE_logNormalizationfunc(scEx, sfactor)
   
   # turn normalization button green
-  addClass("updateNormalization", "green")
+  shinyjs::addClass("updateNormalization", "green")
   
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logNormalization = {
