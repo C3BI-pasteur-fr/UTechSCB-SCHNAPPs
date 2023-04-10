@@ -8,7 +8,7 @@ source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 menuList <- list(
   shinydashboard::menuItem("Co-expression",
                            icon = icon("tachometer-alt"),
-                           # id="coexpressionID",
+                           expandedName = "coexpressionID",
                            tabName = "coexpression", startExpanded = FALSE,
                            shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
                            shinydashboard::menuSubItem("Gene sets", tabName = "geneSets"),
@@ -126,7 +126,7 @@ tabList <- list(
                  column(
                    width = 12,
                    # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
-                   jqui_resizable(plotlyOutput("coE_dotPlot_GeneSets"))
+                   plotlyOutput("coE_dotPlot_GeneSets")%>% jqui_resizable()
                  )
                ),
                br(),
@@ -195,7 +195,7 @@ tabList <- list(
                  column(
                    width = 12,
                    # jqui_resizable(plotly::plotlyOutput("coE_dotPlot_GeneSets"))
-                   jqui_resizable(plotlyOutput("coE_dotPlot_GeneSetsModuleScore"))
+                   plotlyOutput("coE_dotPlot_GeneSetsModuleScore") %>% jqui_resizable()
                  )
                ),
                br(),
@@ -386,7 +386,7 @@ tabList <- list(
              br(),
              fluidRow(column(width = 12,
                              # jqui_resizable(plotly::plotlyOutput("coE_geneGrp_vio_plot") )
-                             jqui_resizable(plotOutput("coE_geneGrp_vio_plot") )
+                             plotOutput("coE_geneGrp_vio_plot") # %>% jqui_resizable( )
              )),
              br(),
              actionButton("save2HistVio", "save to history")
@@ -425,7 +425,7 @@ tabList <- list(
              ),
              br(),
              fluidRow(column(width = 12,
-                             jqui_resizable(plotly::plotlyOutput("coE_geneGrp_vio_plot2") )
+                             plotly::plotlyOutput("coE_geneGrp_vio_plot2")  %>% jqui_resizable()
                              # jqui_resizable(plotOutput("coE_geneGrp_vio_plot") )
              )),
              br(),
@@ -445,7 +445,7 @@ tabList <- list(
             ),
             fluidRow(
               column(width = 12, 
-                     plotOutput("alluvial_plot")  %>% jqui_resizable()
+                     plotOutput("alluvial_plot")  #%>% jqui_resizable()
               )
             ),
             br(),

@@ -68,7 +68,7 @@ gList = c('ggnetwork', 'shinyMCE',
 
 instList = c('BiocManager', 'pdftools',
              'shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r',
-             'forcats', 'kohonen', 'SCORPIUSbj', 'shinyBS', 'threejs', 'DT', 'shinythemes'
+             'forcats', 'kohonen', 'SCORPIUS', 'shinyBS', 'threejs', 'DT', 'shinythemes'
   
 )
 # setRepositories(ind = c(1,2,3))
@@ -102,6 +102,6 @@ for (pg in gList) {
   require (`pg`,character.only = T)
 }
 
-remotes::install_github('chris-mcginnis-ucsf/DoubletFinder')
+devtools::install_github('chris-mcginnis-ucsf/DoubletFinder', dependencies = TRUE, build = T,type = "source", upgrade = "always")
 
 

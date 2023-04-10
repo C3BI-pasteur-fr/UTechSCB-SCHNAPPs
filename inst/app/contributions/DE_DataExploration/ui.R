@@ -77,7 +77,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          jqui_resizable(plotly::plotlyOutput("DE_tsne_plt"))
+          plotly::plotlyOutput("DE_tsne_plt") %>% jqui_resizable()
         )
       ),
       br(),
@@ -93,7 +93,7 @@ tabList <- list(
       fluidRow(
         column(
           width = 12,
-          jqui_resizable(plotOutput("DE_gene_vio_plot") %>% withSpinner())
+          plotOutput("DE_gene_vio_plot") #%>% jqui_resizable()
         )
       )
     )
@@ -172,7 +172,7 @@ tabList <- list(
       ),
       fluidRow(column(
         12,
-        jqui_resizable(plotOutput("DE_panelPlot"))
+        plotOutput("DE_panelPlot") #%>% jqui_resizable()
       )),
       br(),
       actionButton("save2HistPanel", "save to history")

@@ -20,7 +20,7 @@ suppressMessages(require(edgeR))
 suppressMessages(require(pheatmap))
 # suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
-suppressMessages(require(shinyjs))
+# suppressMessages(require(shinyjs))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
@@ -59,6 +59,8 @@ if ("rintrojs" %in% rownames(installed.packages())) {
 
 scShinyUI <- function(request) {
   library(shinyjqui)
+  # jsCode <- 'shinyjs.hidemenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = "none"; x.classList.remove("menu-open");};shinyjs.showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = "block"; x.classList.add("menu-open");};'
+  
   # browser()
   # load from history directory the old input variable that use defaultValues function
   dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
@@ -203,9 +205,13 @@ scShinyUI <- function(request) {
   if(file.exists(paste0(packagePath, "/controlbarContext.R"))) 
     source(file = paste0(packagePath, "/controlbarContext.R"), local = TRUE)
   
+  # jsCode <- "shinyjs.hidemenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'none'; x.classList.remove('menu-open');}; shinyjs.showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'block'; x.classList.add('menu-open');};"
+  # jsCode2 <- "shinyjs.pageCol = function(params){console.log(params);$('body').css('color', params);}"
+  
   shinyUI(
     shinydashboardPlus::dashboardPage(
       dheader(),
+      
       shinydashboardPlus::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sideBarID",
@@ -242,10 +248,16 @@ scShinyUI <- function(request) {
         # ,verbatimTextOutput("currentTabInfo")
       ), # dashboard side bar
       shinydashboard::dashboardBody(
+        # shinyjs is not working jqui_ and since we need resize etc we cannot use shinyjs
+        # understanding the java script - shiny interaction takes a bit too much time
+        # https://shiny.rstudio.com/articles/communicating-with-js.html
         shinyjs::useShinyjs(debug = TRUE),
+        # shinyjs::extendShinyjs(text = jsCode, functions = c("hidemenuItem", "showmenuItem")),
+        # extendShinyjs(text = jsCode2, functions = c("pageCol")),
+        tags$script("showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'block'; x.classList.add('menu-open');};"),
         introjsUI(),
-        inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
-        inlineCSS(list(.green = "background-color: lightgreen")),
+        shinyjs::inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
+        shinyjs::inlineCSS(list(.green = "background-color: lightgreen")),
         getallTabs(),
         
         ### !!!! https://github.com/Yang-Tang/shinyjqui/issues/87
@@ -272,7 +284,7 @@ scShinyUI <- function(request) {
       ), # dashboard body
       
       options = list(sidebarExpandOnHover = TRUE),
-    controlbar = controlbarContext
+      controlbar = controlbarContext
     ) # main dashboard
   )
 }

@@ -75,6 +75,7 @@ geneSetModTab <- shinydashboard::tabItem(
              column(
                width = 6,
                sc_selectInput("oldGS", "gene sets to copy + rename", choices = defaultValue("oldGS", "notyet"), selected = defaultValue("oldGS", "notyet"))
+               
              ),
              column(
                width = 6,
@@ -101,7 +102,7 @@ geneSetModTab <- shinydashboard::tabItem(
                  tags$style(type = "text/css", "#delGSButton { width:100%; margin-top: 25px;}")
                )
              )
-           ) 
+           )
          ),
          tabPanel(
            title = "edit gene set", solidHeader = TRUE, width = 12, value = "gQC_editGS",
@@ -171,11 +172,11 @@ modTab <- shinydashboard::tabItem(
              ),
              column(
                width = 6,
-               
+
                sc_selectInput("gQC_combPrj2", "2nd Projections", choices = c("notyet"), selected = "notyet")
              )),
            fluidRow(
-             column(width = 6, 
+             column(width = 6,
                     sc_textInput("gQC_newCombPrj", "name of new Projection", value = "")),
              column(
                width = 6,
@@ -193,16 +194,16 @@ modTab <- shinydashboard::tabItem(
            id = "rename.Levels.Tab",
            tags$p("rename the levels of a factor"),
            br(),
-           
+
            fluidRow(
              column(
                width = 6,
                sc_selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
              ),
-             column(width = 6, 
+             column(width = 6,
                     sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
            ),
-           
+
            fluidRow(
              column(
                width = 12,
@@ -225,6 +226,8 @@ modTab <- shinydashboard::tabItem(
              )
            )
          ),
+         
+         
          tabPanel(
            title = "rearrange levels", width = 12, value = "gQC_rearrangeLev",
            id = "rearrange.Levels.Tab",
@@ -235,12 +238,12 @@ modTab <- shinydashboard::tabItem(
                width = 6,
                sc_selectInput("gQC_raProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_raProj", "notyet"))
              ),
-             column(width = 6, 
+             column(width = 6,
                     sc_textInput("gQC_newRaPrj", "name of new Projection", value = ""))
            ),
            fluidRow(
-             column(width = 12, 
-                    orderInput('gQC_newRaLev', 'Rearrange levels', items = NULL, placeholder = 'choose projection...'),
+             column(width = 12,
+                    shinyjqui::orderInput('gQC_newRaLev', 'Rearrange levels', items = NULL, placeholder = 'choose projection...'),
              )),
            br(),
            fluidRow(
@@ -250,6 +253,8 @@ modTab <- shinydashboard::tabItem(
              )
            )
          ),
+
+         
          tabPanel(
            title = "WIND", width = 12, value = "gQC_wind",
            id = "wind.Tab",
@@ -265,7 +270,7 @@ modTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 12,
-               jqui_resizable(plotOutput("gQC_windHC"))
+               plotOutput("gQC_windHC") %>% jqui_resizable()
              )
            )
          )
@@ -280,7 +285,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 0,
-      jqui_resizable(plotly::plotlyOutput("gQC_plotUmiHist"))
+      plotly::plotlyOutput("gQC_plotUmiHist") %>% jqui_resizable()
     )),
     br(),
     actionButton("save2Histumi", "save to history")
@@ -293,7 +298,7 @@ tabList <- list(
     fluidRow(column(
       10,
       offset = 0,
-      jqui_resizable(plotly::plotlyOutput("gQC_plotSampleHist"))
+      plotly::plotlyOutput("gQC_plotSampleHist") %>% jqui_resizable()
     )),
     br(),
     actionButton("save2HistSample", "save to history")
@@ -314,7 +319,7 @@ tabList <- list(
   shinydashboard::tabItem(
     tabName = "gQC_tsnePlot",
     # id = "gQC_tsneTab",
-    shinyjs::useShinyjs(),
+    # shinyjs::useShinyjs(),
     fluidRow(div(h3("tSNE Plot"), align = "center")),
     br(),
     shinydashboardPlus::box(
@@ -392,7 +397,7 @@ tabList <- list(
       ),
       fluidRow(column(
         width = 12,
-        jqui_resizable(plotly::plotlyOutput("gQC_tsne_main"))
+        plotly::plotlyOutput("gQC_tsne_main") %>% jqui_resizable()
       ))
     ),
     br(),

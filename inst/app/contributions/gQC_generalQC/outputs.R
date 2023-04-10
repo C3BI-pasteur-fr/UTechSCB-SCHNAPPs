@@ -1003,6 +1003,15 @@ observeEvent(input$GS_DF_button,{
   newPrjs[,colnames(dubs)] = 0
   newPrjs[rownames(dubs),colnames(dubs)] = dubs
   sessionProjections$prjs <- newPrjs
+  .schnappsEnv[["GS_DF_plot-dimension_x"]] <- "barcode"
+  .schnappsEnv$defaultValues[["GS_DF_plot-dimension_x"]] <- "barcode"
+  .schnappsEnv[["GS_DF_plot-dimension_y"]] <- colnames(dubs)[1]
+  .schnappsEnv$defaultValues[["GS_DF_plot-dimension_y"]] <- colnames(dubs)[1]
+  .schnappsEnv[["GS_DF_plot-dimension_col"]] <- colnames(dubs)[2]
+  .schnappsEnv$defaultValues[["GS_DF_plot-dimension_col"]] <- colnames(dubs)[2]
+  updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_x", selected = "barcode")
+  updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_y", selected = colnames(dubs)[1])
+  updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_col", selected = colnames(dubs)[2])
 })
 
 # gc_DF_2D <-
