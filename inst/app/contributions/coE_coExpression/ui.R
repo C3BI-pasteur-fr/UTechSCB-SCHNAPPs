@@ -66,7 +66,7 @@ tabList <- list(
     tabBox(title = "Gene set plots", width = 12, id = "geneSetPlotsTabBox",
            tabPanel(
              title = "Dot plot",
-             
+             value = "dotPlotGeneSet",
              shinydashboardPlus::box(
                title = "Dot plot", solidHeader = TRUE, width = 12, status = "primary",
                fluidRow(
@@ -135,7 +135,7 @@ tabList <- list(
            ),
            tabPanel(
              title = "Dot plot with Module Score",
-             
+             value = "dotPlotMscore",
              shinydashboardPlus::box(
                title = "Dot plot with Module Score", solidHeader = TRUE, width = 12, status = "primary",
                fluidRow(
