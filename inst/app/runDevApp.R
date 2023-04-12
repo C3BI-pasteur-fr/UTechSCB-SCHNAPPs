@@ -149,6 +149,8 @@ chromeBrowser = function(url){
   system(paste("open -a 'Google Chrome' ", url))
 }
 
+source("R/DotPlotwithModuleScore.R")
+
 runApp(app, port=3838, launch.browser = chromeBrowser)
 
 

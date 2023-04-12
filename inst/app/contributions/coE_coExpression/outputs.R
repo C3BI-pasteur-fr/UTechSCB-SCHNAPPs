@@ -527,14 +527,14 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
     if (DEBUG) cat(file = stderr(), "output$coE_geneGrp_vio_plot2:NULL\n")
     return(NULL)
   }
-  if (!projectionVar %in% colnames(projections)) {
+  if (!all(projectionVar %in% colnames(projections))) {
     if (DEBUG) cat(file = stderr(), "coE_geneGrp_vio_plot2: projectionVar not known: NULL\n")
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData")
+  #cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData")
 
   featureData <- rowData(scEx_log)
   retVal <- coE_geneGrp_vioFunc2(

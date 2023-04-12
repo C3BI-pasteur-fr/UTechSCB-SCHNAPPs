@@ -2,7 +2,7 @@ require(cowplot)
 require(Seurat)
 require(ggplot2)
 require(tidyr)
-
+require(cowplot)
 #' DotPlotwithModuleScore
 #' 
 #' adapted from Seurat::DotPlot but adds the module score per group
@@ -12,9 +12,10 @@ require(tidyr)
 #' @export DotPlotwithModuleScore
 #' 
 
-DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("lightgrey", 
-                                                                             "blue"), col.min = -2.5, col.max = 2.5, dot.min = 0, dot.scale = 6, 
-                                    idents = NULL, group.by = NULL, split.by = NULL, cluster.idents = FALSE, 
+DotPlotwithModuleScore <- function (object, assay = NULL, features,
+                                    featureDat = featureDat, 
+                                    cols = c("lightgrey", "blue"), col.min = -2.5, col.max = 2.5, dot.min = 0, dot.scale = 6, 
+                                    idents = NULL, group.by = NULL, split.by = NULL, cluster.idents = FALSE, clusters="sampleNames",
                                     scale = TRUE, scale.by = "radius", scale.min = NA, scale.max = NA) 
 {
   
@@ -35,6 +36,8 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("li
   # scale.min = NA
   # scale.max = NA
   
+  # save(file = "~/SCHNAPPsDebug/DotPlotwithModuleScoreF.RData", list = c(ls()))
+  # cp = load("~/SCHNAPPsDebug/DotPlotwithModuleScoreF.RData")
   
   gmtd = features
   
@@ -154,7 +157,9 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("li
       return(colorRampPalette(colors = c("grey", color))(20)[value])
     }, color = cols[splits.use], value = avg.exp.scaled)
   }
-  color.by <- ifelse(test = split.colors, yes = "colors", no = "avg.exp.scaled")
+  # browser()
+  color.byNoQ <- ifelse(test = split.colors, yes = "colors", no = "avg.exp.scaled")
+  color.by <- enquo(color.byNoQ)
   if (!is.na(x = scale.min)) {
     data.plot[data.plot$pct.exp < scale.min, "pct.exp"] <- scale.min
   }
@@ -164,6 +169,12 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("li
   if (!is.null(x = feature.groups)) {
     data.plot$feature.groups <- factor(x = feature.groups[data.plot$features.plot], 
                                        levels = unique(x = feature.groups))
+  }
+  
+  if(is.null(data.plot$feature.groups)) {
+    data.plot$feature.groups = "1"
+    feature.groups = data.plot$feature.groups
+    names(feature.groups) = data.plot$feature.groups
   }
   
   s=AddModuleScore(
@@ -177,7 +188,10 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("li
       subset(s, idents = id)[[paste0("Combined",cIdx)]][,1]%>% mean()
     })
   }) %>% unlist() %>% matrix(ncol=length(gmtd),byrow=T) %>% data.frame()
-  colnames(ams) = names(gmtd)
+  if(is.list(gmtd))  colnames(ams) = names(gmtd)
+  if(is.character(gmtd)) {
+    colnames(ams) = gmtd
+  }
   ams$id = Idents(s) %>% levels() 
   amsLong = gather(ams, feature.groups, avg.exp.scaled, 1:(ncol(ams)-1) )
   # colnames(amsLong) = c("feature.groups", "avg.exp.scaled")
@@ -192,21 +206,24 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("li
     tidyr::pivot_longer(values_to = "pct.exp", cols = names(gmtd), names_to = "feature.groups")
   
   amsLong = merge(pct.expSca, amsLong, by=c("id", "feature.groups"))
-  rbind(amsLong, data.plot)
+  # rbind(amsLong, data.plot)
   data = rbind(amsLong, data.plot)
   data$features.plot = factor(data$features.plot, levels = c(unique(features),"M-Score"))
   plot <- ggplot(data, 
                  mapping = aes(x = features.plot, y = id)) + 
-    geom_point(mapping = aes_string(size = "pct.exp",color = color.by)) + 
+    # color.byNoQ
+  geom_point(mapping = aes(size = pct.exp,color = .data[[color.byNoQ]])) + 
     scale.func(range = c(0, dot.scale), limits = c(scale.min, scale.max)) + 
     theme(axis.title.x = element_blank(), axis.title.y = element_blank()) + guides(size = guide_legend(title = "Percent Expressed")) + 
-    labs(x = "Features", y = ifelse(test = is.null(x = split.by), yes = "Identity", no = "Split Identity")) + theme_cowplot()
+    labs(x = "Features", y = ifelse(test = is.null(x = split.by), yes = "Identity", no = "Split Identity")) + cowplot::theme_cowplot()
   
   if (!is.null(x = feature.groups)) {
     plot <- plot + facet_grid(facets = ~feature.groups, scales = "free_x", 
                               space = "free_x", switch = "y") + 
       theme(panel.spacing = unit(x = 1, units = "lines"), strip.background = element_blank())
   }
+  # plot + scale_color_distiller(palette = cols)
+  
   if (split.colors) {
     plot <- plot + scale_color_identity()
   } else if (length(x = cols) == 1) {
@@ -222,7 +239,7 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features, cols = c("li
     out = featureDat[breakval,"symbol"]
     out[is.na(out)] = "M-Score"
     return(out)
-    }
+  }
   ylabFun <- function(val){stringr::str_replace(val,"SeuratProject_","bla")}
   plot= plot + scale_x_discrete(labels = labFun) +
     scale_y_discrete(labels = ylabFun) +
