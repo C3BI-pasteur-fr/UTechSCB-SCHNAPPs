@@ -179,7 +179,6 @@ coE_dotPlot_GeneSets <- function(projections = projections,
   p
 }
 
-
 # coE_dotPlot_GeneSetsModuleScore ----
 # same as coE_dotPlot_GeneSets, only that the X labels are already set inside the function and adds ModuleScore.
 coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
@@ -195,6 +194,10 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
                                  dot.scale = dot.scale,
                                  scale.by = scale.by
 ){
+  require(Seurat)
+  require(SingleCellExperiment)
+  # save(file = "~/SCHNAPPsDebug/coE_dotPlot_GeneSetsModuleScoreF.RData", list = c(ls()))
+  # cp = load("~/SCHNAPPsDebug/coE_dotPlot_GeneSetsModuleScoreF.RData")
   # replace "_", with "."
   newRN = stringr::str_replace_all(rownames(scEx_log),"_",".")
   rownames(scEx_log) = newRN
@@ -204,7 +207,8 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
   Idents(seurDat) <- as.factor(projections[,clusters])
   featureDat = rowData(scEx_log)
   if(length(geneSets) == 1){
-    features = geneName2Index(paste(gmtData[[geneSets]]$genes,collapse = ", "), featureDat)
+    features = geneName2Index(paste(gmtData[[geneSets[1]]]$genes,collapse = ", "), featureDat) %>% list()
+    names(features) = gmtData[[geneSets[1]]]$name
   } else {
     FUN = function(x){
       geneName2Index(paste(gmtData[[x]]$genes,collapse = ", "), featureDat)
@@ -225,13 +229,15 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
   }
   p = DotPlotwithModuleScore(seurDat, 
               assay="RNA", 
-              features = features, 
+              features = features,
+              featureDat = featureDat,
               cols = col,
               col.min = col.min,
               col.max = col.max,
               dot.min = dot.min,
               dot.scale = dot.scale,
               idents = NULL,
+              clusters = clusters,
               group.by = NULL,
               split.by = NULL,
               cluster.idents = FALSE,
