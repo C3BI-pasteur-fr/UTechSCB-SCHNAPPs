@@ -274,28 +274,307 @@ shortCutsList = list(
 ) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
 
 
-# scaterPlot.png
-# UMAPwParameters.png
-# UMIhistogram.png
-# WINDdendrogram.png
+shortCutsList = list(
+  Head = "dotPlotGeneSetsMscore",
+  Descr = "Gene list dot plot with M-score",
+  Explain = "Group cells by genes sets, calculate the Seurat M-score and plot in a dot plot. A GMT has to be loaded or gene sets have to be manually defined beforehand.",
+  URL = "www/images/dotPlotGeneSetsMscore.png",
+  Func =function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "geneSets"
+    )
+    updateTabsetPanel(
+      session = session,
+      "geneSetPlotsTabBox",
+      selected = "dotPlotMscore"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+shortCutsList = list(
+  Head = "dotPlotGeneSet",
+  Descr = "Gene list dot plot",
+  Explain = "Group cells by genes sets, calculate the Seurat M-score and plot in a dot plot. A GMT has to be loaded or gene sets have to be manually defined beforehand.",
+  URL = "www/images/dotPlotGeneSetsMscore.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "geneSets"
+    )
+    updateTabsetPanel(
+      session = session,
+      "geneSetPlotsTabBox",
+      selected = "dotPlotGeneSet"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
 
 
-# shortCutsList = list(
-#   Head = ,
-#   Descr = ,
-#   Explain = ,
-#   URL = "www/images/",
-#   Func = 
-# ) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+shortCutsList = list(
+  Head = "UMI histogram",
+  Descr = "UMI histogram.",
+  Explain = "UMI histogram.",
+  URL = "www/images/UMIhistogram.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_umiHist"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+shortCutsList = list(
+  Head = "scaterPlot",
+  Descr = "scater plot, summarizing the 50 most highly variable genes.",
+  Explain = "Click on 'apply changes' and potentially increase the memory if you run into problems (see console).",
+  URL = "www/images/scaterPlot.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "DE_scaterQC"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
 
 
-# shortCutsList = list(
-#   Head = ,
-#   Descr = ,
-#   Explain = ,
-#   URL = "www/images/",
-#   Func = 
-# ) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+shortCutsList = list(
+  Head = "WIND",
+  Descr = "Dendrogram showing the relation of leaves for a factorial.",
+  Explain = "Dendrogram showing the relation of leaves for a factorial.",
+  URL = "www/images/WINDdendrogram.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "modifyProj"
+    )
+    updateTabsetPanel(
+      session = session,
+      "modProj",
+      selected = "gQC_wind"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+
+# 
+shortCutsList = list(
+  Head = "UMAP",
+  Descr = "UMAP",
+  Explain = "To activate UMAP projection and optimize parameters click on apply changes",
+  URL = "www/images/UMAPwParameters.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_umapPlot"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+# VariancePCs
+shortCutsList = list(
+  Head = "PCEigenvalues",
+  Descr = "PCA Eigenvalues",
+  Explain = "Show the Eigenvalues of a PCA to estimate the number of PCs needed for downstream calculations.",
+  URL = "www/images/VariancePCs.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_variancePC"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+
+shortCutsList = list(
+  Head = "ViolinCobinations",
+  Descr = "Violin plot of combinations",
+  Explain = "Show violin plot of combination of genes. Set max 5 genes to investigate.",
+  URL = "www/images/ViolinCobinations.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "CoExpressionViolin"
+    )
+    updateTabsetPanel(
+      session = session,
+      "violinPlots",
+      selected = "permViol"
+    )
+    updateCheckboxInput(session = session, "coE_showExpression",value = FALSE)
+    updateCheckboxInput(session = session, "coE_showPermutations",value = TRUE)
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+# PanelPlotUMI
+shortCutsList = list(
+  Head = "PanelPlotUMI",
+  Descr = "UMI counts as panel plot",
+  Explain = "Given a factorial (x-axis) show a box plot of a set of genes individually.",
+  URL = "www/images/PanelPlotUMI.png",
+  Func =function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "DE_panelPlot"
+    )
+    updateSelectInput(session, "DE_dim_x",
+                      selected = "dbCluster"
+    )
+    updateSelectInput(session, "DE_dim_y",
+                      selected = "UMI.count"
+    )
+    
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+# PanelPlottSNE
+shortCutsList = list(
+  Head = "PanelPlotUMI",
+  Descr = "tSNE projection as panel plot",
+  Explain = "Plot individual genes on a tSNE projection in parallel",
+  URL = "www/images/PanelPlottSNE.png",
+  Func =function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "DE_panelPlot"
+    )
+    updateSelectInput(session, "DE_dim_x",
+                      selected = "tsne1"
+    )
+    updateSelectInput(session, "DE_dim_y",
+                      selected = "tsne2"
+    )
+    
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+
+# ViolinPlotGeneCount
+shortCutsList = list(
+  Head = "ViolinPlotGeneCount",
+  Descr = "Violin plot of number of given expressed.",
+  Explain = "For each cell the number of genes that are expressed within a given range is counted and plotted in a violin plot.",
+  URL = "www/images/ViolinPlotGeneCount.png",
+  Func =function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "DE_panelPlot"
+    )
+    updateTabsetPanel(
+      session = session,
+      "violinPlots",
+      selected = "permViol"
+    )
+    updateCheckboxInput(session = session, "coE_showExpression",value = FALSE)
+    updateCheckboxInput(session = session, "coE_showPermutations",value = FALSE)
+    
+    }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+###################################
+
+# VolcanoPlot
+shortCutsList = list(
+  Head = "VolcanoPlot",
+  Descr = "Volcano plot of DGE",
+  Explain = "Volcano plot of differentially expressed gene. To show this a differential gene expression analysis has to be performed. The link goes to this page. Cells selected on the left panel will be compared to cells selected in the right panel. If no cells are seleted in the right panel all other cells will be used. The display of the volcano plot needs a few seconds to build.",
+  URL = "www/images/VolcanoPlot.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "sCA_dge"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+
+# 3DExpressionGene
+shortCutsList = list(
+  Head = "3DExpressionGene",
+  Descr = "3D expression of gene",
+  Explain = "Show the expression intensity of a gene or the sum of a list of genes in a 3D representation.",
+  URL = "www/images/3DExpressionGene.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "DE_expression"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+
+###################################
+
+
+# 3DUMAP
+shortCutsList = list(
+  Head = "3DUMAP",
+  Descr = "3D UMAP",
+  Explain = "given that the UMAP has been calulated, show it in 3D",
+  URL = "www/images/3DUMAP.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_tsnePlot"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_x",
+                         selected = "UMAP1"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_y",
+                         selected = "UMAP2"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_z",
+                         selected = "UMAP3"
+    )
+    updateSelectizeInput(session, "gQC_col3D",
+                         selected = "dbCluster"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+# 3DClusterTsne
+shortCutsList = list(
+  Head = "3DClusterTsne",
+  Descr = "tSNE in 3D",
+  Explain = "show the tSNE projection in 3D",
+  URL = "www/images/3DClusterTsne.png",
+  Func = function(session){
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_tsnePlot"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_x",
+                         selected = "tsne1"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_y",
+                         selected = "tsne2"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_z",
+                         selected = "tsne3"
+    )
+    updateSelectizeInput(session, "gQC_col3D",
+                         selected = "dbCluster"
+    )
+  }
+) %>% add2ShortCutList(name = ".shortCut", group = group, shortCutsList)
+
+
+
 
 
 # shortCutsList = list(
