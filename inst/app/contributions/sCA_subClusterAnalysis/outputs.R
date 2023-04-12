@@ -331,7 +331,7 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
     return(NULL)
   }
   # reset selection
-  js$sCA_volcanoPlot_resetClick()
+  # js$sCA_volcanoPlot_resetClick()
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls()))
   }

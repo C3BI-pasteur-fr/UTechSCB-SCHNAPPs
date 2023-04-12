@@ -66,7 +66,18 @@ if ("shinyBS" %in% rownames(installed.packages())) {
   .schnappsEnv$sbTT_temporaPval_thresh  <-  bsPopover("temporaPval_thresh", title = "", "P-value threshold to determine the significance of pathway enrichment over time. Set rel. high because filtering is done later. Default to 0.5.")
   
   
-  .schnappsEnv$sbTT_temporaCluster <-  bsPopover("gQC_tsneTheta", title = "", "Speed/accuracy trade-off (increase for less accuracy), set to 0.0 for exact TSNE (default: 0.5)")
+  .schnappsEnv$sbTT_gQC_tsneTheta <-  bsPopover("gQC_tsneTheta", title = "", "Speed/accuracy trade-off (increase for less accuracy), set to 0.0 for exact TSNE (default: 0.5)")
+  .schnappsEnv$sbTT_gQC_tsnePerplexity  <- bsPopover("gQC_tsnePerplexity", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_n_neighbors  <- bsPopover("gQC_um_n_neighbors", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_spread <- bsPopover("gQC_um_spread", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_local_connectivity <- bsPopover("gQC_um_local_connectivity", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_init <- bsPopover("gQC_um_init", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_negative_sample_rate <- bsPopover("gQC_um_negative_sample_rate", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_min_dist <- bsPopover("gQC_um_min_dist", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_metric <- bsPopover("gQC_um_metric", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_set_op_mix_ratio <- bsPopover("gQC_um_set_op_mix_ratio", title = "", "text")
+  .schnappsEnv$sbTT_gQC_um_bandwidth  <- bsPopover("gQC_um_bandwidth", title = "", "text")
+  
   
   
   checkbsTT <- function(item) {

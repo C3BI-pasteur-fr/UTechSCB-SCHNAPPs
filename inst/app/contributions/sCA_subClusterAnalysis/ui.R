@@ -16,7 +16,7 @@ tabList <- list(
     tabBox(
       title = "Differential expression", width = 12, 
       tabPanel(title = "Select data", 
-               width = 12, id = "modProj",
+               width = 12, id = "modProjDGE",
                footer = {
                  tags$ul(
                    tags$li(

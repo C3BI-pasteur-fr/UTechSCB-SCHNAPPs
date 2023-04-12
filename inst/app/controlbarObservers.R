@@ -8,10 +8,11 @@ add2workflowObsList <- function(li, wkfl, workflowObsList){
 # shortCutsTab ----
 workflowObsList = list()
 
+# wkfl1 ----
 wkfl = "wkfl1"
 workflowObsList[[wkfl]] = list()
 
-# LoadData ----
+## LoadData ----
 workflowObsList = list(
   id = "LoadData",
   Func = function(session) {
@@ -27,7 +28,8 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# gQC_sampleHist ----
+# QC
+## gQC_sampleHist ----
 workflowObsList = list(
   id = "gQC_sampleHist",
   Func = function(session) {
@@ -40,7 +42,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# gQC_umiHist ----
+## gQC_umiHist ----
 workflowObsList = list(
   id = "gQC_umiHist",
   Func = function(session) {
@@ -53,7 +55,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# nFeatureViolin ----
+## nFeatureViolin ----
 workflowObsList = list(
   id = "nFeatureViolin",
   Func = function(session) {
@@ -85,7 +87,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# nFeatureSelection ----
+## nFeatureSelection ----
 workflowObsList = list(
   id = "nFeatureSelection",
   Func = function(session) {
@@ -113,7 +115,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# nCountViolin ----
+## nCountViolin ----
 workflowObsList = list(
   id = "nCountViolin",
   Func = function(session) {
@@ -138,7 +140,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# nCountSelection ----
+## nCountSelection ----
 workflowObsList = list(
   id = "nCountSelection",
   Func = function(session) {
@@ -165,7 +167,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# npMTViolin ----
+## npMTViolin ----
 workflowObsList = list(
   id = "npMTViolin",
   Func = function(session) {
@@ -190,7 +192,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# npMTSelection ----
+## npMTSelection ----
 workflowObsList = list(
   id = "npMTSelection",
   Func = function(session) {
@@ -217,7 +219,7 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# countFeature ----
+## countFeature ----
 workflowObsList = list(
   id = "countFeature",
   Func = function(session) {
@@ -243,7 +245,7 @@ workflowObsList = list(
   }
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# wkfl1.countMt.click ----
+## wkfl1.countMt.click ----
 workflowObsList = list(
   id = "countMt",
   Func = function(session) {
@@ -269,7 +271,7 @@ workflowObsList = list(
   }
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# go2CellSelection ----
+## go2CellSelection ----
 workflowObsList = list(
   id = "go2CellSelection",
   Func = function(session) {
@@ -283,19 +285,263 @@ workflowObsList = list(
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
-# go2CellSelection ----
+## combineVars1 ----
 workflowObsList = list(
   id = "combineVars1",
   Func = function(session) {
     updateTabItems(
       session = session,
       "sideBarID",
-      selected = "combine.Proj.Tab"
+      selected = "modifyProj"
+    )
+    updateTabsetPanel(
+      session = session,
+      "modProj",
+      selected = "gQC_combProj"
     )
     # "combine.Proj.Tab"
   }
   
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## renameLevels1 ----
+workflowObsList = list(
+  id = "renameLevels1",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "modifyProj"
+    )
+    updateTabsetPanel(
+      session = session,
+      "modProj",
+      selected = "gQC_renameLev"
+    )
+  }
+  
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+
+# Normalization
+## selectNormParameters ----
+workflowObsList = list(
+  id = "selectNormParameters",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "clusterParameters"
+    )
+  }
+  
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+
+
+## selectPCAParameters ----
+workflowObsList = list(
+  id = "setPCAparameters",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "clusterParameters"
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "pcaRank",
+      value = 50
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "pcaN",
+      value = 2000
+    )
+    updateSelectizeInput(
+      session = session,
+      inputId = "hvgSelection", 
+      selected = "getTopHVGs"
+    )
+    updateCheckboxInput(
+      session = session,
+      inputId = "pcaCenter",
+      value = TRUE
+    )
+    updateCheckboxInput(
+      session = session,
+      inputId = "pcaScale",
+      value = FALSE
+    )
+  }
+  
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+
+## selectPCAParameters ----
+workflowObsList = list(
+  id = "setClusterParameters",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "clusterParameters"
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "seurClustDims", 
+      value = "50"
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "seurClustk.param", 
+      value = "20"
+    )
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## geneSelection ----
+workflowObsList = list(
+  id = "geneSelection",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "geneSelection"
+    )
+  }
+  
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## input2 ----
+workflowObsList = list(
+  id = "input2",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "input"
+    )
+  }
+  
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## umap ----
+workflowObsList = list(
+  id = "umap",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_umapPlot"
+    )
+  }
+  
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## setUMAPparameters ----
+
+workflowObsList = list(
+  id = "setUMAPparameters",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_umapPlot"
+    )
+    updateBox("addUMAPoptions", action = "toggle")
+    updateNumericInput(
+      session = session,
+      inputId = "gQC_um_n_neighbors", 
+      value = "20"
+    )
+    updateSelectizeInput(
+      session = session,
+      inputId = "gQC_um_spread", 
+      selected = "7"
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "gQC_um_metric", 
+      value = "cosine"
+    )
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## viewUMAP2D ----
+workflowObsList = list(
+  id = "viewUMAP2D",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_umapPlot"
+    )
+    updateSelectInput(session, "gQC_umap_main-dimension_x",
+                      selected = "UMAP1"
+    )
+    updateSelectInput(session, "gQC_umap_main-dimension_y",
+                      selected = "UMAP2"
+    )
+    updateSelectInput(session, "gQC_umap_main-dimension_col",
+                      selected = "dbCluster"
+    )
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+## viewUMAP3D ---- 
+workflowObsList = list(
+  id = "viewUMAP3D",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "gQC_tsnePlot"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_x",
+                      selected = "UMAP1"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_y",
+                      selected = "UMAP2"
+    )
+    updateSelectizeInput(session, "gQC_dim3D_z",
+                      selected = "UMAP3"
+    )
+    updateSelectizeInput(session, "gQC_col3D",
+                      selected = "dbCluster"
+    )
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
+
+
+## renameCluster ----
+workflowObsList = list(
+  id = "renameCluster",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "Projections"
+    )
+    updateTabsetPanel(
+      session = session,
+      "modProj",
+      selected = "renameProj"
+    )
+    updateSelectizeInput(
+      session = session,
+      inputId = "oldPrj", 
+      selected = "dbCluster"
+    )
+    updateTextInput(
+      session = session,
+      inputId = "newPrj",
+      value = "dbClusterLog"
+    )
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
+
 
 
 # tSNE

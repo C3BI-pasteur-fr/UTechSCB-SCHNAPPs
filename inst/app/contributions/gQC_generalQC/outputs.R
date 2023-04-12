@@ -104,7 +104,7 @@ observe(label ="obs_gQC_binSize", x = {
 # gQC_update3DInput ----
 #' gQC_update3DInput
 #' update axes for tsne display
-gQC_update3DInput <- reactive({
+gQC_update3DInput <- observeEvent(projections(),{
   if (DEBUG) cat(file = stderr(), "gQC_update3DInput started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -220,7 +220,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
     showNotification("gQC_tsne_main", id = "gQC_tsne_main", duration = NULL)
   }
   
-  upI <- gQC_update3DInput()
+  # upI <- gQC_update3DInput()
   projections <- projections()
   dimX <- input$gQC_dim3D_x
   dimY <- input$gQC_dim3D_y
@@ -402,9 +402,109 @@ output$gQC_variancePCA <- renderPlot({
 
 # gene set related
 
+## modify a gene set ----
+observeEvent(input$geneSetModifyButton,{
+  if (DEBUG) cat(file = stderr(), "geneSetModifyButton\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "geneSetModifyButton")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "geneSetModifyButton")
+    }
+  })
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("geneSetModifyButton", id = "geneSetModifyButton", duration = NULL)
+  }
+  # inputGS <- input$gQC_geneSetModifyInput
+  newName = make.names(input$gQC_geneSetModifynName)
+  newGenes = input$gQC_geneSetModifyGenes
+  desc = input$gQC_geneSetModifynDesc
+  gd = gmtData()
+  userData = gmtUserData()
+  scEx = scEx()
+  featureData <- rowData(scEx)
+  # browser()
+  # deepDebug()
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/geneSetModifyButton.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/geneSetModifyButton.RData")
+  
+  if (newGenes == "" | newName == "X" | is.null(scEx)) {
+    return(NULL)
+  }
+  
+  # li = new gene list
+  li <- geneName2Index(g_id = newGenes, featureData = featureData)
+  if(is.null(li)) {
+    cat(file = stderr(), "!!!!geneSetModifyButton: no genes found\n")
+    return(NULL)
+  }
+  if(newName %in% names(gd)) {
+    cat(file = stderr(), "!!!!geneSetModifyButton: gene set already set.\n")
+    return(NULL)
+  }
+  li = list(list(genes = featureData[li,"symbol"], desc = desc, name = newName))
+  
+  names(li) = newName
+  # append to global list
+  if(is.null(userData)){
+    gmtUserData(li)
+  } else {
+    gmtUserData(append(userData, li))
+  }
+  
+  
+  .schnappsEnv$defaultValues["gQC_geneSetModifyInput"] = newName
+  updateSelectizeInput(
+    session = session,
+    inputId = "gQC_geneSetModifyInput",
+    # choices = ,
+    selected = newName
+  )
+})
+
+output$gQC_geneSetModifyInputGL <- renderText({
+  if (DEBUG) cat(file = stderr(), "gQC_geneSetModifyInputGL\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "gQC_geneSetModifyInputGL")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "gQC_geneSetModifyInputGL")
+    }
+  })
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("gQC_geneSetModifyInputGL", id = "gQC_geneSetModifyInputGL", duration = NULL)
+  }
+  
+  
+  gd = gmtData()
+  inputGS <- input$gQC_geneSetModifyInput
+  req(gd)
+  if (inputGS == "") {
+    return(NULL)
+  }
+  # deepDebug()
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gQC_geneSetModifyInput.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/gQC_geneSetModifyInput.RData")
+  if(inputGS %in% names(gd)) {
+    retVal = paste(gd[[inputGS]]$genes, collapse = ", ")
+  } else {
+    retVal = ""
+  }
+  return(retVal)
+})
+
 observe({
   gd = gmtData()
   updateSelectizeInput(session, inputId = "oldGS",choices = names(gd))
+  updateSelectizeInput(session, inputId = "gQC_geneSetModifyInput", 
+                       choices = names(gd), 
+                       selected = defaultValue("gQC_geneSetModifyInput", "dummy"))
 })
 
 observeEvent(input$updateGSButton,{
@@ -416,8 +516,9 @@ observeEvent(input$updateGSButton,{
   li = gd[name]
   names(li) = newName
   gmtUserData(append(userData, li))
-  save(file = "~/SCHNAPPsDebug/updateGSButton.RData", list = c(ls()))
-  # }
+  if(.schnappsEnv$DEBUGSAVE){
+    save(file = "~/SCHNAPPsDebug/updateGSButton.RData", list = c(ls()))
+  }
   # cp =load(file='~/SCHNAPPsDebug/updateGSButton.RData')
   
 })
@@ -928,13 +1029,13 @@ output$gQC_windHC <- renderPlot({
   trueclass <- projections[,gQC_windProj]
   ctStruct = tryCatch({
     createRef(Y, classes = trueclass)
-    },error = function(e) {
-      if (!is.null(getDefaultReactiveDomain())) {
-        showNotification("Problem with WIND", type = "warning", duration = NULL)
-      }
-      cat(file = stderr(), paste("\n+++++ Error in WIND\n\t", e, "\n"))
-      return(NULL)
+  },error = function(e) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Problem with WIND", type = "warning", duration = NULL)
     }
+    cat(file = stderr(), paste("\n+++++ Error in WIND\n\t", e, "\n"))
+    return(NULL)
+  }
   )
   if(is.null(ctStruct)) return(NULL)
   plot(ctStruct$hc, xlab="", axes=FALSE, ylab="", ann=FALSE)
@@ -1015,10 +1116,10 @@ observeEvent(input$GS_DF_button,{
 })
 
 # gc_DF_2D <-
-  callModule(
-    clusterServer,
-    "GS_DF_plot",
-    projections # ,
-    # reactive(input$coE_gene_id_sch)
-  )
+callModule(
+  clusterServer,
+  "GS_DF_plot",
+  projections # ,
+  # reactive(input$coE_gene_id_sch)
+)
 
