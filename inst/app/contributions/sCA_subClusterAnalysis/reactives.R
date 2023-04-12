@@ -760,6 +760,8 @@ subCluster2Dplot <- function() {
     
     p1 <-
       ggplot(subsetData,
+             # this version causes a crash with unknown column seleted
+             # aes(x = .data[[x1]], y = .data[[y1]]),
              aes_string(x = x1, y = y1),
              colour = mycolPal[subsetData[,prjs]]
       ) +
