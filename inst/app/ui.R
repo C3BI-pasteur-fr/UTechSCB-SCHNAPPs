@@ -214,6 +214,7 @@ scShinyUI <- function(request) {
       
       shinydashboardPlus::dashboardSidebar(
         shinydashboard::sidebarMenu(
+          style = "height: 90vh; overflow-y: auto;", 
           id = "sideBarID",
           getallMenus(),
           htmlOutput("summaryStatsSideBar"),
@@ -230,7 +231,7 @@ scShinyUI <- function(request) {
           br(),
           downloadButton("RmdSave", "Download History", class = "butt"),
           if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
-          verbatimTextOutput("DEBUGSAVEstring"),
+          # verbatimTextOutput("DEBUGSAVEstring"),
           if (is.environment(.schnappsEnv)) {
             if (exists("historyPath", envir = .schnappsEnv)) {
               # sc_checkboxInput("save2History", "save to history file", FALSE)
@@ -248,6 +249,7 @@ scShinyUI <- function(request) {
         # ,verbatimTextOutput("currentTabInfo")
       ), # dashboard side bar
       shinydashboard::dashboardBody(
+        tags$script(HTML("$('body').addClass('fixed');")),
         # shinyjs is not working jqui_ and since we need resize etc we cannot use shinyjs
         # understanding the java script - shiny interaction takes a bit too much time
         # https://shiny.rstudio.com/articles/communicating-with-js.html

@@ -455,7 +455,15 @@ umapReact <- reactive({
     ),
     button = "activateUMAP"
   )
-  
+  updateSelectizeInput(session = session, inputId = "gQC_umap_main-dimension_x", selected = "UMAP1")
+  updateSelectizeInput(session = session, inputId = "gQC_umap_main-dimension_y", selected = "UMAP2")
+  updateSelectizeInput(session = session, inputId = "gQC_umap_main-dimension_col", selected = "dbCluster")
+  .schnappsEnv$defaultValues[["gQC_umap_main-dimension_x"]] <- "UMAP1"
+  .schnappsEnv$defaultValues[["gQC_umap_main-dimension_y"]] <- "UMAP2"
+  .schnappsEnv$defaultValues[["gQC_umap_main-dimension_col"]] <- "dbCluster"
+  .schnappsEnv[["gQC_umap_main-dimension_x"]] <- "UMAP1"
+  .schnappsEnv[["gQC_umap_main-dimension_y"]] <- "UMAP2"
+  .schnappsEnv[["gQC_umap_main-dimension_col"]] <- "dbCluster"
   
   exportTestValues(umapReact = {
     embedding

@@ -108,15 +108,26 @@ geneSetModTab <- shinydashboard::tabItem(
            title = "edit gene set", solidHeader = TRUE, width = 12, value = "gQC_editGS",
            id = "gQC_editGS.Tab",
            tags$p("Select a gene set and then edit it"),
-           br()
+           sc_selectizeInput(inputId="gQC_geneSetModifyInput",
+                             label = "Gene set to modify",
+                             multiple = FALSE,
+                             choices = c(defaultValue("gQC_geneSetModifyInput", "dummy")),
+                             selected = defaultValue("gQC_geneSetModifyInput", "dummy"), 
+                             options = list(maxItems = 1)),
+           verbatimTextOutput("gQC_geneSetModifyInputGL"),
+           sc_textInput(inputId= "gQC_geneSetModifynName", label="name of new gene set", value="newGeneSet"),
+           sc_textInput(inputId= "gQC_geneSetModifynDesc", label="description of new gene set", value="newGeneSet"),
+           sc_textInput(inputId= "gQC_geneSetModifyGenes", label="comma separated list of genes", value=""),
+           actionButton("geneSetModifyButton", "rename")
          )
   )
 )
 
 
 # modTab ----
-modTab <- shinydashboard::tabItem(
-  tabName = "modifyProj",
+modTab <- 
+  shinydashboard::tabItem(
+  "modifyProj",
   fluidRow(div(h3("work with projections"), align = "center")),
   br(),
   tabBox(title = "modify projections", width = 12, id = "modProj",
@@ -348,6 +359,7 @@ tabList <- list(
         )
       ),
       checkbsTT(item = "gQC_tsneTheta"),
+      checkbsTT(item = "gQC_tsnePerplexity"),
       fluidRow(
         column(
           width = 12, offset = 1,
@@ -360,7 +372,7 @@ tabList <- list(
     ),
     shinydashboardPlus::box(
       title = "3D plot", solidHeader = TRUE, width = 12, status = "primary",
-      collapsible = TRUE, collapsed = FALSE,
+      collapsible = TRUE, collapsed = FALSE, id = "tsne3D",
       fluidRow(
         column(
           width = 3,
@@ -400,6 +412,10 @@ tabList <- list(
         plotly::plotlyOutput("gQC_tsne_main") %>% jqui_resizable()
       ))
     ),
+    checkbsTT("gQC_tsnePerplexity"),
+    checkbsTT("normalizationRadioButtonValue"),
+    checkbsTT("updateNormalization"),
+    
     br(),
     shinydashboard::box(
       title = "Table with all projections", solidHeader = TRUE, width = 12, status = "primary",
@@ -506,7 +522,16 @@ tabList <- list(
               "gQC_um_bandwidth",
               label = "bandwidth",
               choices = c(1:20), selected = defaultValue("gQC_um_bandwidth", "1")
-            )
+            ),
+            checkbsTT("gQC_um_n_neighbors"),
+            checkbsTT("gQC_um_spread"),
+            checkbsTT("gQC_um_local_connectivity"),
+            checkbsTT("gQC_um_init"),
+            checkbsTT("gQC_um_negative_sample_rate"),
+            checkbsTT("gQC_um_min_dist"),
+            checkbsTT("gQC_um_metric"),
+            checkbsTT("gQC_um_set_op_mix_ratio"),
+            checkbsTT("gQC_um_bandwidth")
           )
         )
       ) # additional options box

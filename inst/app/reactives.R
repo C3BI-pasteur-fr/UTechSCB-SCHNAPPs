@@ -84,14 +84,27 @@ observeEvent(input$comment2History, {
 # # TODO modal to confirm
 observeEvent(input$Quit, {
   deepDebug()
-  if(input$Quit <= 1) return(NULL)
+  showModal(modalDialog(
+    title="Quit SCHNAPPs",
+    footer = tagList(actionButton("confirmQuit", "yes, quit"),
+                     modalButton("Cancel")
+    )
+  ))
+  
+})
+
+observeEvent(input$confirmQuit, {
   if(DEBUG) {cat(file = stderr(), "\nquit the app\n\n")}
   add2history(type = "save", input=isolate( reactiveValuesToList(input)), 
               comment = "manual quit", sessionInfo = sessionInfo())
   
   stopApp()
-  # exit()
+  removeModal()
 })
+
+
+
+
 
 observeEvent(input$openBrowser, {
   deepDebug()
@@ -3766,7 +3779,7 @@ reacativeReport <- function() {
 # load RData file with singlecellExperiment object
 # internal, should not be used by plug-ins
 
-# combine user defined and file defined GMT lists
+## combine user defined and file defined GMT lists ----
 observe({
   gmtfDat = gmtFileData()
   gmtuDat = gmtUserData() 
@@ -3777,14 +3790,15 @@ observe({
   retVal = append(gmtfDat, gmtuDat) %>% compact
   gmtData(retVal)
   gmt = gmtData()
-  # if (.schnappsEnv$DEBUGSAVE) {
-  save(file = "~/SCHNAPPsDebug/gmtFileData.RData", list = c(ls()))
-  # }
-  # cp =load(file='~/SCHNAPPsDebug/gmtFileData.RData')
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gmtFileDataObs.RData", list = c(ls()))
+  }
+  # cp =load(file='~/SCHNAPPsDebug/gmtFileDataObs.RData')
   
 })
 
 
+## load GMT file ----
 gmtFileData <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "gmtData started.\n")
