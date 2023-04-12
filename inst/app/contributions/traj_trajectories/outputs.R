@@ -285,7 +285,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       if (vChanged) {
         cat(file = stderr(), "scropius Values changed\n")
       }
-      p1 <- ggplot2::ggplot(projections, aes_string(dimX, dimY)) + 
+      p1 <- ggplot2::ggplot(projections, aes(.data[[dimX]], .data[[dimY]])) + 
         ggplot2::geom_point(colour = mycolPal[projections[,dimCol]]) + 
         theme_classic()
       return(p1)
@@ -726,8 +726,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
         cat(file = stderr(), "elpi Values changed\n")
       }
       require(ggplot2)
-      p1 <- ggplot(projections, aes_string(dimX, dimY, colour = dimCol)) + geom_point()
-      p1 <- ggplot2::ggplot(projections, aes_string(dimX, dimY)) + 
+      p1 <- ggplot(projections, aes(.data[[dimX]], .data[[dimY]], colour = .data[[dimCol]])) + geom_point()
+      p1 <- ggplot2::ggplot(projections, aes(.data[[dimX]], .data[[dimY]])) + 
         ggplot2::geom_point(colour = mycolPal[projections[,dimCol]]) + 
         theme_classic()
       return(p1)

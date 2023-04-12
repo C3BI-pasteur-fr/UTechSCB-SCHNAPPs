@@ -690,9 +690,9 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   } else {
     scY = scale_y_continuous(breaks = 1:length(permsNames), labels = str_wrap(permsNames))
   }
-  
+  # browser()
   p1 <-
-    ggplot(projections, aes_string(prj, "coExpVal",
+    ggplot(projections, aes(prj, coExpVal,
                                    fill = factor(projections[, dbCluster])
     )) +
     geom_violin(scale = coE_scale) +
@@ -1099,8 +1099,8 @@ coE_heatmapReactive <- reactive({
 
 alluvialPlotFunc <- function(dat, alluiv1, alluiv2) {
   gg = ggplot(as.data.frame(dat),
-              aes_string(  axis1 = alluiv1, axis2 = alluiv2)) +
-    geom_alluvium(aes_string(fill = alluiv1), width = 1/12) +
+              aes(  axis1 = .data[[alluiv1]], axis2 = .data[[alluiv2]])) +
+    geom_alluvium(aes(fill = .data[[alluiv1]]), width = 1/12) +
     geom_stratum(width = 1/12, fill = "black", color = "grey") +
     geom_label(stat = "stratum", infer.label = TRUE) +
     scale_x_discrete(limits = c(alluiv1, alluiv2), expand = c(.05, .05)) +

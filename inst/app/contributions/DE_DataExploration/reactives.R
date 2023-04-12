@@ -343,7 +343,7 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols, x) {
   names(projections)[length(projections)] <- "values"
   
   p1 <-
-    ggplot(projections, aes_string(x, "values", fill = x)) +
+    ggplot(projections, aes(.data[[x]], .data[["values"]], fill = .data[[x]])) +
     geom_violin(scale = "width") +
     scale_color_manual(values = ccols) +
     scale_fill_manual(values = ccols, aesthetics = "fill") +
