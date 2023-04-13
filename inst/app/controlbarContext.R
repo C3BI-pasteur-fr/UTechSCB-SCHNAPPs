@@ -233,8 +233,10 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
         width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
         fluidRow(
           column(width=11, offset = 0,
-                 div(h4(a(id = "wkfl1.LoadData.click", "Load data"))),
-                 div(h6(HTML("[<em>Input</em>]")))
+                 div(h4(a(id = "wkfl1.LoadData2.click", "Load data"))),
+                 div(h6(HTML("[<em>Input</em>]"))),
+                 div(h5("Restart the app (this is not necessary, but it assures a 'cleaner' environment)."), align = "left"),
+                 div(h5(""), align = "left")
           )
         )
         ,
@@ -247,7 +249,10 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                  withTags(
                    nav(div(),ol(
                      li(
-                       div(h5("show standard heatmap"), align = "left")),
+                       div(h5("show standard heatmap"), align = "left"),
+                       div(h6(HTML("[<em>Input</em>]"))),
+                       div(h5(""), align = "left")
+                     ),
                      li(
                        div(h5("change order"), align = "left")),
                      li(
