@@ -74,8 +74,8 @@ geneSetModTab <- shinydashboard::tabItem(
            fluidRow(
              column(
                width = 6,
-               sc_selectInput("oldGS", "gene sets to copy + rename", choices = defaultValue("oldGS", "notyet"), selected = defaultValue("oldGS", "notyet"))
-               
+               sc_selectInput("oldGS", "gene sets to copy + rename", choices = defaultValue("oldGS", "notyet"), selected = defaultValue("oldGS", "notyet")),
+               verbatimTextOutput("gQC_renameGenes") %>% jqui_resizable()
              ),
              column(
                width = 6,
@@ -108,17 +108,23 @@ geneSetModTab <- shinydashboard::tabItem(
            title = "edit gene set", solidHeader = TRUE, width = 12, value = "gQC_editGS",
            id = "gQC_editGS.Tab",
            tags$p("Select a gene set and then edit it"),
-           sc_selectizeInput(inputId="gQC_geneSetModifyInput",
+           fluidRow(
+             column(
+               width = 12,
+               sc_selectizeInput(inputId="gQC_geneSetModifyInput",
                              label = "Gene set to modify",
                              multiple = FALSE,
                              choices = c(defaultValue("gQC_geneSetModifyInput", "dummy")),
                              selected = defaultValue("gQC_geneSetModifyInput", "dummy"), 
-                             options = list(maxItems = 1)),
-           verbatimTextOutput("gQC_geneSetModifyInputGL"),
+                             width = "100%",
+                             options = list(maxItems = 1))
+               ,
+           verbatimTextOutput("gQC_geneSetModifyInputGL") %>% jqui_resizable(),
            sc_textInput(inputId= "gQC_geneSetModifynName", label="name of new gene set", value="newGeneSet"),
            sc_textInput(inputId= "gQC_geneSetModifynDesc", label="description of new gene set", value="newGeneSet"),
-           sc_textInput(inputId= "gQC_geneSetModifyGenes", label="comma separated list of genes", value=""),
+           sc_textInput(inputId= "gQC_geneSetModifyGenes", label="comma separated list of genes", value="") %>% jqui_resizable() ,
            actionButton("geneSetModifyButton", "rename")
+             ))
          )
   )
 )

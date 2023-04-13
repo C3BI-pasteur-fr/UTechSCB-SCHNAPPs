@@ -148,7 +148,7 @@ shiny::addResourcePath(
 chromeBrowser = function(url){
   system(paste("open -a 'Google Chrome' ", url))
 }
-
+chromeBrowser = getOption("shiny.launch.browser", interactive())
 source("R/DotPlotwithModuleScore.R")
 
 runApp(app, port=3838, launch.browser = chromeBrowser)
