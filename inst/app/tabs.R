@@ -73,7 +73,7 @@ inputTab <- function() {
             "file1",
             "Count data upload",
             accept = c(
-              ".Rds", ".RData", ".Rdata", ".txt", ".csv"
+              ".Rds", ".RData", ".Rdata", ".rdata", ".txt", ".csv"
             ),
             placeholder = "no file selected",
             multiple = TRUE,

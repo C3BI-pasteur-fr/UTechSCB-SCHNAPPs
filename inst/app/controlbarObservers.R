@@ -513,6 +513,23 @@ workflowObsList = list(
   }
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
+## renamedbCluster ----
+workflowObsList = list(
+  id = "renamedbCluster",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "Projections"
+    )
+    updateTabsetPanel(
+      session = session,
+      "modProj",
+      selected = "renameProj"
+    )
+    
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
 
 ## renameCluster ----
