@@ -465,6 +465,41 @@ observeEvent(input$geneSetModifyButton,{
   )
 })
 
+output$gQC_renameGenes <- renderText({
+  if (DEBUG) cat(file = stderr(), "gQC_renameGenes\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "gQC_renameGenes")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "gQC_renameGenes")
+    }
+  })
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("gQC_renameGenes", id = "gQC_renameGenes", duration = NULL)
+  }
+  
+  
+  gd = gmtData()
+  inputGS <- input$oldGS
+  req(gd)
+  if (inputGS == "") {
+    return(NULL)
+  }
+  # deepDebug()
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/gQC_renameGenes.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/gQC_renameGenes.RData")
+  if(inputGS %in% names(gd)) {
+    retVal = paste(gd[[inputGS]]$genes, collapse = ", ")
+  } else {
+    retVal = ""
+  }
+  return(retVal)
+})
+
+
 output$gQC_geneSetModifyInputGL <- renderText({
   if (DEBUG) cat(file = stderr(), "gQC_geneSetModifyInputGL\n")
   start.time <- base::Sys.time()
