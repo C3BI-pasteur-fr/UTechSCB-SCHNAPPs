@@ -224,7 +224,7 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
     ),
     
     
-    # specific questions ----
+    # wkfl2: specific questions ----
     controlbarItem(
       "specifiic analyses",
       ## Loading data ----
@@ -233,10 +233,10 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
         width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
         fluidRow(
           column(width=11, offset = 0,
-                 div(h4(a(id = "wkfl1.LoadData2.click", "Load data"))),
+                 div(h4(a(id = "wkfl2.LoadData2.click", "Load data"))),
                  div(h6(HTML("[<em>Input</em>]"))),
                  div(h5("Restart the app (this is not necessary, but it assures a 'cleaner' environment)."), align = "left"),
-                 div(h5(""), align = "left")
+                 div(h5("Load data and GMT file"), align = "left")
           )
         )
         ,
@@ -250,7 +250,7 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                    nav(div(),ol(
                      li(
                        div(h5("show standard heatmap"), align = "left"),
-                       div(h6(HTML("[<em>Input</em>]"))),
+                       div(h6(HTML("[<em>Co-expression -  All clusters</em>]"))),
                        div(h5(""), align = "left")
                      ),
                      li(
@@ -264,16 +264,20 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                    )))
           )),
         br()),
+      ## DoubletFinder ----
       shinydashboardPlus::box(
         title = "QC - DoubletFinder",background = "navy",
         width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
         fluidRow(
           column(width=11, offset = 0,
-                 div(h4("Counts"), align = "center"),
-                 
+                 div(h5("DoubletFinder"), align = "center"),
+                 div(h6(HTML("[<em>General QC - DoubletFinder</em>]"))),
           ))
         
-      ),shinydashboardPlus::box(
+      ),
+      ## Investigate PCA
+      
+      shinydashboardPlus::box(
         title = "Investigate PCA",background = "navy",
         width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
         fluidRow(
@@ -282,12 +286,12 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                    nav(div(),ol(
                      li(
                        div(h4("PCA"), align = "center"),
-                       div(h5("select top and bottom 10 genes of PC1"), align = "left")),
-                     li(
-                       div(h5("select PCA parameters"), align = "left"),
-                     ),
+                       div(h6(HTML("[<em>Parameters - Cluster Parameters - Loadings</em>]"))),
+                       div(h5("check 'show row names'"), align = "left")),
+                     div(h5("select top and bottom 10 genes of PC1"), align = "left")),
                      li(
                        div(h5("define gene set"), align = "left"),
+                       div(h6(HTML("[<em>Parameters - Gene sets - edit gene set</em>]"))),
                      )
                      
                    ))))),
