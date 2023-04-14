@@ -236,7 +236,7 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                  div(h4(a(id = "wkfl1.LoadData2.click", "Load data"))),
                  div(h6(HTML("[<em>Input</em>]"))),
                  div(h5("Restart the app (this is not necessary, but it assures a 'cleaner' environment)."), align = "left"),
-                 div(h5(""), align = "left")
+                 div(h5("Load "), align = "left")
           )
         )
         ,

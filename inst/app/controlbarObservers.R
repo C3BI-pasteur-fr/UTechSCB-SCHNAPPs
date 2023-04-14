@@ -520,7 +520,7 @@ workflowObsList = list(
     updateTabItems(
       session = session,
       "sideBarID",
-      selected = "Projections"
+      selected = "modifyProj"
     )
     updateTabsetPanel(
       session = session,
@@ -574,8 +574,10 @@ workflowObsList = list(
 # div(h5("Then combine these two new projections using a temp variable.", a(id="combineVars1","combine projections."))),
 # div(h5("Then rename the levels of this new temp variable.", a(id="renameLevels1","rename levels."))),
 
+# wkfl1 ----
+wkfl = "wkfl2"
 
-
+# LoadData2
 
 # UMI.count
 
