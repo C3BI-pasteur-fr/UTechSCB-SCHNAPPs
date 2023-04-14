@@ -295,41 +295,41 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                      )
                      
                    ))))),
-        br()),
-      shinydashboardPlus::box(
-        title = "compare two clusterings",background = "navy",
-        width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
-        fluidRow(
-          column(width=11, offset = 0,
-                 withTags(
-                   nav(div(),ol(
-                     li(
-                       div(h5("load data with annotation from Seb"), align = "left")),
-                     li(
-                       div(h5("DGE of outlier cells"), align = "left"))
-                   )))
-          )),
-        br()),
-      shinydashboardPlus::box(
-        title = "Gene sets",background = "navy",
-        width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
-        fluidRow(
-          column(width=11, offset = 0,
-                 withTags(
-                   nav(div(),ol(
-                     li(
-                       div(h5("work with c7 gene set"), align = "left")),
-                     li(
-                       div(h5("load gene sets"), align = "left")),
-                     li(
-                       div(h5("visualize in Dot plot"), align = "left")),
-                     li(
-                       div(h5("dot plot with summary"), align = "left")),
-                     li(
-                       div(h5(""), align = "left"))
-                   )))
-          )),
-        br())
+      br()),
+    shinydashboardPlus::box(
+      title = "compare two clusterings",background = "navy",
+      width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
+      fluidRow(
+        column(width=11, offset = 0,
+               withTags(
+                 nav(div(),ol(
+                   li(
+                     div(h5("load data with annotation from Seb"), align = "left")),
+                   li(
+                     div(h5("DGE of outlier cells"), align = "left"))
+                 )))
+        )),
+      br()),
+    shinydashboardPlus::box(
+      title = "Gene sets",background = "navy",
+      width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
+      fluidRow(
+        column(width=11, offset = 0,
+               withTags(
+                 nav(div(),ol(
+                   li(
+                     div(h5("work with c7 gene set"), align = "left")),
+                   li(
+                     div(h5("load gene sets"), align = "left")),
+                   li(
+                     div(h5("visualize in Dot plot"), align = "left")),
+                   li(
+                     div(h5("dot plot with summary"), align = "left")),
+                   li(
+                     div(h5(""), align = "left"))
+                 )))
+        )),
+      br()
     ),
     controlbarItem(
       "advanced features",
