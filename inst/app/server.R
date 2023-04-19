@@ -311,9 +311,9 @@ scShinyServer <- function(input, output, session) {
   ### history setup ----
   # TODO put in function
   # can this be done just with bookmarking?
+  .schnappsEnv$restoreHistory = FALSE
   if (exists("historyPath", envir = .schnappsEnv)) {
     
-    .schnappsEnv$restoreHistory = FALSE
     if (!is.null(x = .schnappsEnv$historyPath)) {
       # check that at least some of the files that can be created have been
       rmdFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "history.*.Rmd")

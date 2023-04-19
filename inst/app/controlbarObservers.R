@@ -513,6 +513,23 @@ workflowObsList = list(
   }
 ) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
+## renamedbCluster ----
+workflowObsList = list(
+  id = "renamedbCluster",
+  Func = function(session) {
+    updateTabItems(
+      session = session,
+      "sideBarID",
+      selected = "modifyProj"
+    )
+    updateTabsetPanel(
+      session = session,
+      "modProj",
+      selected = "renameProj"
+    )
+    
+  }
+) %>% add2workflowObsList(wkfl = wkfl, workflowObsList)
 
 
 ## renameCluster ----
@@ -557,8 +574,10 @@ workflowObsList = list(
 # div(h5("Then combine these two new projections using a temp variable.", a(id="combineVars1","combine projections."))),
 # div(h5("Then rename the levels of this new temp variable.", a(id="renameLevels1","rename levels."))),
 
+# wkfl1 ----
+wkfl = "wkfl2"
 
-
+# LoadData2
 
 # UMI.count
 

@@ -17,6 +17,7 @@
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
 #' @param historyPath location (directory) where history directories and data will be stored.
 #' @param defaultValues list of default values to use for inputs
+#' @param launch.browser a function to call with the application's URL.
 #'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
 #' tabItem menuSubItem menuItem
@@ -40,7 +41,8 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                      DEBUGSAVE = FALSE,
                      historyPath = NULL,
                      defaultValues = list(),
-                     port = NULL
+                     port = NULL,
+                     launch.browser = getOption("shiny.launch.browser", interactive())
                      # ,
                      # historyFile = NULL
 
@@ -80,7 +82,7 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   source(paste0(packagePath, "/server.R"), local = TRUE)
   source(paste0(packagePath, "/ui.R"), local = TRUE)
   app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
-  runApp(app, port = port)
+  runApp(app, port = port,launch.browser = launch.browser)
 }
 
 # library(SCHNAPPs)
