@@ -123,6 +123,7 @@ scShinyUI <- function(request) {
   # parse all ui.R files under contributions to include in application
   uiFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
   for (fp in uiFiles) {
+    # fp = uiFiles[5]
     menuList <- list()
     tabList <- list()
     source(fp, local = TRUE)
@@ -207,7 +208,7 @@ scShinyUI <- function(request) {
   
   # jsCode <- "shinyjs.hidemenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'none'; x.classList.remove('menu-open');}; shinyjs.showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'block'; x.classList.add('menu-open');};"
   # jsCode2 <- "shinyjs.pageCol = function(params){console.log(params);$('body').css('color', params);}"
-  
+  dep=htmltools::htmlDependency("jqueryui", "3.6.0", c(href="shared/jqueryui"), script = "jquery-ui.min.js")
   shinyUI(
     shinydashboardPlus::dashboardPage(
       dheader(),
