@@ -466,7 +466,7 @@ emptyImage = list(
 
 createScaterPNG <- function(scaterReads, n, scols, width=NULL, height=NULL, DEBUG, outfile) {
   if (DEBUG) cat(file = stderr(), "function: createScaterPNG\n")
-  save(file = "~/SCHNAPPsDebug/createScaterPNG.RData", list = c(ls()))
+  # save(file = "~/SCHNAPPsDebug/createScaterPNG.RData", list = c(ls()))
   # cp=load(file='~/SCHNAPPsDebug/createScaterPNG.RData')
   if (DEBUG) cat(file = stderr(), "function: createScaterPNG2\n")
   p1 = pltHighExp( scaterReads, n, scols) 
@@ -639,7 +639,7 @@ observe({
         # browser()
         detachedProc$result <- value(detachedProc$process)
         result = detachedProc$result
-        save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
+        # save(file = "~/SCHNAPPsDebug/createScaterPNGprocess.RData", list = c("result"))
         # cp=load(file='~/SCHNAPPsDebug/createScaterPNGprocess.RData')
         detachedProc$process <- NULL
         detachedProc$PID = NULL
