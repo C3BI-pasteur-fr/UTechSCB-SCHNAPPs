@@ -1643,6 +1643,7 @@ pHeatMapModule <- function(input, output, session,
                  projectionsTable$newProjections <- newPrjs
                }) 
   
+  renderGeneName = reactiveVal()
   # observer click ----
   observe( {
     if (DEBUG) cat(file = stderr(), "observe input$heatmap_click \n")
@@ -1710,35 +1711,10 @@ pHeatMapModule <- function(input, output, session,
       htMat = htDat@matrix
     }
     
-    
-    
     # unlist(selection$row_index)
     geneName = rowData(scEx_log)[rownames(htMat)[selection$row_index],"symbol"]
+    renderGeneName(geneName)
     
-    # clusterServer - output$heatmapSelectedGenes ----
-    output$heatmapSelectedGenes <- renderText({
-      if (DEBUG)
-        cat(file = stderr(), "heatmapSelectedGenes started.\n")
-      start.time <- base::Sys.time()
-      on.exit({
-        printTimeEnd(start.time, "heatmapSelectedGenes")
-        if (!is.null(getDefaultReactiveDomain())) {
-          removeNotification(id = "heatmapSelectedGenes")
-        }
-        
-      })
-      # show in the app that this is running
-      if (!is.null(getDefaultReactiveDomain())) {
-        showNotification("heatmapSelectedGenes", id = "heatmapSelectedGenes", duration = NULL)
-      }
-      
-      retVal <- paste(geneName, collapse = ", ")
-      
-      # exportTestValues(ClusterCellSelection = {
-      #   retVal
-      # })
-      return(retVal)
-    })
     
     if (!addOptions()$sortingCols == "gene (click)") return(NULL)
     newPrj = make.names(geneName)
@@ -1755,7 +1731,36 @@ pHeatMapModule <- function(input, output, session,
     
     
     
-  }) 
+  })
+  
+  # clusterServer - output$heatmapSelectedGenes ----
+  output$heatmapSelectedGenes <- renderText({
+    if (DEBUG)
+      cat(file = stderr(), "heatmapSelectedGenes started.\n")
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "heatmapSelectedGenes")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "heatmapSelectedGenes")
+      }
+      
+    })
+    # show in the app that this is running
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("heatmapSelectedGenes", id = "heatmapSelectedGenes", duration = NULL)
+    }
+    # browser()
+    geneName = renderGeneName()
+    req(geneName)
+    
+    retVal <- paste(geneName, collapse = ", ")
+    
+    # exportTestValues(ClusterCellSelection = {
+    #   retVal
+    # })
+    return(retVal)
+  })
+  
   
   # observe brush -----
   observe( {

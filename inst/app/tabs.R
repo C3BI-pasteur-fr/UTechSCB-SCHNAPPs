@@ -613,7 +613,8 @@ clusterParametersTab <- function() {
                                     value = defaultValue("simlr_maxClust", 20),
                                     min = 2, max = 1000)
                      )
-                   )),
+                   ))
+        ),
         fluidRow(
           column(12, offset = 0, textOutput("Nclusters"))
         ),
@@ -624,13 +625,13 @@ clusterParametersTab <- function() {
             actionButton("updateClusteringParameters", "apply changes", width = "80%")
           )
         )
-      )
     ),
     # fluidRow(div(h3("Parameters for clustering"), align = "left")),
     
     br()
-    
   )
+
+  
 }
 
 if (DEBUG) {
