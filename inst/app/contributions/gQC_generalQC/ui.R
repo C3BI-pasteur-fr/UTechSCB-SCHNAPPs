@@ -23,7 +23,10 @@ DoubletFinderTab <- shinydashboard::tabItem(
   fluidRow(div(h3("DoubletFinder"), align = "center")),
   br(),
   tabBox(title = "", width = 12, id = "doubletFinderBox",
-         fluidRow(
+         tabPanel(
+           title = "Doublet Finder", solidHeader = TRUE, width = 12, value = "doubletFinderTab",
+           id = "doublet.Finder.Tab",
+           fluidRow(
            column(
              width = 6,
              sc_numericInput("GS_DF_dims", "PC imensions to use", min = 0, max = 200, step = 1, value = defaultValue("GS_DF_dims", 20))
@@ -57,6 +60,7 @@ DoubletFinderTab <- shinydashboard::tabItem(
              width = 12,
              clusterUI("GS_DF_plot")
            )
+         )
          )
   )
 )
