@@ -165,7 +165,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   scorpius_projections <- reactive({
     projections <- projections()
     if (is.null(projections)) return(NULL)
-    selectedCells <- isolate(Scorpius_dataInput()) #DE_Exp_dataInput
+    selectedCells <- Scorpius_dataInput() #DE_Exp_dataInput
     if(is.null(selectedCells)) return(NULL)
     cellNs <- selectedCells$cellNames()
     if(length(cellNs)<1) return(NULL)
@@ -238,7 +238,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     doCalc <- input$updatetScorpiusParameters
     dimX <- isolate(input$dimScorpiusX)
     dimY <- isolate(input$dimScorpiusY)
-    # scInput <- isolate(scorpiusInput())
+    scInput <- isolate(scorpiusInput())
     projections <- scorpius_projections()
     
     if (!is.null(scInput)) {

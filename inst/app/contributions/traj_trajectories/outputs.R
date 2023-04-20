@@ -84,7 +84,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     .schnappsEnv$defaultValues[["dimScorpiusCol"]] <- isolate(input$dimScorpiusCol)
     .schnappsEnv$defaultValues[["scorpMaxGenes"]] <- isolate(input$scorpMaxGenes)
     .schnappsEnv$defaultValues[["scorpRepeat"]] <- isolate(input$scorpRepeat)
-    
+     
   })
   
   observe(label = "ob_scorpButton",priority = 99,
@@ -114,6 +114,11 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     .schnappsEnv$defaultValues[["dimScorpiusCol"]] = input$dimScorpiusCol
     .schnappsEnv$defaultValues[["scorpRepeat"]] = input$scorpRepeat
     .schnappsEnv$defaultValues[["scorpMaxGenes"]] = input$scorpMaxGenes
+    .schnappsEnv[["dimScorpiusX"]] <- isolate(input$dimScorpiusX)
+    .schnappsEnv[["dimScorpiusY"]] <- isolate(input$dimScorpiusY)
+    .schnappsEnv[["dimScorpiusCol"]] <- isolate(input$dimScorpiusCol)
+    .schnappsEnv[["scorpMaxGenes"]] <- isolate(input$scorpMaxGenes)
+    .schnappsEnv[["scorpRepeat"]] <- isolate(input$scorpRepeat)
   })
   
   observe(label = "ob2", {
@@ -241,15 +246,16 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     }
     # sdi = Scorpius_dataInput() # variable not used but display depends on this => causes endless loop??
     traj <- scorpiusTrajectory()
-    projections <- isolate(scorpius_projections())
-    space <- isolate(scorpiusSpace())
+    projections <- (scorpius_projections())
+    space <- (scorpiusSpace())
     # upI <- updateScorpiusInput() # needed to update input
     dimX <- input$dimScorpiusX
     dimY <- input$dimScorpiusY
     dimCol <- input$dimScorpiusCol
     sampCol <- sampleCols$colPal
     ccols <- clusterCols$colPal
-    
+    scInput <- scorpiusInput()
+    selectedCells <- Scorpius_dataInput() 
     # doCalc <- input$scorpiusCalc
     
     if (is.null(projections) ) {
@@ -265,8 +271,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       "dimScorpiusX", "dimScorpiusY", "dimScorpiusCol",
       "scorpMaxGenes", "scorpRepeat" , "scorpInFile"
     ))
-    browser()
     if (!dimCol %in% colnames(projections)) return(NULL)
+    browser()
     prj = projections[,dimCol]
     mycolPal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(
       n = 12, name =
