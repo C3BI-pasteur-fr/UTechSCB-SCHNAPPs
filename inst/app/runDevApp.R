@@ -55,7 +55,7 @@ assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("DEBUGSAVE_cellSelectionModule", TRUE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
 assign("allowFunctionality--shiny-tab-clusterParameters", T, envir = .schnappsEnv)
-# assign("enableTrajectories", F, envir = .schnappsEnv)
+assign("enableTrajectories", T, envir = .schnappsEnv)
 
 # ls(.schnappsEnv)
 
