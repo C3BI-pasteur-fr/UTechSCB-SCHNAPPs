@@ -109,7 +109,7 @@ observeEvent(input$confirmQuit, {
 observeEvent(input$openBrowser, {
   deepDebug()
   require(rmarkdown)
-  browser()
+  # browser()
   knitr::opts_chunk$set(
     message = FALSE,
     warning = FALSE,
@@ -119,6 +119,8 @@ observeEvent(input$openBrowser, {
   inputList = reactiveValuesToList(input)
   scEx_log = scEx_log()
   scEx = scEx()
+  projections = projections()
+  pca = pcaReact()
   if(is.null(scEx_log)) scEx_log = "NULL"
   tryCatch(
     rmarkdown::render("test.Rmd",
@@ -130,7 +132,9 @@ observeEvent(input$openBrowser, {
                         scEx_log = scEx_log,
                         projections = projections(),
                         ccols = isoloate(clusterCols$colPal),
-                        scols = isoloate(sampleCols$colPal)
+                        scols = isoloate(sampleCols$colPal),
+                        pa = pca,
+                        projections
                       )
     ),
     error = function(e) {cat(file = stderr(),paste("Error\n",e,"\n")); NULL}
