@@ -12,7 +12,7 @@ source("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/serverFunctions.R", echo=F)
 ```
 
 ```{r}
-  doCalc <- input$scorpiusCalc
+doCalc <- input$scorpiusCalc
 ```
 
 ```{r som}
@@ -46,3 +46,53 @@ save(file = "test.RData", list = c(ls(),".schnappsEnv"))
 
 
 ```
+
+```{r umap}
+umapData <- as.matrix(assays(scEx_log)[[1]])
+compCases <- complete.cases(umapData)
+save(file = "embedding.Rdata", list=c(ls()))
+# cp = load("embedding.Rdata")
+library(ggplot2)
+# for (n_neighbors in seq(2,100,by =10)){
+#   for(spread in seq( 2,20, by=3)){
+#   for(min_dist in seq(0.01, 0.5, by = 0.08)){
+#     for (local_connectivity in seq(1, 20, by = 5)){
+for (n_neighbors in c(2,50,100)){
+  for(spread in c( 2,5,10,20)){
+    for(min_dist in c(0.01, 0.2, 0.5)){
+      for (local_connectivity in c(1, 5, 10, 20)){
+        embedding <- tryCatch(uwot::umap(pca$x  ,
+                                n_neighbors = n_neighbors,
+                                n_components = 3,
+                                n_epochs = 2000,
+                                # alpha = alpha,
+                                init = "spectral",
+                                spread = spread,
+                                min_dist = min_dist,
+                                set_op_mix_ratio = 1,
+                                local_connectivity = local_connectivity,
+                                bandwidth = 1,
+                                # gamma = gamma,
+                                negative_sample_rate = 5,
+                                metric = "cosine",
+                                n_threads = 8
+        ), error = function(x)return(NULL))
+        if(is.null(embedding)) next()
+        embedding <- as.data.frame(embedding)
+        colnames(embedding) <- paste0("UMAP", 1:3)
+        rownames(embedding) <- colnames(scEx_log)
+        embedding$dbCluster = projections[rownames(embedding), "dbCluster"]
+        print(ggplot(embedding, aes(x=UMAP1, y=UMAP2, color=dbCluster)) + geom_point() + 
+              ggtitle(paste("n_neighbors:", n_neighbors, " spread:", spread, " min_dist:", min_dist, " local_connectivity:", local_connectivity))
+        )
+      }
+    }
+  }
+}
+#   embedding <- as.data.frame(embedding)
+#   colnames(embedding) <- paste0("UMAP", 1:n_components)
+#   rownames(embedding) <- colnames(scEx_log)
+# save(file = "embedding.Rdata", list=c(ls()))
+
+```
+
