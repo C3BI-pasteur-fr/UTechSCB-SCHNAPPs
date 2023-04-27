@@ -129,6 +129,18 @@ geneSetModTab <- shinydashboard::tabItem(
            sc_textInput(inputId= "gQC_geneSetModifyGenes", label="comma separated list of genes", value="") %>% jqui_resizable() ,
            actionButton("geneSetModifyButton", "rename")
              ))
+         ),
+         tabPanel(
+           title = "search gene sets", solidHeader = TRUE, width = 12, value = "gQC_search",
+           id = "gQC_search.Tab",
+           fluidRow(
+             column(
+               width = 12,
+               sc_textInput(inputId= "gQC_genesets_search", label="comma separated list of genes", value="") %>% jqui_resizable(),
+               verbatimTextOutput("gQC_geneSetsearchOutput") %>% jqui_resizable()
+               #,
+               # actionButton("button_GSEA", "run GSEA")
+             ))
          )
   )
 )
