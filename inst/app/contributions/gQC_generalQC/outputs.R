@@ -400,7 +400,7 @@ output$gQC_variancePCA <- renderPlot({
   # barplot(pca$var_pcs, main = "Variance captured by first PCs")
 })
 
-# gene set related
+# gene set related -----
 
 ## modify a gene set ----
 observeEvent(input$geneSetModifyButton,{
@@ -464,6 +464,60 @@ observeEvent(input$geneSetModifyButton,{
     selected = newName
   )
 })
+
+# GSEA ----
+output$gQC_geneSetsearchOutput = renderText({
+  if (DEBUG) cat(file = stderr(), "geneSetsearchOutput\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "geneSetsearchOutput")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "geneSetsearchOutput")
+    }
+  })
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("geneSetsearchOutput", id = "geneSetsearchOutput", duration = NULL)
+  }
+  # inputGS <- input$gQC_geneSetModifyInput
+  genes = input$gQC_genesets_search
+  gd = gmtData()
+  userData = gmtUserData()
+  scEx = scEx()
+  featureData <- rowData(scEx)
+  # browser()
+  # deepDebug()
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/geneSetsearchOutput.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/geneSetsearchOutput.RData")
+  
+  if ( is.null(scEx)) {
+    return(NULL)
+  }
+  
+  # li = new gene list
+  li <- geneName2Index(g_id = genes, featureData = featureData)
+  if(is.null(li)) {
+    cat(file = stderr(), "!!!!geneSetsearchOutput: no genes found\n")
+    return(NULL)
+  }
+  counts = lapply(gd, FUN=function(x)sum(li %in% x$genes))
+  counts = counts[which(counts>0)]
+  outStr = ""
+  countNames = counts %>% unlist() %>% sort(decreasing = T) %>% names()
+  for (name in countNames){
+    outStr = paste(outStr, name, "found:", counts[[name]], "\n",
+                   gd[[name]]$desc, "\n",
+                   paste(gd[[name]]$genes, collapse=", "), "\n\n")
+    
+  }
+  outStr
+})
+
+
+
+# gQC_renameGenes ----
 
 output$gQC_renameGenes <- renderText({
   if (DEBUG) cat(file = stderr(), "gQC_renameGenes\n")
@@ -858,6 +912,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                names(newLbVec) = orgLevelNames
                
                if (.schnappsEnv$DEBUGSAVE) {
+                 browser()
                  save(file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
                       list = c("normaliztionParameters", ls())
                  )
@@ -865,7 +920,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                # cp=  load(file="~/SCHNAPPsDebug/gQC_renameLevButton.RData")
                # deepDebug()
                # sampe projections as displayed, i.e. only those available for the cells
-               # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
+               # otherwise the display (output$gQC_orgLevels) has to be changed as well
                proj2Add =  projections[,rnProj,drop=FALSE]
                proj2Add[,rnProj] = factor(proj2Add[,rnProj])
                

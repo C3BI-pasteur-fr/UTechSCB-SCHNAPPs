@@ -584,6 +584,7 @@ find_doublets = function(scEx, dims=1:20, n_recovered=10000, pK=20/ncol(srt), pN
   
   # create Seurat object
   require(Seurat)
+  require(DoubletFinder)
   srt = CreateSeuratObject(counts = assays(scEx)[["counts"]])
   
   # cellMeta <- colData(scEx_log)
