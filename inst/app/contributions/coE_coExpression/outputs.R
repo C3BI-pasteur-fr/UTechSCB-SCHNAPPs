@@ -41,6 +41,14 @@ callModule(
   "coE_topCCGenes",
   coE_topExpCCTable, caption = "Tables with highest expressed correlated genes"
 )
+
+callModule(
+  tableSelectionServer,
+  "coE_scranFindMarkerTable",
+  coE_scranFindMarkerTableReact, caption = "Tables with marker genes per cluster"
+  
+)
+
 # observe: updateHeatMapSelectedParameters ----
 observe(label = "ob_HeatMapSelectedParams", {
   if (DEBUG) cat(file = stderr(), "observe HeatMapSelected\n")
@@ -274,6 +282,19 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
                                                  
   )
   return(retVal %>% ggplotly())
+})
+
+output$scranFindMarkersSelected <- renderText({
+  scEx_log = scEx_log()
+  featureData <- rowData(scEx_log)
+  wmarkers = scranFindMarkerFullReactiveTable()
+  nFindCluster <- isolate(input$coE_nFindMarker)
+  
+  req(wmarkers)
+  
+  markerlist = lapply(wmarkers,FUN = function(x){
+    rownames(x)[order(x$p.value)[1:nFindCluster]]}) %>% unlist %>% unique
+  return(paste(featureData[markerlist, "symbol"], collapse  = ", "))
 })
 
 # coE_dotPlot_GeneSetsModuleScore ----
