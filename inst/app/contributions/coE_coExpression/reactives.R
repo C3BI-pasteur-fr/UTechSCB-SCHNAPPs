@@ -174,7 +174,7 @@ coE_dotPlot_GeneSets <- function(projections = projections,
     scale_y_discrete(labels = ylabFun) +
     ylab(clusters) +
     theme(axis.text.x = element_text(angle = 25, vjust = 0.5),
-                           strip.text.x = element_text(angle=5))
+          strip.text.x = element_text(angle=5))
   ggplotly(p)
   p
 }
@@ -182,17 +182,17 @@ coE_dotPlot_GeneSets <- function(projections = projections,
 # coE_dotPlot_GeneSetsModuleScore ----
 # same as coE_dotPlot_GeneSets, only that the X labels are already set inside the function and adds ModuleScore.
 coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
-                                 scEx_log = scEx_log,
-                                 clusters = clusters,
-                                 geneSets = geneSets,
-                                 gmtData = gmtData,
-                                 summarize = T,
-                                 col = "RdBu",
-                                 col.min = col.min,
-                                 col.max = col.max,
-                                 dot.min = dot.min,
-                                 dot.scale = dot.scale,
-                                 scale.by = scale.by
+                                            scEx_log = scEx_log,
+                                            clusters = clusters,
+                                            geneSets = geneSets,
+                                            gmtData = gmtData,
+                                            summarize = T,
+                                            col = "RdBu",
+                                            col.min = col.min,
+                                            col.max = col.max,
+                                            dot.min = dot.min,
+                                            dot.scale = dot.scale,
+                                            scale.by = scale.by
 ){
   require(Seurat)
   require(SingleCellExperiment)
@@ -228,23 +228,23 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
     features$common =c(features$common, dupGene)
   }
   p = DotPlotwithModuleScore(seurDat, 
-              assay="RNA", 
-              features = features,
-              featureDat = featureDat,
-              cols = col,
-              col.min = col.min,
-              col.max = col.max,
-              dot.min = dot.min,
-              dot.scale = dot.scale,
-              idents = NULL,
-              clusters = clusters,
-              group.by = NULL,
-              split.by = NULL,
-              cluster.idents = FALSE,
-              scale = TRUE,
-              scale.by = scale.by,
-              scale.min = NA,
-              scale.max = NA
+                             assay="RNA", 
+                             features = features,
+                             featureDat = featureDat,
+                             cols = col,
+                             col.min = col.min,
+                             col.max = col.max,
+                             dot.min = dot.min,
+                             dot.scale = dot.scale,
+                             idents = NULL,
+                             clusters = clusters,
+                             group.by = NULL,
+                             split.by = NULL,
+                             cluster.idents = FALSE,
+                             scale = TRUE,
+                             scale.by = scale.by,
+                             scale.min = NA,
+                             scale.max = NA
   )
   p
 }
@@ -418,6 +418,62 @@ coE_topExpGenesTable <- reactive({
   })
   return(retVal)
 })
+
+
+scranFindMarkerFullReactiveTable <- reactive({
+  if (DEBUG) cat(file = stderr(), "coE_scranFindMarkerTableReact started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_scranFindMarkerTableReact")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_scranFindMarkerTableReact")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_scranFindMarkerTableReact", id = "coE_scranFindMarkerTableReact", duration = NULL)
+  }
+  # deepDebug()
+  scEx_log <- isolate(scEx_log())
+  projections <- isolate(projections())
+  direction <- isolate(input$coE_direction)
+  lfc <- isolate(input$coE_lfc)
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "pca:NULL\n")
+    }
+    return(NULL)
+  }
+  clicked <- input$scranFindMarkerApply
+  wmarkers <- tryCatch({
+   scran::findMarkers(scEx_log, 
+                                   projections$dbCluster,
+                                   direction = direction,
+                                   lfc = lfc)
+    
+    
+    
+  }, error = function(e) {
+    return(NULL)
+  })
+  updateSelectInput(session = session, inputId = "coE_scranFindMarkerCluster",
+                    choices = levels(projections$dbCluster))
+  
+  
+  return(wmarkers)
+})
+
+# coE_scranFindMarkerTableReact ----
+coE_scranFindMarkerTableReact <- reactive({
+  
+  markerlist = scranFindMarkerFullReactiveTable()
+  selectedCluster = input$coE_scranFindMarkerCluster
+  projections = projections()
+  req(markerlist)
+  if(! selectedCluster %in% levels(projections$dbCluster)) return(NULL)
+  
+  return(markerlist[[selectedCluster]] %>% as.data.frame())
+})
+
 
 # coE_topExpCCTable ----
 #' coE_topExpCCTable
@@ -693,7 +749,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   # browser()
   p1 <-
     ggplot(projections, aes(prj, coExpVal,
-                                   fill = factor(projections[, dbCluster])
+                            fill = factor(projections[, dbCluster])
     )) +
     geom_violin(scale = coE_scale) +
     scale_fill_manual(values = mycolPal, aesthetics = "fill") +
@@ -1028,12 +1084,9 @@ coE_heatmapReactive <- reactive({
   scEx_log <- scEx_log()
   projections <- projections()
   genesin <- input$coE_heatmap_geneids
-  nFindCluster <- isolate(input$coE_nFindMarker)
   sampCol <- sampleCols$colPal
   ccols <- clusterCols$colPal
   projections <- projections()
-  direction <- isolate(input$coE_direction)
-  lfc <- isolate(input$coE_lfc)
   
   if (is.null(scEx_log) | is.null(projections)) {
     return(list(
@@ -1048,38 +1101,10 @@ coE_heatmapReactive <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/heatmap.RData")
+  # cp = load(file = "~/SCHNAPPsDebug/heatmap.RData")
   
   featureData <- rowData(scEx_log)
-  if (genesin == "") {
-    markerlist =  tryCatch({
-      wmarkers <- scran::findMarkers(scEx_log, 
-                                     projections$dbCluster,
-                                     direction = direction,
-                                     lfc = lfc)
-      
-      lapply(wmarkers,FUN = function(x){
-        rownames(x)[order(x$p.value)[1:nFindCluster]]
-      }) %>% unlist %>% unique
-    }, error = function(e) {
-      return(NULL)
-    })
-    # %>% 
-    if (is.null(markerlist)) {
-      return(list(
-        src = "empty.png",
-        contentType = "image/png",
-        width = 96,
-        height = 96,
-        alt = "heatmap should be here"
-      ))
-    }
-    genesin =  paste(featureData[markerlist, "symbol"], collapse  = ", ")
-    updateTextInput(session = session, inputId = "coE_heatmap_geneids",
-                    value = genesin)
-    
-  }
-  
+  if (genesin == "") return(NULL)
   
   scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]])
   retVal <- coE_heatmapFunc(
