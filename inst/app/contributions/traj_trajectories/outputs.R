@@ -268,11 +268,11 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     # cp =load(file="~/SCHNAPPsDebug/scropius_trajectory_plot.RData")
     
     vChanged = valuesChanged(parameters = c(
-      "dimScorpiusX", "dimScorpiusY", "dimScorpiusCol",
+      "dimScorpiusX", "dimScorpiusY",
       "scorpMaxGenes", "scorpRepeat" , "scorpInFile"
     ))
     if (!dimCol %in% colnames(projections)) return(NULL)
-    browser()
+    # browser()
     prj = projections[,dimCol]
     mycolPal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(
       n = 12, name =
@@ -601,71 +601,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     ))
   })
   
-  ## elpiHeatmapPlotReactive ----
-  elpiHeatmapPlotReactive <- reactive({
-    if (DEBUG) cat(file = stderr(), "elpiHeatmapPlotReactive started.\n")
-    start.time <- base::Sys.time()
-    on.exit({
-      printTimeEnd(start.time, "elpiHeatmapPlotReactive")
-      if (!is.null(getDefaultReactiveDomain())) {
-        removeNotification(id = "elpiHeatmapPlotReactive")
-      }
-    })
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("elpiHeatmapPlotReactive", id = "elpiHeatmapPlotReactive", duration = NULL)
-    }
-    
-    # upI <- updateScorpiusInput() # needed to update input
-    scEx = Elpi_scEx()
-    clicked <- input$elpiCalc
-    projections <- Elpi_projections()
-    psTime <- traj_getPseudotime()
-    expr_sel <- traj_elpi_gimp()
-    modules <- traj_elpi_modules()
-    
-    dimCol <- isolate(input$dimElpiCol)
-    pixelratio <- session$clientData$pixelratio
-    width <- session$clientData$output_plot_width
-    height <- session$clientData$output_plot_height
-    
-    
-    
-    if (is.null(projections) | is.null(modules) | is.null(expr_sel) | is.null(psTime)) {
-      if (.schnappsEnv$DEBUG) cat(file = stderr(), paste("elpiHeatmapPlot:NULL\n"))
-      return(NULL)
-    }
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/elpiHeatmapPlotReactive.RData", list = c(ls()))
-    }
-    # load(file="~/SCHNAPPsDebug/elpiHeatmapPlotReactive.RData")
-    # browser()
-    if (is.null(pixelratio)) pixelratio <- 1
-    if (is.null(width)) {
-      width <- 96 * 7
-    } # 7x7 inch output
-    if (is.null(height)) {
-      height <- 96 * 7
-    }
-    colnames(expr_sel$expr_sel) = rowData(scEx[colnames(expr_sel$expr_sel),])$symbol
-    
-    outfile <- paste0(tempdir(), "/heatmapScorpius", base::sample(1:10000, 1), ".png")
-    cat(file = stderr(), paste("saving to: ", outfile, "\n"))
-    outfile = NULL
-    pst <- psTime$Pt[which(!is.na(psTime$Pt))]
-    # modules <- extract_modules(scale_quantile(expr_sel), traj$time, verbose = F)
-    retVal <- drawTrajectoryHeatmap(x =expr_sel$expr_sel,
-                                    time = pst, progression_group = projections[rownames(expr_sel$expr_sel), dimCol], 
-                                    modules = modules, show_labels_col = FALSE, show_labels_row = TRUE,
-                                    filename = normalizePath(outfile, mustWork = FALSE)
-    )
-    
-    exportTestValues(scorpiusHeatmapPlotReactive = {
-      retVal
-    })
-    return(retVal)
-  })
-  
-  
+ 
   ## elpiHeatmapPlotModule -----
   callModule(
     pHeatMapModule,

@@ -232,7 +232,7 @@ scShinyUI <- function(request) {
           br(),
           downloadButton("RmdSave", "Download History", class = "butt"),
           if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", FALSE),
-          # verbatimTextOutput("DEBUGSAVEstring"),
+          if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
           if (is.environment(.schnappsEnv)) {
             if (exists("historyPath", envir = .schnappsEnv)) {
               # sc_checkboxInput("save2History", "save to history file", FALSE)
