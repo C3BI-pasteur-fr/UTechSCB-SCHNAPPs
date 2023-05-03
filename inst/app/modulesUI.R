@@ -296,6 +296,9 @@ pHeatMapUI <- function(id) {
               selected = defaultValue(ns("colPal"), "none"),
               multiple = FALSE
             ),
+            # uiOutput(ns("addColours")),
+            # actionButton(ns("heatmapTest"),"test"),
+            # verbatimTextOutput(ns("heatmapTestout")),
             sliderInput(
               ns("heatmapCellGrp"),
               label = "number of cell groups",

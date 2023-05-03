@@ -14,7 +14,7 @@ allTabs[[length(allTabs) + 1]] <- list(
     # )
     shinydashboardPlus::box(
       title = "Colors", solidHeader = TRUE, width = 12, status = "primary",
-      collapsible = TRUE, collapsed = TRUE,
+      collapsible = TRUE, collapsed = F,
       fluidRow(column(
         width = 12, offset = 1,
         actionButton("updateColors", "apply changes", width = "80%")
