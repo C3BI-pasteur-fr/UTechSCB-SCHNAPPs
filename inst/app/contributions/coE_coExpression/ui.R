@@ -30,9 +30,12 @@ tabList <- list(
   # coexpressionAll ----
   coexpressionAllTab = shinydashboard::tabItem(
     "coexpressionAll",
-    shinydashboardPlus::box(
-      title = "Heatmap of all cells", solidHeader = TRUE, width = 12, status = "primary",
-      fluidRow(
+    tabBox(title = "Heatmap of all cells", width = 12, id = "heatMapTabBox",
+      # title = "Heatmap of all cells", solidHeader = TRUE, width = 12, status = "primary",
+      tabPanel(
+        title = "Heat map",
+        value = "heatmapPanel",
+        fluidRow(
         column(
           width = 12,
           sc_textInput("coE_heatmap_geneids", "Comma separated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
@@ -40,22 +43,44 @@ tabList <- list(
       ),
       fluidRow(
         column(
-          width = 3,
-          sc_numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 10, min=2)
-        ),
-        column(
-          width = 3,
-          sc_numericInput("coE_lfc", "min log fold change", 2, min=0.1)
-        ),
-        column(
-          width = 3,
-          sc_selectInput("coE_direction", "direction", "up", choices = c("up", "down", "any"))
-        )),
-      
-      fluidRow(
-        column(
           width = 12,
           pHeatMapUI("coExpHeatmapModule")
+        )
+      )
+      ),
+      tabPanel(
+        title = "Scran find markers", value = "scranFindMarkersPanel",
+        fluidRow(
+          column(
+            width = 3,
+            sc_numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 10, min=2)
+          ),
+          column(
+            width = 3,
+            sc_numericInput("coE_lfc", "min log fold change", 2, min=0.1)
+          ),
+          column(
+            width = 3,
+            sc_selectInput("coE_direction", "direction", "up", choices = c("up", "down", "any"))
+          ),
+          column(width = 3,
+                 actionButton(inputId = "scranFindMarkerApply", label = "apply changes", width = "80%"))
+          ),
+        fluidRow(
+          column(width = 12,
+                 verbatimTextOutput("scranFindMarkersSelected") %>% jqui_resizable()
+          )
+        ),
+        fluidRow(
+          column(width = 3,
+                 sc_selectInput(inputId = "coE_scranFindMarkerCluster", label = "select cluster", 
+                                 selected = defaultValue("coE_scranFindMarkerCluster", "1"), 
+                                 choices = c("please run normalization","1"), multiple = F)
+                 )
+        ),
+        fluidRow(
+          column(width = 12,
+                 tableSelectionUi("coE_scranFindMarkerTable"))
         )
       )
     )
