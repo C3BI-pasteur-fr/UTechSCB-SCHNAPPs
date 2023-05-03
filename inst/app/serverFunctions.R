@@ -725,9 +725,10 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   logy <- input[[paste0(moduleName, "-logY")]]
   divXBy <- input[[paste0(moduleName, "-divideXBy")]]
   divYBy <- input[[paste0(moduleName, "-divideYBy")]]
-  scols <- sampleCols$colPal
-  ccols <- clusterCols$colPal
-  
+  # scols <- sampleCols$colPal
+  # ccols <- clusterCols$colPal
+  scols <- projectionColors[["sampleNames"]]
+  ccols <- projectionColors[["dbCluster"]]
   
   if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
