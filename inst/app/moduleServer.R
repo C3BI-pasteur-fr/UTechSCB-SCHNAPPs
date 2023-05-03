@@ -65,7 +65,7 @@ clusterServer <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), paste0("observe: dimension_x\n"))
     .schnappsEnv[[ns('dimension_x')]] <- input$dimension_x
     .schnappsEnv$defaultValues[[ns('dimension_x')]] <- input$dimension_x
- 
+    
     .schnappsEnv[[ns('geneIds')]] <- input$geneIds
     .schnappsEnv$defaultValues[[ns('geneIds')]] <- input$geneIds
     .schnappsEnv[[ns('geneIds2')]] <- input$geneIds2
@@ -482,8 +482,12 @@ clusterServer <- function(input, output, session,
     logy <- input$logY
     divXBy <- input$divideXBy
     divYBy <- input$divideYBy
-    scols <- sampleCols$colPal
-    ccols <- clusterCols$colPal
+    # scols <- sampleCols$colPal
+    # ccols <- clusterCols$colPal
+    # browser()
+    if(!"sampleNames" %in% names(projectionColors)) return(NULL) # should not happen
+    scols <- projectionColors[["sampleNames"]]
+    ccols <- projectionColors[["dbCluster"]]
     # moreOptions <- input$moreOptions
     myns <- session$ns("-")
     save2History <- .schnappsEnv$saveHistorycheckbox
@@ -1376,9 +1380,8 @@ pHeatMapModule <- function(input, output, session,
     .schnappsEnv$defaultValues[[ns('heatmapCellGrp')]]  = input$heatmapCellGrp
     .schnappsEnv$defaultValues[[ns('sortingRows')]]  = input$sortingRows
   })
-
+  
   addOptions <- reactive(
-   
     {
       ph = pheatmapList()
       req(ph)
@@ -1436,7 +1439,7 @@ pHeatMapModule <- function(input, output, session,
     sortingCols <- addOptions()$sortingCols
     sortingRows <- addOptions()$sortingRows
     scale <- addOptions()$normRow
-    
+    pc = projectionColors %>% reactiveValuesToList()
     myns <- ns("pHeatMap")
     save2History <- input$save2History
     # pWidth <- input$heatmapWidth
@@ -1464,12 +1467,21 @@ pHeatMapModule <- function(input, output, session,
     if (!"annotation_colors" %in% names(heatmapData)) {
       heatmapData$annotation_colors = list()
     }
-    if (!"sampleNames" %in% names(heatmapData$annotation_colors)) {
-      heatmapData$annotation_colors$sampleNames = sampCol
-    }
-    if (!"dbCluster" %in% names(heatmapData$annotation_colors)) {
-      heatmapData$annotation_colors$dbCluster = ccols
-    }
+    # browser()
+    colorList = lapply(addColNames, FUN = function(x){
+      cat(file = stderr(), x)
+      if(x %in% names(pc)){
+        heatmapData$annotation_colors[[x]] = pc[[x]]
+      }
+    })
+    names(colorList) = addColNames
+    heatmapData$annotation_colors = colorList
+    # if (!"sampleNames" %in% names(heatmapData$annotation_colors)) {
+    #   heatmapData$annotation_colors$sampleNames = sampCol
+    # }
+    # if (!"dbCluster" %in% names(heatmapData$annotation_colors)) {
+    #   heatmapData$annotation_colors$dbCluster = ccols
+    # }
     updateSliderInput(session = session, inputId = "heatmapCellGrp",
                       max = min(200,ncol(heatmapData$mat)-1))
     

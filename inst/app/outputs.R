@@ -734,13 +734,23 @@ output$descriptOfWorkOutput <- renderPrint({
 #     )
 #   })
 # })
+# 
+# 
+
+
+
 # sampleColorSelection ----
+
+
+projectionColors <- reactiveValues()
+
+
 output$ColorSelection <- renderUI({
   scEx <- scEx()
-  sampCol <- sampleCols$colPal
-  prFct = projFactors()
+  # sampCol <- sampleCols$colPal
+  # prFct = projFactors()
   projections = projections()
-  clusterCol <- clusterCols$colPal
+  # clusterCol <- clusterCols$colPal
   
   if (is.null(scEx)) {
     return(NULL)
@@ -757,6 +767,8 @@ output$ColorSelection <- renderUI({
   lev1 <- levels(projections$dbCluster)
   lev2 <- levels(colData(scEx)$sampleNames)
   # deepDebug()
+  # browser()
+  # function for selecting colors for a factorial
   tmpFun <- function(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors){
     tabPanel(
       name, value = value,
@@ -776,13 +788,55 @@ output$ColorSelection <- renderUI({
           })
         )))
   }
+  tmpFunCont <- function(name = "Sample", value = "SampleColorPanel", sampCol, allowedColors){
+    tabPanel(
+      name, value = value,
+      fluidRow(
+        column(
+          width = 6,
+          lapply(c("min","max"), function(i) {
+            cnames = c("min","max")
+            colourpicker::colourInput(
+              inputId = paste0(name, ".col.",i),
+              label = paste0("Choose color for ",i),
+              # value = "#762A83"
+              # ,
+              value = sampCol[which(cnames == i)],
+              allowedCols = allowedColors,
+              palette = "limited"
+            )
+          })
+        )))
+  }
   
-  tabs = list( 
-    tmpFun(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors),
-    tmpFun(name = "Cluster", value = "ClusterColorPanel", lev = lev1, idStr = "clusterNamecol", clusterCol, allowedColors)
-  )
+  # browser()
+  # where and how to store the colors
+  tabs= lapply(names(projections), FUN = function(name){
+    if(is.factor(projections[,name])){
+      if(length(levels(projections[,name]))>30) return(NULL)
+      return(tmpFun(name = name, value = paste0(name, "ColorPanel"), lev = levels(projections[,name]), idStr = paste0(name, ".col."),
+             sampCol = defaultValue(paste0(name, ".colVec"), allowedColors[seq(levels(projections[,name]))]),
+             allowedColors = allowedColors)
+      )
+    } else {
+      return(tmpFunCont(name = name, value = paste0(name, "ColorPanel"),
+                    sampCol = defaultValue(paste0(name, ".colVec"), c("white", "#2D96FA")),
+                    allowedColors = allowedColors)
+      )
+    }
+    
+  })
+  # tabs = list( 
+  #   tmpFun(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors),
+  #   tmpFun(name = "Cluster", value = "ClusterColorPanel", lev = lev1, idStr = "clusterNamecol", clusterCol, allowedColors)
+  # )
   do.call(tabsetPanel, tabs)
 })
+
+# ensure this is executed even if not visible
+outputOptions(output, "ColorSelection", suspendWhenHidden = FALSE)
+
+# ids = dbCluster.col.0, sampleNames.col.1, sampleNames.col.test2
 
 # # clusterColorSelection ----
 # output$clusterColorSelection <- renderUI({
@@ -935,8 +989,21 @@ observeEvent(
   }
 )
 
+# while we still have these reactive values specific for sampleNames and dbCluster...
+observeEvent(projectionColors$sampleNames,{
+  cat(file = stderr(), "========observe projectionColors\n")
+  pc = projectionColors %>% reactiveValuesToList()
+  if("sampleNames" %in% names(pc)){
+    sampleCols$colPal = projectionColors[["sampleNames"]]
+  }
+  if("dbCluster" %in% names(pc)){
+    clusterCols$colPal = projectionColors[["dbCluster"]]
+  }
+})
+
+
 # observe: color selection----
-observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
+observeEvent(eventExpr = input$updateColors | projections(), label = "ob_colorParams", {
   deepDebug()
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
@@ -945,24 +1012,61 @@ observeEvent(eventExpr = input$updateColors, label = "ob_colorParams", {
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
+  # ids = dbCluster.col.0, sampleNames.col.1, sampleNames.col.test2
   
-  lev <- levels(projections$dbCluster)
-  ccols <- lapply(seq_along(lev), function(i) {
-    input[[paste0("clusterNamecol", lev[i])]]
+  # browser()
+  lapply(names(projections), FUN = function(name){
+    if(is.factor(projections[,name])){
+      if(length(levels(projections[,name]))>30) return(NULL)
+      ccols <- lapply(levels(projections[,name]), function(i) {
+        input[[paste0(name, ".col.", i)]]
+      })
+      # if not initialized
+      if(any(is.null(ccols %>% unlist()))){
+        if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
+          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = allowedColors[seq(levels(projections[,name]))]
+        names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]]) = levels(projections[,name])
+        projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]
+      } else {
+        names(ccols) = levels(projections[,name])
+        projectionColors[[name]] = unlist(ccols)
+        .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = unlist(ccols)
+      }
+    } else{
+      minMax = c("min","max")
+      ccols <- lapply(minMax, function(i) {
+        input[[paste0(name, ".col.", i)]]
+      })
+      if(any(is.null(ccols %>% unlist()))){
+        if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
+          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("white", "blue")
+        # if vector is named then complexheatmap thinks it is a factorial
+        names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]] ) = NULL
+        projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]
+      } else {
+        names(ccols) = NULL
+        projectionColors[[name]] = unlist(ccols)
+        .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = unlist(ccols)
+      }
+    }
+    
   })
-  lev <- levels(colData(scEx)$sampleNames)
-  scols <- lapply(seq_along(lev), function(i) {
-    input[[paste0("sampleNamecol", lev[i])]]
-  })
+  # 
+  # lev <- levels(projections$dbCluster)
+  # ccols <- lapply(seq_along(lev), function(i) {
+  #   input[[paste0("clusterNamecol", lev[i])]]
+  # })
+  # lev <- levels(colData(scEx)$sampleNames)
+  # scols <- lapply(seq_along(lev), function(i) {
+  #   input[[paste0("sampleNamecol", lev[i])]]
+  # })
+  cc = projectionColors %>% reactiveValuesToList()
   setRedGreenButtonCurrent(
-    vars = list(
-      c("sampleNamecol", unlist(scols)),
-      c("clusterCols", unlist(ccols))
-    )
+    vars = cc
   )
   
   updateButtonColor(buttonName = "updateColors", parameters = c(
-    "sampleNamecol", "clusterCols"
+    names(cc)
   ))
 })
 

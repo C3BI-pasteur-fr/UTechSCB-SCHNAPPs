@@ -660,6 +660,7 @@ observeEvent(
       newPrjs = newPrjs[,-1]
     }
     colnames(newPrjs)[ncol(newPrjs)] <- newPrj
+    if(is.factor(projections[, oldPrj])) newPrjs[,newPrj] = as.factor(newPrjs[,newPrj])
     projectionsTable$newProjections <- newPrjs
   }
 )

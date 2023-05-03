@@ -725,9 +725,10 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   logy <- input[[paste0(moduleName, "-logY")]]
   divXBy <- input[[paste0(moduleName, "-divideXBy")]]
   divYBy <- input[[paste0(moduleName, "-divideYBy")]]
-  scols <- sampleCols$colPal
-  ccols <- clusterCols$colPal
-  
+  # scols <- sampleCols$colPal
+  # ccols <- clusterCols$colPal
+  scols <- projectionColors[["sampleNames"]]
+  ccols <- projectionColors[["dbCluster"]]
   
   if (is.null(scEx_log) | is.null(scEx_log) | is.null(projections)) {
     if (DEBUG) cat(file = stderr(), paste("output$clusterPlot:NULL\n"))
@@ -1665,6 +1666,12 @@ heatmapModuleFunction <- function(
   # if modules are available don't do cluster rows
   if(!is.null(heatmapData$gaps_row)) heatmapData$cluster_rows = FALSE
   ht_opt$message = F
+  if(length(heatmapData$annotation_colors)>0){
+    heatmapData$annotation_colors = heatmapData$annotation_colors[which(!unlist(lapply(heatmapData$annotation_colors,is.null)))]
+  }
+  # col_fun =  c("blue", "white", "red","green")
+  # heatmapData$annotation_colors$PC2=col_fun
+  # heatmapData$annotation_colors$PC2
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
@@ -2148,7 +2155,7 @@ add2Projections <- function(proj2Add, acn, newPrjs, projections){
       if (ncol(newPrjs) == 0) {
         newPrjs = data.frame(row.names = acn)
       }
-    # 2DO: what happes if newPrjs has more rows than original? How could this happen?
+      # 2DO: what happes if newPrjs has more rows than original? How could this happen?
       newPrjs <- dplyr::full_join(
         tibble::rownames_to_column(newPrjs), 
         tibble::rownames_to_column(proj2Add), 
@@ -2161,7 +2168,7 @@ add2Projections <- function(proj2Add, acn, newPrjs, projections){
         showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
       return(NULL)
     }))) return(NULL)
- # what happens if NA is introduced by the join
+  # what happens if NA is introduced by the join
 }
 
 
