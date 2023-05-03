@@ -1,5 +1,5 @@
 controlbarContext <- shinydashboardPlus::dashboardControlbar(
-  width = 500, collapsed = F,
+  width = 500, collapsed = T,
   id = "controlbar",
   controlbarMenu(
     id = "menu",

@@ -150,9 +150,11 @@ scaterReads <- reactive({
   
   scEx <- scEx()
   # scEx_log = scEx_log()
-  if (is.null(scEx)) {
+  if (is.null(scEx) ) {
     return(NULL)
   }
+  featureData <- rowData(scEx)
+  rownames(scEx) = featureData$symbol
   retVal <- gQC_scaterReadsFunc(scEx)
   
   exportTestValues(scaterReads = {

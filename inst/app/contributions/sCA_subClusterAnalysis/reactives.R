@@ -461,7 +461,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls()))
   }
-  # cp =load(file='~/debug/sCA_dge_CellViewfunc.RData')
+  # cp =load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
   
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
