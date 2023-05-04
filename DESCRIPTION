@@ -21,6 +21,7 @@ Imports:
     pryr,
     colourpicker,
     Seurat,
+    circlize,
     kohonen,
     scater,
     scran,

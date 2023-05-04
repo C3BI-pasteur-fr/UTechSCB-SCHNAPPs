@@ -767,8 +767,8 @@ output$ColorSelection <- renderUI({
   lev1 <- levels(projections$dbCluster)
   lev2 <- levels(colData(scEx)$sampleNames)
   # deepDebug()
-  # browser()
-  # function for selecting colors for a factorial
+
+    # function for selecting colors for a factorial
   tmpFun <- function(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors){
     tabPanel(
       name, value = value,
