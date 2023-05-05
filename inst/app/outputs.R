@@ -1034,7 +1034,7 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
         names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]]) = levels(projections[,name])
         projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]
       } else {
-        if(!length(names(ccols)) == length(levels(projections[,name]))){
+        if(!length(ccols) == length(levels(projections[,name]))){
           browser()
         }
         names(ccols) = levels(projections[,name])

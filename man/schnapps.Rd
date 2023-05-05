@@ -14,7 +14,8 @@ schnapps(
   DEBUGSAVE = FALSE,
   historyPath = NULL,
   defaultValues = list(),
-  port = NULL
+  port = NULL,
+  launch.browser = getOption("shiny.launch.browser", interactive())
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ schnapps(
 \item{historyPath}{location (directory) where history directories and data will be stored.}
 
 \item{defaultValues}{list of default values to use for inputs}
+
+\item{launch.browser}{a function to call with the application's URL.}
 }
 \description{
 shiny server relevant functions
