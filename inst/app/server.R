@@ -203,6 +203,9 @@ scShinyServer <- function(input, output, session) {
   .schnappsEnv$diffExpFunctions <- list()
   diffExpFunctions <- list()
   
+  
+  projectionColors <- reactiveValues()
+  
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
   base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
@@ -373,8 +376,11 @@ scShinyServer <- function(input, output, session) {
         latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
         tempEnv =  new.env(parent=emptyenv())
         cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
+        if("projectionColors" %in% cp) {
+          projectionColors <- tempEnv$projectionColors$projectionColors
+        }
         if("scol" %in% cp) {
-          sampleCols$colPal <- unlist(tempEnv$scol$scol)
+          projectionColors$sampleNames <- unlist(tempEnv$scol$scol)
         }
         rm("tempEnv")
         fileInfo = ccolFiles %>% file.info()
@@ -382,7 +388,7 @@ scShinyServer <- function(input, output, session) {
         tempEnv =  new.env(parent=emptyenv())
         cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
         if("ccol" %in% cp) {
-          clusterCols$colPal <- unlist(tempEnv$ccol$ccol)
+          projectionColors$dbCluster <- unlist(tempEnv$ccol$ccol)
         }
         rm("tempEnv")
         
@@ -408,7 +414,7 @@ scShinyServer <- function(input, output, session) {
     } else {
       rm("historyPath", envir = .schnappsEnv)
     }
-    shinyOptions(cache = cachem::cache_disk(paste0(.schnappsEnv$historyPath, "/app_cache/cache/")))
+    shinyOptions(cache = cachem::cache_disk(paste0(.schnappsEnv$historyPath, "./app_cache2/cache/")))
     # shinyOptions(cache = NULL)
     # bindCache <- function(x, ...){return(x)}
   }

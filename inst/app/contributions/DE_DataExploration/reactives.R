@@ -190,7 +190,7 @@ activateObserver <- reactiveVal(0)
 #       alt = "Scater plot will be here when 'apply changes' is clicked"
 #     ))
 #   }
-#   scols <- isolate(sampleCols$colPal)
+#   scols <- isolate(projectionColors$sampleNames)
 #   
 #   width <- session$clientData$output_plot_width
 #   height <- session$clientData$output_plot_height

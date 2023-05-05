@@ -702,8 +702,8 @@ subCluster2Dplot <- function() {
     cellNs <- selectedCells$cellNames()
     sampdesc <- selectedCells$selectionDescription()
     prjs <- selectedCells$ProjectionUsed()
-    sampCol <- sampleCols$colPal
-    ccols <- clusterCols$colPal
+    sampCol <- projectionColors$sampleNames
+    ccols <- projectionColors$dbCluster
     
     if (is.null(projections)) {
       return(NULL)

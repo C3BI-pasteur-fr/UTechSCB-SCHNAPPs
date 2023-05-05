@@ -265,7 +265,9 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
           )),
         br()),
       ## DoubletFinder ----
-      shinydashboardPlus::box(
+      
+      if("DoubletFinder" %in% installed.packages()){
+        shinydashboardPlus::box(
         title = "QC - DoubletFinder",background = "navy",
         width = 12, solidHeader = FALSE, collapsible = TRUE, collapsed = FALSE,
         fluidRow(
@@ -274,7 +276,7 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                  div(h6(HTML("[<em>General QC - DoubletFinder</em>]"))),
           ))
         
-      ),
+      )},
       ## Investigate PCA
       
       shinydashboardPlus::box(

@@ -253,8 +253,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     dimX <- input$dimScorpiusX
     dimY <- input$dimScorpiusY
     dimCol <- input$dimScorpiusCol
-    sampCol <- sampleCols$colPal
-    ccols <- clusterCols$colPal
+    sampCol <- projectionColors$sampleNames
+    ccols <- projectionColors$dbCluster
     scInput <- scorpiusInput()
     selectedCells <- Scorpius_dataInput() 
     # doCalc <- input$scorpiusCalc
@@ -335,8 +335,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     traj <- scorpiusTrajectory()
     expr_sel <- scorpiusExpSel()
     modules <- scorpiusModules()
-    sampCol <- isolate(sampleCols$colPal)
-    ccols <- isolate(clusterCols$colPal)
+    sampCol <- isolate(projectionColors$sampleNames)
+    ccols <- isolate(projectionColors$dbCluster)
     
     dimCol <- input$dimScorpiusCol
     # doCalc <- input$scorpiusCalc
@@ -633,8 +633,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     dimX <- input$dimElpiX
     dimY <- input$dimElpiY
     dimCol <- input$dimElpiCol
-    sampCol <- sampleCols$colPal
-    ccols <- clusterCols$colPal
+    sampCol <- projectionColors$sampleNames
+    ccols <- projectionColors$dbCluster
     
     vChanged = valuesChanged(parameters = c(
       "elpinReps","elpiNumNodes","elpiProbPoint","ElpiMethod",

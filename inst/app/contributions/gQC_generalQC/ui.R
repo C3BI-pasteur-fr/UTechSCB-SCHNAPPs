@@ -9,7 +9,9 @@ menuList <- list(
                            shinydashboard::menuSubItem("UMI histogram", tabName = "gQC_umiHist"),
                            shinydashboard::menuSubItem("Sample histogram", tabName = "gQC_sampleHist"),
                            shinydashboard::menuSubItem("PC variance", tabName = "gQC_variancePC"),
-                           shinydashboard::menuSubItem("Doublet Finder", tabName = "gQC_doubletFinder"),
+                           
+                           if("DoubletFinder" %in% installed.packages()){
+                             shinydashboard::menuSubItem("Doublet Finder", tabName = "gQC_doubletFinder")},
                            shinydashboard::menuSubItem("Scater QC", tabName = "DE_scaterQC")
                            # shinydashboard::menuSubItem("TSNE plot", tabName = "gQC_tsnePlot"),
                            # shinydashboard::menuSubItem("Umap", tabName = "gQC_umapPlot")
@@ -18,53 +20,55 @@ menuList <- list(
 
 # gQC_doubletFinder ----
 
-DoubletFinderTab <- shinydashboard::tabItem(
-  tabName = "gQC_doubletFinder",
-  fluidRow(div(h3("DoubletFinder"), align = "center")),
-  br(),
-  tabBox(title = "", width = 12, id = "doubletFinderBox",
-         tabPanel(
-           title = "Doublet Finder", solidHeader = TRUE, width = 12, value = "doubletFinderTab",
-           id = "doublet.Finder.Tab",
-           fluidRow(
-           column(
-             width = 6,
-             sc_numericInput("GS_DF_dims", "PC imensions to use", min = 0, max = 200, step = 1, value = defaultValue("GS_DF_dims", 20))
-           ),
-           column(
-             width = 6,
-             sc_numericInput("GS_DF_nRecover", "number of cells recovered by CellRanger (before QC)", min = 100, max = 20000000, step = 1000, value = defaultValue("GS_DF_nRecover", 10000))
-           )
-         ),
-         fluidRow(
-           column(
-             width = 6,
-             sc_numericInput("GS_DF_pk", "neighborhood size to estimate likelihood of being doublet \n
+if("DoubletFinder" %in% installed.packages()){
+  
+  DoubletFinderTab <- shinydashboard::tabItem(
+    tabName = "gQC_doubletFinder",
+    fluidRow(div(h3("DoubletFinder"), align = "center")),
+    br(),
+    tabBox(title = "", width = 12, id = "doubletFinderBox",
+           tabPanel(
+             title = "Doublet Finder", solidHeader = TRUE, width = 12, value = "doubletFinderTab",
+             id = "doublet.Finder.Tab",
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_numericInput("GS_DF_dims", "PC imensions to use", min = 0, max = 200, step = 1, value = defaultValue("GS_DF_dims", 20))
+               ),
+               column(
+                 width = 6,
+                 sc_numericInput("GS_DF_nRecover", "number of cells recovered by CellRanger (before QC)", min = 100, max = 20000000, step = 1000, value = defaultValue("GS_DF_nRecover", 10000))
+               )
+             ),
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_numericInput("GS_DF_pk", "neighborhood size to estimate likelihood of being doublet \n
                              (expressed as fraction of merged real-artifical data)", min = 0, max = Inf, step = 1, value = defaultValue("GS_DF_pk", 20))
-           ),
-           column(
-             width = 6,
-             sc_numericInput("GS_DF_pN", "number of artificial doublets generated \n
+               ),
+               column(
+                 width = 6,
+                 sc_numericInput("GS_DF_pN", "number of artificial doublets generated \n
                              (expressed as fraction of merged real-artifical data)", min = 0, max = 1, step = 0.01, value = defaultValue("GS_DF_pN", 0.10))
+               )
+             ),
+             br(),
+             fluidRow(
+               column(
+                 width = 12, offset = 1,
+                 actionButton("GS_DF_button", "apply changes", width = "80%")
+               )
+             ),
+             fluidRow(
+               column(
+                 width = 12,
+                 clusterUI("GS_DF_plot")
+               )
+             )
            )
-         ),
-         br(),
-         fluidRow(
-           column(
-             width = 12, offset = 1,
-             actionButton("GS_DF_button", "apply changes", width = "80%")
-           )
-         ),
-         fluidRow(
-           column(
-             width = 12,
-             clusterUI("GS_DF_plot")
-           )
-         )
-         )
+    )
   )
-)
-
+}
 # geneSetModTab -----
 
 geneSetModTab <- shinydashboard::tabItem(
@@ -116,18 +120,18 @@ geneSetModTab <- shinydashboard::tabItem(
              column(
                width = 12,
                sc_selectizeInput(inputId="gQC_geneSetModifyInput",
-                             label = "Gene set to modify",
-                             multiple = FALSE,
-                             choices = c(defaultValue("gQC_geneSetModifyInput", "dummy")),
-                             selected = defaultValue("gQC_geneSetModifyInput", "dummy"), 
-                             width = "100%",
-                             options = list(maxItems = 1))
+                                 label = "Gene set to modify",
+                                 multiple = FALSE,
+                                 choices = c(defaultValue("gQC_geneSetModifyInput", "dummy")),
+                                 selected = defaultValue("gQC_geneSetModifyInput", "dummy"), 
+                                 width = "100%",
+                                 options = list(maxItems = 1))
                ,
-           verbatimTextOutput("gQC_geneSetModifyInputGL") %>% jqui_resizable(),
-           sc_textInput(inputId= "gQC_geneSetModifynName", label="name of new gene set", value="newGeneSet"),
-           sc_textInput(inputId= "gQC_geneSetModifynDesc", label="description of new gene set", value="newGeneSet"),
-           sc_textInput(inputId= "gQC_geneSetModifyGenes", label="comma separated list of genes", value="") %>% jqui_resizable() ,
-           actionButton("geneSetModifyButton", "rename")
+               verbatimTextOutput("gQC_geneSetModifyInputGL") %>% jqui_resizable(),
+               sc_textInput(inputId= "gQC_geneSetModifynName", label="name of new gene set", value="newGeneSet"),
+               sc_textInput(inputId= "gQC_geneSetModifynDesc", label="description of new gene set", value="newGeneSet"),
+               sc_textInput(inputId= "gQC_geneSetModifyGenes", label="comma separated list of genes", value="") %>% jqui_resizable() ,
+               actionButton("geneSetModifyButton", "rename")
              ))
          ),
          tabPanel(
@@ -149,166 +153,166 @@ geneSetModTab <- shinydashboard::tabItem(
 # modTab ----
 modTab <- 
   shinydashboard::tabItem(
-  "modifyProj",
-  fluidRow(div(h3("work with projections"), align = "center")),
-  br(),
-  tabBox(title = "modify projections", width = 12, id = "modProj",
-         tabPanel(
-           title = "Rename projections", solidHeader = TRUE, width = 12, value = "renameProj",
-           id = "rename.Proj.Tab",
-           fluidRow(
-             column(
-               width = 6,
-               sc_selectInput("oldPrj", "projections to copy + rename", choices = defaultValue("oldPrj", "notyet"), selected = defaultValue("oldPrj", "notyet"))
-             ),
-             column(
-               width = 6,
-               fluidRow(
-                 column(
-                   width = 8,
-                   sc_textInput("newPrj", "new name of Projection", value = defaultValue("newPrj", ""))
-                 ),
-                 column(
-                   width = 4,
-                   actionButton("updatePrjsButton", "rename")
-                 )
+    "modifyProj",
+    fluidRow(div(h3("work with projections"), align = "center")),
+    br(),
+    tabBox(title = "modify projections", width = 12, id = "modProj",
+           tabPanel(
+             title = "Rename projections", solidHeader = TRUE, width = 12, value = "renameProj",
+             id = "rename.Proj.Tab",
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_selectInput("oldPrj", "projections to copy + rename", choices = defaultValue("oldPrj", "notyet"), selected = defaultValue("oldPrj", "notyet"))
                ),
-               fluidRow(
-                 column(
-                   width = 8,
-                   sc_selectInput("delPrj", "projections to delete", choices = defaultValue("delPrj", "notyet"), selected = defaultValue("delPrj", "notyet"))
+               column(
+                 width = 6,
+                 fluidRow(
+                   column(
+                     width = 8,
+                     sc_textInput("newPrj", "new name of Projection", value = defaultValue("newPrj", ""))
+                   ),
+                   column(
+                     width = 4,
+                     actionButton("updatePrjsButton", "rename")
+                   )
                  ),
-                 column(
-                   width = 4,
-                   actionButton("delPrjsButton", "delete")
-                 ),
-                 tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}"),
-                 tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
+                 fluidRow(
+                   column(
+                     width = 8,
+                     sc_selectInput("delPrj", "projections to delete", choices = defaultValue("delPrj", "notyet"), selected = defaultValue("delPrj", "notyet"))
+                   ),
+                   column(
+                     width = 4,
+                     actionButton("delPrjsButton", "delete")
+                   ),
+                   tags$style(type = "text/css", "#updatePrjsButton { width:100%; margin-top: 25px;}"),
+                   tags$style(type = "text/css", "#delPrjsButton { width:100%; margin-top: 25px;}")
+                 )
+               )
+             ),
+             checkbsTT(item = "oldPrj"),
+             checkbsTT(item = "newPrj"),
+             checkbsTT(item = "updatePrjsButton"),
+             checkbsTT(item = "delPrj"),
+             checkbsTT(item = "delPrjsButton")
+           ),
+           tabPanel(
+             title = "combine projections", solidHeader = TRUE, width = 12, value = "gQC_combProj",
+             id = "combine.Proj.Tab",
+             tags$p("Two factors can be combined by pasting the values per row and re-leveling"),
+             br(),
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_selectInput("gQC_combPrj1", "1 st Projection", choices = c("notyet"), selected = "notyet")
+               ),
+               column(
+                 width = 6,
+                 
+                 sc_selectInput("gQC_combPrj2", "2nd Projections", choices = c("notyet"), selected = "notyet")
+               )),
+             fluidRow(
+               column(width = 6,
+                      sc_textInput("gQC_newCombPrj", "name of new Projection", value = "")),
+               column(
+                 width = 6,
+                 actionButton("gQC_updateCombPrjsButton", "apply")
+               )
+             ),
+             fluidRow(column(
+               width = 12,
+               tableSelectionUi("gQC_projCombTableMod")
+             )
+             )
+           ),
+           tabPanel(
+             title = "rename levels", width = 12, value = "gQC_renameLev",
+             id = "rename.Levels.Tab",
+             tags$p("rename the levels of a factor"),
+             br(),
+             
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
+               ),
+               column(width = 6,
+                      sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
+             ),
+             
+             fluidRow(
+               column(
+                 width = 12,
+                 tags$p(tags$b("original values")),
+                 textOutput("gQC_orgLevels"),
+                 br()
+               )
+             ),
+             fluidRow(
+               column(
+                 width = 12,
+                 textAreaInput("gQC_renameLev", "new levels")
+               )
+             ),
+             br(),
+             fluidRow(
+               column(
+                 width = 6,
+                 actionButton("gQC_renameLevButton", "apply")
                )
              )
            ),
-           checkbsTT(item = "oldPrj"),
-           checkbsTT(item = "newPrj"),
-           checkbsTT(item = "updatePrjsButton"),
-           checkbsTT(item = "delPrj"),
-           checkbsTT(item = "delPrjsButton")
-         ),
-         tabPanel(
-           title = "combine projections", solidHeader = TRUE, width = 12, value = "gQC_combProj",
-           id = "combine.Proj.Tab",
-           tags$p("Two factors can be combined by pasting the values per row and re-leveling"),
-           br(),
-           fluidRow(
-             column(
-               width = 6,
-               sc_selectInput("gQC_combPrj1", "1 st Projection", choices = c("notyet"), selected = "notyet")
+           
+           
+           tabPanel(
+             title = "rearrange levels", width = 12, value = "gQC_rearrangeLev",
+             id = "rearrange.Levels.Tab",
+             tags$p("rearrange the levels of a factor"),
+             br(),
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_selectInput("gQC_raProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_raProj", "notyet"))
+               ),
+               column(width = 6,
+                      sc_textInput("gQC_newRaPrj", "name of new Projection", value = ""))
              ),
-             column(
-               width = 6,
-
-               sc_selectInput("gQC_combPrj2", "2nd Projections", choices = c("notyet"), selected = "notyet")
-             )),
-           fluidRow(
-             column(width = 6,
-                    sc_textInput("gQC_newCombPrj", "name of new Projection", value = "")),
-             column(
-               width = 6,
-               actionButton("gQC_updateCombPrjsButton", "apply")
+             fluidRow(
+               column(width = 12,
+                      shinyjqui::orderInput('gQC_newRaLev', 'Rearrange levels', items = NULL, placeholder = 'choose projection...'),
+               )),
+             br(),
+             fluidRow(
+               column(
+                 width = 6,
+                 actionButton("gQC_rearrangeLevButton", "apply")
+               )
              )
            ),
-           fluidRow(column(
-             width = 12,
-             tableSelectionUi("gQC_projCombTableMod")
-           )
-           )
-         ),
-         tabPanel(
-           title = "rename levels", width = 12, value = "gQC_renameLev",
-           id = "rename.Levels.Tab",
-           tags$p("rename the levels of a factor"),
-           br(),
-
-           fluidRow(
-             column(
-               width = 6,
-               sc_selectInput("gQC_rnProj", "Projection to modify", choices = c("notyet"), selected = "notyet")
+           
+           
+           tabPanel(
+             title = "WIND", width = 12, value = "gQC_wind",
+             id = "wind.Tab",
+             tags$p("from WIND package compute hierachy of projection (https://github.com/haowulab/Wind)"),
+             tags$p("to compute weighted normalized mutual information (wNMI) and weighted Rand index (wRI) to evaluate the clustering results by comparing a clustering output with a reference which has a hierarchical structure."),
+             br(),
+             fluidRow(
+               column(
+                 width = 6,
+                 sc_selectInput("gQC_windProj", "Projection to use", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
+               )
              ),
-             column(width = 6,
-                    sc_textInput("gQC_newRnPrj", "name of new Projection", value = ""))
-           ),
-
-           fluidRow(
-             column(
-               width = 12,
-               tags$p(tags$b("original values")),
-               textOutput("gQC_orgLevels"),
-               br()
-             )
-           ),
-           fluidRow(
-             column(
-               width = 12,
-               textAreaInput("gQC_renameLev", "new levels")
-             )
-           ),
-           br(),
-           fluidRow(
-             column(
-               width = 6,
-               actionButton("gQC_renameLevButton", "apply")
+             fluidRow(
+               column(
+                 width = 12,
+                 plotOutput("gQC_windHC") %>% jqui_resizable()
+               )
              )
            )
-         ),
-         
-         
-         tabPanel(
-           title = "rearrange levels", width = 12, value = "gQC_rearrangeLev",
-           id = "rearrange.Levels.Tab",
-           tags$p("rearrange the levels of a factor"),
-           br(),
-           fluidRow(
-             column(
-               width = 6,
-               sc_selectInput("gQC_raProj", "Projection to modify", choices = c("notyet"), selected = defaultValue("gQC_raProj", "notyet"))
-             ),
-             column(width = 6,
-                    sc_textInput("gQC_newRaPrj", "name of new Projection", value = ""))
-           ),
-           fluidRow(
-             column(width = 12,
-                    shinyjqui::orderInput('gQC_newRaLev', 'Rearrange levels', items = NULL, placeholder = 'choose projection...'),
-             )),
-           br(),
-           fluidRow(
-             column(
-               width = 6,
-               actionButton("gQC_rearrangeLevButton", "apply")
-             )
-           )
-         ),
-
-         
-         tabPanel(
-           title = "WIND", width = 12, value = "gQC_wind",
-           id = "wind.Tab",
-           tags$p("from WIND package compute hierachy of projection (https://github.com/haowulab/Wind)"),
-           tags$p("to compute weighted normalized mutual information (wNMI) and weighted Rand index (wRI) to evaluate the clustering results by comparing a clustering output with a reference which has a hierarchical structure."),
-           br(),
-           fluidRow(
-             column(
-               width = 6,
-               sc_selectInput("gQC_windProj", "Projection to use", choices = c("notyet"), selected = defaultValue("gQC_windProj", "notyet"))
-             )
-           ),
-           fluidRow(
-             column(
-               width = 12,
-               plotOutput("gQC_windHC") %>% jqui_resizable()
-             )
-           )
-         )
+    )
   )
-)
 
 tabList <- list(
   shinydashboard::tabItem(
@@ -568,6 +572,9 @@ tabList <- list(
   ),
   modTab,
   geneSetModTab,
-  DoubletFinderTab
+  
+  if("DoubletFinder" %in% installed.packages()){
+    DoubletFinderTab
+    }
   
 )

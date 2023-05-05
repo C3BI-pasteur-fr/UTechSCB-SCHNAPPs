@@ -470,6 +470,7 @@ clusterServer <- function(input, output, session,
     projections <- projections()
     grpNs <- groupNames$namesDF
     grpN <- grpNameDebounced()
+    pc = projectionColors %>% reactiveValuesToList()
     
     # returnValues$cluster <- input$clusters
     dimY <- input$dimension_y
@@ -482,12 +483,12 @@ clusterServer <- function(input, output, session,
     logy <- input$logY
     divXBy <- input$divideXBy
     divYBy <- input$divideYBy
-    # scols <- sampleCols$colPal
-    # ccols <- clusterCols$colPal
+    # scols <- projectionColors$sampleNames
+    # ccols <- projectionColors$dbCluster
     # browser()
     if(!"sampleNames" %in% names(projectionColors)) return(NULL) # should not happen
-    scols <- projectionColors[["sampleNames"]]
-    ccols <- projectionColors[["dbCluster"]]
+    # scols <- projectionColors[["sampleNames"]]
+    # ccols <- projectionColors[["dbCluster"]]
     # moreOptions <- input$moreOptions
     myns <- session$ns("-")
     save2History <- .schnappsEnv$saveHistorycheckbox
@@ -530,14 +531,18 @@ clusterServer <- function(input, output, session,
     #   geneNames2 = geneNames2,
     #   scEx = scEx_log[, rownames(projections)], projections = tdata
     # )
-    if (dimCol == "sampleNames") {
-      myColors <- scols
-    } else {
+    if(dimCol %in% names(pc)){
+      myColors = pc[[dimCol]]
+    }else {
       myColors <- NULL
     }
-    if (dimCol == "dbCluster") {
-      myColors <- ccols
-    }
+    
+    # if (dimCol == "sampleNames") {
+    #   myColors <- scols
+    # } 
+    # if (dimCol == "dbCluster") {
+    #   myColors <- ccols
+    # }
     # if (!moreOptions) grpN <- ""
     p1 <- plot2Dprojection(scEx_log,
                            projections = tdata, g_id, featureData, geneNames,
@@ -1448,8 +1453,8 @@ pHeatMapModule <- function(input, output, session,
     colPal <- addOptions()$colPal
     minMaxVal <- heatmapMinMaxValueDeb()
     # maxVal <- input$heatmapMaxValue
-    sampCol <- sampleCols$colPal
-    ccols <- clusterCols$colPal
+    # sampCol <- projectionColors$sampleNames
+    # ccols <- projectionColors$dbCluster
     # force redraw
     input$pHeatMapPlot__shinyjquiBookmarkState__resizable$width
     input$pHeatMapPlot__shinyjquiBookmarkState__resizable$height
