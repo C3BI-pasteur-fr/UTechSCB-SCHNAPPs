@@ -913,7 +913,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                names(newLbVec) = orgLevelNames
                
                if (.schnappsEnv$DEBUGSAVE) {
-                 browser()
+                 # browser()
                  save(file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
                       list = c("normaliztionParameters", ls())
                  )

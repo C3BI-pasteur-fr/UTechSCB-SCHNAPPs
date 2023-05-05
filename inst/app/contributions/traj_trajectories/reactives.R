@@ -163,6 +163,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   ## scorpius_projections ----
   # subset of projections that corresponds to input
   scorpius_projections <- reactive({
+    # browser()
     projections <- projections()
     if (is.null(projections)) return(NULL)
     selectedCells <- Scorpius_dataInput() #DE_Exp_dataInput
@@ -403,7 +404,10 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     .schnappsEnv$react.scorpiusModules = list(digest = dig, modules = modules)
     
     return(modules)
-  })
+  }) %>% bindCache(isolate(Scorpius_scEx_log()),
+                   scorpiusTrajectory(),
+                   scorpiusExpSel()
+  )
   
   ## scorpiusModulesTable ----
   scorpiusModulesTable <- reactive({
@@ -509,6 +513,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     if (is.null(projections)) return(NULL)
     selectedCells <- isolate(Elpi_dataInput()) #DE_Exp_dataInput
     if(is.null(selectedCells)) return(NULL)
+    # browser()
     cellNs <- selectedCells$cellNames()
     if(length(cellNs)<1) return(NULL)
     projections[cellNs,]
@@ -586,6 +591,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     }
     
     clicked <- input$elpiCalc
+    # browser()
     scEx <- Elpi_scEx()
     projections <- isolate(Elpi_projections())
     dimElpi <- isolate(input$dimElpi)

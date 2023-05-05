@@ -1001,10 +1001,14 @@ observeEvent(projectionColors$sampleNames,{
   }
 })
 
-
+obscolorParamsChanger <- reactive({
+  input$updateColors 
+  projections()
+})
 # observe: color selection----
-observeEvent(eventExpr = input$updateColors | projections(), label = "ob_colorParams", {
-  deepDebug()
+# observeEvent(eventExpr = input$updateColors | projections(), label = "ob_colorParams", {
+observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
+    deepDebug()
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
   scEx <- scEx()

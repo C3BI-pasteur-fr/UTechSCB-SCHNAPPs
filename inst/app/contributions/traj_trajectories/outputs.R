@@ -122,6 +122,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   })
   
   observe(label = "ob2", {
+    # browser()
     projections <- scorpius_projections()
     
     # Can use character(0) to remove all choices
@@ -600,7 +601,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       "elpiSeed","dimElpi","dimElpiX","dimElpiY"
     ))
   })
-  
+  # 
  
   ## elpiHeatmapPlotModule -----
   callModule(

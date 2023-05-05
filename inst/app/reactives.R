@@ -1623,7 +1623,7 @@ scEx <- reactive({
   minG <- cellSelectionValues$minGenes # min number of reads per cell
   maxG <- cellSelectionValues$maxGenes # max number of reads per cell
   
-  
+  # browser()
   if (!exists("dataTables") |
       is.null(dataTables) | is.null(useGenes) | is.null(useCells)) {
     if (DEBUG) {
@@ -2048,6 +2048,11 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   ))
 }
 # pca ----
+runPCAclicked <- reactive({
+  runme = input$updatePCAParameters
+  if(runme>0) return(1)
+  return(0)
+})
 pcaReact <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "pca started.\n")
@@ -2078,7 +2083,7 @@ pcaReact <- reactive({
   
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "pcaReact: scEx_log:NULL\n")
     }
     return(NULL)
   }
@@ -2112,7 +2117,20 @@ pcaReact <- reactive({
     retVal
   })
   return(retVal)
-})
+}) %>%
+  bindCache(scEx(),
+            scEx_log(),
+            runPCAclicked(),
+            isolate(input$pcaRank),
+            isolate(input$pcaN),
+            isolate(input$pcaCenter),
+            isolate(input$pcaScale),
+            isolate(input$genes4PCA),
+            isolate(input$genesRMPCA),
+            isolate(input$hvgSelection),
+            isolate(input$useSeuratPCA),
+            isolate(input$normalizationRadioButton)
+  )
 
 # scranCluster -----
 scranCluster <- function(pca,
@@ -2371,7 +2389,7 @@ seurat_Clustering <- function() {
   }
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "seurat_Clustering: scEx_log:NULL\n")
     }
     return(NULL)
   }
@@ -2412,7 +2430,14 @@ seurat_Clustering <- function() {
   )
   
   return(retVal)
-}
+} %>% bindCache(  isolate(scEx()), # need to be run when updated
+                  isolate(scEx_log()),
+                  isolate(pcaReact()),
+                  isolate(input$tabsetCluster),
+                  isolate(input$seurClustDims),
+                  isolate(input$seurClustk.param),
+                  isolate(input$seurClustresolution),
+)
 
 # snnGraph ----
 snnGraph <- function(){
@@ -2438,7 +2463,7 @@ snnGraph <- function(){
   tabsetCluster = isolate(input$tabsetCluster)
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "snnGraph scEx_log:NULL\n")
     }
     return(NULL)
   }
@@ -2557,7 +2582,7 @@ simlrFunc  <- function(){
   }
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "simlrFunc scEx_log:NULL\n")
     }
     return(NULL)
   }
@@ -2660,7 +2685,7 @@ dbCluster <- reactive({
   }
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "dbCluster scEx_log:NULL\n")
     }
     return(NULL)
   }
@@ -2893,6 +2918,7 @@ projections <- reactive({
   # in case (no Normalization) no clusters or sample names have been assigned
   if (!"dbCluster" %in% colnames(projections)) {
     projections$dbCluster <- 0
+    projections$dbCluster = as.factor(projections$dbCluster)
   }
   if (!"sampleNames" %in% colnames(projections)) {
     projections$sampleNames <- "1"
@@ -2908,6 +2934,7 @@ projections <- reactive({
   exportTestValues(projections = {
     projections
   })
+  # browser()
   # .schnappsEnv$DEBUGSAVE = F
   return(projections)
 })
@@ -2990,6 +3017,7 @@ initializeGroupNames <- reactive({
     # cp = load(file="~/SCHNAPPsDebug/initializeGroupNames.RData")
     # TODO ??? if cells have been removed it is possible that other cells that were excluded previously show up
     # this will invalidate all previous selections.
+    # browser()
     if (rlang::is_empty(grpNs) | !all(colnames(scEx) %in% rownames(grpNs))) {
       df <-
         data.frame(
