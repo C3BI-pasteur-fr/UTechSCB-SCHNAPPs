@@ -131,8 +131,7 @@ observeEvent(input$openBrowser, {
                         input = inputList,
                         scEx_log = scEx_log,
                         projections = projections(),
-                        ccols = isoloate(clusterCols$colPal),
-                        scols = isoloate(sampleCols$colPal),
+                        projectionColors = isolate( projectionColors) %>% reactiveValuesToList(),
                         pa = pca,
                         projections
                       )
@@ -371,8 +370,8 @@ inputDataFunc <- function(inFile) {
     }
     sampNames <- levels(colData(allScEx)$sampleNames)
     # isolate({
-    #   sampleCols$colPal <- allowedColors[seq_along(sampNames)]
-    #   names(sampleCols$colPal) <- sampNames
+    #   projectionColors$sampleNames <- allowedColors[seq_along(sampNames)]
+    #   names(projectionColors$sampleNames) <- sampNames
     # })
   } else {
     showNotification(
@@ -786,11 +785,11 @@ inputData <- reactive({
   # browser()
   
   isolate({
-    if (is.null(names(sampleCols$colPal)) | !all(names(sampleCols$colPal) %in% sampNames)){
-      sampleCols$colPal <- rev(allowedColors[rep(1:length(allowedColors),ceiling(length(sampNames) / length(allowedColors)))[1:length(sampNames)]])
-      # sampleCols$colPal <- rev(allowedColors)[seq_along(sampNames)]
-      names(sampleCols$colPal) <- sampNames
-      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
+    if (is.null(names(projectionColors$sampleNames)) | !all(names(projectionColors$sampleNames) %in% sampNames)){
+      projectionColors$sampleNames <- rev(allowedColors[rep(1:length(allowedColors),ceiling(length(sampNames) / length(allowedColors)))[1:length(sampNames)]])
+      # projectionColors$sampleNames <- rev(allowedColors)[seq_along(sampNames)]
+      names(projectionColors$sampleNames) <- sampNames
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = projectionColors$sampleNames)
     }
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
@@ -2679,7 +2678,7 @@ dbCluster <- reactive({
   
   if (is.null(clustering)) {
     if (DEBUG) {
-      cat(file = stderr(), "dbCluster: NULL\n")
+      cat(file = stderr(), "dbCluster: clustering NULL\n")
     }
     return(NULL)
   }
@@ -2699,15 +2698,15 @@ dbCluster <- reactive({
   # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
   isolate(
-    if(is.null(names(clusterCols$colPal)) | !all(names(clusterCols$colPal) %in% levels(dbCluster))){
-      clusterCols$colPal <- unlist(inCols)
-      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
+    if(is.null(names(projectionColors$dbCluster)) | !all(names(projectionColors$dbCluster) %in% levels(dbCluster))){
+      projectionColors$dbCluster <- unlist(inCols)
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = projectionColors$dbCluster)
     }
   )
   setRedGreenButton(
     vars = list(
-      c("sampleNamecol", isolate(sampleCols$colPal)),
-      c("clusterCols", isolate(clusterCols$colPal))
+      c("sampleNamecol", isolate(projectionColors$sampleNames)),
+      c("clusterCols", isolate(projectionColors$dbCluster))
     ),
     button = "updateColors"
   )

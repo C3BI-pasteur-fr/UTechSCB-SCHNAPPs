@@ -57,8 +57,8 @@ observe(label = "ob_HeatMapSelectedParams", {
     vars = list(
       c("coE_heatmapselected_geneids", input$coE_heatmapselected_geneids),
       c("coE_heatmapselected_cells", coE_selctedCluster()$selectedCells()),
-      c("coE_heatmapselected_sampcolPal", sampleCols$colPal),
-      c("coE_heatmapselected_cluscolPal", clusterCols$colPal)
+      c("coE_heatmapselected_sampcolPal", projectionColors$sampleNames),
+      c("coE_heatmapselected_cluscolPal", projectionColors$dbCluster)
     )
   )
   
@@ -446,8 +446,9 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   minMaxExpr <- coeMinMax()
   coE_showPermutations <- input$coE_showPermutations
   # colPal = coE_geneGrp_vioFunc # TODO must be wrong
-  sampCol <- sampleCols$colPal
-  ccols <- clusterCols$colPal
+  # sampCol <- projectionColors$sampleNames
+  # ccols <- projectionColors$dbCluster
+  pc = projectionColors %>% reactiveValuesToList()
   
   # upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
   if (is.null(projections) | is.null(scEx_log)) {
@@ -457,7 +458,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
+  # cp=load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
   
   featureData <- rowData(scEx_log)
   retVal <- coE_geneGrp_vioFunc(
@@ -468,8 +469,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     minMaxExpr = minMaxExpr,
     dbCluster = projectionVar,
     coE_showPermutations = coE_showPermutations,
-    sampCol = sampCol,
-    ccols = ccols,
+    projectionColors = pc,
     showExpression = showExpression,
     coE_scale = coE_scale
   )
@@ -500,8 +500,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
                                                  minMaxExpr = minMaxExpr,
                                                  dbCluster = projectionVar,
                                                  coE_showPermutations = coE_showPermutations,
-                                                 sampCol = sampCol,
-                                                 ccols = ccols,
+                                                 projectionColors=pc,
                                                  showExpression = showExpression,
                                                  coE_scale = coE_scale
   )
@@ -540,8 +539,9 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
   projectionVar <- input$coE_dimension_xVioiGrp2
   minMaxExpr <- coeMinMax2()
   # colPal = coE_geneGrp_vioFunc # TODO must be wrong
-  sampCol <- sampleCols$colPal
-  ccols <- clusterCols$colPal
+  # sampCol <- projectionColors$sampleNames
+  # ccols <- projectionColors$dbCluster
+  pc = projectionColors %>% reactiveValuesToList()
   
   # upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
   if (is.null(projections) | is.null(scEx_log)) {
@@ -565,8 +565,8 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
     featureData = featureData,
     minMaxExpr = minMaxExpr,
     dbCluster = projectionVar,
-    sampCol = sampCol,
-    ccols = ccols
+    projectionColors = pc
+    
   )
   
   if(is.null(retVal)) return(NULL)
@@ -581,8 +581,8 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
                                                  featureData = featureData,
                                                  minMaxExpr = minMaxExpr,
                                                  dbCluster = projectionVar,
-                                                 sampCol = sampCol,
-                                                 ccols = ccols)
+                                                 projectionColors = pc
+  )
   
   # .schnappsEnv[["coE_geneGrp_vio_plot"]] <- retVal
   exportTestValues(coE_geneGrp_vio_plot = {

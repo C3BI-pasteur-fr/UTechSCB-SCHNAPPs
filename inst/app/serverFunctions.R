@@ -725,8 +725,8 @@ twoDplotFromModule <- function(twoDData, moduleName, input, projections, g_id, l
   logy <- input[[paste0(moduleName, "-logY")]]
   divXBy <- input[[paste0(moduleName, "-divideXBy")]]
   divYBy <- input[[paste0(moduleName, "-divideYBy")]]
-  # scols <- sampleCols$colPal
-  # ccols <- clusterCols$colPal
+  # scols <- projectionColors$sampleNames
+  # ccols <- projectionColors$dbCluster
   scols <- projectionColors[["sampleNames"]]
   ccols <- projectionColors[["dbCluster"]]
   

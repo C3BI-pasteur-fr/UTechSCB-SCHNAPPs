@@ -268,7 +268,7 @@ output$DE_gene_vio_plot <- renderPlot({
   scEx_log <- scEx_log()
   projections <- projections()
   g_id <- input$DE_gene_id
-  ccols <- clusterCols$colPal
+  ccols <- projectionColors$dbCluster
   x = input$DE_gene_vio_x
   
   selectedCells <- DE_Exp_dataInput()
@@ -515,7 +515,7 @@ observeEvent(input$runScater,{
     removeNotification(id="DE_scaterPNG_Error")
   }
   scaterReads <- isolate(scaterReads())
-  scols <- isolate(sampleCols$colPal)
+  scols <- isolate(projectionColors$sampleNames)
   maxMemory = isolate(input$maxMemory)
   
   if (is.null(scaterReads)){
@@ -687,7 +687,7 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
   # remove env because it is too big
   environment(af) = new.env(parent = emptyenv())
   n <- min(nrow(scaterReads), 50)
-  scols <- isolate(sampleCols$colPal)
+  scols <- isolate(projectionColors$sampleNames)
   .schnappsEnv[["DE_scaterPNG"]] <- list(plotFunc = af,
                                          # plotHighestExprs = plotHighestExprs,
                                          scaterReads = scaterReads, 
@@ -736,9 +736,9 @@ output$DE_tsne_plt <- plotly::renderPlotly({
   y = input$DE_expclusters_y
   z = input$DE_expclusters_z
   # dimCol <- input$DE_expclusters_col
-  scols <- sampleCols$colPal
-  ccols <- clusterCols$colPal
-  
+  # scols <- projectionColors$sampleNames
+  # ccols <- projectionColors$dbCluster
+  pc = projectionColors %>% reactiveValuesToList()
   if (is.null(scEx_log) | is.null(projections) | is.null(cellNs) ) {
     return(NULL)
   }
@@ -759,7 +759,7 @@ output$DE_tsne_plt <- plotly::renderPlotly({
     projections$ExpressionColor <- Matrix::colSums(assays(scEx_log)[[1]][geneid, ])
   }
   
-  retVal <- tsnePlot(projections, x,y,z, dimCol, scols, ccols) 
+  retVal <- tsnePlot(projections, x,y,z, dimCol, projColors=pc) 
   
   # retVal <- DE_dataExpltSNEPlot(scEx_log[,cellNs], g_id, projections[cellNs, ], x,y,z)
   

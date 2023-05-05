@@ -226,8 +226,9 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   dimY <- input$gQC_dim3D_y
   dimZ <- input$gQC_dim3D_z
   dimCol <- input$gQC_col3D
-  scols <- sampleCols$colPal
-  ccols <- clusterCols$colPal
+  # scols <- projectionColors$sampleNames
+  # ccols <- clusterCols$colPal
+  pc = projectionColors %>% reactiveValuesToList()
   
   if (is.null(projections)) {
     if (DEBUG) cat(file = stderr(), "output$gQC_tsne_main:NULL\n")
@@ -238,7 +239,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
   }
   # cp =load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
   
-  retVal <- tsnePlot(projections, dimX, dimY, dimZ, dimCol, scols, ccols)
+  retVal <- tsnePlot(projections, dimX, dimY, dimZ, dimCol, projColors = pc)
   
   exportTestValues(tsnePlot = {
     str(retVal)
@@ -282,7 +283,8 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
   }
   
   scEx <- scEx()
-  scols <- sampleCols$colPal
+  pc = projectionColors %>% reactiveValuesToList()
+  scols <- projectionColors$sampleNames
   binSize <- input$gQC_binSize
   
   if (is.null(scEx)) {
@@ -346,7 +348,7 @@ output$gQC_plotSampleHist <- plotly::renderPlotly({
   }
   
   sampleInf <- sampleInfo()
-  scols <- sampleCols$colPal
+  scols <- projectionColors$sampleNames
   
   if (is.null(sampleInf)) {
     return(NULL)
@@ -1136,81 +1138,81 @@ output$gQC_windHC <- renderPlot({
 # DoubletFinder related ----
 ## 
 
-
-observe({
-  if (DEBUG) cat(file = stderr(), "GS_DF_pk update\n")
-  scEx = scEx()
-  updateNumericInput(session = session, inputId = "GS_DF_pk", value=20/ncol(scEx))
-})
-
-observeEvent(input$GS_DF_button,{
-  if (DEBUG) cat(file = stderr(), "GS_DF_button started.\n")
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "GS_DF_button")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "GS_DF_button")
-    }
+if("DoubletFinder" %in% installed.packages()){
+  observe({
+    if (DEBUG) cat(file = stderr(), "GS_DF_pk update\n")
+    scEx = scEx()
+    updateNumericInput(session = session, inputId = "GS_DF_pk", value=20/ncol(scEx))
   })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("GS_DF_button", id = "GS_DF_button", duration = NULL)
-    removeNotification(id = "GS_DF_buttonERROR")
-  }
   
-  scEx = scEx()
-  dims = input$GS_DF_dims
-  nRecover = input$GS_DF_nRecover
-  pK = input$GS_DF_pk
-  pN = input$GS_DF_pN
-  projections <- as.data.frame(projections)
-  newPrjs <- sessionProjections$prjs 
-  acn = allCellNames()
-  
-  if (is.null(scEx)) {
-    return(NULL)
-  }
-  if (is.null(projections)) {
-    return(NULL)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/GS_DF_button.RData", list = c(ls()))
-  }
-  # cp = load(file = "~/SCHNAPPsDebug/GS_DF_button.RData")
-  
-  dubs = tryCatch({
-    find_doublets(scEx, dims=1:dims, n_recovered=nRecover, pK=pK, pN=pN)
-  }, 
-  error = function(e) {
-    cat(file = stderr(), paste("\n\n!!!Error during detach process:", e, "\n\nDo you need to increase the memory?\n\n"))
+  observeEvent(input$GS_DF_button,{
+    if (DEBUG) cat(file = stderr(), "GS_DF_button started.\n")
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "GS_DF_button")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "GS_DF_button")
+      }
+    })
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("DE_scaterPNG ERROR", id = "DE_scaterPNG_Error", duration = NULL, type = "error")
+      showNotification("GS_DF_button", id = "GS_DF_button", duration = NULL)
+      removeNotification(id = "GS_DF_buttonERROR")
     }
-    return(NULL)
-  }
-  )
+    
+    scEx = scEx()
+    dims = input$GS_DF_dims
+    nRecover = input$GS_DF_nRecover
+    pK = input$GS_DF_pk
+    pN = input$GS_DF_pN
+    projections <- as.data.frame(projections)
+    newPrjs <- sessionProjections$prjs 
+    acn = allCellNames()
+    
+    if (is.null(scEx)) {
+      return(NULL)
+    }
+    if (is.null(projections)) {
+      return(NULL)
+    }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/GS_DF_button.RData", list = c(ls()))
+    }
+    # cp = load(file = "~/SCHNAPPsDebug/GS_DF_button.RData")
+    
+    dubs = tryCatch({
+      find_doublets(scEx, dims=1:dims, n_recovered=nRecover, pK=pK, pN=pN)
+    }, 
+    error = function(e) {
+      cat(file = stderr(), paste("\n\n!!!Error during detach process:", e, "\n\nDo you need to increase the memory?\n\n"))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("DE_scaterPNG ERROR", id = "DE_scaterPNG_Error", duration = NULL, type = "error")
+      }
+      return(NULL)
+    }
+    )
+    
+    if (ncol(newPrjs) == 0) {
+      newPrjs = data.frame(row.names = acn)
+    } 
+    newPrjs[,colnames(dubs)] = 0
+    newPrjs[rownames(dubs),colnames(dubs)] = dubs
+    sessionProjections$prjs <- newPrjs
+    .schnappsEnv[["GS_DF_plot-dimension_x"]] <- "barcode"
+    .schnappsEnv$defaultValues[["GS_DF_plot-dimension_x"]] <- "barcode"
+    .schnappsEnv[["GS_DF_plot-dimension_y"]] <- colnames(dubs)[1]
+    .schnappsEnv$defaultValues[["GS_DF_plot-dimension_y"]] <- colnames(dubs)[1]
+    .schnappsEnv[["GS_DF_plot-dimension_col"]] <- colnames(dubs)[2]
+    .schnappsEnv$defaultValues[["GS_DF_plot-dimension_col"]] <- colnames(dubs)[2]
+    updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_x", selected = "barcode")
+    updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_y", selected = colnames(dubs)[1])
+    updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_col", selected = colnames(dubs)[2])
+  })
   
-  if (ncol(newPrjs) == 0) {
-    newPrjs = data.frame(row.names = acn)
-  } 
-  newPrjs[,colnames(dubs)] = 0
-  newPrjs[rownames(dubs),colnames(dubs)] = dubs
-  sessionProjections$prjs <- newPrjs
-  .schnappsEnv[["GS_DF_plot-dimension_x"]] <- "barcode"
-  .schnappsEnv$defaultValues[["GS_DF_plot-dimension_x"]] <- "barcode"
-  .schnappsEnv[["GS_DF_plot-dimension_y"]] <- colnames(dubs)[1]
-  .schnappsEnv$defaultValues[["GS_DF_plot-dimension_y"]] <- colnames(dubs)[1]
-  .schnappsEnv[["GS_DF_plot-dimension_col"]] <- colnames(dubs)[2]
-  .schnappsEnv$defaultValues[["GS_DF_plot-dimension_col"]] <- colnames(dubs)[2]
-  updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_x", selected = "barcode")
-  updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_y", selected = colnames(dubs)[1])
-  updateSelectizeInput(session = session, inputId = "GS_DF_plot-dimension_col", selected = colnames(dubs)[2])
-})
-
-# gc_DF_2D <-
-callModule(
-  clusterServer,
-  "GS_DF_plot",
-  projections # ,
-  # reactive(input$coE_gene_id_sch)
-)
-
+  # gc_DF_2D <-
+  callModule(
+    clusterServer,
+    "GS_DF_plot",
+    projections # ,
+    # reactive(input$coE_gene_id_sch)
+  )
+}

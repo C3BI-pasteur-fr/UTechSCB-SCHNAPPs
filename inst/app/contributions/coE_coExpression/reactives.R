@@ -273,8 +273,8 @@ coE_heatmapSelectedReactive <- reactive({
   # scCL <- sc$cluster # "1" "2" "3" "4"
   # scCL <- isolate(levels(projections$dbCluster))
   scCells <- isolate(sc$selectedCells()) # [1] "AAACCTGAGACACTAA-1" "AAACCTGAGACGACGT-1" "AAACCTGAGTCAAGCG-1" "AAACCTGCAAGAAGAG-1" "AAACCTGCAGACAGGT-1" "AAACCTGCATACAGCT-1" "AAACCTGGTGTGACCC-1"
-  sampCol <- isolate(sampleCols$colPal)
-  ccols <- isolate(clusterCols$colPal)
+  sampCol <- isolate(projectionColors$sampleNames)
+  ccols <- isolate(projectionColors$dbCluster)
   # coE_heatmapSelectedModuleShow <- input$coE_heatmapSelectedModuleShow
   
   if (is.null(scEx_log) ||is.null(scCells) || length(scCells) == 0 ||
@@ -317,8 +317,8 @@ coE_heatmapSelectedReactive <- reactive({
     vars = list(
       c("coE_heatmapselected_geneids", isolate(input$coE_heatmapselected_geneids)),
       c("coE_heatmapselected_cells", isolate(coE_selctedCluster()$selectedCells())),
-      c("coE_heatmapselected_sampcolPal", isolate(sampleCols$colPal)),
-      c("coE_heatmapselected_cluscolPal", isolate(clusterCols$colPal))
+      c("coE_heatmapselected_sampcolPal", isolate(projectionColors$sampleNames)),
+      c("coE_heatmapselected_cluscolPal", isolate(projectionColors$dbCluster))
     ),
     button = "updateHeatMapSelectedParameters"
   )
@@ -445,10 +445,10 @@ scranFindMarkerFullReactiveTable <- reactive({
   }
   clicked <- input$scranFindMarkerApply
   wmarkers <- tryCatch({
-   scran::findMarkers(scEx_log, 
-                                   projections$dbCluster,
-                                   direction = direction,
-                                   lfc = lfc)
+    scran::findMarkers(scEx_log, 
+                       projections$dbCluster,
+                       direction = direction,
+                       lfc = lfc)
     
     
     
@@ -586,7 +586,7 @@ coE_topExpCCTable <- reactive({
 #' optionally creates all combinations
 coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
                                 dbCluster, coE_showPermutations = FALSE, 
-                                sampCol, ccols, showExpression = FALSE, coE_scale = "count") {
+                                projectionColors, showExpression = FALSE, coE_scale = "count") {
   
   
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc started.\n")
@@ -610,6 +610,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   genesin <- strsplit(genesin, ",")[[1]]
   
   map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
+  pc = projectionColors 
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls()))
@@ -699,19 +700,22 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
     }
   }
   
-  
+  # browser()
   prj <- factor(projections[, dbCluster])
-  mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
-    n = 6, name =
-      "RdYlBu"
-  ))(length(levels(prj)))
-  
-  if (dbCluster == "sampleNames") {
-    mycolPal <- sampCol
+  if(dbCluster %in% names(pc)){
+    mycolPal = pc[[dbCluster]]
+  }else{
+     mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
+      n = 6, name =
+        "RdYlBu"
+    ))(length(levels(prj)))
   }
-  if (dbCluster == "dbCluster") {
-    mycolPal <- ccols
-  }
+  # if (dbCluster == "sampleNames") {
+  #   mycolPal <- sampCol
+  # }
+  # if (dbCluster == "dbCluster") {
+  #   mycolPal <- ccols
+  # }
   
   
   # p1 <- projections %>% plotly::plot_ly(
@@ -749,7 +753,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   # browser()
   p1 <-
     ggplot(projections, aes(prj, coExpVal,
-                            fill = factor(projections[, dbCluster])
+                            fill = .data[[dbCluster]]
     )) +
     geom_violin(scale = coE_scale) +
     scale_fill_manual(values = mycolPal, aesthetics = "fill") +
@@ -791,7 +795,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
 #' generates a ggplot object with a violin plot
 #' optionally creates all combinations
 coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMaxExpr = c(-1,1),
-                                 dbCluster, sampCol, ccols) {
+                                 dbCluster, projectionColors ) {
   if (DEBUG) cat(file = stderr(), "coE_geneGrp_vioFunc2 started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -810,7 +814,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
   genesin <- toupper(genesin)
   genesin <- gsub(" ", "", genesin, fixed = TRUE)
   genesin <- strsplit(genesin, ",")[[1]]
-  
+  pc = projectionColors
   map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
   
   if (.schnappsEnv$DEBUGSAVE) {
@@ -841,40 +845,57 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
   
   #first coordinate
   prj <- factor(projections[, dbCluster[1]])
-  mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
-    n = 6, name =
-      "RdYlBu"
-  ))(length(levels(prj)))
+  if(dbCluster[1] %in% names(pc)){
+    mycolPal = pc[[dbCluster[1]]]
+  }else{
+    mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
+      n = 6, name =
+        "RdYlBu"
+    ))(length(levels(prj)))
+  }
   
-  if (dbCluster[1] == "sampleNames") {
-    mycolPal <- sampCol
-    names(mycolPal) = names(sampCol)
-  }
-  if (dbCluster[1] == "dbCluster") {
-    mycolPal <- ccols
-    names(mycolPal) = names(ccols)
-  }
+  # mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
+  #   n = 6, name =
+  #     "RdYlBu"
+  # ))(length(levels(prj)))
+  # 
+  # if (dbCluster[1] == "sampleNames") {
+  #   mycolPal <- sampCol
+  #   names(mycolPal) = names(sampCol)
+  # }
+  # if (dbCluster[1] == "dbCluster") {
+  #   mycolPal <- ccols
+  #   names(mycolPal) = names(ccols)
+  # }
   
   
   
   if (length(dbCluster) == 2 ) {
     prj2 = factor(projections[, dbCluster[2]])
     #second coordinate
-    prj2 <- factor(projections[, dbCluster[2]])
-    mycolPal2 <- colorRampPalette(RColorBrewer::brewer.pal(
-      n = 6, name =
-        "RdYlBu"
-    ))(length(levels(prj2)))
-    names(mycolPal2) = levels(prj2)
-    
-    if (dbCluster[2] == "sampleNames") {
-      mycolPal2 <- sampCol
-      names(mycolPal2) = names(sampCol)
+    # prj2 <- factor(projections[, dbCluster[2]])
+    if(dbCluster[2] %in% names(pc)){
+      mycolPal2 = pc[[dbCluster[2]]]
+    }else{
+      mycolPal2 <- colorRampPalette(RColorBrewer::brewer.pal(
+        n = 6, name =
+          "RdYlBu"
+      ))(length(levels(prj)))
     }
-    if (dbCluster[2] == "dbCluster") {
-      mycolPal2 <- ccols
-      names(mycolPal2) = names(ccols)
-    }
+    # mycolPal2 <- colorRampPalette(RColorBrewer::brewer.pal(
+    #   n = 6, name =
+    #     "RdYlBu"
+    # ))(length(levels(prj2)))
+    # names(mycolPal2) = levels(prj2)
+    # 
+    # if (dbCluster[2] == "sampleNames") {
+    #   mycolPal2 <- sampCol
+    #   names(mycolPal2) = names(sampCol)
+    # }
+    # if (dbCluster[2] == "dbCluster") {
+    #   mycolPal2 <- ccols
+    #   names(mycolPal2) = names(ccols)
+    # }
   } else {
     if (length(dbCluster) == 1 ) {
       prj2 = factor(rep(1,nrow(projections)))
@@ -884,24 +905,41 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
     }
   }
   
+  showLegend <- rep(F, length(levels(projections[, dbCluster[1]])))
+  showLegend[1] = T
+  
+  if(lapply(levels(projections[, dbCluster[1]]), FUN = function(x)!is.na(suppressWarnings(as.numeric(x)))) %>% unlist() %>% any() ){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Some values can be interpreted as numericals and will be removed", id = "coE_geneGrp_vioFunc2Warn", type = "warning", duration = NULL)
+    } 
+  }
+  
+
   p1 <- projections %>% plotly::plot_ly(type = 'violin', colors=mycolPal2)
-  for (lv in levels(prj2)) {
-    p1 <- p1 %>% plotly::add_trace(
-      x = prj[prj2 == lv],
-      y = projections$coExpVal[prj2 == lv],
+  for (lv2 in levels(prj2)) {
+    for (lv in levels(projections[, dbCluster[1]])) {
+      p1 <- p1 %>% plotly::add_trace(
+      x = {
+        # cat(file = stderr(), projections[prj2 == lv2 & projections[dbCluster[1]] == lv, dbCluster[1]] %>% as.character() )
+        projections[prj2 == lv2 & projections[dbCluster[1]] == lv, dbCluster[1]] %>% as.character() 
+        },
+      y = projections$coExpVal[prj2 == lv2 & projections[dbCluster[1]] == lv],
       legendgroup = lv,
       scalegroup = lv,
-      name = lv,
+      showlegend = showLegend[which(lv == levels(projections[, dbCluster[1]]))],
+      name = lv2,
+      visible=T,
       box = list(
         visible = T
       ),
       meanline = list(
         visible = T
       )
-      ,line = list(color=mycolPal2[[lv]])
-      , fillcolor = mycolPal2[[lv]]
+      ,line = list(color=mycolPal2[[lv2]])
+      , fillcolor = mycolPal2[[lv2]]
     )
     # print(p1)
+    }
   }
   
   p1 <- p1  %>%
@@ -916,6 +954,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
         # ticknames = permsNames
       )
       ,
+      # violingap = 0,violingroupgap = 1,
       violinmode = 'group'
       # ,
       # annotations = list(y = permsNames, yref = "y")
@@ -923,7 +962,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
   
   # p1 <- p1 %>% 
   
-  p1
+  # p1
   
   
   
@@ -1084,8 +1123,8 @@ coE_heatmapReactive <- reactive({
   scEx_log <- scEx_log()
   projections <- projections()
   genesin <- input$coE_heatmap_geneids
-  sampCol <- sampleCols$colPal
-  ccols <- clusterCols$colPal
+  sampCol <- projectionColors$sampleNames
+  ccols <- projectionColors$dbCluster
   projections <- projections()
   
   if (is.null(scEx_log) | is.null(projections)) {

@@ -704,7 +704,7 @@ output$descriptOfWorkOutput <- renderPrint({
 # # sampleColorSelection ----
 # output$sampleColorSelection <- renderUI({
 #   scEx <- scEx()
-#   sampCol <- sampleCols$colPal
+#   sampCol <- projectionColors$sampleNames
 #   prFct = projFactors()
 #   projections = projections()
 #   
@@ -742,15 +742,13 @@ output$descriptOfWorkOutput <- renderPrint({
 # sampleColorSelection ----
 
 
-projectionColors <- reactiveValues()
-
 
 output$ColorSelection <- renderUI({
   scEx <- scEx()
-  # sampCol <- sampleCols$colPal
+  # sampCol <- projectionColors$sampleNames
   # prFct = projFactors()
   projections = projections()
-  # clusterCol <- clusterCols$colPal
+  # clusterCol <- projectionColors$dbCluster
   
   if (is.null(scEx)) {
     return(NULL)
@@ -842,7 +840,7 @@ outputOptions(output, "ColorSelection", suspendWhenHidden = FALSE)
 # output$clusterColorSelection <- renderUI({
 #   scEx <- scEx()
 #   projections <- projections()
-#   clusterCol <- clusterCols$colPal
+#   clusterCol <- projectionColors$dbCluster
 #   
 #   if (is.null(scEx) || is.null(projections)) {
 #     return(NULL)
@@ -924,82 +922,82 @@ observe({
   add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "gmtData", gmtData = gmtData)
 })
 
-# observe: input$updateColors ----
-observeEvent(
-  label = "ob22",
-  eventExpr = input$updateColors,
-  handlerExpr = {
-    deepDebug()
-    cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
-    scExx <- scEx()
-    projections <- projections()
-    
-    if (is.null(scExx) || is.null(projections)) {
-      return(NULL)
-    }
-    # sample colors
-    scols <- sampleCols$colPal
-    
-    inCols <- list()
-    lev <- levels(colData(scExx)$sampleNames)
-    
-    inCols <- lapply(seq_along(lev), function(i) {
-      input[[paste0("sampleNamecol", lev[i])]]
-    })
-    names(inCols) <- lev
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls()))
-      cat(file = stderr(), paste0("observeEvent save done\n"))
-    }
-    # load(file="~/SCHNAPPsDebug/updateColors.RData")
-    
-    # isolate({
-    sampleCols$colPal <- unlist(inCols)
-    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = sampleCols$colPal)
-    # })
-    
-    # cluster colors
-    ccols <- clusterCols$colPal
-    
-    inCols <- list()
-    lev <- levels(projections$dbCluster)
-    
-    inCols <- lapply(seq_along(lev), function(i) {
-      input[[paste0("clusterNamecol", lev[i])]]
-    })
-    names(inCols) <- lev
-    if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls()))
-      cat(file = stderr(), paste0("observeEvent 2 save done\n"))
-    }
-    # load(file="~/SCHNAPPsDebug/updateColors2.RData")
-    
-    # isolate({
-    clusterCols$colPal <- unlist(inCols)
-    add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = clusterCols$colPal)
-    
-    # })
-    setRedGreenButton(
-      vars = list(
-        c("sampleNamecol", sampleCols$colPal),
-        c("clusterCols", clusterCols$colPal)
-      ),
-      button = "updateColors"
-    )
-  }
-)
+# # observe: input$updateColors ----
+# observeEvent(
+#   label = "ob22",
+#   eventExpr = input$updateColors,
+#   handlerExpr = {
+#     deepDebug()
+#     cat(file = stderr(), paste0("observeEvent input$updateColors\n"))
+#     scExx <- scEx()
+#     projections <- projections()
+#     
+#     if (is.null(scExx) || is.null(projections)) {
+#       return(NULL)
+#     }
+#     # sample colors
+#     scols <- projectionColors$sampleNames
+#     
+#     inCols <- list()
+#     lev <- levels(colData(scExx)$sampleNames)
+#     
+#     inCols <- lapply(seq_along(lev), function(i) {
+#       input[[paste0("sampleNamecol", lev[i])]]
+#     })
+#     names(inCols) <- lev
+#     if (.schnappsEnv$DEBUGSAVE) {
+#       save(file = "~/SCHNAPPsDebug/updateColors.RData", list = c(ls()))
+#       cat(file = stderr(), paste0("observeEvent save done\n"))
+#     }
+#     # load(file="~/SCHNAPPsDebug/updateColors.RData")
+#     
+#     # isolate({
+#     projectionColors$sampleNames <- unlist(inCols)
+#     add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = projectionColors$sampleNames)
+#     # })
+#     
+#     # cluster colors
+#     ccols <- projectionColors$dbCluster
+#     
+#     inCols <- list()
+#     lev <- levels(projections$dbCluster)
+#     
+#     inCols <- lapply(seq_along(lev), function(i) {
+#       input[[paste0("clusterNamecol", lev[i])]]
+#     })
+#     names(inCols) <- lev
+#     if (.schnappsEnv$DEBUGSAVE) {
+#       save(file = "~/SCHNAPPsDebug/updateColors2.RData", list = c(ls()))
+#       cat(file = stderr(), paste0("observeEvent 2 save done\n"))
+#     }
+#     # load(file="~/SCHNAPPsDebug/updateColors2.RData")
+#     
+#     # isolate({
+#     projectionColors$dbCluster <- unlist(inCols)
+#     add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = projectionColors$dbCluster)
+#     
+#     # })
+#     setRedGreenButton(
+#       vars = list(
+#         c("sampleNamecol", projectionColors$sampleNames),
+#         c("clusterCols", projectionColors$dbCluster)
+#       ),
+#       button = "updateColors"
+#     )
+#   }
+# )
 
-# while we still have these reactive values specific for sampleNames and dbCluster...
-observeEvent(projectionColors$sampleNames,{
-  cat(file = stderr(), "========observe projectionColors\n")
-  pc = projectionColors %>% reactiveValuesToList()
-  if("sampleNames" %in% names(pc)){
-    sampleCols$colPal = projectionColors[["sampleNames"]]
-  }
-  if("dbCluster" %in% names(pc)){
-    clusterCols$colPal = projectionColors[["dbCluster"]]
-  }
-})
+# # while we still have these reactive values specific for sampleNames and dbCluster...
+# observeEvent(projectionColors$sampleNames,{
+#   cat(file = stderr(), "========observe projectionColors\n")
+#   pc = projectionColors %>% reactiveValuesToList()
+#   if("sampleNames" %in% names(pc)){
+#     projectionColors$sampleNames = projectionColors[["sampleNames"]]
+#   }
+#   if("dbCluster" %in% names(pc)){
+#     projectionColors$dbCluster = projectionColors[["dbCluster"]]
+#   }
+# })
 
 obscolorParamsChanger <- reactive({
   input$updateColors 
@@ -1029,9 +1027,16 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
           .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = allowedColors[seq(levels(projections[,name]))]
+        if(!length(names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]])) == length(levels(projections[,name]))){
+          # browser()
+          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = allowedColors[seq(levels(projections[,name]))]
+        }
         names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]]) = levels(projections[,name])
         projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]
       } else {
+        if(!length(names(ccols)) == length(levels(projections[,name]))){
+          browser()
+        }
         names(ccols) = levels(projections[,name])
         projectionColors[[name]] = unlist(ccols)
         .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = unlist(ccols)
@@ -1064,14 +1069,17 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
   # scols <- lapply(seq_along(lev), function(i) {
   #   input[[paste0("sampleNamecol", lev[i])]]
   # })
-  cc = projectionColors %>% reactiveValuesToList()
+  pc = projectionColors %>% reactiveValuesToList()
   setRedGreenButtonCurrent(
-    vars = cc
+    vars = pc
   )
+  add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "Colors", projectionColors = pc)
   
   updateButtonColor(buttonName = "updateColors", parameters = c(
-    names(cc)
+    names(pc)
   ))
+  if (DEBUG) cat(file = stderr(), "observe color Vars done\n")
+  
 })
 
 # Nclusters ----
@@ -1150,8 +1158,7 @@ output$RDSsave <- downloadHandler(
     pca <- pcaReact()
     # TODO should be taken from projections
     tsne <- tsne()
-    ccol = clusterCols$colPal
-    scol = sampleCols$colPal
+    pc = projectionColors %>% reactiveValuesToList()
     namesDF = groupNames$namesDF
     
     if (is.null(scEx)) {
@@ -1167,7 +1174,7 @@ output$RDSsave <- downloadHandler(
     # we save the pca separately because I don't know how to store the rotation  otherwise.
     # mostly done to make the lite version work.
     
-    saveList =  c("scEx" ,  "scol" , "ccol" , "namesDF")
+    saveList =  c("scEx" ,  "pc" , "namesDF")
     if(!is.null(pca)){
       saveList = c(saveList, "pca")
     }

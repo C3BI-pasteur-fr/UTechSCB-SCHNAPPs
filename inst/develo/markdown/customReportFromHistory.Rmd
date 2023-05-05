@@ -22,7 +22,7 @@ Basic information is already provided in the history. Here we just show how to c
 ```{r}
 sampNames <- levels(colData(scEx)$sampleNames)
 sampleCols=list()
-sampleCols$colPal <- allowedColors[seq_along(sampNames)]
+projectionColors$sampleNames <- allowedColors[seq_along(sampNames)]
 ```
 
 ```{r}
@@ -37,7 +37,7 @@ source("../../inst/app/contributions/sCA_subClusterAnalysis/reactives.R")
 ```{r histogram raw counts}
 dat <- data.frame(counts = Matrix::colSums(assays(scEx)[["counts"]]))
 dat$sample <- colData(scEx)$sampleNames
-scols <- sampleCols$colPal
+scols <- projectionColors$sampleNames
 retVal <- ggplot(data = dat, aes(counts, fill = sample)) +
   geom_histogram(bins = 50) +
   labs(title = "Histogram for raw counts", x = "count", y = "Frequency") +
@@ -70,7 +70,7 @@ source("../../inst/app/contributions/coE_coExpression//reactives.R")
   minExpr <- 1
   coE_showPermutations <- FALSE
   # colPal = coE_geneGrp_vioFunc # TODO must be wrong
-  # sampCol <- sampleCols$colPal
+  # sampCol <- projectionColors$sampleNames
 ccols <- allowedColors[1:length(levels(projections$dbCluster))]
   upI <- coE_updateInputXviolinPlot() # no need to check because this is done in projections
   if (is.null(projections) | is.null(scEx_log)) {
