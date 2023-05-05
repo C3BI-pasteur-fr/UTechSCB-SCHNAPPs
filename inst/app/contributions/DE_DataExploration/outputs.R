@@ -706,6 +706,8 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
   })
   result
 })
+#  Cannot call `bindCache()` on this object because it is marked as not cacheable.
+# %>% bindCache(scaterReads())
 
 # DE_tsne_plt ----
 # tSNE plot within Data exploration - Expressoin

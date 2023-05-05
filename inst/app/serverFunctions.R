@@ -1262,7 +1262,7 @@ getReactEnv <- function(DEBUG) {
 # add2history ----
 
 add2history <- function(type, comment = "", input = input, ...) {
-  if (DEBUG) cat(file = stderr(), paste0("add2history", type, "\n"))
+  if (DEBUG) cat(file = stderr(), paste0("add2history: ", type, "\n"))
   if (!exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
     return(NULL)
@@ -1273,11 +1273,15 @@ add2history <- function(type, comment = "", input = input, ...) {
   dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
   if (DEBUG) cat(file = stderr(), paste0("add2history: saving default Values to", dvFile, "\n"))
   save(file=dvFile, list = c("defaultValues"))
+  # browser()
   varnames <- lapply(substitute(list(...))[-1], deparse)
   arg <- list(...)
   inp = input
   schnappsEnv = .schnappsEnv
-  if(is.null(arg[[1]])) return(NULL)
+  if(is.null(arg[[1]])) {
+    if (DEBUG) cat(file = stderr(), paste0("add2history: arg[[1]] is null\n"))
+    return(NULL)
+  }
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls(), ".schnappsEnv"), compress = F)
   }
@@ -1296,7 +1300,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   # deepDebug()
   if (type == "save") {
     tfile <- tempfile(pattern = paste0(names(varnames[1]), "."), tmpdir = .schnappsEnv$historyPath, fileext = ".RData")
-    if (file.exists(tfile)){}
+    if (file.exists(tfile)){cat(file = stderr(), paste("file exists, should not happen", tfile, "\n\n"))}
     assign(names(varnames[1]), arg[1])
     save(file = tfile, list = c(names(varnames[1]), "inp","schnappsEnv", "sessionI"), compress = F)
     if (DEBUG) cat(file = stderr(), paste0("add2history: inp, schnappsEnv to", tfile, "\n"))

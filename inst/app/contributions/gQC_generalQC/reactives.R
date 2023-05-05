@@ -161,7 +161,7 @@ scaterReads <- reactive({
     str(retVal)
   })
   return(retVal)
-})
+}) 
 
 
 # gQC_sampleHistFunc ----
@@ -182,7 +182,7 @@ gQC_sampleHistFunc <- function(sampleInf, scols) {
   # deepDebug()
   
   # if (!is.factor(sampleInf)) {
-    sampleInf = factor(sampleInf)
+  sampleInf = factor(sampleInf)
   # }
   
   plotly::plot_ly(x=sampleInf, 
@@ -255,6 +255,13 @@ projectionTable <- reactive({
 # updateButton(name = "updatetsneParameters",
 #                                                   )
 
+
+runTSNEclicked <- reactive({
+  runme = input$updatetsneParameters
+  if(runme>0) return(1)
+  return(0)
+})
+
 tsne <- reactive({
   if (DEBUG) cat(file = stderr(), "tsne started.\n")
   start.time <- base::Sys.time()
@@ -307,7 +314,13 @@ tsne <- reactive({
     retVal
   })
   return(retVal)
-})
+}) %>% bindCache(  pcaReact(),
+                   runTSNEclicked(),
+                   isolate(input$gQC_tsneDim),
+                   isolate(input$gQC_tsnePerplexity),
+                   isolate(input$gQC_tsneTheta),
+                   isolate(input$gQC_tsneSeed)
+)
 
 # tsneFunc ----
 tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_tsneSeed) {
@@ -353,7 +366,11 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   return(retVal)
 }
 
-
+activatedUMAP <- reactive({
+  inp = input$activateUMAP
+  if(inp>0) return(1)
+  return(0)
+})
 # umapReact ----
 #' umapReact
 #' reactive for calculating UMAP projection
@@ -471,7 +488,23 @@ umapReact <- reactive({
     embedding
   })
   return(embedding)
-})
+})%>% bindCache(activatedUMAP(),
+                isolate(input$gQC_um_n_neighbors),
+                isolate(input$gQC_um_n_components),
+                isolate(input$gQC_um_n_epochs),
+                isolate(input$gQC_um_min_dist),
+                isolate(input$gQC_um_set_op_mix_ratio),
+                isolate(input$gQC_um_local_connectivity),
+                isolate(input$gQC_um_bandwidth),
+                isolate(input$um_gamma),
+                isolate(input$gQC_um_negative_sample_rate),
+                isolate(input$gQC_um_spread),
+                isolate(input$gQC_um_metric),
+                isolate(input$gQC_um_randSeed),
+                isolate(input$gQC_um_init),
+                scEx_log(),
+                pcaReact()
+ )
 
 
 # myProjections ----

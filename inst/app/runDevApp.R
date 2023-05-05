@@ -35,9 +35,11 @@ DEBUG = T
 DEBUGSAVE = F
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Jan-18.09.02"
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Feb-22.17.42/"
-historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-Apr-21.10.44/"
+historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-04.18.02/"
+# historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/katja/hist_2022-Dec-26.17.05"
-# historyPath = "demoHistory/hist_2023-Feb-15.10.13/"
+# historyPath = "demoHistory/hist_2023-May-03.15.50/"
+# historyPath = "demoHistory/hist_2023-May-04.12.31/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
 # historyPath = NULL
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
@@ -150,7 +152,17 @@ chromeBrowser = function(url){
 }
 chromeBrowser = getOption("shiny.launch.browser", interactive())
 source("R/DotPlotwithModuleScore.R")
-
+# if(!is.null(historyPath)){
+#   shinyOptions(cache = cachem::cache_disk(paste0(historyPath, "/app_cache/cache/")))
+# }
+# options(error = dump.frames)
+# options(shiny.error=NULL)
+# options(shiny.error=recover)
+# options(shiny.jquery.version=3)
+# options(shiny.trace=TRUE)
+# options(shiny.devmode=F)
 runApp(app, port=3838, launch.browser = chromeBrowser)
-
+# 
+# last.dump[length(last.dump)]
+# debugger(last.dump)
 

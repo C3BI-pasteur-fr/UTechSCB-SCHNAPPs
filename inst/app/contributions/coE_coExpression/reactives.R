@@ -439,7 +439,7 @@ scranFindMarkerFullReactiveTable <- reactive({
   lfc <- isolate(input$coE_lfc)
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "pca:NULL because scEx_log is null\n")
     }
     return(NULL)
   }
@@ -503,7 +503,7 @@ coE_topExpCCTable <- reactive({
   projections <- projections()
   if (is.null(scEx_log)) {
     if (DEBUG) {
-      cat(file = stderr(), "pca:NULL\n")
+      cat(file = stderr(), "coE_topExpCCTable: scEx_log:NULL\n")
     }
     return(NULL)
   }

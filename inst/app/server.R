@@ -408,9 +408,12 @@ scShinyServer <- function(input, output, session) {
     } else {
       rm("historyPath", envir = .schnappsEnv)
     }
+    shinyOptions(cache = cachem::cache_disk(paste0(.schnappsEnv$historyPath, "/app_cache/cache/")))
+    # shinyOptions(cache = NULL)
+    # bindCache <- function(x, ...){return(x)}
   }
   # browser()
-  
+  # bindCache <- function(x, ...){return(x)}
   
 } # END SERVER
 
