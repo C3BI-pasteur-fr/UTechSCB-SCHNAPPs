@@ -268,7 +268,7 @@ output$DE_gene_vio_plot <- renderPlot({
   scEx_log <- scEx_log()
   projections <- projections()
   g_id <- input$DE_gene_id
-  ccols <- projectionColors$dbCluster
+  pc <- projectionColors %>% reactiveValuesToList()
   x = input$DE_gene_vio_x
   
   selectedCells <- DE_Exp_dataInput()
@@ -282,11 +282,11 @@ output$DE_gene_vio_plot <- renderPlot({
     if (DEBUG) cat(file = stderr(), "output$DE_gene_vio_plot:NULL\n")
     return(NULL)
   }
-  # debugControl("DE_gene_vio_plot", list = c(ls()))
+  debugControl("DE_gene_vio_plot", list = c(ls()))
   # cp = load(file="~/SCHNAPPsDebug/DE_gene_vio_plot.RData")
   
   
-  p1 <- DE_geneViolinFunc(scEx_log = scEx_log[, cellNs], g_id = g_id, projections = projections[cellNs, ], ccols = ccols, x)
+  p1 <- DE_geneViolinFunc(scEx_log = scEx_log[, cellNs], g_id = g_id, projections = projections[cellNs, ], ccols = pc[[x]], x)
   
   printTimeEnd(start.time, "DE_gene_vio_plot")
   exportTestValues(DE_gene_vio_plot = {
@@ -412,8 +412,8 @@ output$DE_panelPlot <- renderPlot({
   genesin <- strsplit(genesin, ",")
   genesin <- genesin[[1]]
   
-  if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
-  retVal <- panelPlotFunc(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs )
+  # if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
+  retVal <- panelPlotFunc_m(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs ) 
   
   setRedGreenButton(
     vars = list(

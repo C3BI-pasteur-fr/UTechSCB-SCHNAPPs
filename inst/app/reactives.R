@@ -1668,6 +1668,17 @@ scEx <- reactive({
   return(retVal)
 })
 
+## scEx_Hash ----
+scEx_Hash <- reactive({
+  scEx <- scEx()
+  require(digest)
+  if (is.null(scEx)) {
+    return(NULL)
+  }
+  return(sha1(as.matrix(assays(scEx)[[1]])))
+})
+
+
 # rawNormalization ----
 rawNormalization <- reactive({
   if (DEBUG) {
@@ -1755,7 +1766,15 @@ scEx_log <- reactive({
   return(scEx_log)
 })
 
-
+## scEx_log_Hash ----
+scEx_log_Hash <- reactive({
+    scEx_log <- scEx_log()
+    require(digest)
+    if (is.null(scEx_log)) {
+      return(NULL)
+    }
+    return(sha1(as.matrix(assays(scEx_log)[[1]])))
+})
 # scEx_log_sha <- reactive({
 #   scEx_log <- scEx_log()
 #   require(digest)
@@ -2117,8 +2136,8 @@ pcaReact <- reactive({
   })
   return(retVal)
 }) %>%
-  bindCache(scEx(),
-            scEx_log(),
+  bindCache(scEx_Hash(),
+            scEx_log_Hash(),
             runPCAclicked(),
             isolate(input$pcaRank),
             isolate(input$pcaN),
@@ -2262,7 +2281,6 @@ clusterBootstrapReactive <- reactive({
 })
 
 
-
 scran_Cluster <- function(){
   if (DEBUG) {
     cat(file = stderr(), "scran_Cluster started.\n")
@@ -2312,7 +2330,7 @@ scran_Cluster <- function(){
   if (is.null(seed)) {
     seed <- 1
   }
-  retVal <- scranCluster(
+  retVal <- scranCluster_m(
     pca,
     scEx,
     scEx_log,
@@ -2323,7 +2341,7 @@ scran_Cluster <- function(){
     clusterMethod,
     featureData,
     useRanks
-  )
+  ) 
   if (is.null(retVal)) {
     showNotification(
       paste("error: clustering didn't produce a result"),
@@ -2355,6 +2373,30 @@ scran_Cluster <- function(){
 }
 
 # Seurat clustering ----
+runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution) {
+  # creates object @assays$RNA@data and @assays$RNA@counts
+  seurDat <- CreateSeuratObject(
+    counts = assays(scEx)[[1]],
+    meta.data = meta.data
+  )
+  # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
+  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
+  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  dims = min(dims,ncol(pca$x)) 
+  
+  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
+                                          loadings = pca$rotation, 
+                                          stdev = pca$var_pcs, 
+                                          key = "PC_", 
+                                          assay = "RNA")
+  
+  
+  seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
+  seurDat <- FindClusters(seurDat, resolution = resolution)
+  retVal = data.frame(Barcode = colnames(seurDat),
+                      Cluster = Idents(seurDat))
+}
+# 
 seurat_Clustering <- function() {
   if (DEBUG) {
     cat(file = stderr(), "seurat_Clustering started.\n")
@@ -2395,28 +2437,9 @@ seurat_Clustering <- function() {
   cellMeta <- colData(scEx)
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
-  # creates object @assays$RNA@data and @assays$RNA@counts
-  seurDat <- CreateSeuratObject(
-    counts = assays(scEx)[[1]],
-    meta.data = meta.data
-  )
-  # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
-  dims = min(dims,ncol(pca$x)) 
-  
-  seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
-                                          loadings = pca$rotation, 
-                                          stdev = pca$var_pcs, 
-                                          key = "PC_", 
-                                          assay = "RNA")
-  
-  
-  seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
-  seurDat <- FindClusters(seurDat, resolution = resolution)
-  retVal = data.frame(Barcode = colnames(seurDat),
-                      Cluster = Idents(seurDat))
-  
+  # browser()
+  retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
+  # runSeuratClustering(scEx, meta.data, dims, pca, k.param, resolution)
   
   setRedGreenButton(
     vars = list(
@@ -2429,14 +2452,7 @@ seurat_Clustering <- function() {
   )
   
   return(retVal)
-} %>% bindCache(  isolate(scEx()), # need to be run when updated
-                  isolate(scEx_log()),
-                  isolate(pcaReact()),
-                  isolate(input$tabsetCluster),
-                  isolate(input$seurClustDims),
-                  isolate(input$seurClustk.param),
-                  isolate(input$seurClustresolution),
-)
+} 
 
 # snnGraph ----
 snnGraph <- function(){
@@ -2753,7 +2769,9 @@ projections <- reactive({
   # input data being loaded
   # .schnappsEnv$DEBUGSAVE = T
   scEx <- scEx()
+  printTimeEnd(start.time, "projections scEx")
   pca <- pcaReact()
+  printTimeEnd(start.time, "projections pca")
   # manually specified groups of cells (see 2D plot in moduleServer.R)
   prjs <- sessionProjections$prjs
   # derived/modified projections from projections tab
@@ -2781,8 +2799,10 @@ projections <- reactive({
     tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
     save(file = tfile, list = c("prjs", "newPrjs"))
   }
-  # deepDebug()
+  printTimeEnd(start.time, "projections save1")
   
+  # deepDebug()
+  # browser()
   
   
   # todo colData() now returns a s4 object of class DataFrame
@@ -2809,6 +2829,7 @@ projections <- reactive({
     }
     projections <- cbind(projections, pcax)
   }
+  printTimeEnd(start.time, "projections pca2")
   
   withProgress(message = "Performing projections", value = 0, {
     n <- length(.schnappsEnv$projectionFunctions)
@@ -2869,6 +2890,7 @@ projections <- reactive({
       # observe(proj[2], quoted = TRUE)
     }
   })
+  printTimeEnd(start.time, "projections after for")
   
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/projections.af.RData", list = c(ls()))
@@ -2883,6 +2905,7 @@ projections <- reactive({
       projections[, pdIdx] <- pd[, pdIdx]
     }
   }
+  printTimeEnd(start.time, "projections gene specific")
   
   if (ncol(prjs) > 0 ) {
     errorPrjs = FALSE
@@ -2902,6 +2925,8 @@ projections <- reactive({
       projections <- cbind(projections, prjs[rownames(projections),,drop=FALSE])
     }
   }
+  printTimeEnd(start.time, "projections error?")
+  
   # # remove columns with only one unique value
   # rmC <- c()
   # for (cIdx in 1:ncol(projections)) {
@@ -2925,6 +2950,7 @@ projections <- reactive({
   # TODO
   # this takes too long
   # UNCOMMENT
+  printTimeEnd(start.time, "projections add history")
   add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "projections", projections = projections)
   
   cat(file = stderr(), paste("\n\nscLog: ",isolate(input$whichscLog),"\n\n"))
@@ -2936,6 +2962,16 @@ projections <- reactive({
   # browser()
   # .schnappsEnv$DEBUGSAVE = F
   return(projections)
+})
+
+## projections_Hash ----
+projections_Hash <- reactive({
+  projections <- projections()
+  require(digest)
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  return(sha1(projections))
 })
 
 # projFactors ----

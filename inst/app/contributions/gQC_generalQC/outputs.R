@@ -1180,7 +1180,7 @@ if("DoubletFinder" %in% installed.packages()){
     # cp = load(file = "~/SCHNAPPsDebug/GS_DF_button.RData")
     
     dubs = tryCatch({
-      find_doublets(scEx, dims=1:dims, n_recovered=nRecover, pK=pK, pN=pN)
+      find_doublets_m(scEx, dims=1:dims, n_recovered=nRecover, pK=pK, pN=pN)
     }, 
     error = function(e) {
       cat(file = stderr(), paste("\n\n!!!Error during detach process:", e, "\n\nDo you need to increase the memory?\n\n"))

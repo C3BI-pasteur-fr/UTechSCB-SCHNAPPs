@@ -258,6 +258,22 @@ scShinyUI <- function(request) {
         # shinyjs::extendShinyjs(text = jsCode, functions = c("hidemenuItem", "showmenuItem")),
         # extendShinyjs(text = jsCode2, functions = c("pageCol")),
         tags$script("showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'block'; x.classList.add('menu-open');};"),
+        tags$script("$(document).on('shiny:connected', function(){
+  var startingUp = true;
+  Shiny.setInputValue('startingUp', '1');
+  function onTimeout() {
+    if(startingUp){
+      startingUp = 0;
+      Shiny.setInputValue('startingUp', '0');
+      alert('finished loading');
+    };
+  };
+  function startIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(onTimeout, timeoutWarningMsecs);
+  };
+  $(document).on('shiny:idle', onTimeout);
+});"),
         introjsUI(),
         shinyjs::inlineCSS(list(.red = "background-color: DarkSalmon; hover: red")),
         shinyjs::inlineCSS(list(.green = "background-color: lightgreen")),

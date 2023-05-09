@@ -502,7 +502,7 @@ umapReact <- reactive({
                 isolate(input$gQC_um_metric),
                 isolate(input$gQC_um_randSeed),
                 isolate(input$gQC_um_init),
-                scEx_log(),
+                scEx_log_Hash(),
                 pcaReact()
 )
 
@@ -647,5 +647,5 @@ if("DoubletFinder" %in% installed.packages()){
     # colnames(result) = c("DF.score", "DF.class")
     return(result)
   }
-  
+  # find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 }

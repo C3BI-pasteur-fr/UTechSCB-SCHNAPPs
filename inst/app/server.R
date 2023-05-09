@@ -115,6 +115,10 @@ if (all(c("future", "parallel") %in% rownames(installed.packages()))) {
 }
 
 # Sys.setenv(DEBUGME = ".")
+# this one will be overwritten later, but just in case
+.schnappsEnv$cacheDir = list(dir = NULL, 
+                             max_size = 2 * 1024 * 1024^2,
+                             logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL))
 base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 
 
@@ -129,7 +133,10 @@ scShinyServer <- function(input, output, session) {
   session$onSessionEnded(stopApp)
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
   
-  
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("starting application", id = "startSCHNAPPs", duration = NULL)
+  }
+
   # seed ----
   # TODO needs to be an option
   seed <- 2
@@ -323,20 +330,20 @@ scShinyServer <- function(input, output, session) {
       projFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "projections.*.RData")
       sxFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx\\..*.RData")
       sxLogFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scEx_log.*.RData")
-      scolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scol.*.RData")
-      ccolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "ccol.*.RData")
+      gmtFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "gmtData.*.RData")
+      # scolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "scol.*.RData")
+      # ccolFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "ccol.*.RData")
       plotFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = "plotData.*.RData")
       allDataFiles = dir(path = .schnappsEnv$historyPath, full.names = T, pattern = ".RData")
       # if there is already a history
       if(length(rmdFiles)>0 & length(projFiles)>0 & 
-         length(sxFiles)>0 & length(sxLogFiles)>0 & 
-         length(scolFiles)>0){
+         length(sxFiles)>0 & length(sxLogFiles)>0 ){
         deepDebug()
         # browser()
         # this will be overwritten but should be session specific
         oldTmpFolder = .schnappsEnv$reportTempDir
         # load input variables
-        fileInfo = c(sxLogFiles, plotFiles, ccolFiles, scolFiles, sxLogFiles, projFiles) %>% fs::file_info()
+        fileInfo = c(sxLogFiles, plotFiles, sxLogFiles, projFiles) %>% fs::file_info()
         latestFile = fileInfo %>% pull("birth_time") %>% order()  %>% last()
         # this should load inp, i.e. the old input variable with all parameters
         tempEnv =  new.env(parent=emptyenv())
@@ -371,26 +378,37 @@ scShinyServer <- function(input, output, session) {
           cat(file = stderr(), "input is null from history file please update SCHNAPPs and start over.")
         }
         rm("tempEnv")
-        #scol
-        fileInfo = scolFiles %>% file.info()
+        # gmtData
+        fileInfo = gmtFiles %>% file.info()
         latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
         tempEnv =  new.env(parent=emptyenv())
         cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
-        if("projectionColors" %in% cp) {
-          projectionColors <- tempEnv$projectionColors$projectionColors
-        }
-        if("scol" %in% cp) {
-          projectionColors$sampleNames <- unlist(tempEnv$scol$scol)
+        if("gmtData" %in% cp) {
+          gmtData(tempEnv$gmtData$gmtData) 
         }
         rm("tempEnv")
-        fileInfo = ccolFiles %>% file.info()
-        latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
-        tempEnv =  new.env(parent=emptyenv())
-        cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
-        if("ccol" %in% cp) {
-          projectionColors$dbCluster <- unlist(tempEnv$ccol$ccol)
-        }
-        rm("tempEnv")
+        
+        
+        # #scol
+        # fileInfo = scolFiles %>% file.info()
+        # latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+        # tempEnv =  new.env(parent=emptyenv())
+        # cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
+        # if("projectionColors" %in% cp) {
+        #   projectionColors <- tempEnv$projectionColors$projectionColors
+        # }
+        # if("scol" %in% cp) {
+        #   projectionColors$sampleNames <- unlist(tempEnv$scol$scol)
+        # }
+        # rm("tempEnv")
+        # fileInfo = ccolFiles %>% file.info()
+        # latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+        # tempEnv =  new.env(parent=emptyenv())
+        # cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
+        # if("ccol" %in% cp) {
+        #   projectionColors$dbCluster <- unlist(tempEnv$ccol$ccol)
+        # }
+        # rm("tempEnv")
         
         cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
         cat(file = stderr(),  "\n")
@@ -410,16 +428,40 @@ scShinyServer <- function(input, output, session) {
         # create directory with name and Rmd file
         createHistory(.schnappsEnv)
       }
+      .schnappsEnv$cacheDir = list(dir=paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/"),
+                                                 max_size = 2 * 1024 * 1024^2,
+                                                 logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL)
+      )
+      # .schnappsEnv$cacheDir = cachem::cache_disk(dir = NULL)
+      
       
     } else {
       rm("historyPath", envir = .schnappsEnv)
+      
     }
-    shinyOptions(cache = cachem::cache_disk(paste0(.schnappsEnv$historyPath, "./app_cache2/cache/")))
+    shinyOptions(cache = cachem::cache_disk(dir = paste0(.schnappsEnv$historyPath, "/app_cache2/cache/")))
     # shinyOptions(cache = NULL)
     # bindCache <- function(x, ...){return(x)}
   }
+  cat(file = stderr(), unlist(.schnappsEnv$cacheDir))
+  # browser()
+  # cacheDir is not known before and messes up things
+  heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  scranCluster_m <- memoise::memoise(scranCluster,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+
+    if("DoubletFinder" %in% installed.packages()){
+    find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  }
+  sCA_seuratFindMarkers_m = memoise::memoise(sCA_seuratFindMarkers,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  
   # browser()
   # bindCache <- function(x, ...){return(x)}
+  if (!is.null(getDefaultReactiveDomain())) {
+    removeNotification(id = "startSCHNAPPs")
+  }
   
 } # END SERVER
 

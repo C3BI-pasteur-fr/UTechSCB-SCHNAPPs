@@ -1474,7 +1474,7 @@ pHeatMapModule <- function(input, output, session,
     }
     # browser()
     colorList = lapply(addColNames, FUN = function(x){
-      cat(file = stderr(), x)
+      # cat(file = stderr(), x)
       if(x %in% names(pc)){
         heatmapData$annotation_colors[[x]] = pc[[x]]
       }
@@ -1490,7 +1490,7 @@ pHeatMapModule <- function(input, output, session,
     updateSliderInput(session = session, inputId = "heatmapCellGrp",
                       max = min(200,ncol(heatmapData$mat)-1))
     
-    retVal <- heatmapModuleFunction(
+    retVal <- heatmapModuleFunction_m(
       heatmapData = heatmapData,
       addColNames = addColNames,
       orderColNames = orderColNames,

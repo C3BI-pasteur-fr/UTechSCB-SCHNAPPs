@@ -566,8 +566,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     }
     colnames(expr_sel$expr_sel) = rowData(scEx[colnames(expr_sel$expr_sel),])$symbol
     
-    outfile <- paste0(tempdir(), "/heatmapScorpius", base::sample(1:10000, 1), ".png")
-    cat(file = stderr(), paste("saving to: ", outfile, "\n"))
+    # outfile <- paste0(tempdir(), "/heatmapScorpius", base::sample(1:10000, 1), ".png")
+    # cat(file = stderr(), paste("saving to: ", outfile, "\n"))
     outfile = NULL
     pst <- psTime$Pt[which(!is.na(psTime$Pt))]
     # modules <- extract_modules(scale_quantile(expr_sel), traj$time, verbose = F)
@@ -581,7 +581,12 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       retVal
     })
     return(retVal)
-  })
+  }) %>% bindCache(    Elpi_scEx(),
+                       Elpi_projections(),
+                       traj_getPseudotime(),
+                       traj_elpi_gimp(),
+                       traj_elpi_modules()
+  ) %>% bindEvent( input$elpiCalc)
   
  
   # elpiTreeData ----
@@ -1179,6 +1184,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   #' @examples \dontrun{tempora_data <- CalculatePWProfiles(tempora_data, gmt_path="~/Human_AllPathways_September_01_2019_symbol.gmt", parallel.sz = detectCores()-2)}
   #' @return An updated Tempora object containing the pathway enrichment profiles of each cluster, which can be accessed at \code{object@cluster.pathways}
   #' CalculatePWProfiles
+  
   CalculatePWProfiles_updated <- function(object, gmt_path, method="gsva", min.sz=5, max.sz=200, parallel.sz=1){
     if (class(object)[1] != "Tempora"){
       stop("Not a valid Tempora object")
@@ -1215,6 +1221,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     validObject(object)
     return(object)
   }
+  
   environment(CalculatePWProfiles_updated) <- asNamespace("Tempora")
   assignInNamespace("CalculatePWProfiles", CalculatePWProfiles_updated, ns = "Tempora")
   
@@ -1257,7 +1264,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     p_vals <- gams <- list()
     for (i in 1:length(themes)){
-      print(i)
+      print(i, length(themes))
       if(length(grep(themes[i], rownames(gsva_bycluster))) == 0) {
         p_vals[[i]] <- 1
         gams[[i]] <- NA
@@ -1294,6 +1301,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   }
   environment(IdentifyVaryingPWs_updated) <- asNamespace("Tempora")
   assignInNamespace("IdentifyVaryingPWs", IdentifyVaryingPWs_updated, ns = "Tempora")
+  IdentifyVaryingPWs_m <- memoise::memoise(Tempora::IdentifyVaryingPWs,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
   
   
   #  ----
@@ -1351,7 +1359,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       require(Matrix)
       require(BiocGenerics)
       # cat(file = stderr(), paste(idx, "\n"))
-      grp = BiocGenerics::grep(themes[idx], rownames(gsva_bycluster), ignore.case = T)
+      grp = BiocGenerics::grep(themes[idx], rownames(gsva_bycluster), fixed = T)
       crit = length(grp)
       if(crit == 0) {
         return(list(1, NA))
@@ -1850,7 +1858,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     return(temporaObj)
   })
-  
+
   # temporaTrajectory ----
   temporaTrajectory <- reactive({
     if (DEBUG) cat(file = stderr(), "temporaTrajectory started.\n")
@@ -1942,7 +1950,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     #Fit GAMs on pathway enrichment profile
     temporaObj <- IdentifyVaryingPWsParallel(object = temporaObj, pval_threshold = temporaPval_thresh)
-    # temporaObj <- IdentifyVaryingPWs(object = temporaObj, pval_threshold = temporaPval_thresh)
+    # temporaObj <- IdentifyVaryingPWs_m(object = temporaObj, pval_threshold = temporaPval_thresh)
     
     if (is.null(varying.pws(temporaObj))){
       if (!is.null(getDefaultReactiveDomain())) {

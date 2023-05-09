@@ -417,7 +417,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
                        sc_numericInput(
                          inputId = "temporaPval_thresh",
                          label = "max p-value",
-                         value = defaultValue("temporaPval_thresh", 0.5)
+                         value = defaultValue("temporaPval_thresh", 0.99)
                        )
                      )
                      ),
