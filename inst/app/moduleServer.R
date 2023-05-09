@@ -680,6 +680,7 @@ clusterServer <- function(input, output, session,
     if (length(grpN) == 0 || nchar(grpN) == 0) {
       return(NULL)
     }
+    # browser()
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "save: changeGroups\n")
       save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls()))

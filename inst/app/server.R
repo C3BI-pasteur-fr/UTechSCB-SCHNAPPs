@@ -116,9 +116,7 @@ if (all(c("future", "parallel") %in% rownames(installed.packages()))) {
 
 # Sys.setenv(DEBUGME = ".")
 # this one will be overwritten later, but just in case
-.schnappsEnv$cacheDir = list(dir = NULL, 
-                             max_size = 2 * 1024 * 1024^2,
-                             logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL))
+.schnappsEnv$cacheDir = NULL
 base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 
 
@@ -136,7 +134,7 @@ scShinyServer <- function(input, output, session) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("starting application", id = "startSCHNAPPs", duration = NULL)
   }
-
+  
   # seed ----
   # TODO needs to be an option
   seed <- 2
@@ -160,9 +158,9 @@ scShinyServer <- function(input, output, session) {
       } else {
         if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
           packagePath <- "~/Rstudio/Schnapps/inst/app/"
-      } else {
-        stop("package path not found\n")
-      }
+        } else {
+          stop("package path not found\n")
+        }
       }
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
@@ -418,20 +416,21 @@ scShinyServer <- function(input, output, session) {
           sessionProjections$prjs = prjs
           projectionsTable$newProjections = newPrjs
         }
-       
+        
         # derived/modified projections from projections tab
         deepDebug()
         .schnappsEnv$reportTempDir = oldTmpFolder
         
-
+        
       } else { 
         # create directory with name and Rmd file
         createHistory(.schnappsEnv)
       }
-      .schnappsEnv$cacheDir = list(dir=paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/"),
-                                                 max_size = 2 * 1024 * 1024^2,
-                                                 logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL)
-      )
+      if(!is.null(.schnappsEnv$historyPath))
+        .schnappsEnv$cacheDir = list(dir=paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/"),
+                                     max_size = 2 * 1024 * 1024^2,
+                                     logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL)
+        )
       # .schnappsEnv$cacheDir = cachem::cache_disk(dir = NULL)
       
       
@@ -439,24 +438,38 @@ scShinyServer <- function(input, output, session) {
       rm("historyPath", envir = .schnappsEnv)
       
     }
-    shinyOptions(cache = cachem::cache_disk(dir = paste0(.schnappsEnv$historyPath, "/app_cache2/cache/")))
+    if(!is.null(.schnappsEnv$historyPath)) shinyOptions(cache = cachem::cache_disk(dir = paste0(.schnappsEnv$historyPath, "/app_cache2/cache/")))
     # shinyOptions(cache = NULL)
     # bindCache <- function(x, ...){return(x)}
   }
-  cat(file = stderr(), unlist(.schnappsEnv$cacheDir))
+
   # browser()
   # cacheDir is not known before and messes up things
-  heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  scranCluster_m <- memoise::memoise(scranCluster,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-
+  if(!is.null(.schnappsEnv$cacheDir)){
+    cat(file = stderr(), unlist(.schnappsEnv$cacheDir))
+    heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    scranCluster_m <- memoise::memoise(scranCluster,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    
     if("DoubletFinder" %in% installed.packages()){
-    find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+      find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    }
+    sCA_seuratFindMarkers_m = memoise::memoise(sCA_seuratFindMarkers,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  } else {
+    heatmapModuleFunction_m = heatmapModuleFunction
+    runSeuratClustering_m <- runSeuratClustering
+    panelPlotFunc_m = panelPlotFunc
+    runDESEQ2_m <- runDESEQ2
+    scranCluster_m <- scranCluster
+    
+    if("DoubletFinder" %in% installed.packages()){
+      find_doublets_m <- find_doublets
+    }
+    sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
+    
   }
-  sCA_seuratFindMarkers_m = memoise::memoise(sCA_seuratFindMarkers,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  
   # browser()
   # bindCache <- function(x, ...){return(x)}
   if (!is.null(getDefaultReactiveDomain())) {

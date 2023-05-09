@@ -286,6 +286,7 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
 
 output$scranFindMarkersSelected <- renderText({
   scEx_log = scEx_log()
+  req(scEx_log)
   featureData <- rowData(scEx_log)
   wmarkers = scranFindMarkerFullReactiveTable()
   nFindCluster <- isolate(input$coE_nFindMarker)

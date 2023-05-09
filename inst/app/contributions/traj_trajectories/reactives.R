@@ -1301,8 +1301,11 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   }
   environment(IdentifyVaryingPWs_updated) <- asNamespace("Tempora")
   assignInNamespace("IdentifyVaryingPWs", IdentifyVaryingPWs_updated, ns = "Tempora")
-  IdentifyVaryingPWs_m <- memoise::memoise(Tempora::IdentifyVaryingPWs,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  
+  if(!is.null(.schnappsEnv$cacheDir)){
+    IdentifyVaryingPWs_m <- memoise::memoise(Tempora::IdentifyVaryingPWs,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  } else {
+    IdentifyVaryingPWs_m = Tempora::IdentifyVaryingPWs
+  }
   
   #  ----
   #' Calculate temporally changing pathways (parallel version)
