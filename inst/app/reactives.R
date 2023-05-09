@@ -576,7 +576,7 @@ readCSV <- function(inFile) {
   stats[1, "nFeatures"] <- nrow(data)
   stats[1, "nCells"] <- ncol(data)
   inputFileStats$stats <- stats
-  
+  isolate(allCellNames(rownames(colData(dataTables$scEx))))
   return(dataTables)
 }
 
