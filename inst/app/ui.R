@@ -258,6 +258,7 @@ scShinyUI <- function(request) {
         # shinyjs::extendShinyjs(text = jsCode, functions = c("hidemenuItem", "showmenuItem")),
         # extendShinyjs(text = jsCode2, functions = c("pageCol")),
         tags$script("showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'block'; x.classList.add('menu-open');};"),
+        # alert('finished loading');
         tags$script("$(document).on('shiny:connected', function(){
   var startingUp = true;
   Shiny.setInputValue('startingUp', '1');
@@ -265,7 +266,7 @@ scShinyUI <- function(request) {
     if(startingUp){
       startingUp = 0;
       Shiny.setInputValue('startingUp', '0');
-      alert('finished loading');
+
     };
   };
   function startIdleTimer() {

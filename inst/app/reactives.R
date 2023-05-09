@@ -551,7 +551,7 @@ readCSV <- function(inFile) {
   if (all(stringr::str_detect(colnames(data),"-"))) {
     sampleNames = unlist(lapply(colnames(data), function(x) stringr::str_split(x,"-")[[1]][2]))
   } else {
-    sampleNames = as.factor(rep(tools::file_path_sans_ext(inFile$name), ncol(data)))
+    sampleNames = as.factor(rep(tools::file_path_sans_ext(inFile$name) %>% make.names(), ncol(data)))
   }
   scExnew <- SingleCellExperiment(
     assay = list(counts = exAll),
@@ -661,6 +661,7 @@ appendAnnotation <- function(scEx, annFile) {
         for (cCol in colnames(cDat)[commonCols]) {
           if (is(cDat[, cCol], "factor")) {
             cDat[, cCol] <- factor(data[, cCol])
+            levels(cDat[, cCol]) = make.names(levels(cDat[, cCol]))
           }
         }
       }
@@ -670,6 +671,7 @@ appendAnnotation <- function(scEx, annFile) {
         lv <- levels(factor(data[, cn]))
         if (length(lv) <= 20) {
           data[, cn] <- factor(data[, cn])
+          levels(data[,cn]) = make.names(levels(data[,cn]))
         }
       }
       # only take cells that are also in the data set
