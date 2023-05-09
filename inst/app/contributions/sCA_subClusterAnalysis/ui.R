@@ -110,7 +110,7 @@ tabList <- list(
                  shinydashboardPlus::box(title = "scDEA parameters", width = 12,solidHeader = TRUE, 
                      fluidRow(
                        column(width = 3,
-                              sc_checkboxInput("scDEA_parallel", "use parallel implementations", value = defaultValue("scDEA_parallel", TRUE)),
+                              sc_checkboxInput("scDEA_parallel", "use parallel implementations", value = defaultValue("scDEA_parallel", FALSE)),
                        )
                      ),
                      fluidRow(

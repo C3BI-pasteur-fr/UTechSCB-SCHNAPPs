@@ -8,7 +8,7 @@
 library(doParallel)
 library("future.callr")
 
-registerDoParallel(cores=8)
+registerDoParallel(cores=3)
 suppressMessages(require(shinyjqui))
 
 library(reactlog)
@@ -17,11 +17,12 @@ library(reactlog)
 # }
 #
 library(future)
-plan("multisession", workers = 6)
-# plan(callr, workers = 6)
+# plan("multisession", workers = 3)
+plan(callr, workers = 3
+     )
 
 library("BiocParallel")
-register(MulticoreParam(6))
+register(MulticoreParam(3))
 # register(SerialParam())
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
@@ -35,7 +36,7 @@ DEBUG = T
 DEBUGSAVE = F
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Jan-18.09.02"
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Feb-22.17.42/"
-historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-04.18.02/"
+historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-08.10.02/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/katja/hist_2022-Dec-26.17.05"
 # historyPath = "demoHistory/hist_2023-May-03.15.50/"

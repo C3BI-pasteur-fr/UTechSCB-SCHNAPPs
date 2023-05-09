@@ -7,7 +7,7 @@ sCA_selectedDge <- reactiveValues(
 
 #' sCA_getCells
 #' get list of cells from selctions
-sCA_getCells <- function(projections, cl1, db1, db2) {
+sCA_getCells <- function(projections, cl1, db1, db2, db1x, db1y) {
   if (DEBUG) cat(file = stderr(), "sCA_getCells started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -24,12 +24,15 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   # cp =load("~/SCHNAPPsDebug/sCA_getCells.RData")
   # dbCluster = projections$dbCluster
   subsetData <- projections[cl1,]
-  
-  if (is(subsetData[,db1$mapping$x], "logical")) {
-    subsetData[,db1$mapping$x] = as.numeric(subsetData[,db1$mapping$x]) + 1
+  # db1x = db1$mapping$x
+  # db1y = db1$mapping$y
+  db1$mapping$x = db1x
+  db1$mapping$y = db1y
+  if (is(subsetData[,db1x], "logical")) {
+    subsetData[,db1x] = as.numeric(subsetData[,db1x]) + 1
   }
-  if (is(subsetData[, db1$mapping$y], "logical")) {
-    subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y]) + 1
+  if (is(subsetData[, db1y], "logical")) {
+    subsetData[, db1y] <- as.numeric(subsetData[, db1y]) + 1
   }
   
   
@@ -38,12 +41,12 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   # TODO WHY is discrete_limits set/misused?????
   # ggplot is not displaying levels for which there are no values
   # thus, the numbering might be off 
-  if (is(subsetData[, db1$mapping$x], "factor")) {
-    subsetData[, db1$mapping$x] <- as.numeric(subsetData[, db1$mapping$x])
+  if (is(subsetData[, db1x], "factor")) {
+    subsetData[, db1x] <- as.numeric(subsetData[, db1x])
     db1$domain$discrete_limits <- NULL
   }
-  if (is(subsetData[, db1$mapping$y], "factor")) {
-    subsetData[, db1$mapping$y] <- as.numeric(subsetData[, db1$mapping$y])
+  if (is(subsetData[, db1y], "factor")) {
+    subsetData[, db1y] <- as.numeric(subsetData[, db1y])
     db1$domain$discrete_limits <- NULL
   }
   db1$domain$discrete_limits <- NULL
@@ -52,15 +55,19 @@ sCA_getCells <- function(projections, cl1, db1, db2) {
   cells.2 = c()
   if (!is.null(db2)) {
     db2$domain$discrete_limits <- NULL
+    db2x = db1x
+    db2y = db1y
+    db2$mapping$x = db1x
+    db2$mapping$y = db1y
     
     # factors and brushedPoints don't work together.
     # so we change a factor into a numeric
-    if (is(subsetData[, db2$mapping$x], "factor")) {
-      subsetData[, db2$mapping$x] <- as.numeric(subsetData[, db2$mapping$x])
+    if (is(subsetData[, db2x], "factor")) {
+      subsetData[, db2x] <- as.numeric(subsetData[, db2x])
       db2$domain$discrete_limits <- NULL
     }
-    if (is(subsetData[, db2$mapping$y], "factor")) {
-      subsetData[, db2$mapping$y] <- as.numeric(subsetData[, db2$mapping$y])
+    if (is(subsetData[, db2y], "factor")) {
+      subsetData[, db2y] <- as.numeric(subsetData[, db2y])
       db2$domain$discrete_limits <- NULL
     }
     cells.2 <- rownames(shiny::brushedPoints(df = subsetData, brush = db2))
@@ -219,25 +226,26 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
 
 sCA_dge_s_wilcox <- function(scEx_log, cells.1, cells.2){
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="wilcox", normFact)
+  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="wilcox", normFact) 
 }
 sCA_dge_s_bimod <- function(scEx_log, cells.1, cells.2){
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="bimod")
+  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="bimod") 
 }
 sCA_dge_s_t <- function(scEx_log, cells.1, cells.2){
+  if (.schnappsEnv$DEBUG) cat(file = stderr(), paste0("sCA_dge_s_t: \n"))
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="t", normFact)
+  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="t", normFact) 
 }
 sCA_dge_s_LR<- function(scEx_log, cells.1, cells.2){
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="LR", normFact)
+  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="LR", normFact)
 }
 sCA_dge_s_negbinom <- function(scEx_log, cells.1, cells.2){
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="negbinom", normFact = 1)
+  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="negbinom", normFact = 1)
 }
 sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2){
-  sCA_seuratFindMarkers(scEx_log, cells.1, cells.2, test="poisson", normFact = 1)
+  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="poisson", normFact = 1) 
 }
 
 #' scDEA
@@ -343,7 +351,9 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
                              DEsingle.parallel = isolate(input$scDEA_parallel),
                              DESeq2.parallel = isolate(input$scDEA_parallel),
                              MAST.parallel = isolate(input$scDEA_parallel),
-                             monocle.cores = ifelse(isolate(input$scDEA_parallel),parallel::detectCores(),1)
+                             monocle.cores = ifelse(isolate(input$scDEA_parallel),
+                                                    max(floor(parallel::detectCores()/2),1), #assure min 1 core used and not all, i.e. about 50% for memory reasons
+                                                    1)
                              
                              ))
     )
@@ -374,6 +384,27 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
 
 #' sCA_dge_deseq2
 #' calculate dge using DESeq2
+runDESEQ2 <- function(data.use, group.info) {
+  dds1 <- DESeq2::DESeqDataSetFromMatrix(
+    countData = data.use,
+    colData = group.info,
+    design = ~group
+  )
+  dds1 <- DESeq2::estimateSizeFactors(object = dds1, type = "poscounts")
+  dds1 <- DESeq2::estimateDispersions(object = dds1, fitType = "local")
+  dds1 <- DESeq2::nbinomWaldTest(object = dds1)
+  res <- DESeq2::results(
+    object = dds1,
+    contrast = c("group", "Group1", "Group2"),
+    alpha = 0.05
+  )
+  res$log2FoldChange[is.na(res$log2FoldChange)] <- 0
+  res$padj[is.na(res$padj)] <- 1
+  res$pvalue[is.na(res$pvalue)] <- 1
+  return(res)
+}
+
+
 sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   if (DEBUG) cat(file = stderr(), "sCA_dge_deseq2 started.\n")
   start.time <- base::Sys.time()
@@ -415,22 +446,7 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
     .schnappsEnv$normalizationFactor = 1
   }
   data.use = assays(scEx_log)[[1]][,rownames(group.info)]
-  dds1 <- DESeq2::DESeqDataSetFromMatrix(
-    countData = data.use,
-    colData = group.info,
-    design = ~group
-  )
-  dds1 <- DESeq2::estimateSizeFactors(object = dds1, type = "poscounts")
-  dds1 <- DESeq2::estimateDispersions(object = dds1, fitType = "local")
-  dds1 <- DESeq2::nbinomWaldTest(object = dds1)
-  res <- DESeq2::results(
-    object = dds1,
-    contrast = c("group", "Group1", "Group2"),
-    alpha = 0.05
-  )
-  res$log2FoldChange[is.na(res$log2FoldChange)] <- 0
-  res$padj[is.na(res$padj)] <- 1
-  res$pvalue[is.na(res$pvalue)] <- 1
+  res = runDESEQ2_m(data.use, group.info) 
   featureData <- rowData(scEx_log)
   
   to.return <- data.frame(
@@ -441,7 +457,6 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
   
   return(to.return)
 }
-
 
 
 #' sCA_dge_CellViewfunc
@@ -554,7 +569,8 @@ sCA_dge <- reactive({
   sampdesc <- isolate(selectedCells$selectionDescription())
   prj <- isolate(selectedCells$ProjectionUsed())
   prjVals <- isolate(selectedCells$ProjectionValsUsed())
-  
+  db1x <- isolate(input$sCA_subscluster_x1)
+  db1y <- isolate(input$sCA_subscluster_y1)
   db1 <- isolate(input$db1)
   db2 <- isolate(input$db2)
   method <- isolate(input$sCA_dgeRadioButton)
@@ -565,6 +581,7 @@ sCA_dge <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
+  # browser()
   if(method==""){
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("dge: NULL,did you select a method?", id = "dgewarning", 
@@ -582,7 +599,7 @@ sCA_dge <- reactive({
   # deepDebug()
   methodIdx <- ceiling(which(unlist(.schnappsEnv$diffExpFunctions) == method) / 2)
   dgeFunc <- .schnappsEnv$diffExpFunctions[[methodIdx]][2]
-  gCells <- sCA_getCells(projections, cl1 = cellNs, db1, db2)
+  gCells <- sCA_getCells(projections, cl1 = cellNs, db1, db2, db1x, db1y)
   
   # in case we need counts and not normalized counts
   if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson", "sCA_scDEA")) {
@@ -758,11 +775,11 @@ subCluster2Dplot <- function() {
       mycolPal <- ccols
     }
     
-    p1 <-
-      ggplot(subsetData,
-             # this version causes a crash with unknown column seleted
-             # aes(x = .data[[x1]], y = .data[[y1]]),
-             aes_string(x = x1, y = y1),
+    p1 <- subsetData %>%
+      ggplot(
+             # this version causes a crash with unknown column selected
+             aes(x = .data[[x1]], y = .data[[y1]]),
+             # aes_string(x = x1, y = y1),
              colour = mycolPal[subsetData[,prjs]]
       ) +
       geom_point(colour = mycolPal[subsetData[,prjs]]) +

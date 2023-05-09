@@ -551,7 +551,6 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
                     top = text_grob(sampdesc)
     )
   return(retVal)
-}
-
+} 
 
 

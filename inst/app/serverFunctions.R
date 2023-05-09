@@ -1267,6 +1267,8 @@ add2history <- function(type, comment = "", input = input, ...) {
     # if this variable is not set we are not saving
     return(NULL)
   }
+  if(!"startingUp" %in% names(input)) return(NULL)
+  # browser()
   # deepDebug()
   sessionI = sessionInfo()
   defaultValues = .schnappsEnv$defaultValues
@@ -1687,6 +1689,9 @@ heatmapModuleFunction <- function(
   
   return(retVal)
 }
+
+# this has to be called after the cache setup... moved to server.R
+# heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 
 # consolidateScEx ----
 
@@ -2110,6 +2115,12 @@ loadInput = function(inp, session, input){
 }
 
 debugControl <- function( name = "cellSelectionModule", list = c(ls())){
+  if(.schnappsEnv[["DEBUG"]]){
+    cat(file = stderr(), paste("debugControl: ", name, "\n"))
+  }
+  envir = parent.frame(n=1)
+  listObj = lapply(list, FUN=function(x) get(x, envir = envir))
+  names(listObj) = list
   saveVal = FALSE
   if(!is.null(.schnappsEnv[["DEBUGSAVE"]])) {
     saveVal = .schnappsEnv[["DEBUGSAVE"]]
@@ -2119,7 +2130,11 @@ debugControl <- function( name = "cellSelectionModule", list = c(ls())){
     saveVal = .schnappsEnv[[paste0("DEBUGSAVE_",name)]]
   }
   if (saveVal ) {
+    browser()
     save(file = paste0("~/SCHNAPPsDebug/", name, ".RData"), list = list)
+  }
+  if(.schnappsEnv[["DEBUG"]]){
+    cat(file = stderr(), paste("debugControl: ", name, "done\n"))
   }
 }
 

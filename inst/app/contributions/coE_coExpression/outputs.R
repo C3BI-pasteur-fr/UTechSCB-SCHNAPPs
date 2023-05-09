@@ -517,7 +517,7 @@ coeMinMax2 = reactive({
     list(x = NA, y = NA)
   else
     input$coEminMaxExpr2 
-})%>% debounce(1000)
+}) %>% debounce(1000)
 
 output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
   # output$coE_geneGrp_vio_plot2 <- renderPlot({
