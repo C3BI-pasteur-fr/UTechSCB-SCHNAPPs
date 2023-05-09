@@ -377,12 +377,15 @@ scShinyServer <- function(input, output, session) {
         }
         rm("tempEnv")
         # gmtData
-        fileInfo = gmtFiles %>% file.info()
-        latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
-        tempEnv =  new.env(parent=emptyenv())
-        cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
-        if("gmtData" %in% cp) {
-          gmtData(tempEnv$gmtData$gmtData) 
+        # browser()
+        if(!isEmpty(gmtFiles)){
+          fileInfo = gmtFiles %>% file.info()
+          latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
+          tempEnv =  new.env(parent=emptyenv())
+          cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
+          if("gmtData" %in% cp) {
+            gmtData(tempEnv$gmtData$gmtData) 
+          }
         }
         rm("tempEnv")
         
@@ -442,7 +445,7 @@ scShinyServer <- function(input, output, session) {
     # shinyOptions(cache = NULL)
     # bindCache <- function(x, ...){return(x)}
   }
-
+  
   # browser()
   # cacheDir is not known before and messes up things
   if(!is.null(.schnappsEnv$cacheDir)){
