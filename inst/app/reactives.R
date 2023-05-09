@@ -1672,12 +1672,19 @@ scEx <- reactive({
 
 ## scEx_Hash ----
 scEx_Hash <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "scEx_Hash started.\n")
+  }
   scEx <- scEx()
   require(digest)
   if (is.null(scEx)) {
     return(NULL)
   }
-  return(sha1(as.matrix(assays(scEx)[[1]])))
+  hash = sha1(as.matrix(assays(scEx)[[1]]))
+  if (DEBUG) {
+    cat(file = stderr(), "scEx_Hash ended\n")
+  }
+  return(hash)
 })
 
 
@@ -1770,12 +1777,19 @@ scEx_log <- reactive({
 
 ## scEx_log_Hash ----
 scEx_log_Hash <- reactive({
-    scEx_log <- scEx_log()
+  if (DEBUG) {
+    cat(file = stderr(), "scEx_log_Hash started.\n")
+  }
+  scEx_log <- scEx_log()
     require(digest)
     if (is.null(scEx_log)) {
       return(NULL)
     }
-    return(sha1(as.matrix(assays(scEx_log)[[1]])))
+  hash = sha1(as.matrix(assays(scEx_log)[[1]]))
+  if (DEBUG) {
+    cat(file = stderr(), "scEx_log_Hash ended\n")
+  }
+  return(hash)
 })
 # scEx_log_sha <- reactive({
 #   scEx_log <- scEx_log()
@@ -2398,6 +2412,9 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
 }
+# will be overwritten later in server.R if we are using memoise
+runSeuratClustering_m <- runSeuratClustering
+
 # 
 seurat_Clustering <- function() {
   if (DEBUG) {
@@ -2968,12 +2985,19 @@ projections <- reactive({
 
 ## projections_Hash ----
 projections_Hash <- reactive({
+  if (DEBUG) {
+    cat(file = stderr(), "projections_Hash started.\n")
+  }
   projections <- projections()
   require(digest)
   if (is.null(projections)) {
     return(NULL)
   }
-  return(sha1(projections))
+  hash = sha1(projections)
+  if (DEBUG) {
+    cat(file = stderr(), "projections_Hash started.\n")
+  }
+  return(hash)
 })
 
 # projFactors ----
