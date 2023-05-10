@@ -1689,6 +1689,8 @@ heatmapModuleFunction <- function(
     # do.call(TRONCO::pheatmap, heatmapData),
     error = function(e){
       cat (file = stderr(), paste(e))
+      save(file = "~/SCHNAPPsDebug/heatmapError.rdata", list = ls(parent.frame(n=4)))
+      # browser()
       return(NULL)
     }
   )

@@ -1441,6 +1441,7 @@ pHeatMapModule <- function(input, output, session,
     }
     
     ns <- session$ns
+    # browser()
     heatmapData <- pheatmapList()
     addColNames <- addOptions()$ColNames
     orderColNames <- addOptions()$orderColNames
@@ -1463,7 +1464,7 @@ pHeatMapModule <- function(input, output, session,
     input$pHeatMapPlot__shinyjquiBookmarkState__resizable$width
     input$pHeatMapPlot__shinyjquiBookmarkState__resizable$height
     proje <- projections()
-    if (DEBUG) cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot\n")
+    if (DEBUG) cat(file = stderr(), paste("output$pHeatMapModule:pHeatMapPlot", ns("t"),"\n"))
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
       save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", 

@@ -1071,7 +1071,7 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
   # })
   pc = projectionColors %>% reactiveValuesToList()
   setRedGreenButtonCurrent(
-    vars = pc
+    vars = list(c("pc", pc %>% unlist()))
   )
   add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "Colors", projectionColors = pc)
   
