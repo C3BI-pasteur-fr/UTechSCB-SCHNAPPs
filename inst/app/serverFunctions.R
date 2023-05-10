@@ -1678,6 +1678,12 @@ heatmapModuleFunction <- function(
   # col_fun =  c("blue", "white", "red","green")
   # heatmapData$annotation_colors$PC2=col_fun
   # heatmapData$annotation_colors$PC2
+  # 
+  # hande missing values in annotation_col
+  # heatmapData$annotation_col <- 
+  heatmapData$annotation_col = heatmapData$annotation_col %>% mutate_if(is.numeric, function(x) ifelse( is.na(x), min(x, na.rm = T),x))
+  
+
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),

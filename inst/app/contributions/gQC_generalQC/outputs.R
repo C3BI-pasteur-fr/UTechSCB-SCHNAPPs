@@ -504,13 +504,14 @@ output$gQC_geneSetsearchOutput = renderText({
     cat(file = stderr(), "!!!!geneSetsearchOutput: no genes found\n")
     return(NULL)
   }
-  counts = lapply(gd, FUN=function(x)sum(li %in% x$genes))
+  counts = bplapply(gd, FUN=function(x)sum(li %in% x$genes))
   counts = counts[which(counts>0)]
   outStr = ""
   countNames = counts %>% unlist() %>% sort(decreasing = T) %>% names()
   for (name in countNames){
-    outStr = paste(outStr, name, "found:", counts[[name]], "\n",
+    outStr = paste(outStr, name, "found:", counts[[name]], " of ", length(gd[[name]]$genes),"\n",
                    gd[[name]]$desc, "\n",
+                   li[which(li %in% x$genes)], "\n",
                    paste(gd[[name]]$genes, collapse=", "), "\n\n")
     
   }
