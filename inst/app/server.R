@@ -432,7 +432,7 @@ scShinyServer <- function(input, output, session) {
       if(!is.null(.schnappsEnv$historyPath))
         .schnappsEnv$cacheDir = list(dir=paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/"),
                                      max_size = 20 * 1024 * 1024^2,
-                                     logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL)
+                                     logfile = stderr()
         )
       # .schnappsEnv$cacheDir = cachem::cache_disk(dir = NULL)
       

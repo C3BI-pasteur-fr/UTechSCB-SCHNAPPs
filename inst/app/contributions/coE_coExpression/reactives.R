@@ -18,7 +18,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls()))
   }
   # cp=load(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData")
-  
+  # browser()
   #  create parameters used for pheatmap module
   genesin <- geneName2Index(genesin, featureData)
   if (is.null(genesin) | is.null(cells)) {
