@@ -765,8 +765,8 @@ output$ColorSelection <- renderUI({
   lev1 <- levels(projections$dbCluster)
   lev2 <- levels(colData(scEx)$sampleNames)
   # deepDebug()
-
-    # function for selecting colors for a factorial
+  
+  # function for selecting colors for a factorial
   tmpFun <- function(name = "Sample", value = "SampleColorPanel", lev = lev2, idStr = "sampleNamecol", sampCol, allowedColors){
     tabPanel(
       name, value = value,
@@ -813,13 +813,13 @@ output$ColorSelection <- renderUI({
     if(is.factor(projections[,name])){
       if(length(levels(projections[,name]))>30) return(NULL)
       return(tmpFun(name = name, value = paste0(name, "ColorPanel"), lev = levels(projections[,name]), idStr = paste0(name, ".col."),
-             sampCol = defaultValue(paste0(name, ".colVec"), allowedColors[seq(levels(projections[,name]))]),
-             allowedColors = allowedColors)
+                    sampCol = defaultValue(paste0(name, ".colVec"), allowedColors[seq(levels(projections[,name]))]),
+                    allowedColors = allowedColors)
       )
     } else {
       return(tmpFunCont(name = name, value = paste0(name, "ColorPanel"),
-                    sampCol = defaultValue(paste0(name, ".colVec"), c("white", "#2D96FA")),
-                    allowedColors = allowedColors)
+                        sampCol = defaultValue(paste0(name, ".colVec"), c("white", "#2D96FA")),
+                        allowedColors = allowedColors)
       )
     }
     
@@ -1006,7 +1006,7 @@ obscolorParamsChanger <- reactive({
 # observe: color selection----
 # observeEvent(eventExpr = input$updateColors | projections(), label = "ob_colorParams", {
 observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
-    deepDebug()
+  deepDebug()
   if (DEBUG) cat(file = stderr(), "observe color Vars\n")
   
   scEx <- scEx()
@@ -1475,6 +1475,34 @@ ob_clusterParams <- observe(label = "ob_clusterParams", {
     updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
       "useRanks", "clusterSource","geneSelectionClustering",
       "minClusterSize", "clusterMethod", "tabsetCluster"
+    ))
+  }
+  if (tabsetCluster == "snnGraph") {
+    setRedGreenButton(
+      vars = list(
+        # c("snnClusterSource", isolate(input$snnClusterSource)),
+        c("snnType", isolate(input$snnType)),
+        c("tabsetCluster", isolate(input$tabsetCluster))
+      ),
+      button = "updateClusteringParameters"
+    )
+    updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
+      "snnType", "tabsetCluster"
+    ))
+  }
+  if (tabsetCluster == "simlrFunc") {
+    setRedGreenButton(
+    vars = list(
+      # c("snnClusterSource", isolate(input$snnClusterSource)),
+      c("snnType", isolate(input$snnType)),
+      c("tabsetCluster", isolate(input$tabsetCluster)),
+      c("simlr_nClust", isolate(input$simlr_nClust)),
+      c("simlr_maxClust", isolate(input$simlr_maxClust))
+    ),
+    button = "updateClusteringParameters"
+  )
+    updateButtonColor(buttonName = "updateClusteringParameters", parameters = c(
+      "snnType", "simlr_nClust", "simlr_maxClust", "tabsetCluster"
     ))
   }
 })

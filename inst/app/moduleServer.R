@@ -1012,6 +1012,7 @@ tableSelectionServer <- function(input, output, session,
     start.time <- base::Sys.time()
     on.exit(
       if (!is.null(getDefaultReactiveDomain())) {
+        printTimeEnd(start.time, "cellNameTable")
         removeNotification(id = "save2Hist")
       }
     )
@@ -1020,9 +1021,11 @@ tableSelectionServer <- function(input, output, session,
       showNotification("save2Hist", id = "save2Hist", duration = NULL)
     }
     if (is.null(clicked)) {
+      if (DEBUG) cat(file = stderr(), "observe input$save2HistTabUi clicked=NULL\n")
       return()
     }
     if (clicked < 1) {
+      if (DEBUG) cat(file = stderr(), paste("observe input$save2HistTabUi clicked < 1:", clicked,"\n"))
       return()
     }
     req(.schnappsEnv[[ns("historyTable")]])

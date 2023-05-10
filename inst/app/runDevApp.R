@@ -27,16 +27,16 @@ register(MulticoreParam(3))
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
 localContributionDir = ""
-defaultValueSingleGene = "IL7R" # CD52
+defaultValueSingleGene = "PDX1" # CD52
 defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
-defaultValueMultiGenes = "LINC00115, NOC2L, HES4, ISG15, TNFRSF18, CD52, SH3BGRL3"
+defaultValueMultiGenes = "PDX1, Sox9, rfx6, ptf1a, hnf1b, gata6, neurog3, nkx2-2, pax6, neurod1, znf808"
 # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Jan-18.09.02"
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-Feb-22.17.42/"
-historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-08.10.02/"
+historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-09.16.49/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/katja/hist_2022-Dec-26.17.05"
 # historyPath = "demoHistory/hist_2023-May-03.15.50/"
@@ -57,7 +57,7 @@ assign("DEBUG", DEBUG, envir = .schnappsEnv)
 assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("DEBUGSAVE_cellSelectionModule", TRUE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
-assign("allowFunctionality--shiny-tab-clusterParameters", T, envir = .schnappsEnv)
+assign("allowFunctionality--shiny-tab-clusterParameters", T, envir = .schnappsEnv) # a way to remove tabs for schnapps-lite functionality within the regular schnapps app. only used for clusterParameters for the moment. 
 assign("enableTrajectories", T, envir = .schnappsEnv)
 
 # ls(.schnappsEnv)
