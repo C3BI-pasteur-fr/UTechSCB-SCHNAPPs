@@ -1428,7 +1428,7 @@ pHeatMapModule <- function(input, output, session,
     # deepDebug()
     start.time <- base::Sys.time()
     on.exit({
-      printTimeEnd(start.time, "pHeatMapPlot")
+      printTimeEnd(start.time, paste("pHeatMapPlot", ns("t")))
       if (!is.null(getDefaultReactiveDomain())) {
         removeNotification(id = "pHeatMapPlot")
       }
@@ -1533,6 +1533,17 @@ pHeatMapModule <- function(input, output, session,
     
     output$pHeatMapPlot = renderPlot({
       cat(file = stderr(), "output$pHeatMapModule:rendering\n")
+      start.time <- base::Sys.time()
+      on.exit({
+        printTimeEnd(start.time, "pHeatMapModule:rendering")
+        if (!is.null(getDefaultReactiveDomain())) {
+          removeNotification(id = "pHeatMapModule:rendering")
+        }
+      })
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("observe: heatmap_click", 
+                         id = "pHeatMapModule:rendering", duration = NULL)
+      }
       if (is.null(retVal)){
         cat(file = stderr(), "output$pHeatMapModule:renderingNULL\n")
         return(NULL)
@@ -1668,11 +1679,22 @@ pHeatMapModule <- function(input, output, session,
   renderGeneName = reactiveVal()
   # observer click ----
   observe( {
-    if (DEBUG) cat(file = stderr(), "observe input$heatmap_click \n")
+    if (DEBUG) cat(file = stderr(), paste("observe input$heatmap_click", ns("q") ," \n"))
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "observe input$heatmap_click")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = "input-heatmap_click")
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("observe: heatmap_click", 
+                       id = "input-heatmap_click", duration = NULL)
+    }
     heatmap_click = input$heatmap_click
     htobj = ht_obj()
     htpos_obj = ht_pos_obj()
-    projections <- projections()
+    projections <- isolate(projections())
     newPrjs <- isolate(projectionsTable$newProjections)
     acn = allCellNames()
     htDat = myretVal()
