@@ -1,7 +1,7 @@
 Package: SCHNAPPs
 Type: Package
 Title: Single Cell Shiny Application for Analysing Single Cell Transcriptomics Data
-Version: 1.12.40
+Version: 1.12.41
 Authors@R: c(person("Bernd", "Jagla", role = c("aut", "cre"), email = "bernd.jagla@pasteur.fr", comment = c(ORCID = "0000-0002-7696-0484")))
 Maintainer: Bernd Jagla <bernd.jagla@pasteur.fr>
 Description: Single Cell sHiny APPlication (SCHNAPPs) is a R/Shiny based application to interact, manipulate, explore, and analyze single cell RNA-seq experiments, including MARS-seq and others.

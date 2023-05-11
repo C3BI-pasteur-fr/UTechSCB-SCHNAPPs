@@ -333,19 +333,20 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     }
     
     # upI <- updateScorpiusInput() # needed to update input
-    scEx = Scorpius_scEx_log()
+    scEx = isolate(Scorpius_scEx_log())
     projections <- isolate(scorpius_projections())
-    traj <- scorpiusTrajectory()
-    expr_sel <- scorpiusExpSel()
-    modules <- scorpiusModules()
+    traj <- isolate(scorpiusTrajectory())
+    expr_sel <- isolate(scorpiusExpSel())
+    modules <- isolate(scorpiusModules())
     sampCol <- isolate(projectionColors$sampleNames)
     ccols <- isolate(projectionColors$dbCluster)
+    doCalc <- input$updatetScorpiusParameters
     
-    dimCol <- input$dimScorpiusCol
+    dimCol <- isolate(input$dimScorpiusCol)
     # doCalc <- input$scorpiusCalc
-    pixelratio <- session$clientData$pixelratio
-    width <- session$clientData$output_plot_width
-    height <- session$clientData$output_plot_height
+    pixelratio <- isolate(session$clientData$pixelratio)
+    width <- isolate(session$clientData$output_plot_width)
+    height <- isolate(session$clientData$output_plot_height)
     
     # browser()
     if (is.null(projections) | is.null(modules) | is.null(expr_sel) | is.null(traj)) {
@@ -387,7 +388,9 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       retVal
     })
     return(retVal)
-  })
+  }) %>% bindCache(Scorpius_scEx_log(), scorpius_projections(), scorpiusTrajectory(), 
+                   scorpiusExpSel(), scorpiusModules(), projectionColors$sampleNames, 
+                   projectionColors$dbCluster)
   
   callModule(
     pHeatMapModule,
