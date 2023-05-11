@@ -843,7 +843,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                # cp=  load(file="~/SCHNAPPsDebug/gQC_rearrangeButton.RData")
                orgLevelNames = levels(factor(projections[,raProj]))
                newLbVec = stringr::str_trim(str_split(newLevelOrder, ","))
-               names(newLbVec) = orgLevelNames
+               # names(newLbVec) = orgLevelNames
                # deepDebug()
                # sampe projections as displayed, i.e. only those available for the cells
                # otherwise the diplay (output$gQC_orgLevels) has to be changed as well
@@ -867,22 +867,23 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                      # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,raProj])
                    }
                    
-                   newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
+                   newPrjs[,ncol(newPrjs)] = factor(newPrjs[,ncol(newPrjs)], levels = newLbVec)
                    
-                   # in case there was NA introduced by hidden cells
-                   if ("NA" %in% levels(newPrjs[,ncol(newPrjs)]) & !"NA" %in% newLevelOrder ){
-                     newLevelOrder = c(newLevelOrder, "NA")
-                   }
-                   if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(newLevelOrder) ){
-                     cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
-                     cat(file = stderr(), levels(newPrjs[,ncol(newPrjs)]))
-                     cat(file = stderr(), paste("\n\n\nnew levels:\n"))
-                     cat(file = stderr(), newLevelOrder)
-                     cat(file = stderr(), paste("\n"))
-                     showNotification("number of levels not correct. See console", id = "renameProbl", duration = NULL, type = "error")
-                     return(NULL)
-                   }
-                   newPrjs[,ncol(newPrjs)] = factor(newPrjs[,ncol(newPrjs)], levels = newLevelOrder)
+                   # # in case there was NA introduced by hidden cells
+                   # if ("NA" %in% levels(newPrjs[,ncol(newPrjs)]) & !"NA" %in% newLevelOrder ){
+                   #   newLevelOrder = c(newLevelOrder, "NA")
+                   # }
+                   # if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(newLevelOrder) ){
+                   #   cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
+                   #   cat(file = stderr(), levels(newPrjs[,ncol(newPrjs)]))
+                   #   cat(file = stderr(), paste("\n\n\nnew levels:\n"))
+                   #   cat(file = stderr(), newLevelOrder)
+                   #   cat(file = stderr(), paste("\n"))
+                   #   showNotification("number of levels not correct. See console", id = "renameProbl", duration = NULL, type = "error")
+                   #   return(NULL)
+                   # }
+                   
+                   # newPrjs[,ncol(newPrjs)] = factor(newPrjs[,ncol(newPrjs)], levels = newLbVec)
                  }, error=function(w){
                    # deepDebug()
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
@@ -912,7 +913,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                  return(NULL)
                }
                orgLevelNames = levels(factor(projections[,rnProj]))
-               newLbVec = stringr::str_trim(str_split(newLables, ",")[[1]])
+               newLbVec = stringr::str_trim(str_split(newLables, ",")[[1]]) %>% make.names()
                names(newLbVec) = orgLevelNames
                
                if (.schnappsEnv$DEBUGSAVE) {

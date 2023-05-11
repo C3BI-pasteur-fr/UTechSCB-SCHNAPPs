@@ -1017,6 +1017,8 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
   }
   # ids = dbCluster.col.0, sampleNames.col.1, sampleNames.col.test2
   if (.schnappsEnv$DEBUGSAVE) {
+    # browser()
+    inputList = input %>% reactiveValuesToList()
     save(file = "~/SCHNAPPsDebug/ob_colorParams.RData", list = c(ls()))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
@@ -1029,6 +1031,7 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
       ccols <- lapply(levels(projections[,name]), function(i) {
         input[[paste0(name, ".col.", i)]]
       })
+      ccols[ccols==""] = "#000"
       # if not initialized
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
