@@ -171,7 +171,11 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     if(is.null(selectedCells)) return(NULL)
     cellNs <- selectedCells$cellNames()
     if(length(cellNs)<1) return(NULL)
-    sha1(projections[cellNs,])
+    if(all(c(input$dimScorpiusX, input$dimScorpiusY, input$dimScorpiusCol, "sampleNames") %in% colnames(projections))){
+      return(sha1(projections[cellNs,c(input$dimScorpiusX, input$dimScorpiusY,input$dimScorpiusCol, "sampleNames")]))
+    }else{
+      return(NULL)
+    }
   })
   
   scorpius_projections <- reactive({
@@ -315,16 +319,21 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/scorpiusExpSel.RData", list = c(ls()))
     }
+    # it is possible that after reloading a workspace under some circumstances the underlying data changed
+    if(!all(rownames(traj)) %in% colnames(scEx_log)) return(NULL)
+    
     # cp = load(file="~/SCHNAPPsDebug/scorpiusExpSel.RData")
     # cellsNotFound <- colnames(assays(scEx_log)[[1]])[!colnames(assays(scEx_log)[[1]]) %in% rownames(traj)]
-    dig = digest(list(assays(scEx_log)[[1]][,rownames(traj)], traj$time, scorpRepeat), algo = "sha256")
-    if(!is.null(.schnappsEnv$react.scorpiusExpSel))
-      if(dig == .schnappsEnv$react.scorpiusExpSel[[1]]) {
-        return(.schnappsEnv$react.scorpiusExpSel[[2]])
-      }
+    # dig = digest(list(assays(scEx_log)[[1]][,rownames(traj)], traj$time, scorpRepeat), algo = "sha256")
+    # if(!is.null(.schnappsEnv$react.scorpiusExpSel))
+    #   if(dig == .schnappsEnv$react.scorpiusExpSel[[1]]) {
+    #     return(.schnappsEnv$react.scorpiusExpSel[[2]])
+    #   }
+    regis=registered()[[1]]
+    workers = ifelse("workers" %in% names(regis),  regis$workers, detectCores())
     expression <- t(as.matrix(assays(scEx_log)[[1]][,rownames(traj)]))
     gimp <- gene_importances(expression[rownames(traj),], traj$time, num_permutations = scorpRepeat, 
-                             num_threads = detectCores())
+                             num_threads = workers)
     maxRow <- min(scorpMaxGenes, nrow(gimp))
     gene_sel <- gimp[1:maxRow, ]
     expr_sel <- expression[, gene_sel$gene]
@@ -532,7 +541,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     projections[cellNs,]
   })
   
-    ## elpiHeatmapPlotReactive ----
+  ## elpiHeatmapPlotReactive ----
   elpiHeatmapPlotReactive <- reactive({
     if (DEBUG) cat(file = stderr(), "elpiHeatmapPlotReactive started.\n")
     start.time <- base::Sys.time()
@@ -601,7 +610,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
                        traj_elpi_modules()
   ) %>% bindEvent( input$elpiCalc)
   
- 
+  
   # elpiTreeData ----
   elpiTreeData <- reactive({
     if (DEBUG) {
@@ -1881,7 +1890,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     return(temporaObj)
   })
-
+  
   # temporaTrajectory ----
   temporaTrajectory <- reactive({
     if (DEBUG) cat(file = stderr(), "temporaTrajectory started.\n")

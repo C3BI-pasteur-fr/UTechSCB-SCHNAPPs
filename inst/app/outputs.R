@@ -1011,10 +1011,16 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
   
   scEx <- scEx()
   projections <- projections()
+  pc = projectionColors %>% reactiveValuesToList()
   if (is.null(scEx) || is.null(projections)) {
     return(NULL)
   }
   # ids = dbCluster.col.0, sampleNames.col.1, sampleNames.col.test2
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/ob_colorParams.RData", list = c(ls()))
+    cat(file = stderr(), paste0("observeEvent save done\n"))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/ob_colorParams.RData")
   
   # browser()
   lapply(names(projections), FUN = function(name){

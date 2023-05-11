@@ -97,7 +97,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
   
   
   # print debugging information on the console
-  printTimeEnd(start.time, "inputData")
+  printTimeEnd(start.time, "coE_heatmapFunc")
   # for automated shiny testing using shinytest
   # exportTestValues(coE_heatmapFunc = {
   #   retVal

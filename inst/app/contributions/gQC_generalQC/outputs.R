@@ -931,6 +931,8 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                if(is.null(
                  tryCatch({
                    
+                   # copy original data 
+                   # This can be the first newPrjs
                    if (ncol(newPrjs) == 0) {
                      newPrjs = data.frame(row.names = acn)
                      newPrjs[,newProjName] = "NA"
@@ -947,6 +949,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      # newPrjs <- cbind(newPrjs[rownames(projections), , drop = FALSE], projections[,rnProj])
                    }
                    
+                   # ensure that this is a factor
                    newPrjs[,ncol(newPrjs)] = as.factor(newPrjs[,ncol(newPrjs)])
                    
                    
@@ -956,26 +959,31 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                      newLbVec = newLbVec[newLevelNames]
                      newLbVec[which(is.na(newLbVec))] = "NA"
                    }
-                   if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(stringr::str_trim(newLbVec)) ){
-                     cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
-                     cat(file = stderr(), levels(newPrjs[,ncol(newPrjs)]))
-                     cat(file = stderr(), paste("\n\n\nnew levels:\n"))
-                     cat(file = stderr(), stringr::str_trim(newLbVec))
-                     cat(file = stderr(), paste("\n"))
-                     showNotification("number of levels not correct. See console", id = "renameProbl", duration = NULL, type = "error")
-                     return(NULL)
-                   }
-                   levels(newPrjs[,ncol(newPrjs)]) = stringr::str_trim(newLbVec)
+                   
+                   # if (!length(levels(newPrjs[,ncol(newPrjs)])) == length(stringr::str_trim(newLbVec)) ){
+                   #   cat(file = stderr(), paste("number of levels not correct\n\nold levels:\n"))
+                   #   cat(file = stderr(), levels(newPrjs[,ncol(newPrjs)]))
+                   #   cat(file = stderr(), paste("\n\n\nnew levels:\n"))
+                   #   cat(file = stderr(), stringr::str_trim(newLbVec))
+                   #   cat(file = stderr(), paste("\n"))
+                   #   showNotification("number of levels not correct. See console", id = "renameProbl", duration = NULL, type = "error")
+                   #   return(NULL)
+                   # }
+                   
+                   oldLevels = levels(newPrjs[,ncol(newPrjs)])
+                   names(oldLevels) = oldLevels
+                   oldLevels[names(newLbVec)] =  stringr::str_trim(newLbVec)
+                   levels(newPrjs[,ncol(newPrjs)]) = oldLevels
                  }, error=function(w){
                    # deepDebug()
                    cat(file = stderr(), paste("something went wrong during releveling", w,"\n"))
                    showNotification("problem with names", id = "renameProbl", duration = NULL, type = "error")
                    return(NULL)
                  }))) return(NULL)
-               newProjName = make.unique(c(colnames(projections),newProjName))[length(c(colnames(projections),newProjName))]
-               updateTextInput(session, "gQC_newRnPrj", value = newProjName)
+               newProjName = make.unique(c(colnames(projections),newProjName)) %>% tail(n=1)
                colnames(newPrjs)[ncol(newPrjs)] <- newProjName
                projectionsTable$newProjections  <- newPrjs
+               updateTextInput(session, "gQC_newRnPrj", value = newProjName)
                
              })
 

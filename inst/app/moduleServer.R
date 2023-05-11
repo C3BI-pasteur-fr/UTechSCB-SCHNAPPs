@@ -756,7 +756,7 @@ clusterServer <- function(input, output, session,
         rownames(prjs) = prjs[,1]
         prjs = prjs[,-1]
       }
-      prjs[is.na(prjs)] <- "FALSE"
+      # prjs[is.na(prjs)] <- "FALSE"
       prjs$all = "TRUE"
       if ('rowname' %in% colnames(prjs)) prjs = prjs [,-which(colnames(prjs)=='rowname')]
     },
@@ -1463,7 +1463,8 @@ pHeatMapModule <- function(input, output, session,
     # force redraw
     input$pHeatMapPlot__shinyjquiBookmarkState__resizable$width
     input$pHeatMapPlot__shinyjquiBookmarkState__resizable$height
-    proje <- projections()
+    proje <- isolate(projections())
+    
     if (DEBUG) cat(file = stderr(), paste("output$pHeatMapModule:pHeatMapPlot", ns("t"),"\n"))
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
