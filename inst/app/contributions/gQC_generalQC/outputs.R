@@ -511,7 +511,7 @@ output$gQC_geneSetsearchOutput = renderText({
   for (name in countNames){
     outStr = paste(outStr, name, "found:", counts[[name]], " of ", length(gd[[name]]$genes),"\n",
                    gd[[name]]$desc, "\n",
-                   li[which(li %in% x$genes)], "\n",
+                   li[which(li %in% gd[[name]]$genes)], "\n",
                    paste(gd[[name]]$genes, collapse=", "), "\n\n")
     
   }
@@ -593,10 +593,10 @@ output$gQC_geneSetModifyInputGL <- renderText({
 
 observe({
   gd = gmtData()
-  updateSelectizeInput(session, inputId = "oldGS",choices = names(gd))
+  updateSelectizeInput(session, inputId = "oldGS",choices = names(gd), server = TRUE)
   updateSelectizeInput(session, inputId = "gQC_geneSetModifyInput", 
                        choices = names(gd), 
-                       selected = defaultValue("gQC_geneSetModifyInput", "dummy"))
+                       selected = defaultValue("gQC_geneSetModifyInput", "dummy"), server = TRUE)
 })
 
 observeEvent(input$updateGSButton,{

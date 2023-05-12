@@ -654,13 +654,13 @@ observe({
   
   gmtList = gmtData()
   
-  updateSelectInput(session, "coE_dotPlot_geneSets",
+  updateSelectizeInput(session, "coE_dotPlot_geneSets",
                     choices = names(gmtList),
-                    selected = .schnappsEnv$coE_dotPlot_geneSets
+                    selected = .schnappsEnv$coE_dotPlot_geneSets, server = TRUE
   )
-  updateSelectInput(session, "coE_dotPlotModuleScore_geneSets",
+  updateSelectizeInput(session, "coE_dotPlotModuleScore_geneSets",
                     choices = names(gmtList),
-                    selected = .schnappsEnv$coE_dotPlotModuleScore_geneSets
+                    selected = .schnappsEnv$coE_dotPlotModuleScore_geneSets, server = TRUE
   )
 })
 
