@@ -64,6 +64,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     sessionProjections$prjs <- prjs
   })
   
+  runScorpius <- reactiveVal(0)
+  
   ## set scorpiuseParameters on button pressed----
   observeEvent(input$updatetScorpiusParameters,{
     # only react on this value
@@ -84,28 +86,29 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     .schnappsEnv$defaultValues[["dimScorpiusCol"]] <- isolate(input$dimScorpiusCol)
     .schnappsEnv$defaultValues[["scorpMaxGenes"]] <- isolate(input$scorpMaxGenes)
     .schnappsEnv$defaultValues[["scorpRepeat"]] <- isolate(input$scorpRepeat)
-     
+    updateButtonColor(buttonName = "updatetScorpiusParameters", parameters = c(
+      "dimScorpiusX", "dimScorpiusY",
+      "scorpMaxGenes", "scorpRepeat" , "scorpInFile"
+    ))
+    runScorpius(1)
   })
   
-  observe(label = "ob_scorpButton",priority = 99,
-          {
-            if (DEBUG) cat(file = stderr(), "observe ob_scorpButton\n")
-            input$updatetScorpiusParameters
-            setRedGreenButtonCurrent(
-              vars = list(
-                c("dimScorpiusX", input$dimScorpiusX),
-                c("dimScorpiusY", input$dimScorpiusY),
-                c("scorpMaxGenes", input$scorpMaxGenes),
-                c("scorpRepeat", input$scorpRepeat),
-                c("scorpInFile", input$trajInputFile)
-              )
-            )
-            
-            updateButtonColor(buttonName = "updatetScorpiusParameters", parameters = c(
-              "dimScorpiusX", "dimScorpiusY",
-              "scorpMaxGenes", "scorpRepeat" , "scorpInFile"
-            ))
-          })
+  # observe(label = "ob_scorpButton",priority = 99,
+  #         {
+  #           if (DEBUG) cat(file = stderr(), "observe ob_scorpButton\n")
+  #           input$updatetScorpiusParameters
+  #           setRedGreenButtonCurrent(
+  #             vars = list(
+  #               c("dimScorpiusX", input$dimScorpiusX),
+  #               c("dimScorpiusY", input$dimScorpiusY),
+  #               c("scorpMaxGenes", input$scorpMaxGenes),
+  #               c("scorpRepeat", input$scorpRepeat),
+  #               c("scorpInFile", input$trajInputFile)
+  #             )
+  #           )
+  #           
+  #           
+  #         })
   
   
   observe(label ="obs_pcaRank", x = {
@@ -163,7 +166,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   # only execute if button is pressed
   # 
   scorpiusTrajectory <- reactive({
-    clicked = input$updatetScorpiusParameters
+    clicked = runScorpius()
     if (DEBUG) cat(file = stderr(), "scorpiusTrajectory started.\n")
     start.time <- base::Sys.time()
     on.exit({
@@ -178,7 +181,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     cat(file = stderr(), paste("scorpiusTrajectory clicked:", clicked,"\n"))
     # browser()
     # create dependancy on button and return if not pressed once
-    if (input$updatetScorpiusParameters == 0) {
+    if (clicked == 0) {
       # when coming from history
       if(!is.null(.schnappsEnv$react.scorpiusTrajectory))
         return(.schnappsEnv$react.scorpiusTrajectory$path)
@@ -330,28 +333,29 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     }
     
     # upI <- updateScorpiusInput() # needed to update input
-    scEx = Scorpius_scEx_log()
+    scEx = isolate(Scorpius_scEx_log())
     projections <- isolate(scorpius_projections())
-    traj <- scorpiusTrajectory()
-    expr_sel <- scorpiusExpSel()
-    modules <- scorpiusModules()
+    traj <- isolate(scorpiusTrajectory())
+    expr_sel <- isolate(scorpiusExpSel())
+    modules <- isolate(scorpiusModules())
     sampCol <- isolate(projectionColors$sampleNames)
     ccols <- isolate(projectionColors$dbCluster)
+    doCalc <- input$updatetScorpiusParameters
     
-    dimCol <- input$dimScorpiusCol
+    dimCol <- isolate(input$dimScorpiusCol)
     # doCalc <- input$scorpiusCalc
-    pixelratio <- session$clientData$pixelratio
-    width <- session$clientData$output_plot_width
-    height <- session$clientData$output_plot_height
+    pixelratio <- isolate(session$clientData$pixelratio)
+    width <- isolate(session$clientData$output_plot_width)
+    height <- isolate(session$clientData$output_plot_height)
     
     # browser()
     if (is.null(projections) | is.null(modules) | is.null(expr_sel) | is.null(traj)) {
       if (DEBUG) cat(file = stderr(), paste("scorpiusHeatmapPlot:NULL\n"))
       return(NULL)
     }
-    if (.schnappsEnv$DEBUGSAVE) {
+    # if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/scorpiusHeatmapPlot.RData", list = c(ls()))
-    }
+    # }
     # cp=load(file="~/SCHNAPPsDebug/scorpiusHeatmapPlot.RData")
     
     if (is.null(pixelratio)) pixelratio <- 1
@@ -368,6 +372,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     outfile <- paste0(tempdir(), "/heatmapScorpius", base::sample(1:10000, 1), ".png")
     cat(file = stderr(), paste("saving to: ", outfile, "\n"))
+    # if genes are removed after subsetting the input data...
+    expr_sel$expr_sel = expr_sel$expr_sel[,colnames(expr_sel$expr_sel) %in% rownames(scEx)]
     colnames(expr_sel$expr_sel) = rowData(scEx[colnames(expr_sel$expr_sel),])$symbol
     # modules <- extract_modules(scale_quantile(expr_sel), traj$time, verbose = F)
     retVal <- drawTrajectoryHeatmap(x = expr_sel$expr_sel, time = traj$time, 
@@ -382,7 +388,9 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       retVal
     })
     return(retVal)
-  })
+  })  %>% bindCache(Scorpius_scEx_log(), scorpius_projections_hash(), scorpiusTrajectory(),
+                   scorpiusExpSel(), scorpiusModules(), projectionColors$sampleNames,
+                   projectionColors$dbCluster) %>% bindEvent( input$updatetScorpiusParameters)
   
   callModule(
     pHeatMapModule,

@@ -431,8 +431,8 @@ scShinyServer <- function(input, output, session) {
       }
       if(!is.null(.schnappsEnv$historyPath))
         .schnappsEnv$cacheDir = list(dir=paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/"),
-                                     max_size = 2 * 1024 * 1024^2,
-                                     logfile = ifelse(.schnappsEnv$DEBUG, stderr(), NULL)
+                                     max_size = 20 * 1024 * 1024^2,
+                                     logfile = stderr()
         )
       # .schnappsEnv$cacheDir = cachem::cache_disk(dir = NULL)
       
@@ -450,7 +450,8 @@ scShinyServer <- function(input, output, session) {
   # cacheDir is not known before and messes up things
   if(!is.null(.schnappsEnv$cacheDir)){
     cat(file = stderr(), unlist(.schnappsEnv$cacheDir))
-    heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    # heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir)) is called too often
+    heatmapModuleFunction_m = heatmapModuleFunction
     runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
     panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
     runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
