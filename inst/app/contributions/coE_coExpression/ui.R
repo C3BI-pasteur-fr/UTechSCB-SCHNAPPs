@@ -97,7 +97,7 @@ tabList <- list(
                fluidRow(
                  column(
                    width = 4,
-                   sc_selectInput("coE_dotPlot_geneSets", label = "Gene sets for y axis", 
+                   sc_selectizeInput("coE_dotPlot_geneSets", label = "Gene sets for y axis", 
                                   choices = c("please load GMT file"),
                                   selected = .schnappsEnv$coE_dotPlot_geneSets,
                                   multiple = T),
@@ -166,7 +166,7 @@ tabList <- list(
                fluidRow(
                  column(
                    width = 4,
-                   sc_selectInput("coE_dotPlotModuleScore_geneSets", label = "Gene sets for y axis", 
+                   sc_selectizeInput("coE_dotPlotModuleScore_geneSets", label = "Gene sets for y axis", 
                                   choices = c("please load GMT file"),
                                   selected = .schnappsEnv$coE_dotPlotModuleScore_geneSets,
                                   multiple = T),
