@@ -18,7 +18,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   drawTrajectoryHeatmap <- function(x, time, progression_group = NULL, modules = NULL,
                                     show_labels_row = FALSE, show_labels_col = FALSE, scale_features = TRUE,
                                     ...) {
-    # browser()
+    
     if (!is.matrix(x) && !is.data.frame(x)) {
       cat(sQuote("x"), " must be a numeric matrix or data frame",file = stderr())
       return(NULL)
@@ -87,6 +87,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       NULL
     }
     if (!is.null(modules)) {
+      modules = modules[modules$symbol %in% rownames(x_part),]
       x_part <- x_part[modules$symbol, ]
       gaps_row <- which(modules$module[-1] != modules$module[-length(modules$module)])
       cluster_rows <- F
@@ -162,6 +163,21 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   
   ## scorpius_projections ----
   # subset of projections that corresponds to input
+  scorpius_projections_hash <- reactive({
+    # browser()
+    projections <- projections()
+    if (is.null(projections)) return(NULL)
+    selectedCells <- Scorpius_dataInput() #DE_Exp_dataInput
+    if(is.null(selectedCells)) return(NULL)
+    cellNs <- selectedCells$cellNames()
+    if(length(cellNs)<1) return(NULL)
+    if(all(c(input$dimScorpiusX, input$dimScorpiusY, input$dimScorpiusCol, "sampleNames") %in% colnames(projections))){
+      return(sha1(projections[cellNs,c(input$dimScorpiusX, input$dimScorpiusY,input$dimScorpiusCol, "sampleNames")]))
+    }else{
+      return(NULL)
+    }
+  })
+  
   scorpius_projections <- reactive({
     # browser()
     projections <- projections()
@@ -171,7 +187,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     cellNs <- selectedCells$cellNames()
     if(length(cellNs)<1) return(NULL)
     projections[cellNs,]
-  })
+  }) %>% bindCache(scorpius_projections_hash())
   
   ## scorpiusInput Trajectory file ----
   # read input space from file
@@ -290,7 +306,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
         return(.schnappsEnv$react.scorpiusExpSel[[2]])
       return(NULL)
     }
-    scEx_log <- isolate(Scorpius_scEx_log())
+    scEx_log <- Scorpius_scEx_log()
     traj <- isolate(scorpiusTrajectory())
     # doCalc <- input$scorpiusCalc
     scorpMaxGenes <- isolate(input$scorpMaxGenes)
@@ -303,16 +319,21 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/scorpiusExpSel.RData", list = c(ls()))
     }
+    # it is possible that after reloading a workspace under some circumstances the underlying data changed
+    if(!all(rownames(traj)) %in% colnames(scEx_log)) return(NULL)
+    
     # cp = load(file="~/SCHNAPPsDebug/scorpiusExpSel.RData")
     # cellsNotFound <- colnames(assays(scEx_log)[[1]])[!colnames(assays(scEx_log)[[1]]) %in% rownames(traj)]
-    dig = digest(list(assays(scEx_log)[[1]][,rownames(traj)], traj$time, scorpRepeat), algo = "sha256")
-    if(!is.null(.schnappsEnv$react.scorpiusExpSel))
-      if(dig == .schnappsEnv$react.scorpiusExpSel[[1]]) {
-        return(.schnappsEnv$react.scorpiusExpSel[[2]])
-      }
+    # dig = digest(list(assays(scEx_log)[[1]][,rownames(traj)], traj$time, scorpRepeat), algo = "sha256")
+    # if(!is.null(.schnappsEnv$react.scorpiusExpSel))
+    #   if(dig == .schnappsEnv$react.scorpiusExpSel[[1]]) {
+    #     return(.schnappsEnv$react.scorpiusExpSel[[2]])
+    #   }
+    regis=registered()[[1]]
+    workers = ifelse("workers" %in% names(regis),  regis$workers, detectCores())
     expression <- t(as.matrix(assays(scEx_log)[[1]][,rownames(traj)]))
     gimp <- gene_importances(expression[rownames(traj),], traj$time, num_permutations = scorpRepeat, 
-                             num_threads = detectCores())
+                             num_threads = workers)
     maxRow <- min(scorpMaxGenes, nrow(gimp))
     gene_sel <- gimp[1:maxRow, ]
     expr_sel <- expression[, gene_sel$gene]
@@ -343,7 +364,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     
     # browser()
-    scEx_log <- isolate(Scorpius_scEx_log())
+    scEx_log <- Scorpius_scEx_log()
     # projections = projections()
     # space <- scorpiusSpace()
     traj <- scorpiusTrajectory()
@@ -431,7 +452,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       return(NULL)
     }
     
-    scEx_log <- isolate(Scorpius_scEx_log())
+    scEx_log <- Scorpius_scEx_log()
     # projections = projections()
     # space <- scorpiusSpace()
     traj <- isolate(scorpiusTrajectory())
@@ -496,6 +517,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     scEx_log = scEx_log[,cellNs]
     return(scEx_log)
   })
+  
   Elpi_scEx <- reactive({
     scEx = scEx()
     if(is.null(scEx)) return(NULL)
@@ -519,7 +541,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     projections[cellNs,]
   })
   
-    ## elpiHeatmapPlotReactive ----
+  ## elpiHeatmapPlotReactive ----
   elpiHeatmapPlotReactive <- reactive({
     if (DEBUG) cat(file = stderr(), "elpiHeatmapPlotReactive started.\n")
     start.time <- base::Sys.time()
@@ -588,7 +610,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
                        traj_elpi_modules()
   ) %>% bindEvent( input$elpiCalc)
   
- 
+  
   # elpiTreeData ----
   elpiTreeData <- reactive({
     if (DEBUG) {
@@ -663,7 +685,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     # get all end-points:
     endPoints = unique(c(sapply(Tree_e2e, function(x) x[1]), sapply(Tree_e2e, function(x) x[length(x)])))
     return(endPoints)
-  })
+  }) %>% bindCache(elpiGraphCompute(), Elpi_scEx_log(), isolate(Elpi_projections()), isolate(input$ElpiMethod), isolate(input$elpiSeed))
   
   
   # updateElpiInput ----
@@ -1040,7 +1062,16 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       ),
       button = "elpiCalc"
     )
-    
+    return(cep)
+  }) %>% bindCache(input$dimElpi ,input$dimElpiX ,input$dimElpiY ,
+                   input$elpiSeed ,input$ElpiMethod ,
+                   input$elpinReps ,input$elpiNumNodes ,input$elpiProbPoint ,
+                   input$elpiEndNode ,input$elpiStartNode ,input$elpi_num_permutations ,
+                   input$elpi_ntree ,input$elpi_ntree_perm ,input$elpi_nGenes) %>% 
+    bindEvent(input$elpiCalc)
+  
+  observe({
+    if (DEBUG) cat(file = stderr(), "observe elpi parameters\n")
     .schnappsEnv$defaultValues[["dimElpi"]] <- input$dimElpi
     .schnappsEnv$defaultValues[["dimElpiX"]] <- input$dimElpiX
     .schnappsEnv$defaultValues[["dimElpiY"]] <- input$dimElpiY
@@ -1056,8 +1087,6 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     .schnappsEnv$defaultValues[["elpi_ntree"]] <- input$elpi_ntree
     .schnappsEnv$defaultValues[["elpi_ntree_perm"]] <- input$elpi_ntree_perm
     .schnappsEnv$defaultValues[["elpi_nGenes"]] <- input$elpi_nGenes
-    
-    return(cep)
   })
   
   # elpiGraphConstruct ----
@@ -1861,7 +1890,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     
     return(temporaObj)
   })
-
+  
   # temporaTrajectory ----
   temporaTrajectory <- reactive({
     if (DEBUG) cat(file = stderr(), "temporaTrajectory started.\n")

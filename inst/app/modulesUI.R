@@ -28,7 +28,7 @@ clusterUI <- function(id) {
       column(
         width = 6,
         sc_textInput(ns("geneIds"), "comma separated list of genes for UmiCountPerGenes", value = defaultValue(ns("geneIds"), ""))
-      ),
+      ),checkbsTT(ns("geneIds")),
       column(
         width = 6,
         sc_textInput(ns("geneIds2"), "comma separated list of genes for UmiCountPerGenes2", value = defaultValue(ns("geneIds2"), ""))

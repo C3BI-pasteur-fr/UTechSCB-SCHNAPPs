@@ -54,6 +54,9 @@ if ("shinyBS" %in% rownames(installed.packages())) {
   .schnappsEnv$sbTT_delPrj <- bsPopover("delPrj", title = "", "projections to delete")
   .schnappsEnv$sbTT_tabsetPCA <- bsPopover("tabsetPCA", title = "PCA", "performs principle component analysis using BiocSingular::runPCA", placement = "left")
 
+  
+  .schnappsEnv[['sbTT_coE_selected-geneIds']] <- bsPopover('coE_selected-geneIds', title = "", "sum of expression values if normalization is done, otherwise sum of UMI count.")
+  
   # should be read from contribution directory
   .schnappsEnv$sbTT_temporaCluster <-  bsPopover("temporaCluster", title = "", "name of cluster centroids.")
   .schnappsEnv$sbTT_temporaFactor <-  bsPopover("temporaFactor", title = "", "Factor used as time variable")

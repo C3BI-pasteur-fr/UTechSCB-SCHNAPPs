@@ -111,12 +111,14 @@ updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NU
   geneNames <- geneName2Index(g_id = geneNames, featureData = featureData)
   # if (length(geneNames) > 0) {
   if ((length(geneNames) > 0) && (length(geneNames[[1]]) > 0)) {
+    #TODO add drop=F to remove if statement
     if (length(geneNames) == 1) {
       projections$UmiCountPerGenes <- assays(scEx)[[1]][geneNames, ]
     } else {
       projections$UmiCountPerGenes <- Matrix::colSums(assays(scEx)[[1]][geneNames, ])
     }
   } else {
+    # browser()
     projections$UmiCountPerGenes <- 0
   }
   # }
@@ -1598,8 +1600,7 @@ heatmapModuleFunction <- function(
     # use the supplied colors
   } else {
     heatmapData$color <- colorRampPalette(rev(brewer.pal(
-      n = 7, name =
-        colPal
+      n = 7, name = colPal
     )))(100)
   }
   
@@ -1678,11 +1679,20 @@ heatmapModuleFunction <- function(
   # col_fun =  c("blue", "white", "red","green")
   # heatmapData$annotation_colors$PC2=col_fun
   # heatmapData$annotation_colors$PC2
+  # 
+  # hande missing values in annotation_col
+  # heatmapData$annotation_col <- 
+  heatmapData$annotation_col = heatmapData$annotation_col %>% mutate_if(is.numeric, function(x) ifelse( is.na(x), min(x, na.rm = T),x))
+  
+
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
     error = function(e){
       cat (file = stderr(), paste(e))
+      save(file = "~/SCHNAPPsDebug/heatmapError.rdata", list = ls(parent.frame(n=4)))
+      # cp = load("~/SCHNAPPsDebug/heatmapError.rdata")
+      # browser()
       return(NULL)
     }
   )

@@ -2733,18 +2733,18 @@ dbCluster <- reactive({
   # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
   isolate(
-    if(is.null(names(projectionColors$dbCluster)) | !all(names(projectionColors$dbCluster) %in% levels(dbCluster))){
+    if(is.null(names(projectionColors$dbCluster)) | !all(levels(dbCluster) %in% names(projectionColors$dbCluster))){
       projectionColors$dbCluster <- unlist(inCols)
-      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "ccol", ccol = projectionColors$dbCluster)
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "projectionColors", projectionColors = projectionColors)
     }
   )
-  setRedGreenButton(
-    vars = list(
-      c("sampleNamecol", isolate(projectionColors$sampleNames)),
-      c("clusterCols", isolate(projectionColors$dbCluster))
-    ),
-    button = "updateColors"
-  )
+  # setRedGreenButton(
+  #   vars = list(
+  #     c("sampleNamecol", isolate(projectionColors$sampleNames)),
+  #     c("clusterCols", isolate(projectionColors$dbCluster))
+  #   ),
+  #   button = "updateColors"
+  # )
   exportTestValues(dbCluster = {
     dbCluster
   })
