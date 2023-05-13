@@ -42,7 +42,7 @@ historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_3 samples/"
 historyPath = "demoHistory/hist_2023-May-11.12.43/"
 # historyPath = "demoHistory/hist_2023-May-11.12.43/"
 # historyPath = "demoHistory/hist_2023-May-03.15.50/"
-# historyPath = "demoHistory/hist_2023-May-04.12.31/"
+historyPath = "demoHistory/MPI/hist_2023-May-09.13.19/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
 # historyPath = NULL
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
@@ -153,7 +153,10 @@ shiny::addResourcePath(
 chromeBrowser = function(url){
   system(paste("open -a 'Google Chrome' ", url))
 }
-chromeBrowser = getOption("shiny.launch.browser", interactive())
+edgeBrowser = function(url){
+  system(paste("open -a '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' ", url))
+}
+# chromeBrowser = getOption("shiny.launch.browser", interactive())
 source("R/DotPlotwithModuleScore.R")
 # if(!is.null(historyPath)){
 #   shinyOptions(cache = cachem::cache_disk(paste0(historyPath, "/app_cache/cache/")))
