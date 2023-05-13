@@ -593,10 +593,10 @@ output$gQC_geneSetModifyInputGL <- renderText({
 
 observe({
   gd = gmtData()
-  updateSelectizeInput(session, inputId = "oldGS",choices = names(gd))
+  updateSelectizeInput(session, inputId = "oldGS",choices = names(gd), server = TRUE)
   updateSelectizeInput(session, inputId = "gQC_geneSetModifyInput", 
                        choices = names(gd), 
-                       selected = defaultValue("gQC_geneSetModifyInput", "dummy"))
+                       selected = defaultValue("gQC_geneSetModifyInput", "dummy"), server = TRUE)
 })
 
 observeEvent(input$updateGSButton,{

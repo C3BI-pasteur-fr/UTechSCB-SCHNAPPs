@@ -385,19 +385,25 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
 #' sCA_dge_deseq2
 #' calculate dge using DESeq2
 runDESEQ2 <- function(data.use, group.info) {
+  if (DEBUG) cat(file = stderr(), "DESeq2 setup.\n")
   dds1 <- DESeq2::DESeqDataSetFromMatrix(
     countData = data.use,
     colData = group.info,
     design = ~group
   )
+  if (DEBUG) cat(file = stderr(), "DESeq2 estimate size factors\n")
   dds1 <- DESeq2::estimateSizeFactors(object = dds1, type = "poscounts")
+  if (DEBUG) cat(file = stderr(), "DESeq2 estimateDispersions\n")
   dds1 <- DESeq2::estimateDispersions(object = dds1, fitType = "local")
+  if (DEBUG) cat(file = stderr(), "DESeq2 nbinomWaldTest\n")
   dds1 <- DESeq2::nbinomWaldTest(object = dds1)
+  if (DEBUG) cat(file = stderr(), "DESeq2 results\n")
   res <- DESeq2::results(
     object = dds1,
     contrast = c("group", "Group1", "Group2"),
-    alpha = 0.05
+    alpha = 0.05, parallel = T
   )
+  if (DEBUG) cat(file = stderr(), "DESeq2 done\n")
   res$log2FoldChange[is.na(res$log2FoldChange)] <- 0
   res$padj[is.na(res$padj)] <- 1
   res$pvalue[is.na(res$pvalue)] <- 1
