@@ -187,7 +187,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     cellNs <- selectedCells$cellNames()
     if(length(cellNs)<1) return(NULL)
     projections[cellNs,]
-  }) %>% bindCache(scorpius_projections_hash())
+  }) 
+  # %>% bindCache(scorpius_projections_hash())
   
   ## scorpiusInput Trajectory file ----
   # read input space from file
@@ -425,10 +426,11 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     .schnappsEnv$react.scorpiusModules = list(digest = dig, modules = modules)
     
     return(modules)
-  }) %>% bindCache(isolate(Scorpius_scEx_log()),
-                   scorpiusTrajectory(),
-                   scorpiusExpSel()
-  )
+  }) 
+  # %>% bindCache(isolate(Scorpius_scEx_log()),
+  #                  scorpiusTrajectory(),
+  #                  scorpiusExpSel()
+  # )
   
   ## scorpiusModulesTable ----
   scorpiusModulesTable <- reactive({
@@ -603,12 +605,13 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       retVal
     })
     return(retVal)
-  }) %>% bindCache(    Elpi_scEx(),
-                       Elpi_projections(),
-                       traj_getPseudotime(),
-                       traj_elpi_gimp(),
-                       traj_elpi_modules()
-  ) %>% bindEvent( input$elpiCalc)
+  }) 
+  # %>% bindCache(    Elpi_scEx(),
+  #                      Elpi_projections(),
+  #                      traj_getPseudotime(),
+  #                      traj_elpi_gimp(),
+  #                      traj_elpi_modules()
+  # ) %>% bindEvent( input$elpiCalc)
   
   
   # elpiTreeData ----
@@ -685,7 +688,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     # get all end-points:
     endPoints = unique(c(sapply(Tree_e2e, function(x) x[1]), sapply(Tree_e2e, function(x) x[length(x)])))
     return(endPoints)
-  }) %>% bindCache(elpiGraphCompute(), Elpi_scEx_log(), isolate(Elpi_projections()), isolate(input$ElpiMethod), isolate(input$elpiSeed))
+  }) 
+  # %>% bindCache(elpiGraphCompute(), Elpi_scEx_log(), isolate(Elpi_projections()), isolate(input$ElpiMethod), isolate(input$elpiSeed))
   
   
   # updateElpiInput ----
@@ -1063,12 +1067,13 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       button = "elpiCalc"
     )
     return(cep)
-  }) %>% bindCache(input$dimElpi ,input$dimElpiX ,input$dimElpiY ,
-                   input$elpiSeed ,input$ElpiMethod ,
-                   input$elpinReps ,input$elpiNumNodes ,input$elpiProbPoint ,
-                   input$elpiEndNode ,input$elpiStartNode ,input$elpi_num_permutations ,
-                   input$elpi_ntree ,input$elpi_ntree_perm ,input$elpi_nGenes) %>% 
-    bindEvent(input$elpiCalc)
+  }) 
+  # %>% bindCache(input$dimElpi ,input$dimElpiX ,input$dimElpiY ,
+  #                  input$elpiSeed ,input$ElpiMethod ,
+  #                  input$elpinReps ,input$elpiNumNodes ,input$elpiProbPoint ,
+  #                  input$elpiEndNode ,input$elpiStartNode ,input$elpi_num_permutations ,
+  #                  input$elpi_ntree ,input$elpi_ntree_perm ,input$elpi_nGenes) %>% 
+  #   bindEvent(input$elpiCalc)
   
   observe({
     if (DEBUG) cat(file = stderr(), "observe elpi parameters\n")

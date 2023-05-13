@@ -511,7 +511,7 @@ output$gQC_geneSetsearchOutput = renderText({
   for (name in countNames){
     outStr = paste(outStr, name, "found:", counts[[name]], " of ", length(gd[[name]]$genes),"\n",
                    gd[[name]]$desc, "\n",
-                   li[which(li %in% x$genes)], "\n",
+                   paste(li[which(li %in% gd[[name]]$genes)], collapse=", "), "\n",
                    paste(gd[[name]]$genes, collapse=", "), "\n\n")
     
   }

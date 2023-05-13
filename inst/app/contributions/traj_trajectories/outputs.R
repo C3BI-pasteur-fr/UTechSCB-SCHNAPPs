@@ -388,9 +388,10 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       retVal
     })
     return(retVal)
-  })  %>% bindCache(Scorpius_scEx_log(), scorpius_projections_hash(), scorpiusTrajectory(),
-                   scorpiusExpSel(), scorpiusModules(), projectionColors$sampleNames,
-                   projectionColors$dbCluster) %>% bindEvent( input$updatetScorpiusParameters)
+  })  
+  # %>% bindCache(Scorpius_scEx_log(), scorpius_projections_hash(), scorpiusTrajectory(),
+  #                  scorpiusExpSel(), scorpiusModules(), projectionColors$sampleNames,
+  #                  projectionColors$dbCluster) %>% bindEvent( input$updatetScorpiusParameters)
   
   callModule(
     pHeatMapModule,
