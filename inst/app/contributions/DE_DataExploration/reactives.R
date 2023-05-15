@@ -394,8 +394,12 @@ DE_geneViolinFunc <- function(scEx_log, g_id, projections, ccols, x) {
 
 panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs,
                           lowCol = "blue", highCol = "red", midCol = "white",
-                          midFunc = function(x){(max(x)-min(x))/2}) {
-  
+                          midFunc = function(x){(max(x)-min(x))/2}, applyPvalue=FALSE) {
+  #   if (.schnappsEnv$DEBUGSAVE) {
+  #     save(file = "~/SCHNAPPsDebug/scater.RData", list = c(ls()))
+  #   }
+  # cp=load(file='~/SCHNAPPsDebug/panelPlotFunc.RData')
+  # save(file = "~/SCHNAPPsDebug/panelPlotFunc.RData", list = c(ls()))
   featureData <- rowData(scEx_log)
   # featureData$symbol = toupper(featureData$symbol)
   genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
@@ -518,10 +522,20 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
   # }
   # 
   require(cowplot)
+  require(ggpubr)
   printData = printData[order(printData$col, decreasing = F),]
   printData$gene = factor(printData$gene, levels = unique(genesin))
   if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
-    retVal <- ggplot(printData, aes(dimx, dimy)) + geom_boxplot(show.legend = FALSE)
+    retVal <-  ggboxplot(printData, x="dimx", y="dimy", add="jitter")
+    if(applyPvalue){
+      # retVal <- ggplot(printData, aes(dimx, dimy)) + geom_boxplot(show.legend = FALSE)
+      # compare_means(dimy ~ dimx,  data = printData, method = "anova")
+      cm = compare_means(dimy ~ dimx,  data = printData, method = "t.test")
+      maxcomp = min(3,nrow(cm))
+      cm = cm[order(cm$p.adj)[1:maxcomp],]
+      comparisons = apply(cbind(cm$group1,cm$group2) ,1, list) %>% unlist(recursive = F)
+      retVal <-  retVal + stat_compare_means(method = "t.test", comparisons = comparisons)
+    }
   } else {
     retVal <- ggplot(printData, aes(dimx, dimy)) + geom_point(aes(colour = col), alpha = 0.4) 
   }
@@ -539,7 +553,7 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
   retVal =  retVal + scale_color_gradient2(low = lowCol, high = highCol, mid = midCol, midpoint = midFunc(colData))
   
   
-  require(ggpubr)
+
   # retVal <-
   #   ggarrange(
   #     plotlist = plotList, ncol = nCol, nrow = ceiling(length(plotList) / nCol),

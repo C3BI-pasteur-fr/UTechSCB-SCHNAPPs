@@ -56,7 +56,7 @@ if ("shinyBS" %in% rownames(installed.packages())) {
 
   
   .schnappsEnv[['sbTT_coE_selected-geneIds']] <- bsPopover('coE_selected-geneIds', title = "", "sum of expression values if normalization is done, otherwise sum of UMI count.")
-  
+  .schnappsEnv[['sbTT_DE_panelplotPvalue']] <- bsPopover('DE_panelplotPvalue-geneIds', title = "", "Calculate t-test if x: factorial, y='UMI-count'. Max 5 are shown.")
   # should be read from contribution directory
   .schnappsEnv$sbTT_temporaCluster <-  bsPopover("temporaCluster", title = "", "name of cluster centroids.")
   .schnappsEnv$sbTT_temporaFactor <-  bsPopover("temporaFactor", title = "", "Factor used as time variable")

@@ -2152,8 +2152,8 @@ pcaReact <- reactive({
   })
   return(retVal)
 }) %>%
-  bindCache(scEx_Hash(),
-            scEx_log_Hash(),
+  bindCache(scEx(),
+            scEx_log(),
             runPCAclicked(),
             isolate(input$pcaRank),
             isolate(input$pcaN),

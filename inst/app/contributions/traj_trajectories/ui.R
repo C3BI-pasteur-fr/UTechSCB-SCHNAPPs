@@ -75,7 +75,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
             sc_numericInput("scorpMaxGenes",
                             label = "max number of Genes",
                             min = 200, max = 20000, step = 10,
-                            value = defaultValue("scorpMaxGenes", 500)
+                            value = defaultValue("scorpMaxGenes", 100)
             )
           ),
           column(
