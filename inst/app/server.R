@@ -414,10 +414,14 @@ scShinyServer <- function(input, output, session) {
         cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
         cat(file = stderr(),  "\n")
         tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
+        if(file.exists(tfile)){
         cp = load(file = tfile)
         if(all(c("prjs", "newPrjs") %in% cp)){
           sessionProjections$prjs = prjs
           projectionsTable$newProjections = newPrjs
+        }
+        } else {
+          
         }
         
         # derived/modified projections from projections tab
