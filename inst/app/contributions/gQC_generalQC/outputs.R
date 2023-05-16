@@ -483,6 +483,8 @@ output$gQC_geneSetsearchOutput = renderText({
   }
   # inputGS <- input$gQC_geneSetModifyInput
   genes = input$gQC_genesets_search
+  maxItems = isolate(input$gQC_genesets_maxPrint)
+  
   gd = gmtData()
   userData = gmtUserData()
   scEx = scEx()
@@ -508,7 +510,8 @@ output$gQC_geneSetsearchOutput = renderText({
   counts = counts[which(counts>0)]
   outStr = ""
   countNames = counts %>% unlist() %>% sort(decreasing = T) %>% names()
-  for (name in countNames){
+  maxItems = min(maxItems, length(countNames))
+  for (name in countNames[1:maxItems]){
     outStr = paste(outStr, name, "found:", counts[[name]], " of ", length(gd[[name]]$genes),"\n",
                    gd[[name]]$desc, "\n",
                    li[which(li %in% gd[[name]]$genes)], "\n",
@@ -516,7 +519,7 @@ output$gQC_geneSetsearchOutput = renderText({
     
   }
   outStr
-})
+}) %>% bindCache(input$gQC_genesets_search, gmtData())
 
 
 
