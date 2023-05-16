@@ -151,11 +151,15 @@ tabList <- list(
         fluidRow(
           align = 'right',
           column(
-            width = 4,
+            width = 3,
             sc_checkboxInput("DE_panelplotSameScale", "same scale", value = defaultValue("DE_panelplotSameScale", TRUE))
-          ),
+          ), 
           column(
-            width = 8,
+            width = 3,
+            sc_checkboxInput("DE_panelplotPvalue", "apply t-test", value = defaultValue("DE_panelplotPvalue", FALSE))
+          ), checkbsTT("DE_panelplotPvalue"),
+          column(
+            width = 6,
             sc_selectInput("DE_nCol",
                            label = "number of columns for plot",
                            choices = c(1:10),

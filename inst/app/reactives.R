@@ -2152,8 +2152,8 @@ pcaReact <- reactive({
   })
   return(retVal)
 }) %>%
-  bindCache(scEx_Hash(),
-            scEx_log_Hash(),
+  bindCache(scEx(),
+            scEx_log(),
             runPCAclicked(),
             isolate(input$pcaRank),
             isolate(input$pcaN),
@@ -2729,6 +2729,7 @@ dbCluster <- reactive({
   inCols <- list()
   lev <- levels(dbCluster)
   
+  # repeat allowedColors to match cluster colors with repetion
   inCols <- allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
   # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
@@ -2751,6 +2752,17 @@ dbCluster <- reactive({
   return(dbCluster)
 })
 
+observe({
+  pc = projectionColors
+  cat(file = stderr(), paste("colornames", paste(names(pc), collapse = ", "), "\n"))
+  cat(file = stderr(), paste("dbCluster colnames", paste(names(pc$dbCluster), collapse = ", "), "\n"))
+})
+
+observe({
+  pc = projections()
+  cat(file = stderr(), paste("projection names", paste(names(pc), collapse = ", "), "\n"))
+  cat(file = stderr(), paste("projection dbCluster colnames", paste(levels(pc$dbCluster), collapse = ", "), "\n"))
+})
 
 clusterMethodReact <- reactiveValues(
   clusterMethod = "igraph",

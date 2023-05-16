@@ -8,6 +8,118 @@ library(dplyr)
 if (!is.null(.schnappsEnv$enableTrajectories)) {
   
   # Scorpius ----------------------------------------------------------------
+  
+  # Obeservers for input 
+  # Scorpius_scEx_log ----
+  observe({
+    if (DEBUG) cat(file = stderr(), "Scorpius_scEx_log started.\n")
+    scEx_log = scEx_log()
+    if(is.null(scEx_log)) {
+      if (DEBUG) cat(file = stderr(), "Scorpius_scEx_log NULL 1\n")
+      Scorpius_scEx_log(NULL)
+      return(NULL)
+    }
+    # browser()
+    selectedCells <- Scorpius_dataInput() #DE_Exp_dataInput
+    if(is.null(selectedCells)){
+      if (DEBUG) cat(file = stderr(), "Scorpius_scEx_log NULL 2\n")
+      Scorpius_scEx_log(NULL)
+      return(NULL)
+    }
+    cellNs <- selectedCells$cellNames()
+    if(length(cellNs)<1) {
+      if (DEBUG) cat(file = stderr(), "Scorpius_scEx_log NULL 3\n")
+      Scorpius_scEx_log(NULL)
+      return(NULL)
+    }
+    if (DEBUG) cat(file = stderr(), "Scorpius_scEx_log end\n")
+    Scorpius_scEx_log(scEx_log[,cellNs])
+  })
+  
+  # scorpius_projections ----
+  observe({
+    # browser()
+    if (DEBUG) cat(file = stderr(), "scorpius_projections started.\n")
+    projections <- projections()
+    if (is.null(projections)) {
+      if (DEBUG) cat(file = stderr(), "scorpius_projections NULL 1\n")
+      scorpius_projections(NULL)
+      return(NULL)
+    }
+    selectedCells <- Scorpius_dataInput() #DE_Exp_dataInput
+    if(is.null(selectedCells)) {
+      if (DEBUG) cat(file = stderr(), "scorpius_projections NULL 2\n")
+      scorpius_projections(NULL)
+      return(NULL)
+    }
+    cellNs <- selectedCells$cellNames()
+    if(length(cellNs)<1){
+      if (DEBUG) cat(file = stderr(), "scorpius_projections NULL 3\n")
+      scorpius_projections(NULL)
+      return(NULL)
+    }
+    if (DEBUG) cat(file = stderr(), "scorpius_projections return\n")
+    scorpius_projections(projections[cellNs,])
+  }) 
+  
+  # scorpiusSpace ----
+  observeEvent(input$updatetScorpiusParameters, {
+    if (DEBUG) cat(file = stderr(), "scorpiusSpace started.\n")
+    start.time <- base::Sys.time()
+    on.exit({
+      printTimeEnd(start.time, "scorpiusSpace")
+      if (!is.null(getDefaultReactiveDomain()))
+        removeNotification(id = "scorpiusSpace")
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("scorpiusSpace", id = "scorpiusSpace", duration = NULL)
+    }
+    
+    
+    # doCalc <- 
+    dimX <- input$dimScorpiusX
+    dimY <- input$dimScorpiusY
+    scInput <- scorpiusInput()
+    projections <- scorpius_projections()
+    
+    if (!is.null(scInput)) {
+      if (DEBUG) cat(file = stderr(), paste("scorpiusSpace: returning result 1\n"))
+      scorpiusSpace(scInput[, c(1, 2)])
+      return()
+    }
+    if ( is.null(projections)) {
+      if (DEBUG) cat(file = stderr(), paste("scorpiusSpace:NULL 1\n"))
+      scorpiusSpace(NULL)
+      return()
+    }
+    if (.schnappsEnv$DEBUGSAVE) {
+      save(file = "~/SCHNAPPsDebug/scorpiusSpace.RData", list = c(ls()))
+    }
+    # cp=load(file="~/SCHNAPPsDebug/scorpiusSpace.RData")
+    
+    if(!all(c(dimX, dimY) %in% colnames(projections))) {
+      if (DEBUG) cat(file = stderr(), paste("scorpiusSpace:NULL 2\n"))
+      scorpiusSpace(NULL)
+      return(NULL)
+    }
+    if(any(is.na(projections[, c(dimX, dimY)]))){
+      save(file = "~/SCHNAPPsDebug/scorpiusSpaceNA.RData", list = c(ls()))
+      if (DEBUG) cat(file = stderr(), paste("scorpiusSpace:NA found in projections\n"))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("scorpiusSpace NA found", id = "scorpiusSpaceError", duration = NULL,type = "error")
+      }
+      if (DEBUG) cat(file = stderr(), paste("scorpiusSpace:NULL 3\n"))
+      scorpiusSpace(NULL)
+      return(NULL)
+    }
+    space <- projections[, c(dimX, dimY)]
+    if (DEBUG) cat(file = stderr(), paste("scorpiusSpace: returning result 2\n"))
+    
+    scorpiusSpace(space)
+  })
+  
+  
+  
   ## add scorpius Proj to global ----
   # update projections: add new projections
   observe(label = "ob20sc", {
@@ -24,12 +136,13 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     if (DEBUG) cat(file = stderr(), "observeScorpiusProj 20sc started.\n")
     
     traj <- scorpiusTrajectory()
-    scEx_log <- Scorpius_scEx_log()
-    scExNames <- isolate(colnames(scEx_log()))
+    scEx_log <- isolate(Scorpius_scEx_log())
+    # scExNames <- isolate(colnames(scEx_log()))
+    projections <- isolate(projections())
     
-    isolate({
-      prjs <- sessionProjections$prjs
-    })
+    acn = isolate(allCellNames())
+    
+    prjs <-isolate(sessionProjections$prjs)
     if (is.null(scEx_log) || is.null(traj)) {
       return(NULL)
     }
@@ -56,12 +169,15 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       # }
       
     } else {
-      prjs <- data.frame(row.names = scExNames)
+      prjs <- data.frame(row.names = acn)
       prjs[,cn] <- -1
-      prjs[colnames(scEx_log),cn] <- traj$time
+      prjs[rownames(traj),cn] <- traj$time
       # colnames(prjs)[ncol(prjs)] <- cn
     }
-    sessionProjections$prjs <- prjs
+    prjNames = make.names(c(colnames(projections), colnames(prjs)), unique = T)
+    prjNames = prjNames[(ncol(projections)+1):length(prjNames)]
+    colnames(prjs) = prjNames
+    isolate(sessionProjections$prjs <- prjs)
   })
   
   runScorpius <- reactiveVal(0)
@@ -93,22 +209,22 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     runScorpius(1)
   })
   
-  # observe(label = "ob_scorpButton",priority = 99,
-  #         {
-  #           if (DEBUG) cat(file = stderr(), "observe ob_scorpButton\n")
-  #           input$updatetScorpiusParameters
-  #           setRedGreenButtonCurrent(
-  #             vars = list(
-  #               c("dimScorpiusX", input$dimScorpiusX),
-  #               c("dimScorpiusY", input$dimScorpiusY),
-  #               c("scorpMaxGenes", input$scorpMaxGenes),
-  #               c("scorpRepeat", input$scorpRepeat),
-  #               c("scorpInFile", input$trajInputFile)
-  #             )
-  #           )
-  #           
-  #           
-  #         })
+  observe(label = "ob_scorpButton",priority = 99,
+          {
+            if (DEBUG) cat(file = stderr(), "observe ob_scorpButton\n")
+            input$updatetScorpiusParameters
+            setRedGreenButtonCurrent(
+              vars = list(
+                c("dimScorpiusX", input$dimScorpiusX),
+                c("dimScorpiusY", input$dimScorpiusY),
+                c("scorpMaxGenes", input$scorpMaxGenes),
+                c("scorpRepeat", input$scorpRepeat),
+                c("scorpInFile", input$trajInputFile)
+              )
+            )
+
+
+          })
   
   
   observe(label ="obs_pcaRank", x = {
@@ -198,7 +314,7 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       save(file = "~/SCHNAPPsDebug/scorpiusTrajectory.RData", list = c(ls()))
     }
     # cp=load(file="~/SCHNAPPsDebug/scorpiusTrajectory.RData")
-    if (!is.null(scInput)) {
+    if (!is.null(scInput)) { # input file is given
       return(scInput)
     }
     if (is.null(space)) {
@@ -250,8 +366,8 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     }
     # sdi = Scorpius_dataInput() # variable not used but display depends on this => causes endless loop??
     traj <- scorpiusTrajectory()
-    projections <- (scorpius_projections())
-    space <- (scorpiusSpace())
+    projections <- scorpius_projections()
+    space <- isolate(scorpiusSpace())
     # upI <- updateScorpiusInput() # needed to update input
     dimX <- input$dimScorpiusX
     dimY <- input$dimScorpiusY
@@ -388,9 +504,10 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       retVal
     })
     return(retVal)
-  })  %>% bindCache(Scorpius_scEx_log(), scorpius_projections_hash(), scorpiusTrajectory(),
-                   scorpiusExpSel(), scorpiusModules(), projectionColors$sampleNames,
-                   projectionColors$dbCluster) %>% bindEvent( input$updatetScorpiusParameters)
+  })  
+  # %>% bindCache(Scorpius_scEx_log(), scorpius_projections_hash(), scorpiusTrajectory(),
+  #                  scorpiusExpSel(), scorpiusModules(), projectionColors$sampleNames,
+  #                  projectionColors$dbCluster) %>% bindEvent( input$updatetScorpiusParameters)
   
   callModule(
     pHeatMapModule,
@@ -543,7 +660,9 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     elpimode <- input$ElpiMethod
     psTime <- traj_getPseudotime()
     scEx_log <- Elpi_scEx_log()
-    scExNames <- isolate(colnames(scEx_log()))
+    acn = isolate(allCellNames())
+    # scExNames <- isolate(colnames(scEx_log()))
+    projections = isolate(projections())
     isolate({
       prjs <- sessionProjections$prjs
     })
@@ -577,12 +696,16 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
       #   colnames(prjs)[ncol(prjs)] <- cn
       # }
     } else {
-      prjs <- data.frame(row.names = scExNames)
+      prjs <- data.frame(row.names = acn)
       prjs[, cn] = -1
       prjs[colnames(scEx_log),cn] <- psTime$Pt
       # colnames(prjs)[ncol(prjs)] <- cn
     }
-    sessionProjections$prjs <- prjs
+    prjNames = make.names(c(colnames(projections), colnames(prjs)), unique = T)
+    prjNames = prjNames[(ncol(projections)+1):length(prjNames)]
+    colnames(prjs) = prjNames
+    
+   isolate( sessionProjections$prjs <- prjs)
   })
   
   ## obeserver for elpi button ----
