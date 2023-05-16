@@ -350,13 +350,14 @@ observe(label = "ob_panelPlotParams", {
       c("DE_panelplotSameScale", (input$DE_panelplotSameScale)),
       c("DE_nCol", (input$DE_nCol)),
       c("DE_PanelPlotCellSelection-Mod_clusterPP", (input$`DE_PanelPlotCellSelection-Mod_clusterPP`)),
-      c("DE_PanelPlotCellSelection-Mod_PPGrp", (input$`DE_PanelPlotCellSelection-Mod_PPGrp`))
+      c("DE_PanelPlotCellSelection-Mod_PPGrp", (input$`DE_PanelPlotCellSelection-Mod_PPGrp`)),
+      c("DE_panelplotPvalue", (input$DE_panelplotPvalue))
     )
   )
   
   updateButtonColor(buttonName = "updatePanelPlot", parameters = c(
     "DE_panelplotids", "DE_dim_x", "DE_dim_y", "DE_panelplotSameScale", 
-    "DE_nCol", "DE_PanelPlotCellSelection-Mod_clusterPP", "DE_PanelPlotCellSelection-Mod_PPGrp"
+    "DE_nCol", "DE_PanelPlotCellSelection-Mod_clusterPP", "DE_PanelPlotCellSelection-Mod_PPGrp", "DE_panelplotPvalue"
   ))
 })
 
@@ -383,6 +384,7 @@ output$DE_panelPlot <- renderPlot({
   if (DEBUG) cat(file = stderr(), "output$DE_panelPlot\n")
   
   clicked <- input$updatePanelPlot
+  applyPvalue <- isolate(input$DE_panelplotPvalue)
   scEx_log <- scEx_log()
   projections <- projections()
   DE_updateInputPPt()
@@ -413,7 +415,7 @@ output$DE_panelPlot <- renderPlot({
   genesin <- genesin[[1]]
   
   # if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
-  retVal <- panelPlotFunc_m(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs ) 
+  retVal <- panelPlotFunc_m(scEx_log, projections, genesin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs, applyPvalue = applyPvalue) 
   
   setRedGreenButton(
     vars = list(
@@ -423,7 +425,8 @@ output$DE_panelPlot <- renderPlot({
       c("DE_panelplotSameScale", isolate(input$DE_panelplotSameScale)),
       c("DE_nCol", isolate(input$DE_nCol)),
       c("DE_PanelPlotCellSelection-Mod_clusterPP", isolate(input$`DE_PanelPlotCellSelection-Mod_clusterPP`)),
-      c("DE_PanelPlotCellSelection-Mod_PPGrp", isolate(input$`DE_PanelPlotCellSelection-Mod_PPGrp`))
+      c("DE_PanelPlotCellSelection-Mod_PPGrp", isolate(input$`DE_PanelPlotCellSelection-Mod_PPGrp`)),
+      c("DE_panelplotPvalue", isolate(input$DE_panelplotPvalue))
     ),
     button = "updatePanelPlot"
   )
@@ -443,7 +446,8 @@ output$DE_panelPlot <- renderPlot({
                                          genesin=genesin, dimx4=dimx4, 
                                          dimy4=dimy4, sameScale=sameScale, 
                                          nCol=nCol, sampdesc=sampdesc,
-                                         cellNs=cellNs
+                                         cellNs=cellNs,
+                                         applyPvalue = applyPvalue
   )
   retVal
 })

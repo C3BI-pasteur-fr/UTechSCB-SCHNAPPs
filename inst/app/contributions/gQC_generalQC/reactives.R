@@ -502,7 +502,7 @@ umapReact <- reactive({
                 isolate(input$gQC_um_metric),
                 isolate(input$gQC_um_randSeed),
                 isolate(input$gQC_um_init),
-                scEx_log_Hash(),
+                scEx_log,
                 pcaReact()
 )
 
