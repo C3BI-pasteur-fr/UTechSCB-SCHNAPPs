@@ -139,12 +139,21 @@ geneSetModTab <- shinydashboard::tabItem(
            id = "gQC_search.Tab",
            fluidRow(
              column(
-               width = 12,
+               width = 6,
                sc_textInput(inputId= "gQC_genesets_search", label="comma separated list of genes", value="") %>% jqui_resizable(),
-               verbatimTextOutput("gQC_geneSetsearchOutput") %>% jqui_resizable()
+               
                #,
                # actionButton("button_GSEA", "run GSEA")
-             ))
+             ),
+             column(width = 6,
+                    sc_numericInput(inputId = "gQC_genesets_maxPrint", label="max items to print",
+                                    value=100, min=10, max=1000, step=10))),
+           fluidRow(
+             column(
+               width=12,
+               verbatimTextOutput("gQC_geneSetsearchOutput") %>% jqui_resizable()
+             )
+           )
          )
   )
 )
