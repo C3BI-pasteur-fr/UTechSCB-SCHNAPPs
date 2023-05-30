@@ -478,6 +478,7 @@ scShinyServer <- function(input, output, session) {
     sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
   # }
     
+  # }
   # browser()
   # bindCache <- function(x, ...){return(x)}
   if (!is.null(getDefaultReactiveDomain())) {
