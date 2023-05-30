@@ -519,7 +519,8 @@ output$gQC_geneSetsearchOutput = renderText({
     
   }
   outStr
-}) %>% bindCache(input$gQC_genesets_search, gmtData())
+})
+# %>% bindCache(input$gQC_genesets_search, gmtData())
 
 
 
