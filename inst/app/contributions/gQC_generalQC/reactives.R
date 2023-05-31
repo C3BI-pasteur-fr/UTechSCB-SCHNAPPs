@@ -314,13 +314,14 @@ tsne <- reactive({
     retVal
   })
   return(retVal)
-}) %>% bindCache(  pcaReact(),
-                   runTSNEclicked(),
-                   isolate(input$gQC_tsneDim),
-                   isolate(input$gQC_tsnePerplexity),
-                   isolate(input$gQC_tsneTheta),
-                   isolate(input$gQC_tsneSeed)
-)
+})
+# %>% bindCache(  pcaReact(),
+#                    runTSNEclicked(),
+#                    isolate(input$gQC_tsneDim),
+#                    isolate(input$gQC_tsnePerplexity),
+#                    isolate(input$gQC_tsneTheta),
+#                    isolate(input$gQC_tsneSeed)
+# )
 
 # tsneFunc ----
 tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_tsneSeed) {
@@ -488,23 +489,24 @@ umapReact <- reactive({
     embedding
   })
   return(embedding)
-})%>% bindCache(activatedUMAP(),
-                isolate(input$gQC_um_n_neighbors),
-                isolate(input$gQC_um_n_components),
-                isolate(input$gQC_um_n_epochs),
-                isolate(input$gQC_um_min_dist),
-                isolate(input$gQC_um_set_op_mix_ratio),
-                isolate(input$gQC_um_local_connectivity),
-                isolate(input$gQC_um_bandwidth),
-                isolate(input$um_gamma),
-                isolate(input$gQC_um_negative_sample_rate),
-                isolate(input$gQC_um_spread),
-                isolate(input$gQC_um_metric),
-                isolate(input$gQC_um_randSeed),
-                isolate(input$gQC_um_init),
-                scEx_log,
-                pcaReact()
-)
+})
+# %>% bindCache(activatedUMAP(),
+#                 isolate(input$gQC_um_n_neighbors),
+#                 isolate(input$gQC_um_n_components),
+#                 isolate(input$gQC_um_n_epochs),
+#                 isolate(input$gQC_um_min_dist),
+#                 isolate(input$gQC_um_set_op_mix_ratio),
+#                 isolate(input$gQC_um_local_connectivity),
+#                 isolate(input$gQC_um_bandwidth),
+#                 isolate(input$um_gamma),
+#                 isolate(input$gQC_um_negative_sample_rate),
+#                 isolate(input$gQC_um_spread),
+#                 isolate(input$gQC_um_metric),
+#                 isolate(input$gQC_um_randSeed),
+#                 isolate(input$gQC_um_init),
+#                 scEx_log,
+#                 pcaReact()
+# )
 
 
 # myProjections ----
