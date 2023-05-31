@@ -1269,8 +1269,16 @@ add2history <- function(type, comment = "", input = input, ...) {
     # if this variable is not set we are not saving
     return(NULL)
   }
-  if(!"startingUp" %in% names(input)) return(NULL)
   # browser()
+  
+  # new feature to prevent saving during start-up
+  # modules don't have access to the global input...
+  if("startingUp" %in% names(input)){
+    if(input$startingUp=="1") {
+      # browser()
+      return(NULL)
+    } 
+  }
   # deepDebug()
   sessionI = sessionInfo()
   defaultValues = .schnappsEnv$defaultValues
@@ -1315,7 +1323,7 @@ add2history <- function(type, comment = "", input = input, ...) {
       commentOutLoad = ""
     }
     line <- paste0(
-      "```{R, fig.cap = \"\"}\n#",date(),"\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
+      "```{R, fig.cap = \"\", fig.width=20,fig.height=7}\n#",date(),"\n#load ", names(varnames[1]), "\n", commentOutLoad,"load(file = \"", basename(tfile),
       "\")\n#", comment, "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1351,7 +1359,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     if (DEBUG) cat(file = stderr(), paste0("add2history: tronco data to", tfile, "\n"))
     
     line <- paste0(
-      "```{R, fig.cap = \"\"}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R, fig.cap = \"\", fig.width=20,fig.height=7}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]) ,"$filename <- NULL \n",
       "\ndo.call(TRONCO::pheatmap, ", names(varnames[1]), ")\n```\n"
     )
@@ -1367,7 +1375,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     if (DEBUG) cat(file = stderr(), paste0("add2history: saving renderPlot to", tfile, "\n"))
     
     line <- paste0(
-      "```{R, fig.cap = \"\"}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
+      "```{R, fig.cap = \"\", fig.width=20,fig.height=7}\n#",date(),"\n#", comment, "\n#load ", names(varnames[1]), "\nload(file = \"", basename(tfile),"\")\n",
       "\n", names(varnames[1]), "\n```\n"
     )
     write(line, file = .schnappsEnv$historyFile, append = TRUE)
@@ -1684,7 +1692,7 @@ heatmapModuleFunction <- function(
   # heatmapData$annotation_col <- 
   heatmapData$annotation_col = heatmapData$annotation_col %>% mutate_if(is.numeric, function(x) ifelse( is.na(x), min(x, na.rm = T),x))
   
-
+  
   retVal = tryCatch(
     do.call(ComplexHeatmap::pheatmap, heatmapData),
     # do.call(TRONCO::pheatmap, heatmapData),
