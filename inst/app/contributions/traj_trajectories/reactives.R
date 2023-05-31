@@ -294,13 +294,14 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     # retVal = rbind(expr_sel,dfTmp)
     .schnappsEnv$react.scorpiusExpSel = list(dig, list(expr_sel = expr_sel, gene_sel = gene_sel))
     return(list(expr_sel = expr_sel, gene_sel = gene_sel))
-  }) %>% bindCache(
-    Scorpius_scEx_log(),
-    isolate(scorpiusTrajectory()),
-    isolate(input$scorpMaxGenes),
-    isolate(input$scorpRepeat)
-    
-  )
+  })
+  # %>% bindCache(
+  #   Scorpius_scEx_log(),
+  #   isolate(scorpiusTrajectory()),
+  #   isolate(input$scorpMaxGenes),
+  #   isolate(input$scorpRepeat)
+  #   
+  # )
   
   ## scorpiusModules ----
   scorpiusModules <- reactive({
@@ -1288,11 +1289,11 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
   }
   environment(IdentifyVaryingPWs_updated) <- asNamespace("Tempora")
   assignInNamespace("IdentifyVaryingPWs", IdentifyVaryingPWs_updated, ns = "Tempora")
-  if(!is.null(.schnappsEnv$cacheDir)){
-    IdentifyVaryingPWs_m <- memoise::memoise(Tempora::IdentifyVaryingPWs,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  } else {
+  # if(!is.null(.schnappsEnv$cacheDir)){
+  #   IdentifyVaryingPWs_m <- memoise::memoise(Tempora::IdentifyVaryingPWs,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+  # } else {
     IdentifyVaryingPWs_m = Tempora::IdentifyVaryingPWs
-  }
+  # }
   
   #  ----
   #' Calculate temporally changing pathways (parallel version)

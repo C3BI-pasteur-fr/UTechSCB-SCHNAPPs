@@ -386,6 +386,9 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
 #' calculate dge using DESeq2
 runDESEQ2 <- function(data.use, group.info) {
   if (DEBUG) cat(file = stderr(), "DESeq2 setup.\n")
+  
+  # TODO DESeqParallel 
+  
   dds1 <- DESeq2::DESeqDataSetFromMatrix(
     countData = data.use,
     colData = group.info,

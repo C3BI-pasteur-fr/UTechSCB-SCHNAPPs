@@ -2151,20 +2151,21 @@ pcaReact <- reactive({
     retVal
   })
   return(retVal)
-}) %>%
-  bindCache(scEx(),
-            scEx_log(),
-            runPCAclicked(),
-            isolate(input$pcaRank),
-            isolate(input$pcaN),
-            isolate(input$pcaCenter),
-            isolate(input$pcaScale),
-            isolate(input$genes4PCA),
-            isolate(input$genesRMPCA),
-            isolate(input$hvgSelection),
-            isolate(input$useSeuratPCA),
-            isolate(input$normalizationRadioButton)
-  )
+})
+# %>%
+#   bindCache(scEx(),
+#             scEx_log(),
+#             runPCAclicked(),
+#             isolate(input$pcaRank),
+#             isolate(input$pcaN),
+#             isolate(input$pcaCenter),
+#             isolate(input$pcaScale),
+#             isolate(input$genes4PCA),
+#             isolate(input$genesRMPCA),
+#             isolate(input$hvgSelection),
+#             isolate(input$useSeuratPCA),
+#             isolate(input$normalizationRadioButton)
+#   )
 
 # scranCluster -----
 scranCluster <- function(pca,
