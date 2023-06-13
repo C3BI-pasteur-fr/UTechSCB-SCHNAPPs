@@ -55,8 +55,11 @@ image: pf2dock/schnapps
 test2:
   stage: test2
   script:
+    - set
+    - echo $GITHUB_PAT
     - R -e "sessionInfo()"
-    - R -e "devtools::update_packages(dependencies = T, upgrade='always')"    
+    - R -e "installed.packages()"
+    - export GITHUB_PAT=${R_PAT_TOKEN};R -e "devtools::update_packages(dependencies = T, upgrade='always')"    
     - R -e "devtools::install_gitlab(host='https://gitlab.pasteur.fr', repo = 'bernd/UTechSCB-SCHNAPPs', dependencies = TRUE)"
   only:
     - master
