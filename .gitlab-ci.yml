@@ -55,6 +55,8 @@ image: pf2dock/schnapps
 test2:
   stage: test2
   script:
+    - R -e "sessionInfo()"
+    - R -e "devtools::update_packages(dependencies = T, upgrade='always')"    
     - R -e "devtools::install_gitlab(host='https://gitlab.pasteur.fr', repo = 'bernd/UTechSCB-SCHNAPPs', dependencies = TRUE)"
   only:
     - master
