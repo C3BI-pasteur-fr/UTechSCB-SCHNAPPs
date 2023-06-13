@@ -29,14 +29,7 @@ sampleCols <- reactiveValues(colPal = allowedColors)
 # colors for clusters
 clusterCols <- reactiveValues(colPal = allowedColors)
 
-gmtData <- reactiveVal()
-gmtUserData <- reactiveVal()
 
-# Here, we store projections that are created during the session. These can be selections of cells or other values that
-# are not possible to precalculate.
-sessionProjections <- reactiveValues(
-  prjs = data.frame()
-)
 
 # 
 allCellNames <- reactiveVal(
@@ -2413,8 +2406,31 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
 }
-# will be overwritten later in server.R if we are using memoise
+
+# cacheDir is not known before and messes up things
+# if(!is.null(.schnappsEnv$cacheDir)){
+#   cat(file = stderr(), unlist(.schnappsEnv$cacheDir))
+#   # heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir)) is called too often
+#   heatmapModuleFunction_m = heatmapModuleFunction
+#   runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+#   panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+#   runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+#   scranCluster_m <- memoise::memoise(scranCluster,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+#   
+#   if("DoubletFinder" %in% installed.packages()){
+#     find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+#   }
+#   sCA_seuratFindMarkers_m = memoise::memoise(sCA_seuratFindMarkers,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+# } else {
+heatmapModuleFunction_m = heatmapModuleFunction
 runSeuratClustering_m <- runSeuratClustering
+panelPlotFunc_m = panelPlotFunc
+runDESEQ2_m <- runDESEQ2
+scranCluster_m <- scranCluster
+if("DoubletFinder" %in% installed.packages()){
+  find_doublets_m <- find_doublets
+}
+sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
 
 # 
 seurat_Clustering <- function() {
@@ -2764,16 +2780,6 @@ observe({
   cat(file = stderr(), paste("projection names", paste(names(pc), collapse = ", "), "\n"))
   cat(file = stderr(), paste("projection dbCluster colnames", paste(levels(pc$dbCluster), collapse = ", "), "\n"))
 })
-
-clusterMethodReact <- reactiveValues(
-  clusterMethod = "igraph",
-  clusterSource = "counts"
-)
-
-# collect copied/renamed projections
-projectionsTable <- reactiveValues(
-  newProjections = data.frame()
-)
 
 # projections ----
 #' projections

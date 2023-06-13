@@ -134,6 +134,25 @@ scShinyServer <- function(input, output, session) {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("starting application", id = "startSCHNAPPs", duration = NULL)
   }
+  gmtData <- reactiveVal()
+  gmtUserData <- reactiveVal()
+  
+  # Here, we store projections that are created during the session. These can be selections of cells or other values that
+  # are not possible to precalculate.
+  sessionProjections <- reactiveValues(
+    prjs = data.frame()
+  )
+  
+  
+  clusterMethodReact <- reactiveValues(
+    clusterMethod = "igraph",
+    clusterSource = "counts"
+  )
+  
+  # collect copied/renamed projections
+  projectionsTable <- reactiveValues(
+    newProjections = data.frame()
+  )
   
   # seed ----
   # TODO needs to be an option
@@ -414,6 +433,8 @@ scShinyServer <- function(input, output, session) {
         cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
         cat(file = stderr(),  "\n")
         tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
+        prjs = NULL
+        newPrjs = NULL
         if(file.exists(tfile)){
         cp = load(file = tfile)
         if(all(c("prjs", "newPrjs") %in% cp)){
@@ -451,31 +472,7 @@ scShinyServer <- function(input, output, session) {
   }
   
   # browser()
-  # cacheDir is not known before and messes up things
-  # if(!is.null(.schnappsEnv$cacheDir)){
-  #   cat(file = stderr(), unlist(.schnappsEnv$cacheDir))
-  #   # heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir)) is called too often
-  #   heatmapModuleFunction_m = heatmapModuleFunction
-  #   runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  #   panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  #   runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  #   scranCluster_m <- memoise::memoise(scranCluster,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  #   
-  #   if("DoubletFinder" %in% installed.packages()){
-  #     find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  #   }
-  #   sCA_seuratFindMarkers_m = memoise::memoise(sCA_seuratFindMarkers,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-  # } else {
-    heatmapModuleFunction_m = heatmapModuleFunction
-    runSeuratClustering_m <- runSeuratClustering
-    panelPlotFunc_m = panelPlotFunc
-    runDESEQ2_m <- runDESEQ2
-    scranCluster_m <- scranCluster
     
-    if("DoubletFinder" %in% installed.packages()){
-      find_doublets_m <- find_doublets
-    }
-    sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
   # }
     
   # }
