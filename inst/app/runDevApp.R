@@ -49,7 +49,7 @@ historyPath = "demoHistory/celia/"
 historyPath = "/Volumes/CBUtechsZeus/bernd/celia/hist_2023-May-15.09.49/"
 # historyPath = "demoHistory/MPI"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
-# historyPath = NULL
+historyPath = NULL
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
@@ -172,7 +172,13 @@ source("R/DotPlotwithModuleScore.R")
 # options(shiny.jquery.version=3)
 # options(shiny.trace=TRUE)
 # options(shiny.devmode=F)
+
+# takes too long to load
+# testapp <- shinytest2::AppDriver$new(app, load_timeout = 1505 * 1000)
+
+
 runApp(app, port=3838, launch.browser = chromeBrowser)
+
 # 
 # last.dump[length(last.dump)]
 # debugger(last.dump)
