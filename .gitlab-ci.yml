@@ -50,7 +50,7 @@
 stages:
   - test2
   
-image: pf2dock/schnapps  
+image: registry-gitlab.pasteur.fr/bernd/utechscb-schnapps  
 
 test2:
   stage: test2
