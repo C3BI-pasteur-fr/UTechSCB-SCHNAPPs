@@ -23,7 +23,7 @@
 
 
 # load R image
-FROM r-base:4.0.4
+FROM r-base:4.3.0
 
 # set working directory
 WORKDIR /root
