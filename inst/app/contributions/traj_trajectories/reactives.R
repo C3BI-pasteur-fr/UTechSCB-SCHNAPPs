@@ -274,12 +274,12 @@ if (!is.null(.schnappsEnv$enableTrajectories)) {
     # it is possible that after reloading a workspace under some circumstances the underlying data changed
     if(!all(rownames(traj) %in% colnames(scEx_log))) return(NULL)
     
-    # cellsNotFound <- colnames(assays(scEx_log)[[1]])[!colnames(assays(scEx_log)[[1]]) %in% rownames(traj)]
-    # dig = digest(list(assays(scEx_log)[[1]][,rownames(traj)], traj$time, scorpRepeat), algo = "sha256")
-    # if(!is.null(.schnappsEnv$react.scorpiusExpSel))
-    #   if(dig == .schnappsEnv$react.scorpiusExpSel[[1]]) {
-    #     return(.schnappsEnv$react.scorpiusExpSel[[2]])
-    #   }
+    cellsNotFound <- colnames(assays(scEx_log)[[1]])[!colnames(assays(scEx_log)[[1]]) %in% rownames(traj)]
+    dig = digest(list(assays(scEx_log)[[1]][,rownames(traj)], traj$time, scorpRepeat), algo = "sha256")
+    if(!is.null(.schnappsEnv$react.scorpiusExpSel))
+      if(dig == .schnappsEnv$react.scorpiusExpSel[[1]]) {
+        return(.schnappsEnv$react.scorpiusExpSel[[2]])
+      }
     regis=registered()[[1]]
     workers = ifelse("workers" %in% names(regis),  regis$workers, detectCores())
     expression <- t(as.matrix(assays(scEx_log)[[1]][,rownames(traj)]))
