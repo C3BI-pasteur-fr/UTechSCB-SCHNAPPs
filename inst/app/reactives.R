@@ -2413,24 +2413,13 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
 #   # heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir)) is called too often
 #   heatmapModuleFunction_m = heatmapModuleFunction
 #   runSeuratClustering_m <- memoise::memoise(runSeuratClustering,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-#   panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
-#   runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 #   scranCluster_m <- memoise::memoise(scranCluster,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 #   
-#   if("DoubletFinder" %in% installed.packages()){
-#     find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 #   }
-#   sCA_seuratFindMarkers_m = memoise::memoise(sCA_seuratFindMarkers,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 # } else {
 heatmapModuleFunction_m = heatmapModuleFunction
 runSeuratClustering_m <- runSeuratClustering
-panelPlotFunc_m = panelPlotFunc
-runDESEQ2_m <- runDESEQ2
 scranCluster_m <- scranCluster
-if("DoubletFinder" %in% installed.packages()){
-  find_doublets_m <- find_doublets
-}
-sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
 
 # 
 seurat_Clustering <- function() {

@@ -74,19 +74,19 @@ RUN R -e "BiocManager::install(c('multtest', 'limma', 'Biobase', 'monocle', 'rtr
 RUN R -e "BiocManager::install(c('IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics'))"
 RUN R -e "BiocManager::install(c('DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment', 'S4Vectors'))"
 RUN R -e "devtools::install_version('spatstat', version = '1.64-1', repos = 'http://cran.us.r-project.org')"
-# RUN R -e "devtools::install_github(repo = 'satijalab/seurat', dependencies = TRUE)" 
-# RUN R -e "remotes::install_github('C3BI-pasteur-fr/TemporaFork')"
-# RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN', dependencies = TRUE)" && \
-#     R -e "install.packages(c('shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r'))" && \
-#     R -e "setRepositories(ind = c(1,2,3));devtools::install_github('RausellLab/CelliD', ref = 'legacy')" && \
-#     R -e "install.packages(c('forcats', 'kohonen', 'SCORPIUS', 'shinyBS', 'threejs', 'DT', 'shinythemes'))"
-# RUN R -e "devtools::install_github('Albluca/distutils') " && \
-#     R -e "devtools::install_github('Albluca/ElPiGraph.R')" && \
-#     R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))" && \
-#     R -e "BiocManager::install('BiocParallel')" && \
-#     R -e "remotes::install_github('briatte/ggnetwork')" \
-#     R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
-# RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
+RUN R -e "devtools::install_github(repo = 'satijalab/seurat', dependencies = TRUE)" 
+RUN R -e "remotes::install_github('C3BI-pasteur-fr/TemporaFork')"
+RUN R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN', dependencies = TRUE)" && \
+    R -e "install.packages(c('shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r'))" 
+#RUN    R -e "setRepositories(ind = c(1,2,3));devtools::install_github('RausellLab/CelliD', ref = 'legacy')" 
+RUN    R -e "install.packages(c('forcats', 'kohonen', 'SCORPIUS', 'shinyBS', 'threejs', 'DT', 'shinythemes'))"
+RUN R -e "devtools::install_github('Albluca/distutils') " && \
+     R -e "devtools::install_github('Albluca/ElPiGraph.R')" && \
+     R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))" && \
+     R -e "BiocManager::install('BiocParallel')" && \
+     R -e "remotes::install_github('briatte/ggnetwork')" \
+     R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
+ RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
 
 # RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
 #     rm -r SCHNAPPsContributions/Dummy/  && \
