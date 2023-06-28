@@ -83,7 +83,8 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
      R -e "remotes::install_github('briatte/ggnetwork')" \
      R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
 RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
+RUN apt-get lsof
+RUN R -e "devtools::install_github( 'C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
 
 RUN sudo apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
 RUN R -e "devtools::install_github('mul118/shinyMCE')" 
