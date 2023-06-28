@@ -1708,8 +1708,10 @@ heatmapModuleFunction <- function(
   return(retVal)
 }
 
+
 # this has to be called after the cache setup... moved to server.R
 # heatmapModuleFunction_m = memoise::memoise(heatmapModuleFunction,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+heatmapModuleFunction_m = heatmapModuleFunction
 
 # consolidateScEx ----
 

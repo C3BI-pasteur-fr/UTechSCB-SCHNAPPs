@@ -412,6 +412,8 @@ runDESEQ2 <- function(data.use, group.info) {
   res$pvalue[is.na(res$pvalue)] <- 1
   return(res)
 }
+#   runDESEQ2_m <- memoise::memoise(runDESEQ2,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
 
 
 sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {

@@ -349,9 +349,13 @@ parameterItems <- function() {
 # clusterParametersTab ----
 clusterParametersTab <- function() {
   normaliztionChoices <- list(rawNormalization = "rawNormalization")
+  if(!exists(".schnappsEnv")){
+    cat(file = stderr(), "no .schnappsEnv\n")
+  }
   # parameterContributions = list()
   # localContributionDir <- .SCHNAPPs_locContributionDir
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), 
+                  pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     if (DEBUG) {
       cat(file = stderr(), paste(fp, "\n"))
