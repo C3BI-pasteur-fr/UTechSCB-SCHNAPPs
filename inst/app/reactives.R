@@ -2422,7 +2422,7 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
 #   
 #   }
 # } else {
-
+runSeuratClustering_m = runSeuratClustering
 
 # 
 seurat_Clustering <- function() {
