@@ -649,5 +649,9 @@ if("DoubletFinder" %in% installed.packages()){
     # colnames(result) = c("DF.score", "DF.class")
     return(result)
   }
+  #   if("DoubletFinder" %in% installed.packages()){
+  #     find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
+    find_doublets_m <- find_doublets
+
   # find_doublets_m <- memoise::memoise(find_doublets,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 }
