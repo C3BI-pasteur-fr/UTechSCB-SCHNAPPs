@@ -11,6 +11,5 @@ defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
 
 
-schnapps(defaultValues = defaultValues, 
-         localContributionDir = "/SCHNAPPsContributions/", DEBUG = T, historyPath = "history", port = 3838)
+schnapps(defaultValues = defaultValues, DEBUG = T, historyPath = "history", port = 3838)
 
