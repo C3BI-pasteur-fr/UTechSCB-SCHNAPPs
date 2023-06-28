@@ -82,7 +82,6 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
      R -e "BiocManager::install('BiocParallel')" && \
      R -e "remotes::install_github('briatte/ggnetwork')" \
      R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
-RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
 RUN apt-get install lsof
 RUN apt-get install net-tools
 RUN apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
@@ -90,6 +89,7 @@ RUN R -e "devtools::install_github('mul118/shinyMCE')"
 RUN R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))"
 
 RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs',dependencies=TRUE)"
+RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
 
 
  #RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
