@@ -87,8 +87,9 @@ RUN apt-get install lsof
 RUN apt-get install net-tools
 RUN apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
 RUN R -e "devtools::install_github('mul118/shinyMCE')" 
+RUN R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))"
 
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies=TRUE)"
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs',dependencies=TRUE)"
 
 
  #RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
@@ -111,10 +112,10 @@ COPY *.RData /srv/shiny-server/schnapps/
 COPY intro.Rmd /srv/shiny-server/schnapps/
 
 COPY shiny-server.sh /usr/bin/shiny-server.sh
-
-RUN chown -R shiny.shiny /var/log/shiny-server
-RUN chown -R shiny.shiny /srv/shiny-server/schnapps
-RUN chown -R shiny.shiny /var/lib/shiny-server
+ENV SHINY_LOG_STDERR=1
+RUN chown -R shiny:shiny /var/log/shiny-server
+RUN chown -R shiny:shiny /srv/shiny-server/schnapps
+RUN chown -R shiny:shiny /var/lib/shiny-server
 
 CMD ["/usr/bin/shiny-server.sh"]
 

@@ -2,8 +2,8 @@
 
 # Make sure the directory for individual app logs exists
 mkdir -p /var/log/shiny-server
-chown -R shiny.shiny /var/log/shiny-server
-chown -R shiny.shiny /srv/shiny-server/schnapps
+chown -R shiny:shiny /var/log/shiny-server
+chown -R shiny:shiny /srv/shiny-server/schnapps
 
 if [ "$APPLICATION_LOGS_TO_STDOUT" != "false" ];
 then

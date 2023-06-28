@@ -1,5 +1,6 @@
 options(shiny.sanitize.errors = FALSE)
 library(SCHNAPPs)
+library(dplyr)
 #
 #schnappsLite(data = "epdc.rn-sham2.v2.lite.RData", DEBUG = T, historyPath = "history")
 #schnappsLite(data = "rnAllEPDC.lite.RData", DEBUG = T, historyPath = "history")
@@ -10,16 +11,20 @@ defaultValueSingleGene = "wt1"
 defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
 packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+packagePath <<- packagePath
+.schnappsEnv <<- new.env(parent=emptyenv())
+localContributionDir="."
+assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 
 base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
-source("R/DotPlotwithModuleScore.R")
+# source("R/DotPlotwithModuleScore.R")
 
 
 options("future.globals.maxSize")
 options(future.globals.maxSize= 2024^3)
-options(shinyjqui.debug = TRUE)
+# options(shinyjqui.debug = TRUE)
 shiny::addResourcePath(
   prefix = "www",
   directoryPath = "./inst/www/"
