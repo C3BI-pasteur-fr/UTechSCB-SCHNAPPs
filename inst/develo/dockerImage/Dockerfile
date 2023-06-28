@@ -82,10 +82,8 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
      R -e "BiocManager::install('BiocParallel')" && \
      R -e "remotes::install_github('briatte/ggnetwork')" \
      R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
- #RUN apt-get update && apt-get install -y pandoc-citeproc  
 RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
-#RUN    R -e "setRepositories(ind = c(1,2,3));devtools::install_github('RausellLab/CelliD', ref = 'legacy')"
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
 
 RUN sudo apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
 RUN R -e "devtools::install_github('mul118/shinyMCE')" 
