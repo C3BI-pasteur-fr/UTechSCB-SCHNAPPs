@@ -83,11 +83,13 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
      R -e "remotes::install_github('briatte/ggnetwork')" \
      R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
 RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
-RUN apt-get lsof
-RUN R -e "devtools::install_github( 'C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
-
-RUN sudo apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
+RUN apt-get install lsof
+RUN apt-get install net-tools
+RUN apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
 RUN R -e "devtools::install_github('mul118/shinyMCE')" 
+
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies=TRUE)"
+
 
  #RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
 #     rm -r SCHNAPPsContributions/Dummy/  && \

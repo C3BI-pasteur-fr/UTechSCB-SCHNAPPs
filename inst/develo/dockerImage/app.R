@@ -9,7 +9,26 @@ defaultValueSingleGene = "wt1"
 
 defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
+packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+
+base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
+source(paste0(packagePath,  "/ui.R"))
+source(paste0(packagePath,  "/server.R"))
+source("R/DotPlotwithModuleScore.R")
 
 
-schnapps(defaultValues = defaultValues, DEBUG = T, historyPath = "history", port = 3838)
+options("future.globals.maxSize")
+options(future.globals.maxSize= 2024^3)
+options(shinyjqui.debug = TRUE)
+shiny::addResourcePath(
+  prefix = "www",
+  directoryPath = "./inst/www/"
+)
+
+app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+
+
+runApp(app, port=3838)
+
+#schnapps(defaultValues = defaultValues, DEBUG = T, historyPath = "history", port = 3838)
 
