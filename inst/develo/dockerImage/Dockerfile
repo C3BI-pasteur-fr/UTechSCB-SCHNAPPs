@@ -91,6 +91,8 @@ RUN R -e "install.packages(c('psychTools', 'pryr', 'colourpicker', 'Seurat', 'sc
 RUN R -e "BiocManager::install(c('scater', 'tidySingleCellExperiment'))"
 RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
 RUN R -e "install.packages(c('shinyjqui'))"
+RUN R -e "install.packages(c('rintrojs', 'ggalluvial'))"
+
 RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies=F)"
 
 
