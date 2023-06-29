@@ -47,10 +47,10 @@ localContributionDir="."
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 
 base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
-source(paste0(packagePath,  "/ui.R"))
+source(paste0(packagePath,  "/ui.R"),local = T)
 cat(file = stderr(), "here as\n")
 
-source(paste0(packagePath,  "/server.R"))
+source(paste0(packagePath,  "/server.R"),local = T)
 # source("R/DotPlotwithModuleScore.R")
 cat(file = stderr(), "here 1\n")
 
