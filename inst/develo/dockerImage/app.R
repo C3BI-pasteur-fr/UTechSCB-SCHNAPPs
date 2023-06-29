@@ -64,11 +64,11 @@ shiny::addResourcePath(
 )
 cat(file = stderr(), "here 3\n")
 
-app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 
 cat(file = stderr(), "here 4\n")
 
-runApp(app)
+# runApp(app)
 cat(file = stderr(), "here 5\n")
 
 #schnapps(defaultValues = defaultValues, DEBUG = T, historyPath = "history", port = 3838)
