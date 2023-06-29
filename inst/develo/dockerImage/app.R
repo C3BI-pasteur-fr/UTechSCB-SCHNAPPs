@@ -68,7 +68,7 @@ app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "ser
 
 cat(file = stderr(), "here 4\n")
 
-runApp(app, port=3838)
+runApp(app)
 cat(file = stderr(), "here 5\n")
 
 #schnapps(defaultValues = defaultValues, DEBUG = T, historyPath = "history", port = 3838)
