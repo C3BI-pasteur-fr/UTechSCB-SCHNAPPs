@@ -56,7 +56,7 @@ options(future.globals.maxSize= 2024^3)
 # options(shinyjqui.debug = TRUE)
 shiny::addResourcePath(
   prefix = "www",
-  directoryPath = "./inst/www/"
+  directoryPath = paste0(packagePath, "/../www/")
 )
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
