@@ -87,9 +87,10 @@ RUN apt-get install net-tools
 RUN apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
 RUN R -e "devtools::install_github('mul118/shinyMCE')" 
 RUN R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))"
-
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs',dependencies=TRUE)"
+RUN R -e "install.packages(c('psychTools', 'pryr', 'colourpicker', 'Seurat', 'scater', 'shinyjs', 'tidySingleCellExperiment', 'shinyWidgets', 'dendsort', 'reactlog', 'shinydashboardPlus'))"
+RUN R -e "BiocManager::install(c('scater', 'tidySingleCellExperiment'))"
 RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs',dependencies=F)"
 
 
  #RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \

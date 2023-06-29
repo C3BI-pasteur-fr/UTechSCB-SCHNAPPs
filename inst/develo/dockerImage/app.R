@@ -9,6 +9,7 @@ defaultValueSingleGene = "wt1"
 scShinyUI <- NULL
 scShinyServer <- NULL
 packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+.schnappsEnv <<- new.env(parent=emptyenv())
 
 localContributionDir = "~/Rstudio/shHubgit/Dummy/"
 defaultValueSingleGene = "CD3g"
@@ -41,7 +42,6 @@ launch.browser = getOption("shiny.launch.browser", interactive())
 defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
 packagePath <<- packagePath
-.schnappsEnv <<- new.env(parent=emptyenv())
 localContributionDir="."
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 
