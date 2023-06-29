@@ -90,7 +90,8 @@ RUN R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-
 RUN R -e "install.packages(c('psychTools', 'pryr', 'colourpicker', 'Seurat', 'scater', 'shinyjs', 'tidySingleCellExperiment', 'shinyWidgets', 'dendsort', 'reactlog', 'shinydashboardPlus'))"
 RUN R -e "BiocManager::install(c('scater', 'tidySingleCellExperiment'))"
 RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs',dependencies=F)"
+RUN R -e "install.packages(c('shinyjqui'))"
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies=F)"
 
 
  #RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
