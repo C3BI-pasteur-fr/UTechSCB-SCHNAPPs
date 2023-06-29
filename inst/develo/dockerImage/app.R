@@ -1,6 +1,7 @@
 options(shiny.sanitize.errors = FALSE)
 library(SCHNAPPs)
 library(dplyr)
+library(shiny)
 #
 #schnappsLite(data = "epdc.rn-sham2.v2.lite.RData", DEBUG = T, historyPath = "history")
 #schnappsLite(data = "rnAllEPDC.lite.RData", DEBUG = T, historyPath = "history")
