@@ -1,6 +1,7 @@
 options(shiny.sanitize.errors = FALSE)
 library(SCHNAPPs)
 library(dplyr)
+library(shiny)
 #
 #schnappsLite(data = "epdc.rn-sham2.v2.lite.RData", DEBUG = T, historyPath = "history")
 #schnappsLite(data = "rnAllEPDC.lite.RData", DEBUG = T, historyPath = "history")
@@ -47,22 +48,28 @@ assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEn
 
 base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
 source(paste0(packagePath,  "/ui.R"))
+cat(file = stderr(), "here as\n")
+
 source(paste0(packagePath,  "/server.R"))
 # source("R/DotPlotwithModuleScore.R")
-
+cat(file = stderr(), "here 1\n")
 
 options("future.globals.maxSize")
 options(future.globals.maxSize= 2024^3)
 # options(shinyjqui.debug = TRUE)
+cat(file = stderr(), "here 2\n")
 shiny::addResourcePath(
   prefix = "www",
   directoryPath = paste0(packagePath, "/../www/")
 )
+cat(file = stderr(), "here 3\n")
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 
+cat(file = stderr(), "here 4\n")
 
 runApp(app, port=3838)
+cat(file = stderr(), "here 5\n")
 
 #schnapps(defaultValues = defaultValues, DEBUG = T, historyPath = "history", port = 3838)
 
