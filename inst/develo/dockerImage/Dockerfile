@@ -82,18 +82,39 @@ RUN R -e "devtools::install_github('Albluca/distutils') " && \
      R -e "BiocManager::install('BiocParallel')" && \
      R -e "remotes::install_github('briatte/ggnetwork')" \
      R -e "devtools::install_github('theislab/destiny', dependencies = TRUE)"
-RUN apt-get install lsof
-RUN apt-get install net-tools
-RUN apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
-RUN R -e "devtools::install_github('mul118/shinyMCE')" 
-RUN R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))"
-RUN R -e "install.packages(c('psychTools', 'pryr', 'colourpicker', 'Seurat', 'scater', 'shinyjs', 'tidySingleCellExperiment', 'shinyWidgets', 'dendsort', 'reactlog', 'shinydashboardPlus'))"
-RUN R -e "BiocManager::install(c('scater', 'tidySingleCellExperiment'))"
-RUN R -e "BiocManager::install(c('InteractiveComplexHeatmap'))" 
-RUN R -e "install.packages(c('shinyjqui'))"
-RUN R -e "install.packages(c('rintrojs', 'ggalluvial'))"
+RUN apt-get install lsof && \
+    apt-get install net-tools && \
+    apt-get update -y; sudo apt-get install -y r-cran-rcppeigen
+RUN R -e "devtools::install_github('mul118/shinyMCE')"  && \
+    R -e "devtools::install_github('haowulab/Wind', build_opts = c('--no-resave-data'))" && \
+    R -e "install.packages(c('psychTools', 'pryr', 'colourpicker', 'Seurat', 'scater', 'shinyjs', 'tidySingleCellExperiment', 'shinyWidgets', 'dendsort', 'reactlog', 'shinydashboardPlus'))" && \
+    R -e "BiocManager::install(c('scater', 'tidySingleCellExperiment'))" && \
+    R -e "BiocManager::install(c('InteractiveComplexHeatmap'))"  && \
+    R -e "install.packages(c('shinyjqui'))" && \
+    R -e "install.packages(c('rintrojs', 'ggalluvial'))" && \
+    R -e "devtools::install_github('nghiavtr/BPSC')" && \
+    R -e "BiocManager::install('DEsingle')" && \
+    R -e "devtools::install_github('nghiavtr/BPSC')" && \
+    R -e "BiocManager::install('DESeq2')" && \
+    R -e "BiocManager::install('edgeR')" && \
+    R -e "BiocManager::install('MAST')" && \
+    R -e "BiocManager::install('monocle')" && \
+    R -e "BiocManager::install('limma')" && \
+    R -e "BiocManager::install('Seurat')" && \
+    R -e "devtools::install_github('statOmics/zingeR')" && \
+    R -e "BiocManager::install('SingleCellExperiment')" && \
+    R -e "BiocManager::install('scater')" && \
+    R -e "devtools::install_github('Zhangxf-ccnu/scDEA')" && \
+    R -e "install.packages('manhattanly')" && \
+    R -e "install.packages('shinyAce')" && \
+    R -e "install.packages('Hmisc')" && \
+    R -e "install.packages('orca')" && \
+    R -e "install.packages('debugme')" && \
+    R -e "BiocManager::install('TRONCO')" && \
+    R -e "BiocManager::install('SIMLR')"
 
-RUN R -e " devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies =F )"
+
+RUN R -e " devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = F )"
 
 
  #RUN git clone https://github.com/baj12/SCHNAPPsContributions.git && \
