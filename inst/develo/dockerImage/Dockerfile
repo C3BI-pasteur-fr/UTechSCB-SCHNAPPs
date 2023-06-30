@@ -112,8 +112,6 @@ RUN R -e "devtools::install_github('mul118/shinyMCE')"  && \
     R -e "install.packages('debugme')" && \
     R -e "BiocManager::install('TRONCO')" && \
     R -e "BiocManager::install('SIMLR')"
-
-
 RUN R -e " devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = F )"
 
 

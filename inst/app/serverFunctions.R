@@ -1818,6 +1818,7 @@ dheader <- function() {
   shinydashboardPlus::dashboardHeader(
     controlbarIcon = "Wkfl",
     title = paste("SCHNAPPs", packageVersion("SCHNAPPs")),
+    # title = tags$a(tags$img(src='www/images/logo.32.32.png'),  paste("SCHNAPPs", packageVersion("SCHNAPPs"))),
     shinydashboard::dropdownMenu(type = "task", icon = icon("fas fa-question"),badgeStatus = NULL,
                                  headerText = "Help",
                                  # notificationItem(text =  actionButton("menuTour", label = "short Tour", icon = icon("fas fa-directions")),

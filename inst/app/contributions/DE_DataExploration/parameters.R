@@ -629,7 +629,7 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
         DefaultAssay(integrated) <- "integrated"
         
         # Run the standard workflow for visualization and clustering
-        integrated <- ScaleData(integrated, verbose = DEBUG)
+        integrated <- Seurat::ScaleData(integrated, verbose = DEBUG)
         integrated@assays$integrated@data
       } else {
         seur.list[[1]]@assays$RNA@data 
