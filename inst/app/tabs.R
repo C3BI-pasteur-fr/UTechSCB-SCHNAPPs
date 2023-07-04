@@ -134,8 +134,8 @@ inputTab <- function() {
           sc_checkboxInput("sampleInput", label = "sub-sample", value = defaultValue("sampleInput", FALSE)),
           
           sc_numericInput("subsampleNum",
-                       label = "max number of cells per sample",
-                       min = 500, max = 10000, step = 100, value = defaultValue("subsampleNum", 1000)
+                          label = "max number of cells per sample",
+                          min = 500, max = 10000, step = 100, value = defaultValue("subsampleNum", 1000)
           )
         ),
         
@@ -144,13 +144,13 @@ inputTab <- function() {
           6,
           
           sc_radioButtons("whichscLog",
-                       label = "Compute normalizations?",
-                       choices = c(
-                         "disable log" = "disablescEx_log",
-                         "use logcounts assay from loaded data" = "useLog",
-                         "calculate logcounts using SCHNAPPs" = "calcLog"
-                       ),
-                       selected = defaultValue("whichscLog", "disablescEx_log")
+                          label = "Compute normalizations?",
+                          choices = c(
+                            "disable log" = "disablescEx_log",
+                            "use logcounts assay from loaded data" = "useLog",
+                            "calculate logcounts using SCHNAPPs" = "calcLog"
+                          ),
+                          selected = defaultValue("whichscLog", "disablescEx_log")
           )
           # sc_checkboxInput("disablescEx_log", label = "disable Normalization", value = TRUE)
         ),
@@ -394,9 +394,68 @@ clusterParametersTab <- function() {
              tabPanel(
                title = "Transformation for input of PCA", solidHeader = TRUE, width = 12, value = "prePCAtransform",
                id = "prePCAtransform",
+               # scaterNorm = "DE_scaterNormalization",
+               # gene_norm = "DE_logGeneNormalization",
+               # "seurat::SCT normalization" = "DE_seuratSCTnorm",
+               # "seurat::(NormalizeData + FindVariableFeatures + ScaleData)" = "DE_seuratLogNorm",
+               # "seurat::SCTransform" = "DE_seuratStandard",
+               
+               # DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, 
+               #                                   keep.features = "",
+               #                                   splitby = NULL) {
+               
+               # DE_seuratSCtransformFunc =======
+               # DE_seuratSCtransformFunc <- function(scEx, 
+               #                                      nhvg = 3000, 
+               #                                      nfeatures = 3000,
+               #                                      vars2regress = "", 
+               #                                      dimsMin = 1, 
+               #                                      dimsMax = 30, 
+               #                                      k.anchor = 5,
+               #                                      k.filter = 200, 
+               #                                      k.score = 30,
+               #                                      splitby = "sampleNames",
+               #                                      # scalingFactor = 1000, 
+               #                                      keep.features = "") {
                
                list(
-                 tags$p("SCHNAPPs uses normalized/transformed data to calculate the PCA, which in turn is used for the clustering process. Here, the specific method can be set. rawNormalization means that no normalization will be performed."),
+                 tags$p("SCHNAPPs uses normalized/transformed data to calculate the PCA, which in turn is used for the clustering process. Here, the specific method can be set."),
+                 shinydashboardPlus::box(
+                   title = "description of transformation methods", status = "primary", solidHeader = FALSE, width = 12,
+                   id = "transformationDescription",
+                   # helpID = "inputHelpAdd",
+                   closable = FALSE,
+                   dropdown_icon = NULL,
+                   enable_dropdown = T,
+                   dropdown_menu = actionButton(inputId = "transformationDescriptionAdd", label = "", icon = icon("fas fa-question")),
+                   collapsible = TRUE, collapsed = TRUE,
+                   tags$p("rawNormalization means that no normalization will be performed"),
+                   tags$p(tags$b("scEx_log: log2(x+1)"), tags$br()
+                          ,"with x = x/sum(X)*scale. scale can be set or is the min value (>0) for all cells/genes. X=all genes for a given cell. x=gene x of cell y."),
+                   tags$p(tags$b("scaterNorm: ")),
+                   tags$p(tags$b("gene_norm: ")),
+                   tags$p(tags$b("seurat::SCT normalization: ")),
+                   tags$p(tags$b("seurat::(NormalizeData + FindVariableFeatures + ScaleData)")),
+                   tags$p(tags$b("seurat::SCTransform:"),tags$br(),
+                          "split by ident/factor, only groups with more than 30 cells are considered,", tags$br(),
+                          "apply SCTransform (per ident), ", tags$br(),
+                          "SelectIntegrationFeatures ",  tags$br(),
+                          "SelectIntegrationFeatures (parameter), ", tags$br(),
+                          "FindIntegrationAnchors(using SCT, take the sample with the highest number of cells as reference) (per level selected),", tags$br(),
+                          "IntegrateData (SCT, k.weight=100)"),
+                   # "seurat::integrate and SCtransform" = "DE_seuratSCtransform",
+                   tags$p(tags$b("seurat::integrate and SCtransform: "),tags$br(),
+                          "apply SCTransform (per ident, vars2regress out),", tags$br(),
+                          "SelectIntegrationFeatures (parameter), ",tags$br(),
+                          "FindIntegrationAnchors(using SCT, take the sample with the highest number of cells as reference) (per level selected),", tags$br(),
+                          "IntegrateData (SCT, k.weight=100)"),
+                   # "seurat::SeuratRefBased" = "DE_seuratRefBased"
+                   tags$p(tags$b("seurat::SeuratRefBased: split by ident/sampleName of factor defined, "),tags$br(),
+                          "apply SCTransform (per ident), ",tags$br(),
+                          "SelectIntegrationFeatures (parameter), ",tags$br(),
+                          "FindIntegrationAnchors(using SCT, take the sample with the highest number of cells as reference) (per level selected),",tags$br(),
+                          "IntegrateData (SCT, k.weight=100)")
+                 ),
                  fluidRow(
                    column(
                      width = 12,
@@ -464,8 +523,8 @@ clusterParametersTab <- function() {
                  column(4,
                         offset = 0,
                         sc_selectInput("hvgSelection","How to select highly variable genes.", 
-                                    choices = c("getTopHVGs","vst", "mvp", "disp"),
-                                    selected = defaultValue("hvgSelection", "getTopHVGs")),
+                                       choices = c("getTopHVGs","vst", "mvp", "disp"),
+                                       selected = defaultValue("hvgSelection", "getTopHVGs")),
                         sc_checkboxInput("useSeuratPCA", "use Seurat::RunPCA", defaultValue("useSeuratPCA", TRUE))
                  )
                ),
@@ -592,8 +651,8 @@ clusterParametersTab <- function() {
                    column(
                      width = 4,
                      sc_selectInput("snnType", "type to use", 
-                                 selected = defaultValue("snnType", "rank"),
-                                 choices = c("rank", "number", "jaccard"))
+                                    selected = defaultValue("snnType", "rank"),
+                                    choices = c("rank", "number", "jaccard"))
                    )
                  )),
         if ("SIMLR" %in% rownames(installed.packages()))
@@ -608,33 +667,33 @@ clusterParametersTab <- function() {
                      column(
                        width = 4,
                        sc_numericInput("simlr_nClust", "number of clusters (0 = estimate)", 
-                                    value = defaultValue("simlr_nClust", 10),
-                                    min = 0, max = 1000)
+                                       value = defaultValue("simlr_nClust", 10),
+                                       min = 0, max = 1000)
                      ),
                      column(
                        width = 4,
                        sc_numericInput("simlr_maxClust", "max number of clusters when estimating)", 
-                                    value = defaultValue("simlr_maxClust", 20),
-                                    min = 2, max = 1000)
+                                       value = defaultValue("simlr_maxClust", 20),
+                                       min = 2, max = 1000)
                      )
                    ))
-        ),
-        fluidRow(
-          column(12, offset = 0, textOutput("Nclusters"))
-        ),
-        # checkbsTT(item = ""),
-        fluidRow(
-          column(
-            width = 12, offset = 1,
-            actionButton("updateClusteringParameters", "apply changes", width = "80%")
-          )
+      ),
+      fluidRow(
+        column(12, offset = 0, textOutput("Nclusters"))
+      ),
+      # checkbsTT(item = ""),
+      fluidRow(
+        column(
+          width = 12, offset = 1,
+          actionButton("updateClusteringParameters", "apply changes", width = "80%")
         )
+      )
     ),
     # fluidRow(div(h3("Parameters for clustering"), align = "left")),
     
     br()
   )
-
+  
   
 }
 
