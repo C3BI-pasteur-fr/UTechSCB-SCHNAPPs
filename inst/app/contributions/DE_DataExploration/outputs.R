@@ -211,7 +211,7 @@ observe(label = "DE_seuratLogNorm_var2regOBS", {
   updateSelectInput(
     session,
     "DE_seuratSCtransform_vars2regress",
-    choices = choicesVal
+    choices = colData(scEx) %>% names()
     ,
     selected = .schnappsEnv$DE_seuratSCtransform_vars2regress
   )
