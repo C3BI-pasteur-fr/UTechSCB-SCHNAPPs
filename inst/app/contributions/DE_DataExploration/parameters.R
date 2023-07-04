@@ -94,7 +94,7 @@ myNormalizationParameters <- list(
     ),
     sc_selectInput(
       "DE_seuratSCtransform_vars2regress",
-      label = "Vars to regress out (only factors are allowed)",
+      label = "Vars to regress out ",
       multiple = TRUE,
       choices = unique(c(defaultValue("DE_seuratSCtransform_vars2regress", ""), ""))
       ,
@@ -260,7 +260,8 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
           verbose = DEBUG,
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
         )
-        # integrated@assays$integrated@scale.data
+        # return matrix object!!!
+        integrated@assays$integrated@scale.data
       } else {
         seur.list[[1]]@assays$SCT@scale.data 
       }
@@ -387,7 +388,7 @@ DE_seuratSCtransformFunc <- function(scEx,
         meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
       } else {
         meta.data <- as.data.frame(cellMeta[, splitby, drop = FALSE])
-        # only groups of cells with more than 20 cells
+        # only groups of cells with more than 30 cells
         limitCells = meta.data[,1] %in% levels(meta.data[,1])[table(meta.data[,1]) > 30]
         # we cannot remove cell here because this would change scEX and projections
         # not sure that NA would be a good solution
@@ -405,7 +406,9 @@ DE_seuratSCtransformFunc <- function(scEx,
         # scEx = scEx[, limitCells]
         # meta.data = meta.data[limitCells,, drop = FALSE]
       }
-      
+      if(vars2regress %in% names(colData(scEx))){
+        meta.data[,vars2regress] = colData(scEx)[,vars2regress]
+      }
       seurDat <- CreateSeuratObject(
         counts = assays(scEx)[[1]],
         meta.data = meta.data
@@ -629,7 +632,7 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
         DefaultAssay(integrated) <- "integrated"
         
         # Run the standard workflow for visualization and clustering
-        integrated <- ScaleData(integrated, verbose = DEBUG)
+        integrated <- Seurat::ScaleData(integrated, verbose = DEBUG)
         integrated@assays$integrated@data
       } else {
         seur.list[[1]]@assays$RNA@data 
@@ -755,8 +758,8 @@ DE_seuratSCTnorm <- reactive({
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratSCTnorm.RData")
   
-  # make sure only factors are used.
-  var2reg = var2reg[var2reg %in% names(Filter(is.factor, colData(scEx)))]
+  # # make sure only factors are used.
+  # var2reg = var2reg[var2reg %in% names(Filter(is.factor, colData(scEx)))]
   
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
@@ -784,7 +787,7 @@ DE_seuratSCTnormfunc <- function(scEx, nHVG, var2reg) {
   # creates object @assays$RNA@data and @assays$RNA@counts
   # integrated <- NULL
   
-  choicesVal = names(Filter(is.factor, cellMeta))
+  # choicesVal = names(Filter(is.factor, cellMeta))
   choicesVal = choicesVal[unlist(lapply(choicesVal, FUN = function(x) {length(levels(cellMeta[,x]))>1}))]
   var2reg= var2reg[var2reg %in% choicesVal]
   if (is.null(var2reg)) {
