@@ -516,7 +516,7 @@ clusterServer <- function(input, output, session,
       cat(file = stderr(), paste("cluster plot saving done\n"))
     }
     
-    # cp = load("~/SCHNAPPsDebug/clusterPlot-DE_expclusters--.RData");.schnappsEnv$DEBUGSAVE=FALSE
+    # cp = load("~/SCHNAPPsDebug/clusterPlot-coE_selected--.RData");.schnappsEnv$DEBUGSAVE=FALSE
     if (is.null(g_id) || nchar(g_id) == 0) {
       g_id <- featureData$symbol
     }
@@ -544,12 +544,24 @@ clusterServer <- function(input, output, session,
     #   myColors <- ccols
     # }
     # if (!moreOptions) grpN <- ""
-    p1 <- plot2Dprojection(scEx_log,
-                           projections = tdata, g_id, featureData, geneNames,
-                           geneNames2, dimX, dimY, clId, grpN, legend.position,
-                           grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
-    )
-    
+    facetby = FALSE
+    if(!facetby){
+      p1 <- plot2Dprojection(scEx_log,
+                             projections = tdata, g_id, featureData, geneNames,
+                             geneNames2, dimX, dimY, clId, grpN, legend.position,
+                             grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+      )
+    } else {
+      allP = list()
+      for(lv in levels(tdata[,facetby])){
+        allP[[lv]] = plot2Dprojection(scEx_log[,tdata[,facetby] == lv ],
+                                      projections = tdata[tdata[,facetby] == lv ,], g_id, featureData, geneNames,
+                                      geneNames2, dimX, dimY, clId, grpN, legend.position,
+                                      grpNs = grpNs, logx, logy, divXBy, divYBy, dimCol, colors = myColors
+        )
+      }
+      p1 = subplot(allP, shareX = TRUE, shareY  = TRUE, nrows = sqrt(length(levels(tdata[,facetby]))) %>% round())
+    }
     # save p1 to .schnappsEnv for saving to history
     af = plot2Dprojection
     # remove env because it is too big

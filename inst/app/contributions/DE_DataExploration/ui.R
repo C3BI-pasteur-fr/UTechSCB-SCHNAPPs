@@ -8,7 +8,8 @@ menuList <- list(
                            # id="dataExplorationID",
                            tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
                            shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
-                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
+                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot"),
+                           shinydashboard::menuSubItem("Panel plot factorials", tabName = "DE_panelPlotFact")
                            # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
   )
 )
@@ -180,6 +181,95 @@ tabList <- list(
       )),
       br(),
       actionButton("save2HistPanel", "save to history")
+    )
+  ),
+  # DE_panelPlot ----
+  DE_panelPlotTabFact = shinydashboard::tabItem(
+    "DE_panelPlotFact",
+    shinydashboardPlus::box(
+      title = "Panel Plot Factorial", solidHeader = TRUE, width = 12, status = "primary",
+      fluidRow(
+        column(
+          width = 12,
+          
+          footer = tags$ul(
+            tags$li(
+              strong("Panel plot for factorials"),
+              ":Select a cluster. Enter",
+              strong("ONE"),
+              "or",
+              strong("MULTIPLE"),
+              "gene ids to visualize expression in all clusters"
+            ),
+            tags$li("If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to the count for that gene. Otherwise, all genes are used. Only in this case the check box 'same scale' is used.")
+          )
+        )
+      ),
+      fluidRow(
+        column(
+          width = 12, offset = 1,
+          actionButton("updatePanelPlotFact", "apply changes", width = "80%")
+        )
+      ),
+      br(),
+      cellSelectionUI("DE_PanelPlotFactCellSelection"),
+      shinydashboardPlus::box(
+        width = 6, 
+        fluidRow(
+          column(
+            width = 6,
+            sc_selectInput("DE_pFact_dim_x",
+                           label = "X",
+                           choices = c(defaultValue("DE_dim_x", "tsne1"), "tsne2", "tsne3"),
+                           selected = defaultValue("DE_dim_x", "tsne1")
+            )
+          ),
+          column(
+            width = 6,
+            sc_selectInput("DE_pFact_dim_y",
+                           label = "Y",
+                           choices = c("tsne1", defaultValue("DE_dim_y", "tsne2"), "tsne3"),
+                           selected = defaultValue("DE_dim_y", "tsne2")
+            )
+          )
+        ),
+        fluidRow(
+          align = 'right',
+          column(
+            width = 3,
+            sc_checkboxInput("DE_panelplotFactSameScale", "same scale", value = defaultValue("DE_panelplotFactSameScale", TRUE))
+          ), 
+          column(
+            width = 3,
+            sc_checkboxInput("DE_panelplotFactPvalue", "apply t-test", value = defaultValue("DE_panelplotFactPvalue", FALSE))
+          ), checkbsTT("DE_panelplotPvalue"),
+          column(
+            width = 6,
+            sc_selectInput("DE_pFactnCol",
+                           label = "number of columns for plot",
+                           choices = c(1:10),
+                           selected = defaultValue("DE_nCol", 4)
+            )
+          )
+        )
+      ),
+      fluidRow(
+        column(
+          width = 12,
+          sc_selectInput("DE_pFactIds",
+                         label = "Factorials to plot individually",
+                         choices = defaultValue("DE_pFactIds", "dbCluster"),
+                         selected = defaultValue("DE_pFactIds", "dbCluster"), 
+                         multiple = F
+                         )
+        )
+      ),
+      fluidRow(column(
+        12,
+        plotOutput("DE_panelPlotFact") %>% jqui_resizable()
+      )),
+      br(),
+      actionButton("save2HistPanelFact", "save to history")
     )
   ),
   # DE_scaterQC ----
