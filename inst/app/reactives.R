@@ -5,6 +5,8 @@ suppressMessages(require(Seurat))
 suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
+suppressMessages(require(dplyr))
+
 suppressMessages(require(ggalluvial))
 library(SingleCellExperiment)
 # require(tidySingleCellExperiment)

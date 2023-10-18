@@ -1031,7 +1031,7 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
       ccols <- lapply(levels(projections[,name]), function(i) {
         input[[paste0(name, ".col.", i)]]
       })
-      ccols[ccols==""] = "#000"
+      ccols[ccols==""] = "#000000"
       # if not initialized
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
@@ -1057,7 +1057,7 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
       })
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
-          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("white", "blue")
+          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("red", "blue")
         # if vector is named then complexheatmap thinks it is a factorial
         names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]] ) = NULL
         projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]

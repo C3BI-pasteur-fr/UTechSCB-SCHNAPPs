@@ -2005,7 +2005,8 @@ output:
   suppressMessages(require(ggalluvial))
   suppressMessages(require(scran))
   suppressMessages(require(BiocSingular))
-  
+  suppressMessages(require(dplyr))
+
   if (\"debugme\" %in% rownames(installed.packages())) {
     suppressMessages(require(debugme))
   }
