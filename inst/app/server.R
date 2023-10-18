@@ -26,6 +26,7 @@ suppressMessages(require(scran))
 suppressMessages(require(ggalluvial))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(dplyr))
+suppressMessages(require(dplyr))
 
 if ("debugme" %in% rownames(installed.packages())) {
   suppressMessages(require(debugme))
@@ -129,7 +130,7 @@ scShinyServer <- function(input, output, session) {
   library(shinyjqui)
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   session$onSessionEnded(stopApp)
-  base::options(shiny.maxRequestSize = 2000 * 1024^2)
+  base::options(shiny.maxRequestSize = 20 * 1024^3)
   
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("starting application", id = "startSCHNAPPs", duration = NULL)

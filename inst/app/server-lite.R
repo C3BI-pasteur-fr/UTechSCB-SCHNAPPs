@@ -78,6 +78,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
       suppressMessages(require(scran))
       suppressMessages(require(ggalluvial))
       suppressMessages(require(BiocSingular))
+      suppressMessages(require(dplyr))
 
       if (\"debugme\" %in% rownames(installed.packages())) {
         suppressMessages(require(debugme))
