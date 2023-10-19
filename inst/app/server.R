@@ -364,6 +364,7 @@ scShinyServer <- function(input, output, session) {
         latestFile = fileInfo %>% pull("birth_time") %>% order()  %>% last()
         # this should load inp, i.e. the old input variable with all parameters
         tempEnv =  new.env(parent=emptyenv())
+        cat(file = stderr(), paste("reading:", fileInfo[latestFile, "path"] %>% as.character(), "\n"))
         cp = load(fileInfo[latestFile, "path"] %>% as.character(), envir = tempEnv)
         
         if(!"schnappsEnv" %in% cp){
