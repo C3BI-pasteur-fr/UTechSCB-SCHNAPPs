@@ -60,6 +60,55 @@ observe(label ="obs_DE_gene_id", x = {
   .schnappsEnv$defaultValues[["DE_gene_id"]] = input$DE_gene_id
 })
 
+observe(label ="obs_DE_pFact_dim_x", x = {
+  .schnappsEnv$obs_DE_pFact_dim_x = input$DE_pFact_dim_x
+  .schnappsEnv$defaultValues[["DE_pFact_dim_x"]] = input$DE_pFact_dim_x
+})
+observe(label ="obs_DE_pFact_dim_y", x = {
+  .schnappsEnv$DE_pFact_dim_y = input$DE_pFact_dim_y
+  .schnappsEnv$defaultValues[["DE_pFact_dim_y"]] = input$DE_pFact_dim_y
+})
+observe(label ="obs_DE_panelplotFactSameScale", x = {
+  .schnappsEnv$DE_panelplotFactSameScale = input$DE_panelplotFactSameScale
+  .schnappsEnv$defaultValues[["DE_panelplotFactSameScale"]] = input$DE_panelplotFactSameScale
+})
+observe(label ="obs_DE_panelplotFactPvalue", x = {
+  .schnappsEnv$DE_panelplotFactPvalue = input$DE_panelplotFactPvalue
+  .schnappsEnv$defaultValues[["DE_panelplotFactPvalue"]] = input$DE_panelplotFactPvalue
+})
+observe(label ="obs_DE_pFactnCol", x = {
+  .schnappsEnv$DE_pFactnCol = input$DE_pFactnCol
+  .schnappsEnv$defaultValues[["DE_pFactnCol"]] = input$DE_pFactnCol
+})
+observe(label ="obs_DE_pFactIds", x = {
+  .schnappsEnv$DE_pFactIds = input$DE_pFactIds
+  .schnappsEnv$defaultValues[["DE_pFactIds"]] = input$DE_pFactIds
+})
+observe(label = "ob19", {
+  if (DEBUG) cat(file = stderr(), "observe: DE_clusterSelectionPanelPlot\n")
+  .schnappsEnv$DE_cl1 <- input$DE_clusterSelectionPanelPlot
+})
+
+
+observe(label = "DE_seuratLogNorm_var2regOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratLogNorm_var2regOBSinp\n"))
+  .schnappsEnv$DE_seuratLogNorm_var2reg <- input$DE_seuratLogNorm_var2reg
+})
+observe(label = "DE_seuratSCtransform_vars2regressOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_vars2regress\n"))
+  .schnappsEnv$DE_seuratSCtransform_vars2regress <- input$DE_seuratSCtransform_vars2regress
+})
+observe(label = "DE_seuratSCtransform_split.byOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_split.by\n"))
+  .schnappsEnv$DE_seuratSCtransform_split.by <- input$DE_seuratSCtransform_split.by
+})
+observe(label = "DE_seuratStandard_splitbyOBSinp", {
+  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratStandard_splitby\n"))
+  .schnappsEnv$DE_seuratStandard_splitby <- input$DE_seuratStandard_splitby
+})
+
+
+
 
 observe(label = "ob17x", {
   if (DEBUG) cat(file = stderr(), "observe: DE_expclusters_x\n")
@@ -151,6 +200,15 @@ observe({
                     choices = colnames(projections),
                     selected = .schnappsEnv$DE_dim_y
   )
+  updateSelectInput(session,"DE_pFact_dim_x",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_pFact_dim_x)
+  updateSelectInput(session,"DE_pFact_dim_y",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_pFact_dim_y)
+  updateSelectInput(session, "DE_pFactIds",
+                    choices = projFactors,
+                    selected = .schnappsEnv$DE_pFactIds)
   # return(TRUE)
 })
 
@@ -168,24 +226,7 @@ observe({
 })
 
 
-observe(label = "DE_seuratLogNorm_var2regOBSinp", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratLogNorm_var2regOBSinp\n"))
-  .schnappsEnv$DE_seuratLogNorm_var2reg <- input$DE_seuratLogNorm_var2reg
-})
-observe(label = "DE_seuratSCtransform_vars2regressOBSinp", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_vars2regress\n"))
-  .schnappsEnv$DE_seuratSCtransform_vars2regress <- input$DE_seuratSCtransform_vars2regress
-})
-observe(label = "DE_seuratSCtransform_split.byOBSinp", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratSCtransform_split.by\n"))
-  .schnappsEnv$DE_seuratSCtransform_split.by <- input$DE_seuratSCtransform_split.by
-})
-observe(label = "DE_seuratStandard_splitbyOBSinp", {
-  if (DEBUG) cat(file = stderr(), paste0("observe: DE_seuratStandard_splitby\n"))
-  .schnappsEnv$DE_seuratStandard_splitby <- input$DE_seuratStandard_splitby
-})
-
-
+## observe DE_seuratLogNorm_var2regOBS ----
 observe(label = "DE_seuratLogNorm_var2regOBS", {
   scEx <- scEx()
   tmp <- input$normalizationRadioButton
@@ -303,10 +344,6 @@ output$DE_gene_vio_plot <- renderPlot({
 #' it is debateable whether this is usefull to have a different strategy, but for now
 #' we leave it as it.
 .schnappsEnv$DE_cl1 <- "All"
-observe(label = "ob19", {
-  if (DEBUG) cat(file = stderr(), "observe: DE_clusterSelectionPanelPlot\n")
-  .schnappsEnv$DE_cl1 <- input$DE_clusterSelectionPanelPlot
-})
 output$DE_clusterSelectionPanelPlot <- renderUI({
   if (DEBUG) cat(file = stderr(), "output$DE_clusterSelectionPanelPlot\n")
   projections <- projections()
@@ -329,6 +366,11 @@ output$DE_clusterSelectionPanelPlot <- renderUI({
 dePanelCellSelection <- callModule(
   cellSelectionModule,
   "DE_PanelPlotCellSelection"
+)
+
+dePanelFactCellSelection <- callModule(
+  cellSelectionModule,
+  "DE_PanelPlotFactCellSelection"
 )
 
 DE_Exp_dataInput <- callModule(
@@ -387,7 +429,7 @@ output$DE_panelPlot <- renderPlot({
   applyPvalue <- isolate(input$DE_panelplotPvalue)
   scEx_log <- scEx_log()
   projections <- projections()
-  DE_updateInputPPt()
+  # DE_updateInputPPt()
   genesin <- isolate(input$DE_panelplotids)
   # cl4 <- input$DE_clusterSelectionPanelPlot
   # ppgrp <- isolate(input$DE_PPGrp)
@@ -441,6 +483,97 @@ output$DE_panelPlot <- renderPlot({
   environment(af) = new.env(parent = emptyenv())
   
   .schnappsEnv[["DE_panelPlot"]] <- list(plotFunc = af,
+                                         scEx_log = scEx_log, 
+                                         projections=projections, 
+                                         genesin=genesin, dimx4=dimx4, 
+                                         dimy4=dimy4, sameScale=sameScale, 
+                                         nCol=nCol, sampdesc=sampdesc,
+                                         cellNs=cellNs,
+                                         applyPvalue = applyPvalue
+  )
+  retVal
+})
+
+
+
+
+# DE_panelPlotFact ----
+#' DE_panelPlotFact
+#' plot multiple panels for a given list of genes
+#' If the x-axis is a categorical value and the y-axis is UMI.counts the y-axis related to
+#' the count for that gene. Otherwise, all genes are used.
+#' normalized counts are used for plotting
+output$DE_panelPlotFact <- renderPlot({
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "DE_panelPlotFact")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("DE_panelPlotFact", id = "DE_panelPlotFact", duration = NULL)
+  }
+  if (DEBUG) cat(file = stderr(), "output$DE_panelPlotFact\n")
+  
+  clicked <- input$updatePanelPlotFact
+  applyPvalue <- isolate(input$DE_panelplotFactPvalue)
+  scEx_log <- scEx_log()
+  projections <- projections()
+  DE_updateInputPPt()
+  factsin <- isolate(input$DE_pFactIds)
+  # cl4 <- input$DE_clusterSelectionPanelPlot
+  # ppgrp <- isolate(input$DE_PPGrp)
+  # ppCluster <- isolate(input$DE_clusterPP)
+  
+  selectedCells <- isolate(dePanelFactCellSelection())
+  cellNs <- isolate(selectedCells$cellNames())
+  sampdesc <- isolate(selectedCells$selectionDescription())
+  
+  dimx4 <- isolate(input$DE_pFact_dim_x)
+  dimy4 <- isolate(input$DE_pFact_dim_y)
+  sameScale <- isolate(input$DE_panelplotFactSameScale)
+  nCol <- isolate(as.numeric(input$DE_pFactnCol))
+  
+  if (is.null(scEx_log) | is.null(projections) | is.null(cellNs)) {
+    return(NULL)
+  }
+  # debugControl("DE_panelPlotFact", list = c("scEx_log", "projections", "genesin",
+  # "dimx4", "dimy4", "sameScale", "nCol", "sampdesc" , "cellNs"))
+  # cp = load(file="~/SCHNAPPsDebug/DE_panelPlotFact.RData")
+  
+  # genesin <- toupper(genesin)
+  # genesin <- gsub(" ", "", genesin, fixed = TRUE)
+  # genesin <- strsplit(genesin, ",")
+  # genesin <- genesin[[1]]
+  
+  # if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
+  retVal <- panelPlotFactFunc(scEx_log, projections, factsin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs, applyPvalue = applyPvalue) 
+  
+  setRedGreenButton(
+    vars = list(
+      c("DE_pFactIds", isolate(input$DE_pFactIds)),
+      c("DE_pFact_dim_x", isolate(input$DE_pFact_dim_x)),
+      c("DE_pFact_dim_y", isolate(input$DE_pFact_dim_y)),
+      c("DE_panelplotFactSameScale", isolate(input$DE_panelplotFactSameScale)),
+      c("DE_pFactnCol", isolate(input$DE_pFactnCol)),
+      c("DE_PanelPlotFactCellSelection-Mod_clusterPP", isolate(input$`DE_PanelPlotFactCellSelection-Mod_clusterPP`)),
+      c("DE_PanelPlotFactCellSelection-Mod_PPGrp", isolate(input$`DE_PanelPlotFactCellSelection-Mod_PPGrp`)),
+      c("DE_panelplotFactPvalue", isolate(input$DE_panelplotFactPvalue))
+    ),
+    button = "updatePanelPlotFact"
+  )
+  
+  
+  printTimeEnd(start.time, "DE_panelPlotFact")
+  exportTestValues(DE_panelPlotFact = {
+    ls()
+  })
+  af = panelPlotFunc
+  # remove env because it is too big
+  environment(af) = new.env(parent = emptyenv())
+  
+  .schnappsEnv[["DE_panelPlotFact"]] <- list(plotFunc = af,
                                          scEx_log = scEx_log, 
                                          projections=projections, 
                                          genesin=genesin, dimx4=dimx4, 
