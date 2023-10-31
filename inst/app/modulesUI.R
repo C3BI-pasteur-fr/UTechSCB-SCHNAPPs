@@ -109,7 +109,7 @@ clusterUI <- function(id) {
         fluidRow(
           column(
             width = 12,
-            sc_checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", defaultValue(ns("groupNames"), TRUE)),
+            sc_checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", defaultValue(ns("addToGroup"), TRUE)),
             list(sc_textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = ""),
             sc_selectInput(ns("groupNames"),
                         label = "group names, !When modifying a group this list of cells is used as a reference!",

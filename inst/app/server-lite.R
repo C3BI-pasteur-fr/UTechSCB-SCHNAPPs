@@ -1,15 +1,32 @@
 
 scShinyServer <- shinyServer(function(input, output, session) {
+  library(shinyjqui)
   base::cat(file = stderr(), "------ ShinyServer LITE running\n")
-  session$onSessionEnded(function () {
-    if (!is.null(x = .schnappsEnv$historyPath)) {
-      # cat(file = stderr(), paste("removing: ", .schnappsEnv$historyPath ))
-      if (dir.exists(.schnappsEnv$historyPath)){
-        # unlink(.schnappsEnv$historyPath, recursive = T) 
-      }
-    }
-    stopApp()
-  })
+  session$onSessionEnded(stopApp)
+  
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("starting application", id = "startSCHNAPPs", duration = NULL)
+  }
+  gmtData <- reactiveVal()
+  gmtUserData <- reactiveVal()
+  
+  # Here, we store projections that are created during the session. These can be selections of cells or other values that
+  # are not possible to precalculate.
+  sessionProjections <- reactiveValues(
+    prjs = data.frame()
+  )
+  
+  
+  clusterMethodReact <- reactiveValues(
+    clusterMethod = "igraph",
+    clusterSource = "counts"
+  )
+  
+  # collect copied/renamed projections
+  projectionsTable <- reactiveValues(
+    newProjections = data.frame()
+  )
+  
   # TODO needs to be an option
   seed <- 2
   # localContributionDir <- .SCHNAPPs_locContributionDir
@@ -22,14 +39,24 @@ scShinyServer <- shinyServer(function(input, output, session) {
     # TODO ??? clean directory??
   }
   
-  if (exists("devscShinyApp")) {
+  if (base::exists("devscShinyApp")) {
     if (devscShinyApp) {
-      packagePath <- "inst/app"
-      setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
+      if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
+        packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      } else {
+        if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
+          packagePath <- "~/Rstudio/Schnapps/inst/app/"
+        } else {
+          stop("package path not found\n")
+        }
+      }
+      # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
     packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
   }
+  
+  
   # files to be included in report
   # developers can add in outputs.R a variable called "myZippedReportFiles"
   zippedReportFiles <- c(
@@ -38,15 +65,39 @@ scShinyServer <- shinyServer(function(input, output, session) {
   )
   
   base::options(shiny.maxRequestSize = 2000 * 1024^2)
-  cat(file = stderr(), "HALL============================\n")
+
+  
+  # TODO check if file exists
+  # TODO as parameter to load user specified information
+  # TODO have this as an option to load other files
+  if (file.exists(paste0(packagePath, "/geneLists.RData"))) {
+    base::load(file = paste0(packagePath, "/geneLists.RData"))
+  } else {
+    if (!exists("geneLists")) {
+      geneLists <- list(emtpy = list())
+    }
+  }
+  
+  
+  # base projections
+  # display name, reactive to calculate projections
+  projectionFunctions <- list(
+    # c("sampleNames", "sample"),
+    # c("Gene count", "geneCount"),
+    # c("UMI count", "umiCount"),
+    # c("before filter", "beforeFilterPrj")
+  )
+  .schnappsEnv$projectionFunctions <- projectionFunctions
+  
+  
   ### history setup
-  if (exists("historyPath", envir = .schnappsEnv)) {
+  if (base::exists("historyPath", envir = .schnappsEnv)) {
     if (!is.null(x = .schnappsEnv$historyPath)) {
       .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
       if (!dir.exists(.schnappsEnv$historyPath)){
         dir.create(.schnappsEnv$historyPath, recursive = T)
       }  
-      if (!exists("historyFile", envir = .schnappsEnv)) {
+      if (!base::exists("historyFile", envir = .schnappsEnv)) {
         .schnappsEnv$historyFile = paste0("history.",format(Sys.time(), "%Y-%b-%d.%H.%M"),".Rmd")
       }
       if (is.null(.schnappsEnv$historyFile)) {
@@ -105,18 +156,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
     }
   }
   
-  
-  # TODO check if file exists
-  # TODO as parameter to load user specified information
-  # TODO have this as an option to load other files
-  if (file.exists(paste0(packagePath, "/geneLists.RData"))) {
-    base::load(file = paste0(packagePath, "/geneLists.RData"))
-  } else {
-    if (!exists("geneLists")) {
-      geneLists <- list(emtpy = list())
-    }
-  }
-  
+ 
   if (DEBUG) base::cat(file = stderr(), "ShinyServer running\n")
   # base calculations that are quite expensive to calculate
   # display name, reactive name to be executed
@@ -127,20 +167,15 @@ scShinyServer <- shinyServer(function(input, output, session) {
   #   c("projections", "projections")
   # )
   
-  # base projections
-  # display name, reactive to calculate projections
-  projectionFunctions <- list(
-    # c("sampleNames", "sample"),
-    # c("Gene count", "geneCount"),
-    # c("UMI count", "umiCount"),
-    # c("before filter", "beforeFilterPrj")
-  )
-  .schnappsEnv$projectionFunctions <- projectionFunctions
   
   # differential expression functions
   # used in subcluster analysis
   .schnappsEnv$diffExpFunctions <- list()
   diffExpFunctions <- list()
+  
+  
+  projectionColors <- reactiveValues()
+  
   
   # load global reactives, modules, etc ----
   base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
@@ -272,7 +307,11 @@ scShinyServer <- shinyServer(function(input, output, session) {
   
   # colors for clusters ----
   clusterCols <- reactiveValues(colPal = get(".SCHNAPPs_LiteData",envir = .schnappsEnv)$clusterCol)
+  if (!is.null(getDefaultReactiveDomain())) {
+    removeNotification(id = "startSCHNAPPs")
+  }
   
+  # add2history
   
 }) # END SERVER
 
