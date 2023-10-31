@@ -83,7 +83,7 @@ scShinyUI <- function(request) {
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
       packagePath <- "inst/app"
-      setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
+      setwd("~/Rstudio/Schnapps//")
     }
   } else {
     packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
@@ -233,9 +233,9 @@ scShinyUI <- function(request) {
         br(),
         downloadButton("RDSsave", "Download RData", class = "butt"),
         br(),
-        downloadButton("RmdSave", "Download History", class = "butt"),
-        if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
-        if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
+        # downloadButton("RmdSave", "Download History", class = "butt"),
+        # if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
+        # if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
         if (exists("historyPath", envir = .schnappsEnv)){
           br()
           # sc_checkboxInput("save2History", "save to history file", FALSE)

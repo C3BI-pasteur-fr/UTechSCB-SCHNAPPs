@@ -13,6 +13,7 @@ packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0
 .schnappsEnv <<- new.env(parent=emptyenv())
 
 localContributionDir = "~/Rstudio/shHubgit/Dummy/"
+localContributionDir = NULL
 defaultValueSingleGene = "CD3g"
 defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA"
 defaultValueRegExGene = ""
