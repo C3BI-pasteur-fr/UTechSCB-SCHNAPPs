@@ -171,7 +171,7 @@ scShinyServer <- function(input, output, session) {
   }
   
   # in development mode, called not from package? ----
-  if (exists("devscShinyApp")) {
+  if (base::exists("devscShinyApp")) {
     if (devscShinyApp) {
       if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
         packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
@@ -340,7 +340,7 @@ scShinyServer <- function(input, output, session) {
   # TODO put in function
   # can this be done just with bookmarking?
   .schnappsEnv$restoreHistory = FALSE
-  if (exists("historyPath", envir = .schnappsEnv)) {
+  if (base::exists("historyPath", envir = .schnappsEnv)) {
     
     if (!is.null(x = .schnappsEnv$historyPath)) {
       # check that at least some of the files that can be created have been

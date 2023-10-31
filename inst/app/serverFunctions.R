@@ -1265,8 +1265,12 @@ getReactEnv <- function(DEBUG) {
 
 add2history <- function(type, comment = "", input = input, ...) {
   if (DEBUG) cat(file = stderr(), paste0("add2history: ", type, "\n"))
-  if (!exists("historyPath", envir = .schnappsEnv)) {
+  if (!base::exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("add 2 history is not active", id = "startSCHNAPPs",type = "warning", duration = NULL)
+    }
+    
     return(NULL)
   }
   # browser()
@@ -2040,6 +2044,8 @@ sc_numericInput <- function(...){
 }
 sc_checkboxInput <- function(...){
   arg <- list(...)
+  # browser()
+  # cat(file = stderr(), ..., "\n")
   .schnappsEnv$checkboxInputList = unique(c(.schnappsEnv$checkboxInputList, arg[[1]][1]))
   return(checkboxInput(...))
 }

@@ -104,4 +104,16 @@ for (pg in gList) {
 
 devtools::install_github('chris-mcginnis-ucsf/DoubletFinder', dependencies = TRUE, build = T,type = "source", upgrade = "always")
 
+packs = c("archivist", "BiocParallel", "BiocSingular", "callr", "colourpicker", "ComplexHeatmap", 
+          "cowplot", "crayon", "debugme", "digest", "dplyr", "DT", "edgeR", "evaluate", "ggalluvial", "ggplot2", 
+          "ggpubr", "glue", "gtools", "heatmaply", "Hmisc", "hms", "rintrojs", "irlba", "kableExtra", "knitr",
+          "kohonen", "magrittr", "manhattanly", "Matrix", "mclust", "orca", "parallel", "pdftools", "pheatmap",
+          "plotly", "pryr", "psychTools", "RColorBrewer", "reactlog", "reshape2", "rintrojs", 
+          "rmarkdown", "Rsomoclu", "Rtsne", "scater", "scDEA", "scran", "Seurat", "shiny", "shinyBS", 
+          "shinydashboard", "shinydashboardPlus", "shinyjqui", "shinyjs", "shinyMCE", "shinytest", 
+          "shinythemes", "shinyTree", "shinyWidgets", "SIMLR", "SingleCellExperiment", "SingleR", "stringr", 
+          "threejs", "tibble", "tidyr", "tidySingleCellExperiment", "tidyverse", "uwot", "Wind", "xbioc", 
+          "InteractiveComplexHeatmap", "plyr", "shinycssloaders", "profvis", "future", "tools", "doParallel", "reactlog", "MASS", "dendsort")
+
+packs[!packs %in% installed.packages()]
 

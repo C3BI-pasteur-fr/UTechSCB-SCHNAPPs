@@ -578,7 +578,7 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
       save(file = "~/SCHNAPPsDebug/panelPlotFactFunc.RData", list = c(ls()))
     }
   # cp=load(file='~/SCHNAPPsDebug/panelPlotFactFunc.RData')
-  save(file = "~/SCHNAPPsDebug/panelPlotFactFunc.RData", list = c(ls()))
+  # save(file = "~/SCHNAPPsDebug/panelPlotFactFunc.RData", list = c(ls()))
   scEx_log = scEx_log[,cellNs]
   projections = projections[cellNs,]
   finalLevels = projections[,factsin] %>% unique()
@@ -639,7 +639,7 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
     printData = rbind(printData, data.frame(level = finalLevels[i], 
                                             dimx = subsetTSNE[cellNs, dimx4] , 
                                             dimy = subsetTSNE[cellNs, dimy4],
-                                            col = projections[,]
+                                            col = Col #projections[,]
     ))
   }
   require(cowplot)

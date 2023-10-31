@@ -53,7 +53,7 @@ RUN apt-get update && apt-get install -y     libcurl4-gnutls-dev \
    && apt-get install -y     libcurl4-openssl-dev\
    && apt-get install -y procps\
    && apt install -y libharfbuzz-dev libfribidi-dev\
-   && apt-get install -y libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
+   && apt-get install -y libfreetype-dev libpng-dev libtiff5-dev libjpeg-dev
 RUN sudo apt install cmake  cmake-data libarchive13 libjsoncpp25 librhash0 libuv1
 # # Download and install shiny server
 RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION -O "version.txt" && \
