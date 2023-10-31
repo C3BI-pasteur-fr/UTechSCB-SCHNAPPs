@@ -1,0 +1,60 @@
+---
+title: "Untitled"
+author: "Bernd Jagla"
+date: "2022-12-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(SeuratDisk)
+library(anndata)
+library(zellkonverter)
+library(reticulate)
+conda_list()
+use_condaenv("r-reticulate")
+# conda_install("base", "numpy")
+# conda_install("r-reticulate", "numpy")
+
+# Convert("~/Downloads/bb7e90e4-496c-4708-bcc0-e88f5ffd29e0.Output.h5ad", "h5seurat")
+# This creates a copy of this .h5ad object reformatted into .h5seurat inside the example_dir directory
+
+adata <- read_h5ad("~/Downloads/bb7e90e4-496c-4708-bcc0-e88f5ffd29e0.Output.h5ad")
+# ad$write_h5ad("foo.h5ad") 
+ # remotes::install_github("dynverse/anndata")
+ # anndata::install_anndata()
+ reticulate::py_config()
+colnames(adata$obs)
+table(adata$obs$"cell_type")
+a1 = grep(pattern = "Outlier",x = adata$obs$"cluster_label",invert = T)
+a2 = adata[a1][adata[a1]$obs$"cell_type" %in% c("Progenitor cell","Native cell", "Oligodendrocyte precursor cell")]
+table(a2$obs$"cell_type",a2$obs$"cluster_label" )
+a2
+#  [1] "development_stage_ontology_term_id" "indiv_id"                           "brain_region"                      
+#  [4] "cortical_area"                      "lamina"                             "cluster_label"                     
+#  [7] "ngene"                              "numi"                               "percent_mito"                      
+# [10] "percent_ribo"                       "ncount_rna"                         "nfeature_rna"                      
+# [13] "tissue_ontology_term_id"            "assay_ontology_term_id"             "disease_ontology_term_id"          
+# [16] "cell_type_ontology_term_id"         "ethnicity_ontology_term_id"         "is_primary_data"                   
+# [19] "organism_ontology_term_id"          "sex_ontology_term_id"               "cell_type"                         
+# [22] "assay"                              "disease"                            "organism"                          
+# [25] "sex"                                "tissue"                             "ethnicity"                         
+# [28] "development_stage"                  "organ"                              "organ_ontology_term_id"      
+ 
+ adata$obs_names = paste0("cell",adata$obs_names)
+ 
+sce  = basiliskRun(fun = function(adata) {
+        # Convert back to an SCE:
+        zellkonverter::AnnData2SCE(adata, hdf5_backed =F, verbose = T, uns=F)
+    }, env = zellkonverterAnnDataEnv(), adata = adata)
+ 
+ 
+ 
+ sce = zellkonverter::AnnData2SCE(adata = a2, hdf5_backed =F, verbose = T, uns=F,obs = F)
+  
+# This .d5seurat object can then be read in manually
+seuratObject <- LoadH5Seurat("~/Downloads/bb7e90e4-496c-4708-bcc0-e88f5ffd29e0.Output.h5seurat")
+```
