@@ -191,7 +191,7 @@ scShinyUI <- function(request) {
     mListNames[menuListItem] <- allMenus[[menuListItem]][3][[1]][[1]][3]$children[[2]]$children[[1]][1]
   }
   sollOrder <- c(
-    "Introduction", "Parameters", "General QC", "Co-expression",
+    "Introduction", "short cuts", "Parameters", "General QC", "Co-expression",
     "Data Exploration", "Subcluster analysis"
   )
   sollOrderIdx <- c()
