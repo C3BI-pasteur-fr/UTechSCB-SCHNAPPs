@@ -186,9 +186,15 @@ schizophrenia or Autism Spectrum Disorder.</p>
 </div>
 <div id="run-docker" class="section level1">
 <h1>run docker</h1>
+<p>You will need at least 16GB of memory for the VM.</p>
+<p>Loading the app might take a minute or so</p>
+for lima in the yaml file, add
+<pre>memory: 16GiB</pre>
 <pre>
 docker run --user shiny --rm -p 3838:3838  pf2dock/schnapps.celia:latest
 </pre>
+Then open a browser at:
+<pre> localhost:3838</pre>
 `
 <h2>
 SCHNAPPs short information
