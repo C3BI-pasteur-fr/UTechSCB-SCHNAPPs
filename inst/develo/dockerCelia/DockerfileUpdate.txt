@@ -1,5 +1,5 @@
 # docker build - 
-# docker build -f DockerfileUpdate.txt  -t pf2dock/schnapps:1.12.71 -t pf2dock/schnapps:latest .
+# docker build -f DockerfileUpdate.txt -t pf2dock/schnapps.celia:latest .
 # docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps:latest
 
 # load R image
@@ -12,7 +12,7 @@ RUN git --version
 
 
 
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
+RUN R -e "devtools::install_github( 'C3BI-pasteur-fr/UTechSCB-SCHNAPPs', dependencies = TRUE)"
 
 
 EXPOSE 3838
@@ -21,7 +21,7 @@ EXPOSE 3838
 RUN mkdir -p /var/log/shiny-server
 RUN mkdir -p /srv/shiny-server/schnapps
 
-COPY runCelia.R /root/
+COPY runCelia.R /srv/shiny-server/schnapps/runCelia.R
 
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 COPY *.RData /srv/shiny-server/schnapps/
@@ -29,7 +29,7 @@ COPY *.RData /srv/shiny-server/schnapps/
 COPY intro.Rmd /srv/shiny-server/schnapps/
 
 #COPY runDockerApp.R /root/runDockerApp.R
-COPY shiny-server.sh /usr/bin/shiny-server.sh
+#COPY shiny-server.sh /usr/bin/shiny-server.sh
 
 RUN chown -R shiny.shiny /root
 # RUN chmod a+w /root/runDockerApp.R
@@ -39,5 +39,5 @@ RUN chown -R shiny.shiny /root
 
 CMD whoami >/dev/stderr
 CMD ls -ltra /root
-CMD /usr/bin/Rscript /root/runCelia.R
+CMD /usr/bin/Rscript /srv/shiny-server/schnapps/runCelia.R
 
