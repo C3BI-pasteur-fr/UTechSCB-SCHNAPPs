@@ -17,7 +17,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Human induced pluripotent stem cells (hiPSCs) have been used extensively in vitro to model early events in neurodevelopment. Because of a number of shortcomings, previous work has established a potential to use these cells in vivo after transplantation into the mouse brain. Here, we describe a systematic approach for the analysis of transplanted hiPSC-derived neurons and glial cells over time in the mouse brain. Using functional two-photon imaging of GCaMP6fexpressing human neural cells, we define and quantify the embryonic-like features of their spontaneous activity. This is substantiated by detailed electron microscopy (EM) of the graft. We relate this to the synaptic development the neurons undergo up to seven months in vivo. This system can now be used further for the genetic or experimental manipulation of developing hiPSC-derived cells addressing neurodevelopmental diseases like schizophrenia or Autism Spectrum Disorder.
 
+# run docker
 
+<pre>
+docker run --user shiny --rm -p 3838:3838  pf2dock/schnapps.celia:latest
+</pre>
 
 `r shiny::includeHTML(system.file("extdata", "generalSCHNAPPs.html",package = "SCHNAPPs"))`
 
