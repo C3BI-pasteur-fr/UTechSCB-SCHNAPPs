@@ -21,7 +21,7 @@ EXPOSE 3838
 RUN mkdir -p /var/log/shiny-server
 RUN mkdir -p /srv/shiny-server/schnapps
 
-COPY app.R /srv/shiny-server/schnapps/
+COPY runCelia.R /root/
 
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 COPY *.RData /srv/shiny-server/schnapps/
@@ -39,5 +39,5 @@ RUN chown -R shiny.shiny /root
 
 CMD whoami >/dev/stderr
 CMD ls -ltra /root
-CMD /usr/bin/Rscript /root/runDockerApp.R
+CMD /usr/bin/Rscript /root/runCelia.R
 

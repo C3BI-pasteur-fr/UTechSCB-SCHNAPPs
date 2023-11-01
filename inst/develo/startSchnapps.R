@@ -11,7 +11,8 @@ BiocManager::valid()
 library(SCHNAPPs)
 
 library(future)
-plan("multiprocess", workers = 6)
+# plan("multiprocess", workers = 6)
+plan(sequential)
 
 library("BiocParallel")
 register(MulticoreParam(6))

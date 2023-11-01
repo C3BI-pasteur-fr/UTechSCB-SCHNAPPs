@@ -14,7 +14,8 @@ library(future)
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
-plan("multicore", workers = WORKERS)
+plan(callr, workers = 2)
+# plan("multicore", workers = WORKERS)
 # plan(sequential)
 library(doParallel)
 registerDoParallel(cores=WORKERS)
