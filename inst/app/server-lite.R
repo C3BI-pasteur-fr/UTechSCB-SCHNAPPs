@@ -295,7 +295,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   output$introRMD <- renderUI({
     cat(file = stderr(), paste("wd:", getwd(), "\n"))
     introFile = 'intro.Rmd'
-    if (!file.exists(introFile)) return(HTML("introduction file intro.Rmd is missing"))
+    if (!file.exists(introFile)) return(HTML(paste("introduction file intro.Rmd is missing", getwd(),"\n")))
     HTML(markdown::markdownToHTML(knit(introFile, quiet = TRUE), fragment.only = T))
     # includeHTML("intro.html")
   })
