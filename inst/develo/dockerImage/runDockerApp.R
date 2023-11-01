@@ -14,8 +14,8 @@ library(future)
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
-plan("multiprocess", workers = WORKERS)
-# plan(sequential)
+# plan("multiprocess", workers = WORKERS)
+plan(sequential)
 
 
 library("BiocParallel")

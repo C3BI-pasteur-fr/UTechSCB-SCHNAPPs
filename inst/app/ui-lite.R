@@ -82,11 +82,20 @@ base::source(paste0(packagePath, "/serverFunctions.R"))
 scShinyUI <- function(request) {
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
-      packagePath <- "inst/app"
-      setwd("~/Rstudio/Schnapps//")
+      if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
+        packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      } else {
+        if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
+          packagePath <- "~/Rstudio/Schnapps/inst/app/"
+        } else {
+          stop("package path not found\n")
+        }
+      }
+      # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
+      
+    } else {
+      packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
     }
-  } else {
-    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
   }
   localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
   defaultValueSingleGene <- get(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)
@@ -120,11 +129,12 @@ scShinyUI <- function(request) {
     shinydashboard::menuSubItem("Projections", tabName = "modifyProj")
   )
   
-
+  
   
   # general tabs
   allTabs <- list(
     introTab(),
+    shortCutsTab(),
     clusterParametersTab()
     # ,
     # modTab
@@ -221,32 +231,32 @@ scShinyUI <- function(request) {
           id = "sideBarID",
           allMenus,
           
-        htmlOutput("summaryStatsSideBar"),
-        
-        # downloadButton("report", "Generate report", class = "butt"),
-        tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
-        tags$head(tags$style(HTML("berndTest {background-color : rgb(255,34,22,0.1);}"))),
-        
-        # bookmarkButton(id = "bookmark1"),
-        br(),
-        downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
-        br(),
-        downloadButton("RDSsave", "Download RData", class = "butt"),
-        br(),
-        # downloadButton("RmdSave", "Download History", class = "butt"),
-        # if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
-        # if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
-        if (exists("historyPath", envir = .schnappsEnv)){
-          br()
-          # sc_checkboxInput("save2History", "save to history file", FALSE)
-          actionButton("comment2History", "Add comment to history")
-        }
-        # if (DEBUG) {
-        #   actionButton("openBrowser", "open Browser")
-        # }
-        # ,
-        # verbatimTextOutput("save2Historystring")
-        # ,verbatimTextOutput("currentTabInfo")
+          htmlOutput("summaryStatsSideBar"),
+          
+          # downloadButton("report", "Generate report", class = "butt"),
+          tags$head(tags$style(".butt{color: black !important;}")), #  font color; otherwise the text on these buttons is gray
+          tags$head(tags$style(HTML("berndTest {background-color : rgb(255,34,22,0.1);}"))),
+          
+          # bookmarkButton(id = "bookmark1"),
+          br(),
+          downloadButton("countscsv", "Download (log) counts.csv", class = "butt"),
+          br(),
+          downloadButton("RDSsave", "Download RData", class = "butt"),
+          br(),
+          # downloadButton("RmdSave", "Download History", class = "butt"),
+          # if (DEBUG) sc_checkboxInput("DEBUGSAVE", "Save for DEBUG", defaultValue("DEBUGSAVE", FALSE)),
+          # if (DEBUG) verbatimTextOutput("DEBUGSAVEstring"),
+          if (exists("historyPath", envir = .schnappsEnv)){
+            br()
+            # sc_checkboxInput("save2History", "save to history file", FALSE)
+            actionButton("comment2History", "Add comment to history")
+          }
+          # if (DEBUG) {
+          #   actionButton("openBrowser", "open Browser")
+          # }
+          # ,
+          # verbatimTextOutput("save2Historystring")
+          # ,verbatimTextOutput("currentTabInfo")
         )
       ), # dashboard side bar
       shinydashboard::dashboardBody(
