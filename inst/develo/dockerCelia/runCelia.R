@@ -1,3 +1,5 @@
+library(dplyr)
+
 .schnappsEnv <- new.env(parent=emptyenv())
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
 localContributionDir = ""
@@ -66,10 +68,10 @@ assign("defaultValues", defaultValues, envir = .schnappsEnv)
 # will be set during sourcing, but we need to define them, otherwise there will be a warning
 scShinyUI <- NULL
 scShinyServer <- NULL
-# packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 
 devscShinyApp = T   # TRUE = look for local sources
-packagePath <- "inst/app"
+# packagePath <- "inst/app"
 
 source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
 source(paste0(packagePath, "/server.R"), local = TRUE)
@@ -81,7 +83,7 @@ source(paste0(packagePath, "/ui-lite.R"), local = T)
 maxCells = 300000
 # file = "inst/develo/testApp/HPVC.lite.RData"
 # file = "/Users/bernd/Rstudio/UTechSCB-SCHNAPPs/inst/develo/dockerCelia/celia.schnapps.RData"
-file = "celia.schnapps.RData"
+file = "/srv/shiny-server/schnapps/celia.schnapps.RData"
 # data = "~/Rstudio/UTechSCB-SCHNAPPs/data/scExLite.RData"
 assign(".SCHNAPPs_LiteData", loadLiteData(fileName = file), envir = .schnappsEnv)
 
