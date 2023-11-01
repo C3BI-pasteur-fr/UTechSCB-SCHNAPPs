@@ -18,8 +18,7 @@ library(reactlog)
 #
 library(future)
 # plan("multisession", workers = 3)
-plan(callr, workers = 12
-     )
+plan(callr, workers = 12)
 
 library("BiocParallel")
 register(MulticoreParam(9))
@@ -49,7 +48,7 @@ historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-May-26.15.18/"
 historyPath = "/Volumes/CBUtechsZeus/bernd/celia/hist_2023-May-26.15.18/"
 # historyPath = "demoHistory/MPI"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
-# historyPath = NULL
+historyPath = NULL
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
