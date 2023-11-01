@@ -1,6 +1,12 @@
 # docker build - 
 # docker build -f DockerfileUpdate.txt -t pf2dock/schnapps.celia:latest .
-# docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps:latest
+# docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps.celia:latest
+# docker run --user shiny --rm -p 3838:3838  pf2dock/schnapps.celia:latest
+# docker run --user root --rm -p 3838:3838 -it --entrypoint bash pf2dock/schnapps.celia:latest
+# docker context create lima-docker --docker "host=unix:///Users/bernd/.lima/docker/sock/docker.sock"
+# docker context use lima-docker
+# docker run hello-world
+
 
 # load R image
 FROM pf2dock/schnapps:1.12.70
@@ -12,30 +18,33 @@ RUN git --version
 
 
 
-RUN R -e " devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
 
 
 EXPOSE 3838
 
 
-RUN mkdir -p /var/log/shiny-server
-RUN mkdir -p /srv/shiny-server/schnapps
+#RUN mkdir -p /var/log/shiny-server
+#RUN mkdir -p /srv/shiny-server/schnapps
+RUN chown -R root:root /srv/shiny-server/
 
-COPY runCelia.R /srv/shiny-server/schnapps/runCelia.R
+RUN mkdir -p /home/shiny/SCHNAPPsDebug
+RUN chown -R shiny.shiny /home/shiny/SCHNAPPsDebug
 
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 COPY *.RData /srv/shiny-server/schnapps/
 
+RUN ls .
+COPY runCelia.R /srv/shiny-server/schnapps/runCelia.R
+
 COPY intro.Rmd /srv/shiny-server/schnapps/
 
-#COPY runDockerApp.R /root/runDockerApp.R
-#COPY shiny-server.sh /usr/bin/shiny-server.sh
-
 RUN chown -R shiny.shiny /root
-# RUN chmod a+w /root/runDockerApp.R
 
-# rsomoclu is not supported anymore
-# RUN rm -r SCHNAPPsContributions/SOM
+ENV SHINY_LOG_STDERR=1
+RUN chown -R shiny:shiny /var/log/shiny-server
+RUN chown -R shiny:shiny /srv/shiny-server/schnapps
+RUN chown -R shiny:shiny /var/lib/shiny-server
 
 CMD whoami >/dev/stderr
 CMD ls -ltra /root
