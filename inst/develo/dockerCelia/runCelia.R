@@ -1,20 +1,15 @@
 library(dplyr)
 
 .schnappsEnv <- new.env(parent=emptyenv())
-localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
-localContributionDir = ""
+localContributionDir = NULL
 defaultValueSingleGene = "NANOG" # CD52
 defaultValueMultiGenes = "RTN4, NEUROD1, ROBO1, NRG1, DLL1, SLIT2, NRP2, B2M, FLNA, PTN, HES1, FGF13, SOX1, CDK5RAP2, GPI, PAX6, NRCAM, DLG4, TJP1, NANOG"
-# defaultValueMultiGenes = "CD52, S100A9, S100A4" # itgae, cd69, itga1" # CD52, S100A9, S100A4
-# defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = F
 DEBUGSAVE = F
-# historyPath = "~/Rstudio/Schnapps/history"
 historyPath = NULL
-AllowClustering = F
 
-.schnappsEnv 
+AllowClustering = F
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -25,42 +20,39 @@ assign(".SCHNAPPs_DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("DEBUG", DEBUG, envir = .schnappsEnv)
 assign("DEBUGSAVE", DEBUGSAVE, envir = .schnappsEnv)
 assign("historyPath", historyPath, envir = .schnappsEnv)
-# assign("historyFile", historyFile, envir = .schnappsEnv)
-
-defaultValueMultiGenes = "wt1,pdgfrb,agtr1a,col3a1,col1a1,postn,tbx18,scx,npr1,vegfa,npr2,notch2,tagln,acta2,ctgf, Rack1, Bmp4,  Eef2, col3a1,col1a1,tgfb3,postn"
-defaultValueSingleGene = "wt1"
 
 defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
 defaultValues[["coE_selected-groupNames"]] = "plot"
 defaultValues[["coE_heatmap_geneids"]] = defaultValueMultiGenes
 defaultValues[["coExpHeatmapModule-heatmapMinMaxValue"]] = c(0,25)
-defaultValues[["coE_selected-dimension_x"]] = "UMAP1"
-defaultValues[["coE_selected-dimension_y"]] = "UMAP2"
-defaultValues[["coE_selected-dimension_col"]] = "sampleNames"
+defaultValues[["coE_selected-dimension_x"]] = "tsne1"
+defaultValues[["coE_selected-dimension_y"]] = "tsne2"
+defaultValues[["coE_selected-dimension_col"]] = "types.cell"
 defaultValues[["coE_geneGrpVioIds2"]] = defaultValueMultiGenes
-defaultValues[["coE_dimension_xVioiGrp2"]] = c("seuratCluster", "sampleNames")
+defaultValues[["coE_dimension_xVioiGrp2"]] = c("dbCluster", "types.cell")
 defaultValues[["coE_geneGrpVioIds"]]  = defaultValueMultiGenes
-defaultValues[["coE_dimension_xVioiGrp"]] = "seuratCluster"
-defaultValues[["alluiv1"]] = "sampleNames"
-defaultValues[["alluiv2"]] = "seuratCluster"
-defaultValues[["DE_Exp_dataInput-Mod_clusterPP"]] = "seuratCluster"
+defaultValues[["coE_dimension_xVioiGrp"]] = "types.cell"
+defaultValues[["alluiv1"]] = "types.cell"
+defaultValues[["alluiv2"]] = "dbCluster"
+defaultValues[["DE_Exp_dataInput-Mod_clusterPP"]] = "dbCluster"
 defaultValues[["DE_Exp_dataInput-Mod_PPGrp"]] = as.character(c(0,1,2,3,4,5,6))
 defaultValues[["DE_gene_id"]] = defaultValueSingleGene
-defaultValues[["DE_expclusters-dimension_x"]] = "UMAP1"
-defaultValues[["DE_expclusters-dimension_y"]] = "UMAP2" 
-defaultValues[["DE_expclusters-dimension_col"]] = "sampleNames" 
-defaultValues[["DE_PanelPlotCellSelection-Mod_clusterPP"]] = "seuratCluster"
-defaultValues[["DE_PanelPlotCellSelection-Mod_PPGrp"]] = as.character(c(0,1,2,3,4,5,6))
-defaultValues[["DE_dim_x"]] = "UMAP1"
-defaultValues[["DE_dim_y"]] = "UMAP2"
+defaultValues[["DE_expclusters-dimension_x"]] = "tsne1"
+defaultValues[["DE_expclusters-dimension_y"]] = "tsne2" 
+defaultValues[["DE_expclusters-dimension_col"]] = "types.cell" 
+defaultValues[["DE_PanelPlotCellSelection-Mod_clusterPP"]] = "sampleNames"
+defaultValues[["DE_PanelPlotCellSelection-Mod_PPGrp"]] = "All"
+defaultValues[["DE_dim_x"]] = "types.cell"
+defaultValues[["DE_dim_y"]] = "UMI.count"
 defaultValues[["DE_nCol"]] = 3
-defaultValues[["sCA_dataInput-Mod_clusterPP"]] = "seuratCluster"
-defaultValues[["sCA_dataInput-Mod_PPGrp"]] = as.character(c(0,1,2,3,4,5,6))
-defaultValues[["sCA_subscluster_x1"]] = "UMAP1"
-defaultValues[["sCA_subscluster_y1"]] = "UMAP2"
-defaultValues[["DEBUGSAVE"]] = DEBUGSAVE
+defaultValues[["sCA_dataInput-Mod_clusterPP"]] = "types.cell"
+defaultValues[["sCA_dataInput-Mod_PPGrp"]] = c("stem.like", "mature", "NPC")
+defaultValues[["sCA_subscluster_x1"]] = "types.cell"
+defaultValues[["sCA_subscluster_y1"]] = "UMI.count"
+defaultValues[["DEBUGSAVE"]] = FALSE
 
+defaultValues[["sCA_dgeRadioButton"]] = "seurat:t-test"
 
 assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
@@ -68,7 +60,10 @@ assign("defaultValues", defaultValues, envir = .schnappsEnv)
 # will be set during sourcing, but we need to define them, otherwise there will be a warning
 scShinyUI <- NULL
 scShinyServer <- NULL
+
 packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+
+cat(file = stderr(), packagePath,"\n")
 
 devscShinyApp = F   # TRUE = look for local sources
 # packagePath <- "inst/app"
@@ -138,6 +133,6 @@ if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
 # options(shiny.reactlog=TRUE) 
-runApp(app)
+runApp(app, port = 3838,host = "0.0.0.0")
 # 
 

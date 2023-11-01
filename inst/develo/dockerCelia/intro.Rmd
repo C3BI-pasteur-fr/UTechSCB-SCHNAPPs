@@ -19,9 +19,20 @@ Human induced pluripotent stem cells (hiPSCs) have been used extensively in vitr
 
 # run docker
 
+You will need at least 16GB of memory for the VM.
+
+Loading the app might take a minute or so
+
+for lima in the yaml file, add
+<pre>memory: 16GiB</pre>
+
 <pre>
 docker run --user shiny --rm -p 3838:3838  pf2dock/schnapps.celia:latest
 </pre>
+
+Then open a browser at:
+<pre> localhost:3838</pre>
+
 
 `r shiny::includeHTML(system.file("extdata", "generalSCHNAPPs.html",package = "SCHNAPPs"))`
 
