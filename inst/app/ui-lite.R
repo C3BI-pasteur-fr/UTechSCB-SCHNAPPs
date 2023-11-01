@@ -148,6 +148,9 @@ scShinyUI <- function(request) {
     shinydashboard::menuItem("Introduction",
                              tabName = "Intro", icon = icon("tachometer-alt")
     ),
+    shinydashboard::menuItem("short cuts",
+                             tabName = "shortCuts", icon = icon("gopuram")
+    ),
     shinydashboard::menuItem("Parameters",
                              tabName = "parameters", icon = icon("gopuram")
                              ,

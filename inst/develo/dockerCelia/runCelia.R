@@ -51,6 +51,7 @@ defaultValues[["sCA_dataInput-Mod_PPGrp"]] = c("stem.like", "mature", "NPC")
 defaultValues[["sCA_subscluster_x1"]] = "types.cell"
 defaultValues[["sCA_subscluster_y1"]] = "UMI.count"
 defaultValues[["DEBUGSAVE"]] = FALSE
+defaultValues[["gQC_windProj"]] = "dbCluster"
 
 defaultValues[["sCA_dgeRadioButton"]] = "seurat:t-test"
 

@@ -3,9 +3,6 @@
 # docker run --user shiny --rm -p 3838:3838 -v /Users/bernd/Rstudio/:/data pf2dock/schnapps.celia:latest
 # docker run --user shiny --rm -p 3838:3838  pf2dock/schnapps.celia:latest
 # docker run --user root --rm -p 3838:3838 -it --entrypoint bash pf2dock/schnapps.celia:latest
-# docker context create lima-docker --docker "host=unix:///Users/bernd/.lima/docker/sock/docker.sock"
-# docker context use lima-docker
-# docker run hello-world
 
 
 # load R image
@@ -16,8 +13,7 @@ WORKDIR /root
 
 RUN git --version
 
-
-
+RUN ls
 RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
 
 
@@ -34,10 +30,10 @@ RUN chown -R shiny.shiny /home/shiny/SCHNAPPsDebug
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 COPY *.RData /srv/shiny-server/schnapps/
 
-RUN ls .
+RUN ls 
 COPY runCelia.R /srv/shiny-server/schnapps/runCelia.R
 
-COPY intro.Rmd /srv/shiny-server/schnapps/
+COPY intro.Rmd /srv/shiny-server/schnapps/intro.Rmd
 
 RUN chown -R shiny.shiny /root
 
