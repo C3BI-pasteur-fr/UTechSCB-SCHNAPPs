@@ -17,7 +17,6 @@ WORKDIR /root
 RUN git --version
 
 
-
 RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
 
 
