@@ -227,7 +227,7 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
     features =lapply(features,FUN = FUN,g=dupGene)
     features$common =c(features$common, dupGene)
   }
-  p = DotPlotwithModuleScore(seurDat, 
+  p = SCHNAPPs::DotPlotwithModuleScore(seurDat, 
                              assay="RNA", 
                              features = features,
                              featureDat = featureDat,
