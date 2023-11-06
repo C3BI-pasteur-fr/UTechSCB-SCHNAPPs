@@ -17,6 +17,7 @@ library(reactlog)
 # }
 #
 library(future)
+library(future.callr)
 # plan("multisession", workers = 3)
 plan(callr, workers = 12)
 

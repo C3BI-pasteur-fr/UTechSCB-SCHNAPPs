@@ -77,9 +77,9 @@ if (!AllowClustering)
       }
       return(NULL)
     }
-    # if (.schnappsEnv$DEBUGSAVE) {
+    if (.schnappsEnv$DEBUGSAVE) {
       save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls()))
-    # }
+    }
     # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
     
       

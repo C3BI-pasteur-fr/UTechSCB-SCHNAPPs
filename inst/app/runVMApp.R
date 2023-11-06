@@ -7,6 +7,7 @@ library(reactlog)
 # }
 # 
 library(future)
+library(future.callr)
 
 # devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 
@@ -14,7 +15,7 @@ library(future)
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
-plan(callr, workers = 2)
+plan('callr', workers = 2)
 # plan("multicore", workers = WORKERS)
 # plan(sequential)
 library(doParallel)
@@ -32,8 +33,8 @@ defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl1
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
-# historyPath = "/Volumes/Oct2020/RStudio_history/"
 historyPath = "/home/schnapps/history"
+historyPath = "/Volumes/LaCie2022//RStudio_history/"
 #historyPath = NULL
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
@@ -89,6 +90,8 @@ defaultValues = list()
 
 devscShinyApp = FALSE
 packagePath <<- "/home/schnapps/rstudio/schnappsGit/inst/app"
+packagePath <<- "inst/app/"
+
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
