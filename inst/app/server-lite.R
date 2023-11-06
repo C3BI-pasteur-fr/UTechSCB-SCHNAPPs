@@ -10,6 +10,10 @@ scShinyServer <- shinyServer(function(input, output, session) {
   gmtData <- reactiveVal()
   gmtUserData <- reactiveVal()
   
+  if(exists(".SCHNAPPs_GMTData", envir = .schnappsEnv)){
+    gmtData(.schnappsEnv[[".SCHNAPPs_GMTData"]])
+  }
+  
   # Here, we store projections that are created during the session. These can be selections of cells or other values that
   # are not possible to precalculate.
   sessionProjections <- reactiveValues(

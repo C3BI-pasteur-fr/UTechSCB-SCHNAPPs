@@ -2849,8 +2849,9 @@ projections <- reactive({
   if (!is.null(pca)) {
     pcax = pca$x
     comColNames = colnames(projections) %in% colnames(pcax)
-    colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
-    
+    if(any(comColNames)){
+      colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
+    }
     if (!all(c(rownames(pcax) %in% rownames(projections) , 
                rownames(projections) %in% rownames(pcax)))){
       save(file = "~/SCHNAPPsDebug/projectionsError.RData", list = c(ls()))

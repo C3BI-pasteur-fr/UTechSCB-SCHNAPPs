@@ -5,7 +5,7 @@ localContributionDir = NULL
 defaultValueSingleGene = "NANOG" # CD52
 defaultValueMultiGenes = "RTN4, NEUROD1, ROBO1, NRG1, DLL1, SLIT2, NRP2, B2M, FLNA, PTN, HES1, FGF13, SOX1, CDK5RAP2, GPI, PAX6, NRCAM, DLG4, TJP1, NANOG"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
-DEBUG = F
+DEBUG = T
 DEBUGSAVE = F
 historyPath = NULL
 
@@ -93,7 +93,24 @@ assign(".SCHNAPPs_LiteData", loadLiteData(fileName = file), envir = .schnappsEnv
 #     gmtData(tempEnv$gmtData$gmtData) 
 #   }
 # }
+gmtData = list()
+gmtData[["Mature Neurons"]]$name = 'Mature Neurons'
+gmtData[["Mature Neurons"]]$desc = "Mature Neurons"
+gmtData[["Mature Neurons"]]$genes = c("ELAVL4", "CUX2", "TUBB3", "MAP2", "RTN4", "NEUROD1", "ROBO1", "NRG1", "DLL1")
 
+gmtData[["neuronal precursor"]]$name = 'neuronal precursor'
+gmtData[["neuronal precursor"]]$desc = "neuronal precursor"
+gmtData[["neuronal precursor"]]$genes = c("NES", "FABP7", "SLIT2", "NRP2", "B2M", "FLNA", "PTN", "HES1", "FGF13", "SOX1", "CDK5RAP2", "PAX6", "SOX2")
+
+gmtData[["precusor cells"]]$name = 'precusor cells'
+gmtData[["precusor cells"]]$desc = "precusor cells"
+gmtData[["precusor cells"]]$genes = c("TJP1", "NANOG", "POU5F1")
+
+gmtData[["neuro epitel"]]$name = 'neuro epitel'
+gmtData[["neuro epitel"]]$desc = "NEP"
+gmtData[["neuro epitel"]]$genes = c("PAX5", "EMX1", "DLX2", "PAX2")
+
+assign(".SCHNAPPs_GMTData", gmtData, envir = .schnappsEnv)
 
 
 nCells = length(colnames(.schnappsEnv$.SCHNAPPs_LiteData$scEx))
@@ -131,6 +148,12 @@ if (is.null(.schnappsEnv$".SCHNAPPs_LiteData")) {
   # error loading
   stop(".schnappsEnv$.SCHNAPPs_LiteData not given\n")
 }
+
+shiny::addResourcePath(
+  prefix = "www",
+  directoryPath = "~/www/"
+)
+
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer)
 # options(shiny.reactlog=TRUE) 
