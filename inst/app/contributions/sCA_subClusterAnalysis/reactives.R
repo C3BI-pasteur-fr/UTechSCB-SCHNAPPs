@@ -171,10 +171,10 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   rownames(rowNameLookup) = rowNameLookup$org
   # rownames(scEx) = stringr::str_replace_all(rownames(scEx),"_","-")
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = rowNameLookup[which(rowNameLookup$seurat %in% rownames(seurDat@assays$RNA@data)),"seurat"]
+  useGenes = rowNameLookup[which(rowNameLookup$seurat %in% rownames(seurDat@assays$RNA$counts)),"seurat"]
   rownames(scEx) = rowNameLookup[rownames(scEx),"seurat"]
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
-  seurDat@assays$RNA@scale.data = as.matrix(seurDat@assays$RNA@data)
+  seurDat@assays$RNA$counts = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  seurDat@assays$RNA$scale.data = as.matrix(seurDat@assays$RNA$counts)
   
   # not sure we need the normalization factor
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 

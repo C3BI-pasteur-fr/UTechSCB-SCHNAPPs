@@ -38,7 +38,7 @@ DotPlotwithModuleScore <- function (object, assay = NULL, features,
   
   # save(file = "~/SCHNAPPsDebug/DotPlotwithModuleScoreF.RData", list = c(ls()))
   # cp = load("~/SCHNAPPsDebug/DotPlotwithModuleScoreF.RData")
-  
+  require(tidyr)
   gmtd = features
   
   assay <- assay %||% DefaultAssay(object = object)

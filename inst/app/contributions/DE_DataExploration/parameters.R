@@ -633,9 +633,9 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
         
         # Run the standard workflow for visualization and clustering
         integrated <- Seurat::ScaleData(integrated, verbose = DEBUG)
-        integrated@assays$integrated@data
+        integrated@assays$integrated$scale.data
       } else {
-        seur.list[[1]]@assays$RNA@data 
+        seur.list[[1]]@assays$RNA$counts
       }
       # integrated@assays
       # NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
@@ -787,7 +787,7 @@ DE_seuratSCTnormfunc <- function(scEx, nHVG, var2reg) {
   # creates object @assays$RNA@data and @assays$RNA@counts
   # integrated <- NULL
   
-  # choicesVal = names(Filter(is.factor, cellMeta))
+  choicesVal = names(Filter(is.factor, cellMeta))
   choicesVal = choicesVal[unlist(lapply(choicesVal, FUN = function(x) {length(levels(cellMeta[,x]))>1}))]
   var2reg= var2reg[var2reg %in% choicesVal]
   if (is.null(var2reg)) {

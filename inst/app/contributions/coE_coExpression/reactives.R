@@ -227,7 +227,9 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
     features =lapply(features,FUN = FUN,g=dupGene)
     features$common =c(features$common, dupGene)
   }
-  p = DotPlotwithModuleScore(seurDat, 
+  seurDat@assays$RNA$data = seurDat@assays$RNA$counts
+
+  p = SCHNAPPs::DotPlotwithModuleScore(object = seurDat, 
                              assay="RNA", 
                              features = features,
                              featureDat = featureDat,
@@ -265,6 +267,7 @@ coE_heatmapSelectedReactive <- reactive({
     showNotification("coE_heatmapSelectedReactive", id = "coE_heatmapSelectedReactive", duration = NULL)
   }
   # deepDebug()
+  # browser()
   scEx_log <- scEx_log()
   projections <- projections()
   clicked <- input$updateHeatMapSelectedParameters

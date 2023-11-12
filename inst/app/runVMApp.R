@@ -7,15 +7,15 @@ library(reactlog)
 # }
 # 
 library(future)
-
+library(future.callr)
 # devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 
 
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
 
-plan("multicore", workers = WORKERS)
-# plan(sequential)
+#plan("callr", workers=3)
+plan(sequential)
 library(doParallel)
 registerDoParallel(cores=WORKERS)
 
@@ -23,8 +23,8 @@ library("BiocParallel")
 register(MulticoreParam(WORKERS))
 # register(SerialParam())
 
-# localContributionDir = "/home/schnapps/SCHNAPPsContributions/"
-localContributionDir = ""
+localContributionDir = "/home/schnapps/SCHNAPPsContributions/"
+#localContributionDir = NULL
 defaultValueSingleGene = "CD3g" # CD52
 defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA" # itgae, cd69, itga1" # CD52, S100A9, S100A4
 # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
@@ -83,6 +83,7 @@ defaultValues = list()
 # defaultValues[["gQC_um_local_connectivity"]] = 2
 # defaultValues[["useSeuratPCA"]] = TRUE
 
+
 # commented out for paper
 # assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
@@ -93,7 +94,10 @@ source(paste0(packagePath,  "/server.R"))
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=FALSE)
-
+shiny::addResourcePath(
+  prefix = "www",
+  directoryPath = "./inst/www/"
+)
 # options(keep.source=TRUE)
 # p <- profvis::profvis({
 runApp(app, host = "0.0.0.0", port = 6149, launch.browser = FALSE)

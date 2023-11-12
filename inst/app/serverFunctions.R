@@ -1269,6 +1269,10 @@ add2history <- function(type, comment = "", input = input, ...) {
     # if this variable is not set we are not saving
     return(NULL)
   }
+  if (is.null(.schnappsEnv$historyPath)) {
+    # if this variable is not set we are not saving
+    return(NULL)
+  }
   # browser()
   
   # new feature to prevent saving during start-up

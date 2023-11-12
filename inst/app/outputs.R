@@ -253,7 +253,7 @@ output$dimPlotPCA <- renderPlot({
   logDat = assays(scEx_log)[[1]]
   rData = rowData(scEx_log)
   rownames(logDat) = rData$symbol
-  seurDat@assays$RNA@data = as(logDat,"CsparseMatrix")
+  seurDat@assays$RNA$counts = as(logDat,"CsparseMatrix")
   # seurDat <- NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
   # seurDat <- FindVariableFeatures(seurDat, selection.method = "vst", nfeatures = 2000)
   
@@ -276,7 +276,7 @@ output$dimPlotPCA <- renderPlot({
   # DimPlot(seurDat, reduction = "pca")
   # seurDat <- ProjectDim(seurDat, reduction = "pca", assay = 'RNA')
   
-  d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'data',
+  d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'counts',
                  balanced = TRUE, fast = TRUE, projected = FALSE, 
                  reduction = "pca")
   d
@@ -483,7 +483,7 @@ output$summaryStatsSideBar <- renderUI({
          list = c("normaliztionParameters", ls())
     )
   }
-  # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
+  # cp = load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
   line0 <- paste(infile, " _ ", annFile)
   line0a <- paste("Number of samples: ", length(levels(scEx$sampleNames)), sep = "\t")
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")

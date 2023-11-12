@@ -26,7 +26,7 @@ register(MulticoreParam(9))
 # register(SerialParam())
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/"
-localContributionDir = ""
+localContributionDir = "~/rstudio/schnappsGit/data/"
 defaultValueSingleGene = "IL7R" # CD52
 defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
 defaultValueMultiGenes = "LINC00115, NOC2L, HES4, ISG15, TNFRSF18, CD52, SH3BGRL3"
@@ -177,7 +177,7 @@ source("R/DotPlotwithModuleScore.R")
 # testapp <- shinytest2::AppDriver$new(app, load_timeout = 1505 * 1000)
 
 
-runApp(app, port=3838, launch.browser = chromeBrowser)
+runApp(app, port=3839, launch.browser = chromeBrowser)
 
 # 
 # last.dump[length(last.dump)]

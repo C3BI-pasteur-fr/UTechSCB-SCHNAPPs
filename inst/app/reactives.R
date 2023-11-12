@@ -697,7 +697,10 @@ appendAnnotation <- function(scEx, annFile) {
 ### dataFile reactive ----
 dataFile <- reactive({
   deepDebug()
-  if(.schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
+  if(!exists("restoreHistory",envir = .schnappsEnv)){
+    .schnappsEnv$restoreHistory = FALSE
+  }
+  if( .schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
     iFile = .schnappsEnv$inputFile
   }else{
     iFile = input$file1
@@ -933,7 +936,7 @@ medianUMI <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/medianUMI.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/medianUMI.RData')
+  #cp =  load(file='~/SCHNAPPsDebug/medianUMI.RData')
   scEx <- assays(scEx)[["counts"]]
   retVal <- medianUMIfunc(scEx)
   
@@ -2394,9 +2397,10 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
     counts = assays(scEx)[[1]],
     meta.data = meta.data
   )
+  # bowser()
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  useGenes = which(rownames(seurDat@assays$RNA$counts) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
+  seurDat@assays$RNA$counts = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
   dims = min(dims,ncol(pca$x)) 
   
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
@@ -2453,8 +2457,10 @@ seurat_Clustering <- function() {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/seurat_Clustering.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
-  
+  # cp =load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
+  if(any(c(is.null(k.param), is.null(tabsetCluster), is.null(dims), is.null(resolution)))) {
+    return(NULL)
+  }
   if (tabsetCluster != "seurat_Clustering" | is.null(pca)){
     return(NULL)
   }
@@ -2468,7 +2474,7 @@ seurat_Clustering <- function() {
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
   # browser()
-  retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
+   retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
   # runSeuratClustering(scEx, meta.data, dims, pca, k.param, resolution)
   
   setRedGreenButton(
@@ -2718,9 +2724,10 @@ dbCluster <- reactive({
   clustering <- do.call(tabsetCluster, args = list())
   
   if (.schnappsEnv$DEBUGSAVE) {
+    prjCols = isolate( reactiveValuesToList(projectionColors))
     save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/dbCluster.RData")
+  # cp = load(file="~/SCHNAPPsDebug/dbCluster.RData")
   
   if (is.null(clustering)) {
     if (DEBUG) {
@@ -2744,6 +2751,7 @@ dbCluster <- reactive({
   inCols <- allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
   # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
+  browser()
   isolate(
     if(is.null(names(projectionColors$dbCluster)) | !all(levels(dbCluster) %in% names(projectionColors$dbCluster))){
       projectionColors$dbCluster <- unlist(inCols)
@@ -2849,8 +2857,9 @@ projections <- reactive({
   if (!is.null(pca)) {
     pcax = pca$x
     comColNames = colnames(projections) %in% colnames(pcax)
+    if(any(comColNames)){
     colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
-    
+    }
     if (!all(c(rownames(pcax) %in% rownames(projections) , 
                rownames(projections) %in% rownames(pcax)))){
       save(file = "~/SCHNAPPsDebug/projectionsError.RData", list = c(ls()))
@@ -2875,13 +2884,14 @@ projections <- reactive({
       }
       if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2], "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
+      #browser()
       if (.schnappsEnv$DEBUGSAVE) {
         save(file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
              list = c("tmp")
         )
         iter <- iter + 1
       }
-      # load(file="~/SCHNAPPsDebug/projections.3.RData")
+      # cp = load(file="~/SCHNAPPsDebug/projections.5.RData")
       # deepDebug()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (is(tmp, "data.frame")) {
