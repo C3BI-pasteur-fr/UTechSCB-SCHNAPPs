@@ -15,6 +15,7 @@ Depends:
     R (>= 3.6)
 Imports:
     DT,
+    Matrix (<=1.6-1.1)
     shiny,
     shinyTree,
     psychTools,
@@ -22,7 +23,7 @@ Imports:
     colourpicker,
     digest,
     memoise,
-    Seurat,
+    Seurat (<=4.4),
     circlize,
     kohonen,
     scater,
