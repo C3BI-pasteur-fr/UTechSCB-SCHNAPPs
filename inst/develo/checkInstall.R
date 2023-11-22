@@ -8,26 +8,57 @@
 # library(dtupdate)
 # dtupdate::github_update()
 
-install.packages("RcppArmadillo")
-install.packages("RcppEigen")
-remotes::install_github("satijalab/seurat", "seurat5", dependencies  = TRUE)
-install.packages("psychTools")
-BiocManager::install("scran", dependencies  = TRUE)
-devtools::install_github("kassambara/ggpubr", dependencies  = TRUE)
+# brew install poppler librsvg rust leptonica
 
-devtools::install_github('nghiavtr/BPSC')
-BiocManager::install('DEsingle')
-devtools::install_github('nghiavtr/BPSC')
-BiocManager::install('DESeq2')
-BiocManager::install('edgeR')
-BiocManager::install('MAST')
-BiocManager::install('monocle')
-BiocManager::install('limma')
-BiocManager::install('Seurat')
-devtools::install_github('statOmics/zingeR')
-BiocManager::install('SingleCellExperiment')
-BiocManager::install('scater')
-devtools::install_github('Zhangxf-ccnu/scDEA')
+
+
+
+
+PATH=Sys.getenv("PATH")
+PATH = paste0("/usr/local/bin:",PATH)
+Sys.setenv(PATH = PATH)
+PKG_CONFIG_PATH = "/usr/local/lib/pkgconfig/tesseract.pc"
+Sys.setenv(PKG_CONFIG_PATH = PKG_CONFIG_PATH)
+Sys.getenv("PKG_CONFIG_PATH")
+
+# R CMD INSTALL --configure-vars='INCLUDE_DIR=... LIB_DIR=...'
+install.packages("tesseract", build = T,type = "source", upgrade = "always")
+install.packages("rsvg", build = T,type = "source", upgrade = "always")
+install.packages("gifski", build = T,type = "source", upgrade = "always")
+install.packages("magick", build = T,type = "source", upgrade = "always")
+install.packages("pdftools", build = T,type = "source", upgrade = "always")
+
+
+install.packages("RcppArmadillo", build = T,type = "source", upgrade = "always")
+install.packages("RcppEigen", build = T,type = "source", upgrade = "always")
+remotes::install_github("bnprks/BPCells", build = T,type = "source", upgrade = "always")
+# remotes::install_github("satijalab/seurat", "seurat5", dependencies  = TRUE)
+# remotes::install_github("satijalab/seurat-data", "seurat5", quiet = TRUE)
+# remotes::install_github("satijalab/azimuth", "seurat5", quiet = TRUE)
+# remotes::install_github("satijalab/seurat-wrappers", "seurat5", quiet = TRUE)
+# remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)
+remotes::install_github("satijalab/seurat", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+remotes::install_github("satijalab/seurat-data", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+remotes::install_github("satijalab/azimuth", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+remotes::install_github("satijalab/seurat-wrappers", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+remotes::install_github("stuart-lab/signac", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+install.packages("psychTools", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+BiocManager::install("scran", dependencies  = TRUE, build = T, update = TRUE, ask = F, type = "source", upgrade = "always")
+
+devtools::install_github("kassambara/ggpubr", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+
+devtools::install_github('nghiavtr/BPSC', dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+BiocManager::install('DEsingle', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('DESeq2', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('edgeR', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('MAST', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('monocle', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('limma', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('Seurat', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+devtools::install_github('statOmics/zingeR', dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+BiocManager::install('SingleCellExperiment', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('scater', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+devtools::install_github('Zhangxf-ccnu/scDEA', dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 
 
 checkIfLibrariesInstalled <- function() {
@@ -59,7 +90,7 @@ checkIfLibrariesInstalled <- function() {
     print("all should be good")
   } else {
     print(paste("The following packages are missing:" , missing))
-    install.packages(missing)
+    install.packages(missing, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
   }
   for (pg in pkgList){
     library(pg,character.only = TRUE)
@@ -80,7 +111,8 @@ biocList = c('BiocSingular', 'SingleR',
              'DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment',
              'S4Vectors', 'BiocParallel', 'GSEABase', 'GSVA', "InteractiveComplexHeatmap"
              )
-BiocManager::install(biocList)
+BiocManager::install(biocList, dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+
 gitList = c('briatte/ggnetwork', 'mul118/shinyMCE',
             'RausellLab/CelliD',
             'C3BI-pasteur-fr/TemporaFork', 'C3BI-pasteur-fr/UTechSCB-SCHNAPPs',

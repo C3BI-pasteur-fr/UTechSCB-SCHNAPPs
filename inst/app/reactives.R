@@ -2751,7 +2751,7 @@ dbCluster <- reactive({
   inCols <- allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
   # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
-  browser()
+  # browser()
   isolate(
     if(is.null(names(projectionColors$dbCluster)) | !all(levels(dbCluster) %in% names(projectionColors$dbCluster))){
       projectionColors$dbCluster <- unlist(inCols)
