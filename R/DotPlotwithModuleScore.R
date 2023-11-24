@@ -5,13 +5,31 @@ require(tidyr)
 require(cowplot)
 #' DotPlotwithModuleScore
 #' 
-#' adapted from Seurat::DotPlot but adds the module score per group
+#' Adapted from Seurat::DotPlot but adds the module score per group.
 #' 
-#' @param features list of character vectors of gene names in "symbol" annotation (SCHNAPPs specific)
+#' @param object A Seurat object.
+#' @param assay The assay to be used for plotting. Defaults to NULL, in which case the default assay of the object is used.
+#' @param features A list of character vectors of gene names in "symbol" annotation (SCHNAPPs specific).
+#' @param featureDat A data frame containing information about features, particularly the "symbol" column.
+#' @param cols A vector of colors for plotting.
+#' @param col.min Minimum value for color scaling.
+#' @param col.max Maximum value for color scaling.
+#' @param dot.min Minimum value for dot scaling.
+#' @param dot.scale Scaling factor for dot size.
+#' @param idents Identifiers for cells.
+#' @param group.by Grouping variable.
+#' @param split.by Variable to split the plot by.
+#' @param cluster.idents Boolean indicating whether to cluster identifiers.
+#' @param clusters Column name for grouping identifiers.
+#' @param scale Logical indicating whether to scale the data.
+#' @param scale.by The type of scaling to be applied ('size' or 'radius').
+#' @param scale.min Minimum value for scaling.
+#' @param scale.max Maximum value for scaling.
+#' 
+#' @return A ggplot2 object representing the DotPlot with module scores.
 #' 
 #' @export DotPlotwithModuleScore
 #' 
-
 DotPlotwithModuleScore <- function (object, assay = NULL, features,
                                     featureDat = featureDat, 
                                     cols = c("lightgrey", "blue"), col.min = -2.5, col.max = 2.5, dot.min = 0, dot.scale = 6, 

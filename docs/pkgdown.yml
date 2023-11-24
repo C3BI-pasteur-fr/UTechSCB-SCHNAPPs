@@ -1,0 +1,11 @@
+pandoc: 3.1.4
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  Readme: Readme.html
+  FAQs: pkdown/FAQs.html
+  SCHNAPPs_usage: pkdown/SCHNAPPs_usage.html
+  SeuratWorkflow: pkdown/SeuratWorkflow.html
+  scranWorkflow: pkdown/scranWorkflow.html
+last_built: 2023-11-24T12:47Z
+
