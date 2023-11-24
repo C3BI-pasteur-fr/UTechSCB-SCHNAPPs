@@ -32,6 +32,8 @@ https://satijalab.org/seurat/v3.1/pbmc3k_tutorial.html
 
 This workflow uses a dataset of Peripheral Blood Mononuclear Cells (PBMC) freely available from 10X Genomics. There are 2,700 single cells that were sequenced on the Illumina NextSeq 500.
 
+download data from https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
+and unpack therein.
 
 ```{r}
 library(plyr); library(dplyr)

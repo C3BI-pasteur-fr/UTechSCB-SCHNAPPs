@@ -26,8 +26,45 @@ DotPlotwithModuleScore(
 )
 }
 \arguments{
-\item{features}{list of character vectors of gene names in "symbol" annotation (SCHNAPPs specific)}
+\item{object}{A Seurat object.}
+
+\item{assay}{The assay to be used for plotting. Defaults to NULL, in which case the default assay of the object is used.}
+
+\item{features}{A list of character vectors of gene names in "symbol" annotation (SCHNAPPs specific).}
+
+\item{featureDat}{A data frame containing information about features, particularly the "symbol" column.}
+
+\item{cols}{A vector of colors for plotting.}
+
+\item{col.min}{Minimum value for color scaling.}
+
+\item{col.max}{Maximum value for color scaling.}
+
+\item{dot.min}{Minimum value for dot scaling.}
+
+\item{dot.scale}{Scaling factor for dot size.}
+
+\item{idents}{Identifiers for cells.}
+
+\item{group.by}{Grouping variable.}
+
+\item{split.by}{Variable to split the plot by.}
+
+\item{cluster.idents}{Boolean indicating whether to cluster identifiers.}
+
+\item{clusters}{Column name for grouping identifiers.}
+
+\item{scale}{Logical indicating whether to scale the data.}
+
+\item{scale.by}{The type of scaling to be applied ('size' or 'radius').}
+
+\item{scale.min}{Minimum value for scaling.}
+
+\item{scale.max}{Maximum value for scaling.}
+}
+\value{
+A ggplot2 object representing the DotPlot with module scores.
 }
 \description{
-adapted from Seurat::DotPlot but adds the module score per group
+Adapted from Seurat::DotPlot but adds the module score per group.
 }

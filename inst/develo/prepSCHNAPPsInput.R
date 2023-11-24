@@ -34,9 +34,6 @@ applySingleR <- function(scEx, hpca.se, colName, label = "label.main") {
   colData(scEx) <- cdata
   return(scEx)
 }
-
-
-
 # similar to Seurat function, but appends sample name to cell identifiers
 # 
 schnappsRead10X_h5 <- function(filename, use.names = TRUE, unique.features = TRUE, sampleName = "1") {

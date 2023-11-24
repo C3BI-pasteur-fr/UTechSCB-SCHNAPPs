@@ -43,6 +43,9 @@ We pre-compute the scran workflow and make its results available for comparison 
 
 We use the same data set. Here, we have to create a singleCellExperiment object and save it in an external file to be able to load into SCHNAPPs later.
 
+In case of error this might work:
+devtools::install_version("dbplyr", version = "2.3.4")
+
 ```{r setupData, include=TRUE, collapse=TRUE}
 
 if (! "scRNAseq" %in% installed.packages()){

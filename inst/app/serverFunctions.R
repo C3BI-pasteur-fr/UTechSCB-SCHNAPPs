@@ -18,6 +18,17 @@ library(MASS)
 
 
 ### Try catch from extended examples ----
+#' tryCatch with Warning Extraction
+#' 
+#' A wrapper around the tryCatch function that captures both the value and warnings, allowing for the extraction of warning messages.
+#' 
+#' @param expr The expression to be evaluated within the tryCatch block.
+#' 
+#' @return A list with two elements: "value" containing the result of the expression evaluation (or the error if an error occurs),
+#' and "warning" containing the warning message (if any) or NULL if no warning occurred.
+#' 
+#' @export tryCatch.W.E
+#' 
 
 tryCatch.W.E <- function(expr){
   W <- NULL
@@ -30,8 +41,19 @@ tryCatch.W.E <- function(expr){
        warning = W)
 }
 
+# Print Time End ----
+#' Print Time End ----
+#' 
+#' Prints the elapsed time and a completion message based on the provided start time.
+#' 
+#' @param start.time The starting time, typically obtained using `Sys.time()` before the execution of a task.
+#' @param messtr A character string containing the completion message.
+#' 
+#' @return The function prints the elapsed time and a completion message to the standard error stream.
+#' 
+#' @export printTimeEnd
+#' 
 
-# printTimeEnd ----
 printTimeEnd <- function(start.time, messtr) {
   require(hms)
   end.time <- base::Sys.time()
@@ -47,6 +69,18 @@ printTimeEnd <- function(start.time, messtr) {
   }
 }
 
+#' Plot High Expression Genes
+#' 
+#' Generates a plot of the highest expression genes using the `plotHighestExprs` function from the 'scater' package.
+#' 
+#' @param scaterReads A 'SingleCellExperiment' object or any object with a 'counts' assay containing expression values.
+#' @param n The number of highest expression genes to plot.
+#' @param scols A vector of colors for the cells.
+#' 
+#' @return A ggplot2 plot displaying the highest expression genes.
+#' 
+#' @export pltHighExp
+#' 
 pltHighExp <- function( scaterReads, n, scols) {
   # since we are saving without the environment, we need require scater for storing
   require(scater)
@@ -54,7 +88,18 @@ pltHighExp <- function( scaterReads, n, scols) {
   p1
 }
 
-# some comments removed because they cause too much traffic ----
+# Gene Name to Index ----
+#' Gene Name to Index
+#' 
+#' Converts gene names to corresponding indices in the featureData of a SingleCellExperiment object.
+#' 
+#' @param g_id A character vector of gene names.
+#' @param featureData The featureData of a SingleCellExperiment object containing gene information.
+#' 
+#' @return A character vector of gene indices corresponding to the provided gene names.
+#' 
+#' @export geneName2Index
+#' 
 geneName2Index <- function(g_id, featureData) {
   # if (DEBUG) cat(file = stderr(), "geneName2Index started.\n")
   # start.time <- base::Sys.time()
@@ -105,11 +150,22 @@ geneName2Index <- function(g_id, featureData) {
 }
 
 # updateProjectionsWithUmiCount ----
-updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NULL, scEx, projections) {
+#' Update Projections with UMI Count
+#' 
+#' Updates the projection matrix with UMI count information based on specified gene names.
+#' 
+#' @param geneNames A character vector of gene names for UMI count calculation.
+#' @param geneNames2 A character vector of additional gene names for UMI count calculation (optional).
+#' @param scEx A SingleCellExperiment object containing expression data.
+#' @param projections A list containing projection matrices.
+#' 
+#' @return A list containing updated projection matrices with UMI count information.
+#' 
+#' @export updateProjectionsWithUmiCount
+#' 
+updateProjectionsWithUmiCount <- function(geneNames, geneNames2 = NULL, scEx, projections) {
   featureData <- rowData(scEx)
-  # if ((dimY == "UmiCountPerGenes") | (dimX == "UmiCountPerGenes")) {
   geneNames <- geneName2Index(g_id = geneNames, featureData = featureData)
-  # if (length(geneNames) > 0) {
   if ((length(geneNames) > 0) && (length(geneNames[[1]]) > 0)) {
     #TODO add drop=F to remove if statement
     if (length(geneNames) == 1) {
@@ -118,14 +174,9 @@ updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NU
       projections$UmiCountPerGenes <- Matrix::colSums(assays(scEx)[[1]][geneNames, ])
     }
   } else {
-    # browser()
     projections$UmiCountPerGenes <- 0
   }
-  # }
-  # }
-  # if ((dimY == "UmiCountPerGenes2") | (dimX == "UmiCountPerGenes2")) {
   geneNames <- geneName2Index(geneNames2, featureData)
-  # if (length(geneNames) > 0) {
   if ((length(geneNames) > 0) && (length(geneNames[[1]]) > 0)) {
     if (length(geneNames) == 1) {
       projections$UmiCountPerGenes2 <- assays(scEx)[[1]][geneNames, ]
@@ -135,8 +186,6 @@ updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NU
   } else {
     projections$UmiCountPerGenes2 <- 0
   }
-  # }
-  # }
   return(projections)
 }
 
@@ -194,7 +243,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # to the module. Since this can be a subset we need to subset the scEx as well.
   if (is.null(projections)) return(NULL)
   projections <- updateProjectionsWithUmiCount(
-    dimX = dimX, dimY = dimY,
     geneNames = geneNames,
     geneNames2 = geneNames2,
     scEx = scEx_log[, rownames(projections)], 
