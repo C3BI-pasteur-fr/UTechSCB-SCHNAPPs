@@ -277,7 +277,6 @@ clusterServer <- function(input, output, session,
     featureData <- rowData(scEx)
     geneid <- geneName2Index(geneNames, featureData)
     projections <- updateProjectionsWithUmiCount(
-      dimX = dimX, dimY = dimY,
       geneNames = geneNames,
       geneNames2 = geneNames2,
       scEx = scEx_log[, rownames(projections)], projections = projections
@@ -380,7 +379,6 @@ clusterServer <- function(input, output, session,
       # if (!is.null(projections) & moreOptions & !grpSelected == "plot") {
       if (!is.null(projections) & !grpSelected == "plot") {
         projections <- updateProjectionsWithUmiCount(
-          dimX = dimX, dimY = dimY,
           geneNames = geneNames,
           geneNames2 = geneNames2,
           scEx = scEx_log[, rownames(projections)], projections = projections
@@ -526,7 +524,6 @@ clusterServer <- function(input, output, session,
     if (is.null(divYBy)) divYBy <- "None"
     # TODO returns a table but is not used
     # updateProjectionsWithUmiCount(
-    #   dimX = dimX, dimY = dimY,
     #   geneNames = geneNames,
     #   geneNames2 = geneNames2,
     #   scEx = scEx_log[, rownames(projections)], projections = tdata
@@ -971,7 +968,6 @@ clusterServer <- function(input, output, session,
     # subsetData <- subset(projections, dbCluster %in% inpClusters)
     # geneid <- geneName2Index(geneNames, featureData)
     # subsetData <- updateProjectionsWithUmiCount(
-    #   dimX = dimX, dimY = dimY,
     #   geneNames = geneNames,
     #   geneNames2 = geneNames2,
     #   scEx = scEx_log[, rownames(projections)], projections = projections
