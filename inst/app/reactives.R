@@ -471,50 +471,102 @@ readMM <- function(inFile) {
 
 
 ## readGMT ----
+#' Read GMT File
+#'
+#' Read GMT file and return a list containing the name, description, and filtered genes for each element.
+#'
+#' @param inFile A list containing the path of the file to be read (\code{inFile$datapath}).
+#' @param scEx A SingleCellExperiment object.
+#' @return A list containing the name, description, and filtered genes for each element.
+#' @export
+#'
+#' @examples
+#' inFile <- list()
+#' inFile$datapath <- 'h.all.v2022.1.Hs.symbols.gmt'
+#' scEx <- data.frame(symbol = c("A1BG", "A2M", "A4GALT"))
+#' readGMT(inFile, scEx)
 
 readGMT <- function(inFile, scEx){
   # inFile = list()
-  # inFile$datapath="h.all.v2022.1.Hs.symbols.gmt"
-  con <- file(inFile$datapath, "r")
+  # inFile$datapath='h.all.v2022.1.Hs.symbols.gmt'
+  
+  # Open the file specified in inFile$datapath for reading
+  con <- file(inFile$datapath, 'r')
+  
+  # Read the first line of the file
   first_line <- readLines(con, n = 1)
+  
+  # Close the file
   close(con)
-  commaCount <- length(gregexpr(",", first_line, perl = T)[[1]])
-  tabCount <- length(gregexpr("\t", first_line, perl = T)[[1]])
-  spaceCount <- length(gregexpr(" ", first_line, perl = T)[[1]])
-  sep <- ","
-  if (spaceCount > commaCount) sep <- " "
-  if (commaCount > tabCount) sep <- ","
-  if (tabCount > commaCount) sep <- "\t"
-  con <- file(inFile$datapath, "r")
+  
+  # Count the number of occurrences of commas, tabs, and spaces in the first line
+  commaCount <- length(gregexpr(',', first_line, perl = T)[[1]])
+  tabCount <- length(gregexpr('\t', first_line, perl = T)[[1]])
+  spaceCount <- length(gregexpr(' ', first_line, perl = T)[[1]])
+  
+  # Set the separator based on the counts
+  sep <- ','
+  if (spaceCount > commaCount) sep <- ' '
+  if (commaCount > tabCount) sep <- ','
+  if (tabCount > commaCount) sep <- '\t'
+  
+  # Open the file again
+  con <- file(inFile$datapath,'r')
+  
+  # Read all the lines from the file
   dat <- readLines(con = con)
+  
+  # Close the file
   close(con)
+  
+  # Split each line into a list of elements using the separator
   dat <- strsplit(dat, sep)
+  
+  # If the DEBUGSAVE flag is set, save the variables to a file
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/readGMT.RData", list = c(ls()))
+    save(file = '~/SCHNAPPsDebug/readGMT.RData', list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/readGMT.RData')
+  
+  # Define a function to process each element in the list
   FUN = function(x){
     name = x[1]
     desc = x[2]
     genes = x[3:length(x)]
+    
+    # Find the genes that are not in the rowData of scEx
     noGenes = genes[which(!genes %in% rowData(scEx)$symbol)]
+    
+    # If the DEBUG flag is set, print a message listing the genes not found
     if(.schnappsEnv$DEBUG){
-      cat(file = stderr(), paste("GMT reader: ", name, "genes not found:", paste(noGenes, collapse = ","), "\n"))
+      cat(file = stderr(), paste('GMT reader: ', name, 'genes not found:', paste(noGenes, collapse = ','), '\n'))
     }
+    
+    # Filter the genesthat are found in the rowData of scEx
     genes = genes[which(genes %in% rowData(scEx)$symbol)]
+    
+    # If no genes are found, print a message and return NULL
     if (length(genes) == 0) {
       if(.schnappsEnv$DEBUG){
-        cat(file = stderr(), paste("GMT reader: ", name, "no genes found:\n"))
+        cat(file = stderr(), paste('GMT reader: ', name, 'no genes found:\n'))
       }
       return(NULL)
     }
-    paste(genes, collapse = ", " )
+    
+    # Return a list containing the name, description, and filtered genes
     return(list(name = name, desc = desc, genes = genes))
     
   }
+  
+  # Apply the FUN function to each element in dat and store the results in retVal
   retVal = lapply(dat,FUN = FUN)
+  
+  # Filter out elements in retVal that have length 0
   retVal = retVal[lapply(retVal,length)>0]
+  
+  # Set the names of retVal based on the name attribute of each element
   names(retVal) = lapply(retVal, FUN=function(x)x$name) %>% unlist
+  
+  # Return retVal
   retVal
 }
 
@@ -1776,10 +1828,10 @@ scEx_log_Hash <- reactive({
     cat(file = stderr(), "scEx_log_Hash started.\n")
   }
   scEx_log <- scEx_log()
-    require(digest)
-    if (is.null(scEx_log)) {
-      return(NULL)
-    }
+  require(digest)
+  if (is.null(scEx_log)) {
+    return(NULL)
+  }
   hash = sha1(as.matrix(assays(scEx_log)[[1]]))
   if (DEBUG) {
     cat(file = stderr(), "scEx_log_Hash ended\n")
@@ -1992,70 +2044,61 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   }
   
   scaterPCA <- withWarnings({
-    # not sure, but this works on another with TsparseMatrix
-    if (is(assays(scEx_log)[["logcounts"]], "TsparseMatrix")) {
-      assays(scEx_log)[["logcounts"]] <-
-        as(assays(scEx_log)[["logcounts"]], "CsparseMatrix")
-    }
-    x <- assays(scEx_log)[["logcounts"]]
     genesin = genesin[genesin %in% rownames(scEx_log)]
-    x <- as.matrix(x)[genesin, , drop = FALSE]
-    # if (maxGenes > 0) {
-    #   maxGenes = min(maxGenes, length(genesin))
-    #   keep1 <- order(rv, decreasing = TRUE)[1:maxGenes]
-    #   genesin = genesin[keep1]
-    #   x = as.matrix(x)[keep1, , drop = FALSE]
-    #   rv <- rowVars((as.matrix(x)))
-    #   keep <- rv >= 1e-8
-    #   x <- x[keep,,drop=FALSE]
-    #   rv <- rowVars((as.matrix(x)))
-    # }
-    ## This is not being in Seurat
-    # if (scale) {
-    #   rv <- rowVars((as.matrix(x)))
-    #   x <- x/sqrt(rv)
-    #   # rv <- rep(1, nrow(x))
-    # }
+    assay(scEx_log, "counts") = assay(scEx, "counts")
+    scEx_log = scEx_log[genesin,]
+    # not sure, but this works on another with TsparseMatrix
+    if (is(assay(scEx_log, "logcounts"), "TsparseMatrix")) {
+      assay(scEx_log, "logcounts") <-
+        as(assay(scEx_log, "logcounts"), "CsparseMatrix")
+    }
+    # x <- assay(scEx_log, "logcounts")
+    
+    # x <- as.matrix(x)[genesin, , drop = FALSE]
+    
+    sc = as.Seurat(scEx_log, data="logcounts")
+    sc = sc[genesin,]
     if (scale | center) {
       set.seed(1)
-      x <- Seurat::ScaleData(x, do.scale = scale, do.center = center, verbose = T)
-      genesin = rownames(x) # ScaleData can remove genes.
+      # TODO unused parameters
+      # vars.to.regress = NULL,
+      # latent.data = NULL,
+      # split.by = NULL,
+      # model.use = "linear",
+      # use.umi = FALSE,
+      # do.scale = TRUE,
+      
+      sc <- Seurat::ScaleData(sc, do.scale = scale, do.center = center, verbose = T)
+      genesin = rownames(sc) # ScaleData can remove genes.
+    }
+    if(!any(c(scale, center)) & useSeuratPCA){
+      # TODO warning: seurat needs scaled data
     }
     if (useSeuratPCA){
       # Seurat:
-      reductObj = RunPCA(x, npcs = rank, verbose = FALSE, assay = "RNA")
+      reductObj = RunPCA(sc, features = genesin, npcs = rank, verbose = FALSE)
       pca = list()
       pca$rotation = Loadings(reductObj)
       pca$x = Embeddings(reductObj)
       pca$sdev = Stdev(reductObj)
     } else {
-      # # scran:
-      x <- t(x)
-      pca <- runPCA(x, rank=rank, get.rotation=TRUE)
+      # # BiocSingular:
+      # x <- t(x)
+      scEx_log <- runPCA(scEx_log, ncomponents=rank, exprs_values = "logcounts")
+      pcaObj = reducedDim(scEx_log, "PCA")
+      pca = list()
+      pca$rotation = attr(pcaObj, "rotation")
+      pca$sdev = attr(pcaObj, "varExplained")
+      
+      pca$x = pcaObj
+      attributes(pca$x) <- NULL
+      pca$x <- matrix(pcaObj, nrow = attr(pcaObj, "dim")[1])
+      rownames(pca$x) = rownames(pcaObj)
+      colnames(pca$x) = colnames(pcaObj)
+      
     }
-    
-    # pca$x[1:3,1:3]
-    rownames(pca$rotation) = genesin
-    rownames(pca$x) = colnames(scEx_log)
-    
+     
     pca
-    # BiocSingular::runPCA(
-    #   x,
-    #   # scEx_log[genesin, ],
-    #   # ncomponents = rank,
-    #   ntop = pcaN,
-    #   # exprs_values = "logcounts",
-    #   rank = rank,
-    #   #  center = center,
-    #   scale = scale
-    #   # ,
-    #   # method = "irlba",
-    #   # BPPARAM = bpparam(),
-    #   # BPPARAM = SnowParam(workers = 3, type = "SOCK),
-    #   # BPPARAM = MulticoreParam(
-    #   #   workers = ifelse(detectCores()>1, detectCores()-1, 1))
-    #   # BSPARAM = IrlbaParam()
-    # )
   })
   
   if (is.null(scaterPCA)) {
@@ -2086,9 +2129,11 @@ pcaReact <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "pca started.\n")
   }
+  nWorkers = nbrOfWorkers()
   start.time <- base::Sys.time()
   on.exit({
     printTimeEnd(start.time, "pca")
+    
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "pca")
     }

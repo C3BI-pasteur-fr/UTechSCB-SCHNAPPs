@@ -341,7 +341,7 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/tsne.RData')
+  # cp = load(file='~/SCHNAPPsDebug/tsne.RData')
   suppressMessages(require(parallel))
   suppressMessages(require(Rtsne))
   np <- dim(pca$x)[2]
@@ -352,7 +352,7 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
         pca = FALSE, dims = gQC_tsneDim,
         perplexity = gQC_tsnePerplexity,
         theta = gQC_tsneTheta,
-        check_duplicates = FALSE, num_threads = detectCores()
+        check_duplicates = FALSE, num_threads = 0
       )
     },
     error = function(e) {
