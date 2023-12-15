@@ -217,6 +217,13 @@ install.packages("igraph")
 openmpPacks = c("RcppEigen", "RcppML", "BH", "Rcpp", "RcppArmadillo", "RcppEigen", "RcppProgress",
                 "RhpcBLASctl", "data.table", "dqrng", "magick", "mgcv", 
                 "packrat", "renv", "sitmo")
+
+install.packages(
+  openmpPacks, 
+  configure.vars = "CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++",
+  configure.args = "--with-openmp", build = T,type = "source", upgrade = "always",verbose = T
+)
+
 install.packages(openmpPacks, build = T,type = "source", upgrade = "always")
 problems = c( "magick")
 install.packages(problems, build = T,type = "source", upgrade = "always",verbose = T,keep_outputs = T)
