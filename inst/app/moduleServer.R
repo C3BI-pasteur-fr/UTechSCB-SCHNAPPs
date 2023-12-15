@@ -277,7 +277,7 @@ clusterServer <- function(input, output, session,
     featureData <- rowData(scEx)
     geneid <- geneName2Index(geneNames, featureData)
     projections <- updateProjectionsWithUmiCount(
-      dimX = dimX, dimY = dimY,
+      # dimX = dimX, dimY = dimY,
       geneNames = geneNames,
       geneNames2 = geneNames2,
       scEx = scEx_log[, rownames(projections)], projections = projections
@@ -380,7 +380,7 @@ clusterServer <- function(input, output, session,
       # if (!is.null(projections) & moreOptions & !grpSelected == "plot") {
       if (!is.null(projections) & !grpSelected == "plot") {
         projections <- updateProjectionsWithUmiCount(
-          dimX = dimX, dimY = dimY,
+          # dimX = dimX, dimY = dimY,
           geneNames = geneNames,
           geneNames2 = geneNames2,
           scEx = scEx_log[, rownames(projections)], projections = projections

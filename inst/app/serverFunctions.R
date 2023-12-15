@@ -47,6 +47,34 @@ printTimeEnd <- function(start.time, messtr) {
   }
 }
 
+#' Plot the highest expressed genes in a SingleCellExperiment object.
+#'
+#' This function generates a plot showing the highest expressed genes in a
+#' SingleCellExperiment (SCE) object. The plot is colored by sample names.
+#'
+#' @param scaterReads A SingleCellExperiment object containing the expression data.
+#' @param n Number of highest expressed genes to plot.
+#' @param scols A vector of color values to use for coloring the cells by sample names.
+#'
+#' @return A ggplot2 plot object.
+#'
+#' @import ggplot2
+#' @import scater
+#'
+#' @examples
+#' # Load a SingleCellExperiment object (scaterReads) and specify the number of genes (n)
+#' # and color values (scols).
+#' plot <- pltHighExp(scaterReads, n = 10, scols = c("red", "blue", "green"))
+#' print(plot)
+#'
+#' @export
+#'
+#' @author Your Name
+#'
+#' @rdname pltHighExp
+#'
+#' @family SCE Functions
+#'
 pltHighExp <- function( scaterReads, n, scols) {
   # since we are saving without the environment, we need require scater for storing
   require(scater)
@@ -54,6 +82,30 @@ pltHighExp <- function( scaterReads, n, scols) {
   p1
 }
 
+
+#' Convert gene names to indices in featureData
+#'
+#' This function takes in a vector of gene names and a featureData object and 
+#' returns the indices of the gene names in the featureData object. It performs 
+#' case-insensitive comparisons to match the gene names. If any of the gene names 
+#' are not found in the featureData, a warning notification is displayed.
+#'
+#' @param g_id A comma separated string of gene names to be converted to indices.
+#' @param featureData A data frame or matrix containing gene information, with gene 
+#'   names stored in the 'symbol' column.
+#'
+#' @return A vector of indices corresponding to the input gene names in the 
+#'   featureData object.
+#'
+#' @examples
+#' # Create a featureData object 'features' with gene names in the 'symbol' column
+#' features <- data.frame(symbol = c("GeneA", "GeneB", "GeneC"))
+#' 
+#' # Convert gene names to indices
+#' gene_indices <- geneName2Index(c("GeneA", "GeneC"), features)
+#' gene_indices
+#'
+#' @export
 # some comments removed because they cause too much traffic ----
 geneName2Index <- function(g_id, featureData) {
   # if (DEBUG) cat(file = stderr(), "geneName2Index started.\n")
@@ -91,6 +143,8 @@ geneName2Index <- function(g_id, featureData) {
                        id = "moduleNotFound", type = "warning",
                        duration = 20
       )
+    }else{
+      warning(paste("following genes were not found", notFound, collapse = " "))
     }
   }
   
@@ -105,7 +159,39 @@ geneName2Index <- function(g_id, featureData) {
 }
 
 # updateProjectionsWithUmiCount ----
-updateProjectionsWithUmiCount <- function(dimX, dimY, geneNames, geneNames2 = NULL, scEx, projections) {
+#' Update Projections with UMI Count
+#'
+#' This function updates the `projections` object with UMI count information 
+#' for specified genes from a `SingleCellExperiment` object. It handles both 
+#' single genes and multiple genes, calculating the sum of UMI counts across 
+#' multiple genes if necessary.
+#'
+#' @param geneNames A vector of gene names or indices for which UMI counts 
+#'                  are to be retrieved.
+#' @param geneNames2 An optional second vector of gene names or indices for 
+#'                   an alternative set of UMI counts.
+#' @param scEx A `SingleCellExperiment` object containing the UMI count data.
+#' @param projections A list or data structure where the UMI count information 
+#'                    will be stored.
+#'
+#' @return Returns the updated `projections` object with added UMI count data.
+#'
+#' @examples
+#' # Assuming scEx is a valid SingleCellExperiment object 
+#' # and projections is a valid projections object
+#' gene_list = c("Gene1", "Gene2")
+#' updateProjectionsWithUmiCount(gene_list, NULL, scEx, projections)
+#'
+#' @export
+#'
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom Matrix colSums
+updateProjectionsWithUmiCount <- function(geneNames, geneNames2 = NULL, scEx, projections) {
+  # function implementation
+}
+updateProjectionsWithUmiCount <- function(
+    # dimX, dimY, 
+    geneNames, geneNames2 = NULL, scEx, projections) {
   featureData <- rowData(scEx)
   # if ((dimY == "UmiCountPerGenes") | (dimX == "UmiCountPerGenes")) {
   geneNames <- geneName2Index(g_id = geneNames, featureData = featureData)
@@ -194,7 +280,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # to the module. Since this can be a subset we need to subset the scEx as well.
   if (is.null(projections)) return(NULL)
   projections <- updateProjectionsWithUmiCount(
-    dimX = dimX, dimY = dimY,
+    # dimX = dimX, dimY = dimY,
     geneNames = geneNames,
     geneNames2 = geneNames2,
     scEx = scEx_log[, rownames(projections)], 

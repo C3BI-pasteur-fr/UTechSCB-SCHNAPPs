@@ -345,9 +345,6 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   suppressMessages(require(parallel))
   suppressMessages(require(Rtsne))
   np <- dim(pca$x)[2]
-  if(!exists("WORKERS")){
-    WORKERS = 1
-  }
   tsne <- tryCatch(
     {
       Rtsne::Rtsne(
@@ -355,13 +352,14 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
         pca = FALSE, dims = gQC_tsneDim,
         perplexity = gQC_tsnePerplexity,
         theta = gQC_tsneTheta,
-        check_duplicates = FALSE, num_threads = WORKERS
+        check_duplicates = FALSE, num_threads = 0
       )
     },
     error = function(e) {
       return(NULL)
     }
   )
+  
   if (is.null(tsne)) {
     return(NULL)
   }
