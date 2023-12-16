@@ -1,0 +1,107 @@
+---
+title: "How to add functionality to SCHNAPPs"
+author: "Bernd Jagla"
+date: "2023-12-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Design
+
+Identify functions to be used and figures to be presented. Test with sample input. Try using plotly
+
+## ui.R
+
+When using Modules import modulesUI
+
+```{text}
+source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
+```
+
+### menuList
+
+```{text}
+# list of menu Items
+menuList <- list(
+  shinydashboard::menuItem("Data Exploration",
+                           # id="dataExplorationID",
+                           tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
+                           shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
+                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
+                           # ,
+                           # shinydashboard::menuSubItem("Panel plot factorials", tabName = "DE_panelPlotFact")
+                           # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
+  )
+)
+```
+
+
+### tabList
+# list of tab Items
+tabList <- list(
+  # DE_expression ----
+  expressionTab = shinydashboard::tabItem(
+    "DE_expression",
+    shinydashboardPlus::box(
+      title = "Expression overview", solidHeader = TRUE, width = 12, status = "primary",
+      fluidRow(div(tags$h3("Expression based on subset of cells"), align = "center")),
+      tags$p("Similar to Co-expression - selection, but with a focus on subsets of cells and genes."),
+      tags$p("Limit the cells to visualize by cluster or any other factorial."),
+      tags$p("Visualize specific genes in 3D and over the current clustering (not changeable)."),
+      tags$p("Projections will be not be effected by this sub selection."),
+      br(),
+      fluidRow(
+        column( offset = 3,
+                width = 12, 
+                cellSelectionUI("DE_Exp_dataInput")
+        )
+      ),
+      br(),
+      fluidRow(
+        column(
+          width = 12,
+          clusterUI("DE_expclusters")
+
+
+### using callr for killable processes
+
+```{text}
+# variables/names : runScater, stopScater, maxMemory
+# only lines with * are needed
+
+# DE_scaterQC ----
+  DE_scaterQCTab = shinydashboard::tabItem(
+    "DE_scaterQC",
+    shinydashboardPlus::box(
+      title = "Quality control plot from the scater package", solidHeader = TRUE, 
+      width = 12, status = "primary", height = "1627px",
+      fluidRow(
+        column(10, offset = 0,
+*               actionButton("runScater", "apply changes", width = "40%"),
+*               actionButton("stopScater", "stop calculations", width = "40%", class = "btn-danger")
+        ),
+        column(width = 2,
+               sc_numericInput("maxMemory", "max memory to be used in GB",
+                               min = 1, max = 2000, step = 1, value = 2))
+      )
+    )
+  )
+```
+
+
+
+## reactives.R
+
+### using callr for killable processes
+
+
+## outputs.R
+
+## list of available reactives
+
+### scEx
+### scEx_log
