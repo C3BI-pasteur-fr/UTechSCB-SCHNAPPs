@@ -725,7 +725,6 @@ inputData <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("inputData", id = "inputData", duration = NULL)
   }
-  
   inFile <- dataFile()
   annFile <- input$annoFile
   sampleCells <- input$sampleInput

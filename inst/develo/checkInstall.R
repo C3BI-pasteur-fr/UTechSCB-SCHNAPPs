@@ -10,9 +10,45 @@
 
 # brew install poppler librsvg rust leptonica
 
-install.packages("Rcpp", build = T,type = "source", upgrade = "always")
+
+
 install.packages("devtools", build = T,type = "source", upgrade = "always")
 install.packages("BiocManager")
+
+# this needs FC defined in Makevars (nothing else works)
+install.packages("mnormt", 
+                 dependencies  = TRUE, 
+                 build = T,
+                 type = "source", 
+                 upgrade = "always",
+                 configure.args  = "FC=/usr/local/bin/gfortran",
+                 verbose = T
+)
+
+# FC=/usr/local/bin/gfortran-13 
+# F77=/usr/local/bin/gfortran-13 
+
+install.packages("psychTools", 
+                 dependencies  = TRUE, 
+                 build = T,
+                 type = "source", 
+                 upgrade = "always",
+                 configure.args  = "FC=/usr/local/bin/gfortran",
+                 verbose = T
+)
+
+remotes::install_github("satijalab/seurat", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+remotes::install_github("satijalab/seurat-data", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+BiocManager::install("scran", dependencies  = TRUE, build = T, update = TRUE, ask = F, type = "source", upgrade = "always")
+devtools::install_github("kassambara/ggpubr", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+
+‘psychTools’, ‘Seurat’, ‘scran’, ‘ggpubr’ are not available for package ‘SCHNAPPs’
+Warning messages:
+  1: packages ‘multtest’, ‘limma’, ‘monocle’, ‘rtracklayer’, ‘MAST’ are not available for this version of R
+
+
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE, build = T,type = "source", upgrade = "always")
+
 
 # 
 # 
@@ -58,8 +94,6 @@ remotes::install_github("bnprks/BPCells", build = T,type = "source", upgrade = "
 # remotes::install_github("satijalab/azimuth", "seurat5", quiet = TRUE)
 # remotes::install_github("satijalab/seurat-wrappers", "seurat5", quiet = TRUE)
 # remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)
-remotes::install_github("satijalab/seurat", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
-remotes::install_github("satijalab/seurat-data", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 remotes::install_github("satijalab/azimuth", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 remotes::install_github("satijalab/seurat-wrappers", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 remotes::install_github("stuart-lab/signac", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
@@ -84,30 +118,30 @@ checkIfLibrariesInstalled <- function() {
               "cowplot", "crayon", "debugme", "dendsort", "DESeq2",  "devtools", 
               "digest", "doParallel", "dplyr", "DT", "edgeR", "evaluate", "future",
               "GenomeInfoDb", "GenomicRanges", "ggalluvial", "ggnetwork", "ggplot2",
-              "ggplotify", "ggpubr", "glue", "GSEABase", "GSVA", "gtools", "hdf5r",
+              "ggplotify", "ggpubr", "glue",  "gtools", "hdf5r",
               "heatmaply", "Hmisc", "hms", "igraph",  
               "IRanges", "irlba", "kableExtra", "knitr", "kohonen", 
-              "limma", "magrittr", "manhattanly", "MASS", "MAST", "Matrix", "mclust",
-              "monocle", "multtest", "network", "orca", "parallel", "pdftools", 
+              "limma", "magrittr", "manhattanly", "MASS", "Matrix", "mclust",
+              "network", "orca", "parallel", "pdftools", 
               "pheatmap", "plotly", "plyr", "profvis", "pryr", "psychTools", 
               "RColorBrewer", "reactlog", "reactlog", "reshape2", "rintrojs", 
-              "rmarkdown", "Rsomoclu", "rtracklayer", "Rtsne", "S4Vectors", "scater",
-              "scDEA", "SCHNAPPs", "scran", "Seurat", "shiny", "shinyBS", 
+              "rmarkdown", "Rsomoclu", "Rtsne", "S4Vectors", "scater",
+               "SCHNAPPs", "scran", "Seurat", "shiny", "shinyBS", 
               "shinycssloaders", "shinydashboard", "shinydashboardPlus", "shinyjqui",
               "shinyjs",  "shinytest", "shinythemes", "shinyTree",
-              "shinyWidgets", "SIMLR", "SingleCellExperiment", "SingleR", "spatstat", 
-              "stringr", "SummarizedExperiment", "Tempora", "threejs", "tibble", 
-              "tidyr", "tidySingleCellExperiment", "tidyverse", "tools", "uwot", 
-              "Wind", "xbioc") 
+              "shinyWidgets", "SIMLR", "SingleCellExperiment",  "spatstat", 
+              "stringr", "SummarizedExperiment",  "threejs", "tibble", 
+              "tidyr", "tidySingleCellExperiment", "tidyverse", "tools", "uwot"
+              ) 
   
 
-  
+   
   missing = pkgList[!pkgList %in% installed.packages()]
   if(length(missing) == 0) {
     print("all should be good")
   } else {
     print(paste("The following packages are missing:" , missing))
-    install.packages(missing, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+    install.packages(missing, dependencies = NULL, build = T,type = "source", upgrade = "always")
   }
   for (pg in pkgList){
     library(pg,character.only = TRUE)
@@ -123,7 +157,7 @@ devtools::install_github("cysouw/qlcMatrix")
 devtools::install_github("Zhangxf-ccnu/scDEA")
 
 
-biocList = c('BiocSingular', 'SingleR', 
+biocList = c('BiocSingular', 'SingleR', "GSEABase", "GSVA","MAST", "monocle", "multtest", "rtracklayer", "scDEA", "SingleR", "Tempora", "Wind", "xbioc",
              'multtest', 'limma', 'Biobase', 'monocle', 'rtracklayer', 
              'IRanges', 'GenomeInfoDb', 'GenomicRanges', 'BiocGenerics',
              'DESeq2', 'MAST', 'SingleCellExperiment', 'SummarizedExperiment',
@@ -131,10 +165,11 @@ biocList = c('BiocSingular', 'SingleR',
              )
 BiocManager::install(biocList, dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
 BiocManager::install("GSVA", dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install("InteractiveComplexHeatmap", dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
 
 gitList = c('briatte/ggnetwork', 'mul118/shinyMCE',
             'RausellLab/CelliD',
-            'C3BI-pasteur-fr/TemporaFork', 'C3BI-pasteur-fr/UTechSCB-SCHNAPPs',
+            'BaderLab/Tempora', 'C3BI-pasteur-fr/UTechSCB-SCHNAPPs',
             'Albluca/distutils', 'Albluca/ElPiGraph.R'
             )
 devtools::install_github(gitList, dependencies = T)
@@ -147,6 +182,12 @@ gList = c('ggnetwork', 'shinyMCE',
             'distutils', 'ElPiGraph.R'
 )
 
+for (pg in gList) {
+  require (`pg`,character.only = T)
+}
+
+BiocManager::install("GSEABase")
+BiocManager::install("GSVA")
 
 instList = c('BiocManager', 'pdftools',
              'shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r',
@@ -158,6 +199,7 @@ instList = c('BiocManager', 'pdftools',
 # devtools::install_version('spatstat', version = '1.64-1', repos = 'http://cran.us.r-project.org')
 # update / reinstall macports https://trac.macports.org/wiki/Migration
 
+install.packages("RJSONIO")
 
 devtools::install_github("briatte/ggnetwork", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 devtools::install_github("mul118/shinyMCE",  dependencies = TRUE, build = T,type = "source", upgrade = "always")
@@ -165,8 +207,7 @@ devtools::install_github("mul118/shinyMCE",  dependencies = TRUE, build = T,type
 # BiocManager::install("destiny")
 # devtools::install_github("theislab/destiny", ref = "legacy", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 devtools::install_github("RausellLab/CelliD", ref = "legacy", dependencies = TRUE, build = T,type = "source", upgrade = "always")
-devtools::install_github("C3BI-pasteur-fr/TemporaFork", dependencies = TRUE, build = T,type = "source", upgrade = "always")
-devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE, build = T,type = "source", upgrade = "always")
+# devtools::install_github("C3BI-pasteur-fr/TemporaFork", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 devtools::install_github("Albluca/distutils", dependencies = TRUE, build = T,type = "source", upgrade = "always") 
 devtools::install_github("Albluca/ElPiGraph.R", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 devtools::install_github("rcannood/SCORPIUS", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always")
@@ -212,10 +253,14 @@ install.packages("igraph")
 # R_OPENMP_CFLAGS = -fopenmp
 # R_OPENMP_FFLAGS = -fopenmp
 
-
+LDFLAGS="-L/usr/local/opt/llvm/lib/c++ -Wl,-rpath,/usr/local/opt/llvm/lib/c++"
+echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> /Users/bernd/.bash_profile
+export LDFLAGS="-L/usr/local/opt/llvm/lib"
+export CPPFLAGS="-I/usr/local/opt/llvm/include"
+echo 'export PATH="/usr/local/opt/cython/bin:$PATH"' >> /Users/bernd/.bash_profile
 
 openmpPacks = c("RcppEigen", "RcppML", "BH", "Rcpp", "RcppArmadillo", "RcppEigen", "RcppProgress",
-                "RhpcBLASctl", "data.table", "dqrng", "magick", "mgcv", 
+                "RhpcBLASctl", "data.table", "dqrng", "magick", "mgcv", "Matrix", "Rtsne"
                 "packrat", "renv", "sitmo")
 
 install.packages(
@@ -225,11 +270,13 @@ install.packages(
 )
 
 install.packages(openmpPacks, build = T,type = "source", upgrade = "always")
-problems = c( "magick")
+problems = c( "Rtsne")
 install.packages(problems, build = T,type = "source", upgrade = "always",verbose = T,keep_outputs = T)
 
 devtools::install_github("zdebruine/RcppML", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T) 
 devtools::install_github("zdebruine/singlet", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
 
-devtools::install_github("jkrijthe/Rtsne", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
+devtools::install_github("jkrijthe/Rtsne", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T,
+                         configure.vars = "CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++",
+                         configure.args = "--with-openmp",verbose = T)
 

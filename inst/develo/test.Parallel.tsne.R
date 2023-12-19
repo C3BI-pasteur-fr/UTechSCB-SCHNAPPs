@@ -1,15 +1,14 @@
-# library(SCHNAPPs)
+ library(SCHNAPPs)
 library(Rtsne)
 library(SingleCellExperiment)
-cp = load(file='~/SCHNAPPsDebug/tsne.RData')
-np=15
+# cp = load(file='~/SCHNAPPsDebug/tsne.RData')
+
+counts <- matrix(rpois(150000, 5), nrow = 10000, ncol = 15)
 start_time <- Sys.time()
 t=Rtsne::Rtsne(
-  pca$x[, 1:np],
-  pca = FALSE, dims = gQC_tsneDim,
-  perplexity = gQC_tsnePerplexity,
-  theta = gQC_tsneTheta,
-  check_duplicates = FALSE, num_threads = 0
+  counts,
+  pca = FALSE, dims = 3,
+  num_threads = 0
 )
 end_time <- Sys.time()
 end_time - start_time
