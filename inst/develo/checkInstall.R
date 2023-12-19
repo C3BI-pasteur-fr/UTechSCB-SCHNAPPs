@@ -138,6 +138,7 @@ gitList = c('briatte/ggnetwork', 'mul118/shinyMCE',
             'Albluca/distutils', 'Albluca/ElPiGraph.R'
             )
 devtools::install_github(gitList, dependencies = T)
+devtools::install_github('RausellLab/CelliD', dependencies = T)
 
 # devtools::install_version("Matrix",version = "1.6.1.1")
 
@@ -231,5 +232,6 @@ install.packages(problems, build = T,type = "source", upgrade = "always",verbose
 devtools::install_github("zdebruine/RcppML", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T) 
 devtools::install_github("zdebruine/singlet", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
 
-devtools::install_github("jkrijthe/Rtsne", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
+devtools::install_github("jkrijthe/Rtsne",
+                         build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
 

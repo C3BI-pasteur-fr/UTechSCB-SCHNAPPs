@@ -20,6 +20,7 @@ Imports:
     psychTools,
     pryr,
     colourpicker,
+    BPCells,
     digest,
     memoise,
     Seurat,

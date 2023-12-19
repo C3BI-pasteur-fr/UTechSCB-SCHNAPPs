@@ -451,7 +451,8 @@ scranFindMarkerFullReactiveTable <- reactive({
     scran::findMarkers(scEx_log, 
                        projections$dbCluster,
                        direction = direction,
-                       lfc = lfc)
+                       lfc = lfc,
+                       BPPARAM = BiocParallel::bpparam())
     
     
     

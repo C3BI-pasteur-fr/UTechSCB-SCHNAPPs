@@ -6,7 +6,7 @@ suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(dplyr))
-
+suppressMessages(require(BPCells))
 suppressMessages(require(ggalluvial))
 library(SingleCellExperiment)
 # require(tidySingleCellExperiment)
@@ -1879,7 +1879,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     removeNotification(id = "pcawarning2")
     removeNotification(id = "pcawarning3")
   }
-  
+  # browser()
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
   }
@@ -2000,39 +2000,25 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "CsparseMatrix")
     }
-    x <- assays(scEx_log)[["logcounts"]]
+    # x <- assays(scEx_log)[["logcounts"]]
     genesin = genesin[genesin %in% rownames(scEx_log)]
-    x <- as.matrix(x)[genesin, , drop = FALSE]
-    # if (maxGenes > 0) {
-    #   maxGenes = min(maxGenes, length(genesin))
-    #   keep1 <- order(rv, decreasing = TRUE)[1:maxGenes]
-    #   genesin = genesin[keep1]
-    #   x = as.matrix(x)[keep1, , drop = FALSE]
-    #   rv <- rowVars((as.matrix(x)))
-    #   keep <- rv >= 1e-8
-    #   x <- x[keep,,drop=FALSE]
-    #   rv <- rowVars((as.matrix(x)))
-    # }
-    ## This is not being in Seurat
-    # if (scale) {
-    #   rv <- rowVars((as.matrix(x)))
-    #   x <- x/sqrt(rv)
-    #   # rv <- rep(1, nrow(x))
-    # }
+    # x <- x[genesin, , drop = FALSE]
+    mi = BPCells::write_matrix_memory(assays(scEx_log)[["logcounts"]][genesin,], compress = F)
     if (scale | center) {
       set.seed(1)
-      x <- Seurat::ScaleData(x, do.scale = scale, do.center = center, verbose = T)
-      genesin = rownames(x) # ScaleData can remove genes.
+      mi <- Seurat::ScaleData(mi, do.scale = scale, do.center = center, verbose = T)
+      genesin = rownames(mi) # ScaleData can remove genes.
     }
     if (useSeuratPCA){
       # Seurat:
-      reductObj = RunPCA(x, npcs = rank, verbose = FALSE, assay = "RNA")
+      reductObj = RunPCA(mi, npcs = rank, verbose = FALSE, assay = "RNA")
       pca = list()
       pca$rotation = Loadings(reductObj)
       pca$x = Embeddings(reductObj)
       pca$sdev = Stdev(reductObj)
     } else {
       # # scran:
+      x <- assays(scEx_log)[["logcounts"]][genesin,]
       x <- t(x)
       pca <- runPCA(x, rank=rank, get.rotation=TRUE)
     }
@@ -2099,6 +2085,7 @@ pcaReact <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
+  # browser()
   scEx <- scEx()
   scEx_log <- scEx_log()
   # only redo calculations if button is pressed.
@@ -2808,6 +2795,7 @@ projections <- reactive({
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
   # .schnappsEnv$DEBUGSAVE = T
+
   scEx <- scEx()
   printTimeEnd(start.time, "projections scEx")
   pca <- pcaReact()
