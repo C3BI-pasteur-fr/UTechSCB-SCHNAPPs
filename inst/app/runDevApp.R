@@ -17,12 +17,12 @@ library(reactlog)
 # }
 #
 library(future)
-# plan("multisession", workers = 3)
-plan(callr, workers = 3
-     )
+plan("multisession", workers = 12)
+# plan(callr, workers = 3
+#      )
 
 library("BiocParallel")
-register(MulticoreParam(9))
+register(MulticoreParam(12))
 # register(SerialParam())
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/working/"

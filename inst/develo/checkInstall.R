@@ -173,6 +173,7 @@ gitList = c('briatte/ggnetwork', 'mul118/shinyMCE',
             'Albluca/distutils', 'Albluca/ElPiGraph.R'
             )
 devtools::install_github(gitList, dependencies = T)
+devtools::install_github('RausellLab/CelliD', dependencies = T)
 
 # devtools::install_version("Matrix",version = "1.6.1.1")
 
