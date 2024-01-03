@@ -175,7 +175,7 @@ myNormalizationParameters <- list(
 )
 
 # DE_seuratRefBasedFunc ----
-DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100, 
+DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 100, 
                                   keep.features = "",
                                   splitby = NULL) {
   require(Seurat)
@@ -212,7 +212,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
         # meta.data = meta.data[limitCells,, drop = FALSE]
       }
       seurDat <- CreateSeuratObject(
-        counts = assays(scEx)[[1]],
+        counts = scExMat,
         meta.data = meta.data
       )
       seur.list <- SplitObject(seurDat, split.by = splitby)
@@ -232,6 +232,7 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
       }
       
       features = unique(c(features, keep.features))
+      features = lapply(seur.list, row.names) %>% Reduce(intersect, .) 
       
       seur.list <- PrepSCTIntegration(
         object.list = seur.list, anchor.features = features,
@@ -261,9 +262,9 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
         )
         # return matrix object!!!
-        integrated@assays$integrated@scale.data
+        integrated[["integrated"]]$scale.data  %>% as.matrix()
       } else {
-        seur.list[[1]]@assays$SCT@scale.data 
+        seur.list[[1]][["SCT"]]$scale.data  %>% as.matrix()
       }
       
       # integrated <- NormalizeData(integrated, verbose = TRUE)
@@ -279,11 +280,11 @@ DE_seuratRefBasedFunc <- function(scEx, nfeatures = 3000, k.filter = 100,
       # FeaturePlot(integrated, c("CCR7", "S100A4", "GZMB", "GZMK", "GZMH"))
     },
     error = function(e) {
-      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\nNeed multiple samples", e, "\n\n"))
+      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\ncheck console", e, "\n\n"))
       return(NULL)
     }
   )
-  if (is.null(integrated)) {
+  if (is.null(A)) {
     return(NULL)
   }
   scEx_bcnorm <- SingleCellExperiment(
@@ -313,7 +314,8 @@ DE_seuratRefBased <- reactive({
     showNotification("DE_seuratRefBased", id = "DE_seuratRefBased", duration = NULL)
   }
   
-  scEx <- scEx()
+  scExMat <- BPCellsCounts()
+  scEx <-scEx()
   runThis <- DE_seuratRefBasedButton()
   nfeatures <- isolate(input$DE_seuratRefBased_nfeatures)
   k.filter <- isolate(input$DE_seuratRefBased_k.filter)
@@ -338,8 +340,7 @@ DE_seuratRefBased <- reactive({
   
   
   # # TODO ?? define scaling factor somewhere else???
-  # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratRefBasedFunc(scEx = scEx, nfeatures = nfeatures, k.filter = k.filter, 
+  retVal <- DE_seuratRefBasedFunc(scEx = scEx, scExMat = scExMat, nfeatures = nfeatures, k.filter = k.filter, 
                                   # scalingFactor = scalingFactor,
                                   keep.features = geneid,
                                   splitby = splitby)
@@ -355,13 +356,14 @@ DE_seuratRefBased <- reactive({
   shinyjs::addClass("updateNormalization", "green")
   
   exportTestValues(DE_seuratSCtransform = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal,"logcounts")
   })
   return(retVal)
 })
 
 # DE_seuratSCtransformFunc =======
 DE_seuratSCtransformFunc <- function(scEx, 
+                                     scExMat,
                                      nhvg = 3000, 
                                      nfeatures = 3000,
                                      vars2regress = "", 
@@ -410,7 +412,7 @@ DE_seuratSCtransformFunc <- function(scEx,
         meta.data[,vars2regress] = colData(scEx)[,vars2regress]
       }
       seurDat <- CreateSeuratObject(
-        counts = assays(scEx)[[1]],
+        counts = scExMat,
         meta.data = meta.data
       )
       
@@ -478,7 +480,7 @@ DE_seuratSCtransformFunc <- function(scEx,
   if (is.null(A)) {
     return(NULL)
   }
-  
+  A=as.matrix(A)
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -508,6 +510,7 @@ DE_seuratSCtransform <- reactive({
   }
   
   scEx <- scEx()
+  scExMat <- BPCellsCounts()
   runThis <- DE_seuratSCtransformButton()
   nhvg <- isolate(input$DE_seuratSCtransform_nhvg)
   nfeatures <- isolate(input$DE_seuratSCtransform_nfeatures)
@@ -538,6 +541,7 @@ DE_seuratSCtransform <- reactive({
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
   retVal <- DE_seuratSCtransformFunc(scEx = scEx, 
+                                     scExMat = scExMat,
                                      nhvg = nhvg, 
                                      vars2regress = vars2regress, 
                                      nfeatures = nfeatures, 
@@ -561,14 +565,14 @@ DE_seuratSCtransform <- reactive({
   
   shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratSCtransform = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
 })
 
 
 # DE_seuratStandardfunc ----
-DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.weight = 100, 
+DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF = 200, k.weight = 100, 
                                   splitby = "sampleNames") {
   require(Seurat)
   cellMeta <- colData(scEx)
@@ -604,7 +608,8 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
         # meta.data = meta.data[limitCells,, drop = FALSE]
       }
       seurDat <- CreateSeuratObject(
-        counts = assays(scEx)[[1]],
+        # BPCells not compatible with RunCCA
+        counts = assay(scEx, "counts"),
         meta.data = meta.data
       )
       seur.list <- SplitObject(seurDat, split.by = splitby)
@@ -633,9 +638,9 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
         
         # Run the standard workflow for visualization and clustering
         integrated <- Seurat::ScaleData(integrated, verbose = DEBUG)
-        integrated@assays$integrated$scale.data
+        integrated[["integrated"]]["scale.data"]
       } else {
-        seur.list[[1]]@assays$RNA$counts
+        seur.list[[1]][["RNA"]]$counts
       }
       # integrated@assays
       # NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
@@ -648,7 +653,7 @@ DE_seuratStandardfunc <- function(scEx, dims = 10, anchorsF = 2000, kF = 200, k.
   if (is.null(A)) {
     return(NULL)
   }
-  # A <- seurDat@assays$integrated@data
+  A <- as.matrix(A)
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -676,6 +681,7 @@ DE_seuratStandard <- reactive({
   }
   
   scEx <- scEx()
+  scExMat <- BPCellsCounts()
   runThis <- DE_seuratStandardButton()
   
   sDims <- isolate(input$DE_seuratStandard_dims)
@@ -699,7 +705,8 @@ DE_seuratStandard <- reactive({
   
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratStandardfunc(scEx = scEx, dims = sDims, 
+  retVal <- DE_seuratStandardfunc(scEx = scEx, scExMat,
+                                  dims = sDims, 
                                   anchorsF = anchorF, kF = kF, 
                                   k.weight = k.weight, splitby = splitby)
   
@@ -715,7 +722,7 @@ DE_seuratStandard <- reactive({
   
   shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratStandard = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
 })
@@ -742,6 +749,7 @@ DE_seuratSCTnorm <- reactive({
   }
   
   scEx <- scEx()
+  scExMat <- BPCellsCounts()
   runThis <- DE_seuratSCTnormButton()
   nHVG =  isolate(input$DE_seuratSCTnorm_nHVG)
   var2reg =  isolate(input$DE_seuratSCTnorm_var2reg)
@@ -763,7 +771,7 @@ DE_seuratSCTnorm <- reactive({
   
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratSCTnormfunc(scEx = scEx, nHVG, var2reg)
+  retVal <- DE_seuratSCTnormfunc(scEx = scEx, scExMat, nHVG, var2reg)
   
   if (is.null(retVal)) {
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
@@ -771,12 +779,12 @@ DE_seuratSCTnorm <- reactive({
   
   shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratSCTnorm = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
 })
 
-DE_seuratSCTnormfunc <- function(scEx, nHVG, var2reg) {
+DE_seuratSCTnormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   require(Seurat)
   # save(file = "~/SCHNAPPsDebug/DE_seuratSCTnormf.RData", list = c(ls()))
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratSCTnormf.RData")
@@ -819,7 +827,7 @@ DE_seuratSCTnormfunc <- function(scEx, nHVG, var2reg) {
   seurDat <- tryCatch(
     {
       seurDat <- CreateSeuratObject(
-        counts = assays(scEx)[[1]],
+        counts = scExMat,
         meta.data = as.data.frame(cellMeta)
       )
     },
@@ -837,7 +845,7 @@ DE_seuratSCTnormfunc <- function(scEx, nHVG, var2reg) {
                          verbose = DEBUG) 
   
   
-  A <- seurDat[["SCT"]]@scale.data
+  A <- seurDat[["SCT"]]@scale.data %>% as.matrix()
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -870,6 +878,7 @@ DE_seuratLogNorm <- reactive({
     showNotification("DE_seuratLogNorm", id = "DE_seuratLogNorm", duration = NULL)
   }
   
+  scExMat <- BPCellsCounts()
   scEx <- scEx()
   runThis <- DE_seuratLogNormButton()
   nHVG = 3000
@@ -894,16 +903,16 @@ DE_seuratLogNorm <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratStandard.RData", list = c(ls()))
+    save(file = "~/SCHNAPPsDebug/DE_seuratLogNorm.RData", list = c(ls()))
   }
-  # cp = load(file="~/SCHNAPPsDebug/DE_seuratStandard.RData")
+  # cp = load(file="~/SCHNAPPsDebug/DE_seuratLogNorm.RData")
   
   # make sure only factors are used.
   var2reg = var2reg[var2reg %in% names(Filter(is.factor, colData(scEx)))]
   
   # # TODO ?? define scaling factor somewhere else???
   # sfactor = max(max(assays(scEx)[["counts"]]),1000)
-  retVal <- DE_seuratLogNormfunc(scEx = scEx, nHVG, var2reg)
+  retVal <- DE_seuratLogNormfunc(scEx = scEx, scExMat = scExMat, nHVG, var2reg)
   
   if (is.null(retVal)) {
     showNotification("An error occurred during Seurat normalization, please check console", id = "DE_seuratError", duration = NULL, type = "error")
@@ -911,16 +920,15 @@ DE_seuratLogNorm <- reactive({
   
   shinyjs::addClass("updateNormalization", "green")
   exportTestValues(DE_seuratLogNorm = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
 })
 
-DE_seuratLogNormfunc <- function(scEx, nHVG, var2reg) {
+DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   require(Seurat)
   # save(file = "~/SCHNAPPsDebug/DE_seuratStandardf.RData", list = c(ls()))
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratStandardf.RData")
-  
   cellMeta <- colData(scEx)
   # split in different samples
   meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
@@ -957,10 +965,11 @@ DE_seuratLogNormfunc <- function(scEx, nHVG, var2reg) {
     # scEx = scEx[, limitCells]
     # meta.data = meta.data[limitCells,, drop = FALSE]
   }
+ 
   seurDat <- tryCatch(
     {
       seurDat <- CreateSeuratObject(
-        counts = assays(scEx)[[1]],
+        counts = scExMat,
         meta.data = as.data.frame(cellMeta)
       )
     },
@@ -981,7 +990,7 @@ DE_seuratLogNormfunc <- function(scEx, nHVG, var2reg) {
   seurDat = Seurat::ScaleData(object = seurDat,
                               vars.to.regress = var2reg)
   
-  A <- seurDat[["RNA"]]@scale.data
+  A <- seurDat[["RNA"]]["scale.data"] %>% as.matrix()
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -1036,7 +1045,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
   # load(file="~/SCHNAPPsDebug/DE_logGeneNormalization.RData")
   
   # TODO ?? define scaling factor somewhere else???
-  sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
+  sfactor <- max(max(assay(scEx, "counts")), 1000)
   retVal <- DE_logNormalizationGenefunc(scEx, inputGenes)
   
   if (is.null(retVal)) {
@@ -1053,7 +1062,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
   #used for DGE for some of the methods
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logGeneNormalization = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
 })
@@ -1140,7 +1149,7 @@ DE_scaterNormalization <- reactive(label = "scaterNorm", {
   # cp=load(file="~/SCHNAPPsDebug/DE_scaterNormalization.RData")
   
   # TODO ?? define scaling factor somewhere else???
-  sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
+  sfactor <- max(max(assay(scEx, "counts")), 1000)
   retVal <- DE_scaterNormalizationfunc(scEx)
   
   # turn normalization button green
@@ -1148,7 +1157,7 @@ DE_scaterNormalization <- reactive(label = "scaterNorm", {
   
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_scaterNormalization = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
   
@@ -1191,7 +1200,7 @@ DE_scaterNormalizationfunc <- function(scEx) {
   scEx <- computeSumFactors(scEx, clusters=clusters)
   
   sce <- scuttle::logNormCounts(scEx)
-  assays(sce)['counts'] = NULL
+  assay(sce, "counts") = NULL
   return(sce)
 }
 
@@ -1236,7 +1245,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   
   .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logNormalization = {
-    assays(retVal)[["logcounts"]]
+    assay(retVal, "logcounts")
   })
   return(retVal)
 })

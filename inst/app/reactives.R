@@ -1778,10 +1778,10 @@ scEx_log_Hash <- reactive({
     cat(file = stderr(), "scEx_log_Hash started.\n")
   }
   scEx_log <- scEx_log()
-    require(digest)
-    if (is.null(scEx_log)) {
-      return(NULL)
-    }
+  require(digest)
+  if (is.null(scEx_log)) {
+    return(NULL)
+  }
   hash = sha1(as.matrix(assays(scEx_log)[[1]]))
   if (DEBUG) {
     cat(file = stderr(), "scEx_log_Hash ended\n")
@@ -2447,17 +2447,42 @@ scran_Cluster <- function(){
   return(retVal)
 }
 
+BPCellsLog <- reactive({
+  scEx_log = scEx_log()
+  mi = BPCells::write_matrix_memory(assay(scEx_log, "logcounts"), compress = F)
+  return(mi)
+})
+
+
+BPCellsCounts <- reactive({
+  scEx = scEx()
+  mi = BPCells::write_matrix_memory(assay(scEx, "counts"), compress = F)
+  return(mi)
+})
+
+
 # Seurat clustering ----
 runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution) {
   # creates object @assays$RNA@data and @assays$RNA@counts
-  seurDat <- CreateSeuratObject(
-    counts = assays(scEx)[[1]],
-    meta.data = meta.data
-  )
+  seurDat <- NULL
+  if(is(scEx,"SingleCellExperiment")){
+    seurDat <- CreateSeuratObject(
+      counts = as(assays(scEx)[[1]], "CsparseMatrix"),
+      meta.data = meta.data
+    )
+  }else{
+    if(is(scEx,"BPCells")){
+      seurDat <- CreateSeuratObject(
+        counts = scEx,
+        meta.data = meta.data
+      )
+    }
+  }
   # bowser()
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA$counts) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
-  seurDat@assays$RNA$counts = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  useGenes = which(rownames(seurDat[["RNA"]]$counts) %in% rownames(scEx))
+  # seurDat[["RNA"]]$counts = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  seurDat = seurDat[useGenes,]
   dims = min(dims,ncol(pca$x)) 
   
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
@@ -2504,6 +2529,7 @@ seurat_Clustering <- function() {
   }
   
   scEx = scEx() # need to be run when updated
+  scExMat <- BPCellsCounts()
   scEx_log = scEx_log()
   pca = pcaReact()
   tabsetCluster = isolate(input$tabsetCluster)
@@ -2531,7 +2557,7 @@ seurat_Clustering <- function() {
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
   # browser()
-   retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
+  retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
   # runSeuratClustering(scEx, meta.data, dims, pca, k.param, resolution)
   
   setRedGreenButton(
@@ -2865,7 +2891,7 @@ projections <- reactive({
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
   # .schnappsEnv$DEBUGSAVE = T
-
+  
   scEx <- scEx()
   printTimeEnd(start.time, "projections scEx")
   pca <- pcaReact()
@@ -2916,7 +2942,7 @@ projections <- reactive({
     pcax = pca$x
     comColNames = colnames(projections) %in% colnames(pcax)
     if(any(comColNames)){
-    colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
+      colnames(projections)[comColNames] = paste0(colnames(projections)[comColNames], ".old")
     }
     if (!all(c(rownames(pcax) %in% rownames(projections) , 
                rownames(projections) %in% rownames(pcax)))){
