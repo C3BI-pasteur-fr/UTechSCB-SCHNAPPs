@@ -1859,7 +1859,78 @@ scExLogMatrixDisplay <- reactive({
 })
 
 # pcaFunc ----
-pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, rmGenes=c(), featureData, pcaN, maxGenes = 1000, hvgSelection, inputNormalization="DE_something") {
+#' Principal Component Analysis (PCA) Function
+#'
+#' This function performs Principal Component Analysis (PCA) on single-cell RNA-seq data.
+#'
+#' @param scEx A SingleCellExperiment object containing the raw expression data.
+#' @param scEx_log A SingleCellExperiment object containing the log-transformed expression data.
+#' @param rank The number of principal components to compute.
+#' @param center Logical, indicating whether to center the data.
+#' @param scale Logical, indicating whether to scale the data.
+#' @param useSeuratPCA Logical, indicating whether to use Seurat's PCA method. If FALSE, scran's PCA method will be used.
+#' @param pcaGenes A character vector of gene names to include in the analysis.
+#' @param rmGenes A character vector of gene names to exclude from the analysis.
+#' @param featureData A DataFrame containing gene-related metadata.
+#' @param pcaN The maximum number of genes to use for PCA.
+#' @param maxGenes The maximum number of genes to consider in variable gene selection.
+#' @param hvgSelection The method for selecting highly variable genes ("vst", "mvp", "disp", or "getTopHVGs").
+#' @param inputNormalization The method of input data normalization ("DE_something", "DE_seuratSCTnorm", etc.).
+#'
+#' @return A list containing the PCA results, including 'x' (PCA coordinates), 'var_pcs' (standard deviations), and 'rotation' (loadings).
+#'
+#' @details This function performs PCA on single-cell RNA-seq data using either Seurat's PCA method or scran's PCA method, depending on the value of `useSeuratPCA`. It allows you to specify various parameters for PCA analysis and variable gene selection.
+#'
+#' @seealso \code{\link{SingleCellExperiment}}, \code{\link{FindVariableFeatures}}, \code{\link{ScaleData}}, \code{\link{RunPCA}}, \code{\link{runPCA}}
+#'
+#' @examples
+#' \dontrun{
+#' # Load required libraries and create mock data
+#' library(SingleCellExperiment)
+#' scEx <- SingleCellExperiment(assays = list(logcounts = matrix(rnorm(100), nrow = 10)))
+#' scEx_log <- scEx
+#' rank <- 3
+#' center <- FALSE
+#' scale <- FALSE
+#' useSeuratPCA <- TRUE
+#' pcaGenes <- colnames(assays(scEx)[["logcounts"]])
+#' rmGenes <- c()
+#' featureData <- rowData(scEx)
+#' pcaN <- 10
+#' maxGenes <- 1000
+#' hvgSelection <- "vst"
+#' inputNormalization <- "DE_something"
+#'
+#' # Perform PCA analysis
+#' result <- pcaFunc(
+#'   scEx,
+#'   scEx_log,
+#'   rank,
+#'   center,
+#'   scale,
+#'   useSeuratPCA,
+#'   pcaGenes,
+#'   rmGenes,
+#'   featureData,
+#'   pcaN,
+#'   maxGenes,
+#'   hvgSelection,
+#'   inputNormalization
+#' )
+#'
+#' # View PCA results
+#' str(result)
+#' }
+#'
+#' @export
+
+pcaFunc <- function(scEx, scEx_log, 
+                    rank, center, 
+                    cale, useSeuratPCA, 
+                    pcaGenes, rmGenes=c(), 
+                    featureData, pcaN, 
+                    maxGenes = 1000, hvgSelection, 
+                    inputNormalization="DE_something") {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1995,7 +2066,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   
   scaterPCA <- withWarnings({
     # not sure, but this works on another with TsparseMatrix
-    if (is(assays(scEx_log)[["logcounts"]], "TsparseMatrix")) {
+    if (!is(assays(scEx_log)[["logcounts"]], "CsparseMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "CsparseMatrix")
     }
