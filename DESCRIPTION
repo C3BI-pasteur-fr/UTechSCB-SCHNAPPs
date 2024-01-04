@@ -53,7 +53,10 @@ Remotes:
     Albluca/distutils,
     Albluca/ElPiGraph.R,
     BaderLab/Tempora,
-    RausellLab/CelliD
+    RausellLab/CelliD,
+    msraredon/Connectome,
+    cysouw/qlcMatrix,
+    Coolgenome/iTALK
 Suggests:
     tidyverse,
     ComplexHeatmap,
@@ -97,6 +100,7 @@ Suggests:
     spatstat,
     Tempora,
     threejs,
+    SingleCellSignalR,
     tidyverse,
     Wind,
     xbioc,

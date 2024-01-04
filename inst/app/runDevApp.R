@@ -46,7 +46,7 @@ historyPath = "demoHistory/hist_2023-May-11.12.43/"
 # historyPath = "demoHistory/hist_2023-May-03.15.50/"
 historyPath = "demoHistory/MPI/hist_2023-May-09.13.19/hist_2023-May-13.09.20/"
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-May-26.15.18/"
-historyPath = "/Volumes/LaCie2023/RStudio_history/liana/"
+historyPath = "~/RStudio_history/liana/"
 # historyPath = "demoHistory/celia/"
 # historyPath = "/Volumes/CBUtechsZeus/bernd/celia/hist_2023-May-15.09.49/"
 # historyPath = "demoHistory/MPI"
@@ -105,6 +105,7 @@ defaultValues = list()
 # defaultValues[["gQC_um_spread"]] = 6
 # defaultValues[["gQC_um_local_connectivity"]] = 2
 # defaultValues[["useSeuratPCA"]] = TRUE
+defaultValues[["sampleInput"]] = TRUE
 
 # defaultValues[["DE_panelplotids"]] = c("CD8A", "CD4", "CD8B", "FCER1G", "CCR7", "GZMK", "FoxP3", "GZMK", "GZMB", "CCR7", "LEF1", "CCL5", "VIM", "CCL5", "TCF7", "NKG7", "LGALs1", "NKG7", "SELL", "CST7", "ANXA2", "CST7", "IL7R", "HLA-DRB1", "KLRG1", "CD27", "CTLA4A")
 assign("defaultValues", defaultValues, envir = .schnappsEnv)

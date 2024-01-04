@@ -1,3 +1,21 @@
+###
+### Liana contributions UI elements
+###
+
+# Check if needed packages are installed, if not, don't show ui elements.
+# This should prevent the reactives etc from ever being executed.
+
+if(!"liana" %in% installed.packages()){
+  cat(file = stderr(), paste("please install liana:
+     remotes::install_github('saezlab/OmnipathR', dependencies = T)
+     remotes::install_github('saezlab/liana', dependencies = T)
+  "))
+  return(NULL)
+}
+require(liana)
+
+
+
 menuList <- list(
   shinydashboard::menuItem("Liana",
                            icon = icon("dashboard"),
@@ -6,7 +24,7 @@ menuList <- list(
   )
 )
 
-# SOMcluster ----
+# Liana ----
 tabList = list(
   shinydashboard::tabItem(
     "LianaBasic",
@@ -29,11 +47,11 @@ tabList = list(
                                      choices = c("dbCluster"), selected = defaultValue("Liana_idents_col", "dbCluster"))),
             column(width = 3, 
                    sc_selectizeInput(inputId = "Liana_resource", label = "resource(s) to be used by the methods", 
-                                     choices = c("OmniPath"), selected = defaultValue("Liana_resource", "OmniPath"))),
+                                     choices = liana::show_resources(), selected = defaultValue("Liana_resource", "OmniPath"))),
             column(width = 3, 
                    sc_selectizeInput(inputId = "Liana_method", label = "method(s) to be run via liana",
                                      multiple = T,
-                                     choices = c("natmi", "connectome", "logfc", "sca", "cellphonedb"), selected = defaultValue("Liana_method", "natmi"))),
+                                     choices = liana::show_methods() , selected = defaultValue("Liana_method", "natmi"))),
             column(width = 3,
                    sc_numericInput("Liana_min_cells", "minimum cell per cell identity to be considered for analysis",
                                    defaultValue("Liana_min_cells", 5),
@@ -45,21 +63,18 @@ tabList = list(
             # 
             # workers
             # number of workers to be called
-          )
+          ),
+          checkbsTT("Liana_idents_col"),
+          checkbsTT("Liana_resource"),
+          checkbsTT("Liana_method"),
+          checkbsTT("Liana_min_cells")
         ),
         
       ),
       br(),
-      fluidRow(
-        column(
-          width = 10,
-          tableSelectionUi("Liana_raw_TableMod")
-        )
-      ),
-      br(),
       fluidRow(column(
         12,
-        jqui_resizable(plotOutput("Liana_dotPlot")) # %>% withSpinner()
+        jqui_resizable(plotlyOutput("Liana_dotPlot")) # %>% withSpinner()
       )),
       br(),
       actionButton("save2Hist_Liana_dotPlot", "save to history"),
@@ -70,7 +85,25 @@ tabList = list(
       )),
       br(),
       actionButton("save2Hist_Liana_Heatmap", "save to history"),
-      br()
+      br(),
+      fluidRow(
+        column(
+          width = 10,
+          tableSelectionUi("Liana_raw_TableMod")
+        )
+      ),
+      br(),
+      fluidRow(column(width = 6, 
+             sc_selectizeInput(inputId = "Liana_method_show", label = "results to show",
+                               multiple = F,
+                               choices = c("none") , selected = defaultValue("none", "none")))
+             ),
+      fluidRow(
+        column(
+          width = 10,
+          tableSelectionUi("Liana_all_TableMod")
+        )
+      )
     )
     
   )

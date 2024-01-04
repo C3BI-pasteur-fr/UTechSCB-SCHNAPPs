@@ -568,6 +568,8 @@ sCA_dge <- reactive({
     showNotification("sCA_dge", id = "sCA_dge", duration = NULL)
     removeNotification(id = "dgewarning")
   }
+
+  selectedCells <- isolate(Liana_dataInput())
   
   scEx_log <- scEx_log()
   scEx <- scEx()
