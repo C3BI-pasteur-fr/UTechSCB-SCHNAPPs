@@ -1925,7 +1925,7 @@ scExLogMatrixDisplay <- reactive({
 #' @export
 
 pcaFunc <- function(scEx, scEx_log, 
-                    rank, center, 
+                    rank, center, scale,
                     cale, useSeuratPCA, 
                     pcaGenes, rmGenes=c(), 
                     featureData, pcaN, 

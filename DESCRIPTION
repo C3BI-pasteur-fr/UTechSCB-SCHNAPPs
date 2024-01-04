@@ -89,6 +89,7 @@ Suggests:
     network,
     pdftools,
     Rsomoclu,
+    glmGamPoi,
     rtracklayer,
     scDEA,
     shinytest,

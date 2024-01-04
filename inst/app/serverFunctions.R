@@ -1353,10 +1353,26 @@ add2history <- function(type, comment = "", input = input, ...) {
   if (DEBUG) cat(file = stderr(), paste0("add2history: ", type, "\n"))
   if (!exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "history path not set, not saving",
+        id = "noHistoryWARNING",
+        type = "warning",
+        duration = 20
+      )
+    }
     return(NULL)
   }
   if (is.null(.schnappsEnv$historyPath)) {
     # if this variable is not set we are not saving
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "history path NULL, not saving",
+        id = "noHistoryWARNING",
+        type = "warning",
+        duration = 20
+      )
+    }
     return(NULL)
   }
   # browser()

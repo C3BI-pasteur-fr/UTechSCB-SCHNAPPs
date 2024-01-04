@@ -8,7 +8,7 @@
 library(doParallel)
 library("future.callr")
 
-registerDoParallel(cores=3)
+registerDoParallel(cores=5)
 suppressMessages(require(shinyjqui))
 
 library(reactlog)
@@ -17,12 +17,12 @@ library(reactlog)
 # }
 #
 library(future)
-plan("multisession", workers = 12)
+plan("multisession", workers = 5)
 # plan(callr, workers = 3
 #      )
 
 library("BiocParallel")
-register(MulticoreParam(12))
+register(MulticoreParam(5))
 # register(SerialParam())
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/working/"
@@ -46,11 +46,12 @@ historyPath = "demoHistory/hist_2023-May-11.12.43/"
 # historyPath = "demoHistory/hist_2023-May-03.15.50/"
 historyPath = "demoHistory/MPI/hist_2023-May-09.13.19/hist_2023-May-13.09.20/"
 historyPath = "/Volumes/LaCie2022/RStudio_history/celia/hist_2023-May-26.15.18/"
+historyPath = "/Volumes/LaCie2023/RStudio_history/liana/"
 # historyPath = "demoHistory/celia/"
 # historyPath = "/Volumes/CBUtechsZeus/bernd/celia/hist_2023-May-15.09.49/"
 # historyPath = "demoHistory/MPI"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
-historyPath = NULL
+# historyPath = NULL
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
