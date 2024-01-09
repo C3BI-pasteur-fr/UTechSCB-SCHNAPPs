@@ -1023,15 +1023,23 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # cp = load(file="~/SCHNAPPsDebug/ob_colorParams.RData")
-  
+  # input = inputList
   # browser()
   lapply(names(projections), FUN = function(name){
     if(is.factor(projections[,name])){
-      if(length(levels(projections[,name]))>30) return(NULL)
+      if(length(levels(projections[,name]))>30) {
+        cat(file = stderr(), paste0(name, "factor", ">30 levels\n"))
+        return(NULL)
+      }
+      # browser()
       ccols <- lapply(levels(projections[,name]), function(i) {
         input[[paste0(name, ".col.", i)]]
       })
       ccols[ccols==""] = "#000000"
+      nullCol = lapply(ccols,is.null) %>% unlist()
+      if(any(nullCol)){
+        ccols[nullCol] = allowedColors[!allowedColors %in% unlist(ccols)][1:sum(nullCol)]
+      }
       # if not initialized
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
@@ -1051,13 +1059,14 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
         .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = unlist(ccols)
       }
     } else{
+      # browser()
       minMax = c("min","max")
       ccols <- lapply(minMax, function(i) {
         input[[paste0(name, ".col.", i)]]
       })
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
-          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("red", "blue")
+          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("#D4070F", "#1C1AAF")
         # if vector is named then complexheatmap thinks it is a factorial
         names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]] ) = NULL
         projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]

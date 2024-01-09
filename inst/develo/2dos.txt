@@ -10,7 +10,7 @@ check that those functions are using BPCells
 
 ###################################
 
-colors are not correctly updated
+OK??? colors are not correctly updated
 
 ###################################
 
