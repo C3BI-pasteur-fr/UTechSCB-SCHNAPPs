@@ -2449,14 +2449,27 @@ scran_Cluster <- function(){
 
 BPCellsLog <- reactive({
   scEx_log = scEx_log()
-  mi = BPCells::write_matrix_memory(assay(scEx_log, "logcounts"), compress = F)
+  req(scEx_log)
+  # browser()
+  if(!is(assay(scEx_log, "logcounts"),"dgCMatrix")){
+    m = as(assay(scEx_log, "logcounts"),"dgCMatrix")
+  }else{
+    m = assay(scEx_log, "logcounts")
+  }
+  mi = BPCells::write_matrix_memory(m, compress = F)
   return(mi)
 })
 
 
 BPCellsCounts <- reactive({
   scEx = scEx()
-  mi = BPCells::write_matrix_memory(assay(scEx, "counts"), compress = F)
+  req(scEx)
+  if(!is(assay(scEx, "counts"),"dgCMatrix")){
+    m = as(assay(scEx, "counts"),"dgCMatrix")
+  }else{
+    m = assay(scEx, "counts")
+  }
+  mi = BPCells::write_matrix_memory(m, compress = F)
   return(mi)
 })
 
@@ -2471,11 +2484,15 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
       meta.data = meta.data
     )
   }else{
-    if(is(scEx,"BPCells")){
-      seurDat <- CreateSeuratObject(
+    # if(is(scEx,"BPCells")){
+  if(is(scEx,"UnpackedMatrixMem_double")){
+    seurDat <- CreateSeuratObject(
         counts = scEx,
         meta.data = meta.data
       )
+  } else{
+    cat(file = stderr(), "Neither SingleCellExperiment nor UnpackedMatrixMem_double. \n")
+    stop()
     }
   }
   # bowser()
@@ -2493,7 +2510,7 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
   
   
   seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
-  seurDat <- FindClusters(seurDat, resolution = resolution)
+  seurDat <- FindClusters(seurDat, resolution = resolution, method = "igraph", algorithm=1 )
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
 }
@@ -2527,7 +2544,7 @@ seurat_Clustering <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("seurat_Clustering", id = "seurat_Clustering", duration = NULL)
   }
-  
+  # browser()
   scEx = scEx() # need to be run when updated
   scExMat <- BPCellsCounts()
   scEx_log = scEx_log()
@@ -2557,8 +2574,23 @@ seurat_Clustering <- function() {
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
   # browser()
-  retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
+  retVal = NULL
+  retVal <- tryCatch({
+    runSeuratClustering_m(scExMat, meta.data, dims, pca, k.param, resolution)
+    },
+    error = function(e) {
+      cat(file = stderr(), paste("\n\n!!!Error during Seurat clustering:\ncheck console", e, "\n\n"))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification("ERROR in seurat_Clustering", id = "seurat_ClusteringERROR", duration = NULL, type = "error")
+      }
+      return(NULL)
+    }
+  )
   # runSeuratClustering(scEx, meta.data, dims, pca, k.param, resolution)
+  
+  if(is.null(retVal)){
+    return(NULL)
+  }
   
   setRedGreenButton(
     vars = list(
@@ -2720,40 +2752,54 @@ simlrFunc  <- function(){
     }
     return(NULL)
   }
-  retVal <- tryCatch(
-    {
-      if (nClust == 0) {
-        estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
-                                                      NUMC=2:maxClust,
-                                                      cores.ratio = 1)
-        nClust = max(which.min(estimates$K1), which.min(estimates$K2))
+  
+  withWarnings <- function(expr) {
+    wHandler <- function(w) {
+      if (DEBUG) {
+        cat(file = stderr(), paste("simlrFunc created a warning:", w, "\n"))
       }
-      sim = SIMLR(X = as.matrix(assays(scEx_log)[[1]]), 
-                  c = nClust, 
-                  cores.ratio = 1)
-      
-      cluster <- factor(sim$y$cluster)
-      cluster
-    },
-    error = function(e) {
-      cat(file = stderr(), paste("\nProblem with simlrFunc:\n\n", as.character(e), "\n\n"))
       if (!is.null(getDefaultReactiveDomain())) {
-        showNotification("snnClusterError", id = "snnClusterError", type = "error", duration = NULL)
+        showNotification(
+          "Problem with simlrFunc?",
+          type = "warning",
+          id = "pcawarning",
+          duration = NULL
+        )
       }
-      
-      return(NULL)
-    },
-    warning = function(e) {
-      if (DEBUG) cat(file = stderr(), paste("\nSNN clustering produced Warning:\n", e, "\n"))
-      # cluster
+      invokeRestart("muffleWarning")
+    }
+    eHandler <- function(e) {
+      cat(file = stderr(), paste("error in PCA:", e))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          paste("Problem with PCA, probably not enough cells?", e),
+          type = "warning",
+          id = "pcawarning",
+          duration = NULL
+        )
+      }
+      cat(file = stderr(), "PCA FAILED!!!\n")
       return(NULL)
     }
-  )
-  # if ("barcode" %in% colnames(colData(scEx_log))) {
-  #   barCode <- colData(scEx_log)$barcode
-  # } else {
-  # barCode <- rownames(colData(scEx_log))
-  # }
+    val <- withCallingHandlers(expr, warning = wHandler, error = eHandler)
+    return(val)
+  }
+  
+  retVal <- withWarnings({
+    if (nClust == 0) {
+      estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
+                                                    NUMC=2:maxClust,
+                                                    cores.ratio = 1)
+      nClust = max(which.min(estimates$K1), which.min(estimates$K2))
+    }
+    sim = SIMLR(X = as.matrix(assays(scEx_log)[[1]]), 
+                c = nClust, 
+                cores.ratio = 1)
+    
+    cluster <- factor(sim$y$cluster)
+    cluster
+  })
+  
   
   if (is.null(retVal)) {return(NULL)}
   

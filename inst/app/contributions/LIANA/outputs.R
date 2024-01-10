@@ -149,6 +149,7 @@ output$Liana_dotPlot <- plotly::renderPlotly({
     browser()
     return(NULL)
   }
+  retVal=NULL
   retVal <- liana_scEx %>%
     liana::liana_dotplot(source_groups = unique(liana_scEx$source),
                          target_groups = unique(liana_scEx$target),
@@ -166,7 +167,8 @@ output$Liana_dotPlot <- plotly::renderPlotly({
   # remove env because it is too big
   specEnv = emptyenv()
   environment(af) = new.env(parent = specEnv)
-  .schnappsEnv[["coE_dotPlot_GeneSets"]] <- list(plotFunc = af,
+  .schnappsEnv[["Liana_dotPlot"]] <- list(plotFunc = af,
+                                          liana_res = liana_scEx,
                                                  source_groups = unique(liana_scEx$source),
                                                  target_groups = unique(liana_scEx$target),
                                                  ntop = 20)
@@ -207,8 +209,79 @@ output$Liana_Heatmap <- renderPlot({
   liana_truncscEx <- liana_scEx %>%
     # only keep interactions concordant between methods
     filter(aggregate_rank <= 0.01) # note that these pvals are already corrected
+  shinyjs::addClass("updateLianaParameters", "green")
+  
+  
+  af = liana::heat_freq
+  # remove env because it is too big
+  specEnv = emptyenv()
+  environment(af) = new.env(parent = specEnv)
+  .schnappsEnv[["Liana_Heatmap"]] <- list(plotFunc = af,
+                                          liana_res = liana_truncscEx)
+  
   
   # how to get this to work???
   heat_freq(liana_truncscEx) 
+  
+})
+
+observe({
+  projF = projFactors()
+  updateSelectInput(session, "Liana_idents_col",
+                    choices = projF,
+                    selected = .schnappsEnv$Liana_idents_col)
+})
+
+
+# save to history dotplot ---d-
+observe(label = "save2Hist_Liana_dotPlot", {
+  clicked  = input$save2Hist_Liana_dotPlot
+  if (DEBUG) cat(file = stderr(), "observe save2Hist_Liana_dotPlot \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# Liana_dotPlot \n",
+                              "require(liana)\n",
+                              "fun = plotData$plotData$plotFunc\n", 
+                              "environment(fun) = environment()\n",
+                              "plotData$plotData$outfile=NULL\n",
+                              "print(do.call(\"fun\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["Liana_dotPlot"]])
+  
+})
+
+# save to history heatmap ---d-
+observe(label = "save2Hist_Liana_Heatmap", {
+  clicked  = input$save2Hist_Liana_Heatmap
+  if (DEBUG) cat(file = stderr(), "observe save2Hist_Liana_Heatmap \n")
+  start.time <- base::Sys.time()
+  on.exit(
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "save2Hist")
+    }
+  )
+  # show in the app that this is running
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("save2Hist", id = "save2Hist", duration = NULL)
+  }
+  if (is.null(clicked)) return()
+  if (clicked < 1) return()
+  add2history(type = "save", input = isolate( reactiveValuesToList(input)), 
+              comment = paste("# Liana_Heatmap \n",
+                              "require(liana)\n",
+                              "print(do.call(\"heat_freq\",plotData$plotData[2:length(plotData$plotData)]))\n"
+              ),
+              plotData = .schnappsEnv[["Liana_Heatmap"]])
   
 })

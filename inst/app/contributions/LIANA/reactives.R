@@ -35,6 +35,13 @@ liana_scExReact <- reactive({
   proj = proj[cellNs,]
   proj[,idents_col] = droplevels(proj[,idents_col])
   liana_scEx <- liana_scExFunc(scEx=scEx[, cellNs], scEx_log = scEx_log[, cellNs], proj, resource, idents_col, method, min_cells)
+  for(na in names(liana_scEx)){
+    if(is(liana_scEx[[na]], "error")){
+      liana_scEx[[na]] = NULL
+    }
+  }
+  # lapply(liana_scEx, FUN=function(x)any(duplicated(rownames(x))))
+  return(liana_scEx)
 })
 
 liana_aggr <- reactive({

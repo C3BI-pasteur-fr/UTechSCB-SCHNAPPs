@@ -607,6 +607,7 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
         # scEx = scEx[, limitCells]
         # meta.data = meta.data[limitCells,, drop = FALSE]
       }
+      # browser()
       seurDat <- CreateSeuratObject(
         # BPCells not compatible with RunCCA
         counts = assay(scEx, "counts"),
@@ -837,6 +838,7 @@ DE_seuratSCTnormfunc <- function(scEx, scExMat, nHVG, var2reg) {
     }
   )
   # UMI-based normalisation & logTransformation
+  # browser()
   seurDat = Seurat::NormalizeData(seurDat)
   
   seurDat <- SCTransform(object = seurDat, 
@@ -979,6 +981,7 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
     }
   )
   # UMI-based normalisation & logTransformation
+  # browser()
   seurDat = Seurat::NormalizeData(seurDat)
   # Finding variable genes
   seurDat = Seurat::FindVariableFeatures(object = seurDat,
@@ -1243,7 +1246,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   # turn normalization button green
   shinyjs::addClass("updateNormalization", "green")
   
-  .schnappsEnv$normalizationFactor <- sfactor
+  # .schnappsEnv$normalizationFactor <- sfactor
   exportTestValues(DE_logNormalization = {
     assay(retVal, "logcounts")
   })
@@ -1277,6 +1280,7 @@ DE_logNormalizationfunc <- function(scEx, sfactor) {
     sfactor = min(A@x[A@x>0])
   }
   A@x = A@x / sfactor
+  .schnappsEnv$normalizationFactor
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx),

@@ -14,6 +14,9 @@ if(!"liana" %in% installed.packages()){
 }
 require(liana)
 
+# only internal functions
+lianaMethods = liana::show_methods()
+lianaMethods = lianaMethods[!grepl("^call", lianaMethods)]
 
 
 menuList <- list(
@@ -51,7 +54,7 @@ tabList = list(
             column(width = 3, 
                    sc_selectizeInput(inputId = "Liana_method", label = "method(s) to be run via liana",
                                      multiple = T,
-                                     choices = liana::show_methods() , selected = defaultValue("Liana_method", "natmi"))),
+                                     choices = lianaMethods , selected = defaultValue("Liana_method", "natmi"))),
             column(width = 3,
                    sc_numericInput("Liana_min_cells", "minimum cell per cell identity to be considered for analysis",
                                    defaultValue("Liana_min_cells", 5),
