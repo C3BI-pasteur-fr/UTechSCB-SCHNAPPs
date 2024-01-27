@@ -584,11 +584,7 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
   
   finalLevels = projections[,factsin] %>% unique()
   featureData <- rowData(scEx_log)
-  # featureData$symbol = toupper(featureData$symbol)
-  # genesin <- genesin[which(genesin %in% toupper(featureData$symbol))]
-  # if (length(genesin) < 1) {
-  #   return(NULL)
-  # }
+ 
   par(mfrow = c(ceiling(length(finalLevels) / 4), 4), mai = c(0., .3, .3, .3))
   rbPal <- colorRampPalette(c("#f0f0f0", "red"))
   ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
@@ -608,45 +604,49 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
   printData = data.frame(level = character(), dimx = numeric(), dimy = numeric(), col = numeric)
   # save(file = "~/SCHNAPPsDebug/DE_panelPlot.RData", list = c(ls()), compress = F)
   # cp = load(file="~/SCHNAPPsDebug/DE_panelPlot.RData")
-  
-  for (i in 1:length(finalLevels)) {
-    # geneIdx <- which(toupper(featureData$symbol) == genesin[i])
-    subsetTSNE <- projections[cellNs, ] # only work the subset of cells
-    
-    # color for each cell based on the expression
-    # this will always show the max value per cell
-    # this should apply when sameScale = FALSE
-    Col <- rbPal(10)[
-      as.numeric(
-        cut(
-          as.numeric(
-            assays(scEx_log)[[1]]
-          ),
-          breaks = 10
-        )
+
+  # color for each cell based on the expression
+  # this will always show the max value per cell
+  # this should apply when sameScale = FALSE
+  Col <- rbPal(10)[
+    as.numeric(
+      cut(
+        as.numeric(
+          assays(scEx_log)[[1]]
+        ),
+        breaks = 10
       )
-    ]
+    )
+  ]
+  names(Col) <- rownames(projections)
     
-    names(Col) <- rownames(projections)
+  for (i in 1:length(finalLevels)) {
+    subsetTSNE <- projections[projections[,factsin]==finalLevels[i],]
     plotCol <- Col[rownames(subsetTSNE)]
     # if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
     #   projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, , drop = FALSE])
     #   subsetTSNE <- projections[cellNs, ]
     # }
-    colData = assays(scEx_log)[[1]]
+    # colData = assays(scEx_log)[[1]]
     # if (!sameScale){
     #   colData = (colData -min(colData) )/ (max(colData) - min(colData)) 
     # }
     printData = rbind(printData, data.frame(level = finalLevels[i], 
+# <<<<<<< HEAD
+#                                             dimx = subsetTSNE[, dimx4] , 
+#                                             dimy = subsetTSNE[, dimy4],
+#                                             col = plotCol
+# =======
                                             dimx = subsetTSNE[cellNs, dimx4] , 
                                             dimy = subsetTSNE[cellNs, dimy4],
                                             col = Col #projections[,]
+# >>>>>>> master
     ))
   }
   require(cowplot)
   require(ggpubr)
   printData = printData[order(printData$col, decreasing = F),]
-  printData$gene = factor(printData$gene, levels = unique(genesin))
+  # printData$gene = factor(printData$gene, levels = unique(genesin))
   # if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
   #   retVal <-  ggboxplot(printData, x="dimx", y="dimy", add="jitter")
   #   if(applyPvalue){
@@ -663,21 +663,22 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
   # }
   if (sameScale){
     retVal = retVal + 
-      facet_wrap(vars(gene),ncol = nCol) 
+      facet_wrap("level",ncol = nCol) 
   } else {
-    retVal = retVal + facet_wrap(vars(gene),ncol = nCol,scales = "free")
+    retVal = retVal + facet_wrap("level",ncol = nCol,scales = "free")
   }
   retVal = retVal + xlab(dimx4) + 
     ylab(dimy4) 
   # +
   #   scale_colour_gradient2()
   
-  retVal =  retVal + scale_color_gradient2(low = lowCol, high = highCol, mid = midCol, midpoint = midFunc(colData))
+  # retVal =  retVal + scale_color_gradient2(low = lowCol, high = highCol, mid = midCol, midpoint = midFunc(colData))
   
    retVal <-
     ggpubr::annotate_figure(retVal,
                             top = text_grob(sampdesc)
     )
+   # retVal
   return(retVal)
 } 
 #   panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))

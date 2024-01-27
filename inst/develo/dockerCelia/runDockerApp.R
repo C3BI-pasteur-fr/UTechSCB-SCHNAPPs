@@ -7,33 +7,31 @@ library(reactlog)
 # }
 # 
 library(future)
-library(future.callr)
+
 # devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
 
 
 if(!exists("WORKERS")) WORKERS = parallel::detectCores()
 
-plan('callr', workers = 2)
-# plan("multicore", workers = WORKERS)
-# plan(sequential)
-library(doParallel)
-registerDoParallel(cores=WORKERS)
+
+# plan("multiprocess", workers = WORKERS)
+plan(sequential)
+
 
 library("BiocParallel")
 register(MulticoreParam(WORKERS))
 # register(SerialParam())
 
-localContributionDir = "/home/schnapps/SCHNAPPsContributions/"
-#localContributionDir = NULL
-defaultValueSingleGene = "CD3g" # CD52
-defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA" # itgae, cd69, itga1" # CD52, S100A9, S100A4
+localContributionDir = "/root/SCHNAPPsContributions/"
+# localContributionDir = ""
+defaultValueSingleGene = "CDH2" # CD52
+defaultValueMultiGenes = "CAV1, MIR205HG, KCNE1B, ANKRD66, SCGB3A2, SCGB3A1, CDH2" # itgae, cd69, itga1" # CD52, S100A9, S100A4
 # defaultValueMultiGenes = "prf1, Gzmb, IFNG, PDCD1, HAVCR2, LAG3, TSC22D3,ZFP36L2"
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
-historyPath = "/home/schnapps/history"
-historyPath = "/Volumes/LaCie2022//RStudio_history/"
-#historyPath = NULL
+# historyPath = "/Volumes/Oct2020/RStudio_history/"
+historyPath = "/root/history"
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
@@ -58,56 +56,53 @@ defaultValues = list()
 # Seurat parameters
 # defaultValues = list()
 
-# # defaultValues[["selectIds"]] = ""
-# defaultValues[["pcaN"]] = 500
-# defaultValues[["pcaScale"]] = TRUE
-# defaultValues[["sampleInput"]] =FALSE
-# defaultValues[["hvgSelection"]] = "vst"
-# # defaultValues[["alluiv1"]] = "seurartCluster"
-# defaultValues[["alluiv2"]] = "dbCluster"
-# # defaultValues[["tabsetCluster"]] = "seurat_Clustering"
-# defaultValues[["minGenesGS"]] = 100
-# defaultValues[["minGenes"]] = 1
-# defaultValues[["maxGenes"]] = 50000
-# defaultValues[["seurClustDims"]] = 15
-# defaultValues[["seurClustk.param"]] = 15
-# defaultValues[["cellPatternRM"]] = ""
-# defaultValues[["gQC_binSize"]] = 200
-# defaultValues[["selectIds"]] = "^MT-|^RP|^MRP" #"^MT-|^RP|^MRP|MALAT1|B2M|EEF1A1"
 # defaultValues[["selectIds"]] = ""
-# defaultValues[["whichscLog"]] = "calcLog"
-# defaultValues[["whichscLog"]] = "disablescEx_log"
+defaultValues[["pcaN"]] = 500
+defaultValues[["pcaScale"]] = TRUE
+defaultValues[["sampleInput"]] =FALSE
+defaultValues[["hvgSelection"]] = "vst"
+# defaultValues[["alluiv1"]] = "seurartCluster"
+defaultValues[["alluiv2"]] = "dbCluster"
+# defaultValues[["tabsetCluster"]] = "seurat_Clustering"
+defaultValues[["minGenesGS"]] = 100
+defaultValues[["minGenes"]] = 1
+defaultValues[["maxGenes"]] = 50000
+defaultValues[["seurClustDims"]] = 15
+defaultValues[["seurClustk.param"]] = 15
+defaultValues[["cellPatternRM"]] = "-s1|-s2"
+defaultValues[["gQC_binSize"]] = 200
+defaultValues[["selectIds"]] = "^MT-|^RP|^MRP|MALAT1|B2M|EEF1A1"
+defaultValues[["selectIds"]] = ""
+defaultValues[["whichscLog"]] = "calcLog"
+defaultValues[["whichscLog"]] = "disablescEx_log"
 
-# defaultValues[["gQC_um_n_neighbors"]] = 20 
-# defaultValues[["gQC_um_spread"]] = 6 
-# defaultValues[["gQC_um_local_connectivity"]] = 2
+defaultValues[["gQC_um_n_neighbors"]] = 20 
+defaultValues[["gQC_um_spread"]] = 6 
+defaultValues[["gQC_um_local_connectivity"]] = 2
 # defaultValues[["useSeuratPCA"]] = TRUE
 
-
-# commented out for paper
-# assign("defaultValues", defaultValues, envir = .schnappsEnv)
+# defaultValues[["DE_panelplotids"]] = c("CD8A", "CD4", "CD8B", "FCER1G", "CCR7", "GZMK", "FoxP3", "GZMK", "GZMB", "CCR7", "LEF1", "CCL5", "VIM", "CCL5", "TCF7", "NKG7", "LGALs1", "NKG7", "SELL", "CST7", "ANXA2", "CST7", "IL7R", "HLA-DRB1", "KLRG1", "CD27", "CTLA4A")
+assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
 devscShinyApp = FALSE
-packagePath <<- "/home/schnapps/rstudio/schnappsGit/inst/app"
-packagePath <<- "inst/app/"
-
+packagePath <<- "/usr/local/lib/R/site-library/SCHNAPPs/app"
 source(paste0(packagePath,  "/ui.R"))
 source(paste0(packagePath,  "/server.R"))
 
-app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+# app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+app <- shinyApp(ui = scShinyUI, server = scShinyServer)
 options(shiny.reactlog=FALSE)
-shiny::addResourcePath(
-  prefix = "www",
-  directoryPath = "./inst/www/"
-)
+
+cat(file= stderr(), system("whoami"))
+
 # options(keep.source=TRUE)
 # p <- profvis::profvis({
-runApp(app, host = "0.0.0.0", port = 6149, launch.browser = FALSE)
+  runApp(app, host = "0.0.0.0", port = 3838, launch.browser = FALSE)
 # })
 # htmlwidgets::saveWidget(p, '~/profvis1.html')
 
 # 
-# schnapps(
+# schnapps(Ï
 # defaultValueMultiGenes = "IL7R, CCR7,CD14, LYZ ,IL7R, S100A4,MS4A1 ,CD8A,FCGR3A, MS4A7 ,GNLY, NKG7,FCER1A, CST3,PPBP",
 # defaultValueSingleGene = "MS4A1", DEBUG=TRUE
 # )

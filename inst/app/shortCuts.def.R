@@ -469,7 +469,7 @@ shortCutsList = list(
     updateTabItems(
       session = session,
       "sideBarID",
-      selected = "DE_panelPlot"
+      selected = "CoExpressionViolin"
     )
     updateTabsetPanel(
       session = session,
