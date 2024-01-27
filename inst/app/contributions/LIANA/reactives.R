@@ -50,7 +50,13 @@ liana_aggr <- reactive({
   req(method, liana_scEx)
   
   if(length(method) > 1){
-    liana_scEx <- liana_scEx %>% liana_aggregate()
+    liana_scEx <- tryCatch(liana_scEx %>% liana_aggregate(),
+                           error = function(e) {
+                             cat(file = stderr(), "\n\ncaught exception with liana_aggregate:", e,  "\n\n")
+                             return(NULL)
+                           }
+    )
+    
   }
   return(liana_scEx)
 })
