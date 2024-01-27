@@ -6,7 +6,7 @@ suppressMessages(require(scran))
 suppressMessages(require(irlba))
 suppressMessages(require(BiocSingular))
 suppressMessages(require(dplyr))
-
+suppressMessages(require(BPCells))
 suppressMessages(require(ggalluvial))
 library(SingleCellExperiment)
 # require(tidySingleCellExperiment)
@@ -697,7 +697,10 @@ appendAnnotation <- function(scEx, annFile) {
 ### dataFile reactive ----
 dataFile <- reactive({
   deepDebug()
-  if(.schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
+  if(!exists("restoreHistory",envir = .schnappsEnv)){
+    .schnappsEnv$restoreHistory = FALSE
+  }
+  if( .schnappsEnv$restoreHistory & !is.null(.schnappsEnv$inputFile)){
     iFile = .schnappsEnv$inputFile
   }else{
     iFile = input$file1
@@ -722,7 +725,6 @@ inputData <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("inputData", id = "inputData", duration = NULL)
   }
-  
   inFile <- dataFile()
   annFile <- input$annoFile
   sampleCells <- input$sampleInput
@@ -933,7 +935,7 @@ medianUMI <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/medianUMI.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/medianUMI.RData')
+  #cp =  load(file='~/SCHNAPPsDebug/medianUMI.RData')
   scEx <- assays(scEx)[["counts"]]
   retVal <- medianUMIfunc(scEx)
   
@@ -1776,10 +1778,10 @@ scEx_log_Hash <- reactive({
     cat(file = stderr(), "scEx_log_Hash started.\n")
   }
   scEx_log <- scEx_log()
-    require(digest)
-    if (is.null(scEx_log)) {
-      return(NULL)
-    }
+  require(digest)
+  if (is.null(scEx_log)) {
+    return(NULL)
+  }
   hash = sha1(as.matrix(assays(scEx_log)[[1]]))
   if (DEBUG) {
     cat(file = stderr(), "scEx_log_Hash ended\n")
@@ -1857,7 +1859,78 @@ scExLogMatrixDisplay <- reactive({
 })
 
 # pcaFunc ----
-pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes, rmGenes=c(), featureData, pcaN, maxGenes = 1000, hvgSelection, inputNormalization="DE_something") {
+#' Principal Component Analysis (PCA) Function
+#'
+#' This function performs Principal Component Analysis (PCA) on single-cell RNA-seq data.
+#'
+#' @param scEx A SingleCellExperiment object containing the raw expression data.
+#' @param scEx_log A SingleCellExperiment object containing the log-transformed expression data.
+#' @param rank The number of principal components to compute.
+#' @param center Logical, indicating whether to center the data.
+#' @param scale Logical, indicating whether to scale the data.
+#' @param useSeuratPCA Logical, indicating whether to use Seurat's PCA method. If FALSE, scran's PCA method will be used.
+#' @param pcaGenes A character vector of gene names to include in the analysis.
+#' @param rmGenes A character vector of gene names to exclude from the analysis.
+#' @param featureData A DataFrame containing gene-related metadata.
+#' @param pcaN The maximum number of genes to use for PCA.
+#' @param maxGenes The maximum number of genes to consider in variable gene selection.
+#' @param hvgSelection The method for selecting highly variable genes ("vst", "mvp", "disp", or "getTopHVGs").
+#' @param inputNormalization The method of input data normalization ("DE_something", "DE_seuratSCTnorm", etc.).
+#'
+#' @return A list containing the PCA results, including 'x' (PCA coordinates), 'var_pcs' (standard deviations), and 'rotation' (loadings).
+#'
+#' @details This function performs PCA on single-cell RNA-seq data using either Seurat's PCA method or scran's PCA method, depending on the value of `useSeuratPCA`. It allows you to specify various parameters for PCA analysis and variable gene selection.
+#'
+#' @seealso \code{\link{SingleCellExperiment}}, \code{\link{FindVariableFeatures}}, \code{\link{ScaleData}}, \code{\link{RunPCA}}, \code{\link{runPCA}}
+#'
+#' @examples
+#' \dontrun{
+#' # Load required libraries and create mock data
+#' library(SingleCellExperiment)
+#' scEx <- SingleCellExperiment(assays = list(logcounts = matrix(rnorm(100), nrow = 10)))
+#' scEx_log <- scEx
+#' rank <- 3
+#' center <- FALSE
+#' scale <- FALSE
+#' useSeuratPCA <- TRUE
+#' pcaGenes <- colnames(assays(scEx)[["logcounts"]])
+#' rmGenes <- c()
+#' featureData <- rowData(scEx)
+#' pcaN <- 10
+#' maxGenes <- 1000
+#' hvgSelection <- "vst"
+#' inputNormalization <- "DE_something"
+#'
+#' # Perform PCA analysis
+#' result <- pcaFunc(
+#'   scEx,
+#'   scEx_log,
+#'   rank,
+#'   center,
+#'   scale,
+#'   useSeuratPCA,
+#'   pcaGenes,
+#'   rmGenes,
+#'   featureData,
+#'   pcaN,
+#'   maxGenes,
+#'   hvgSelection,
+#'   inputNormalization
+#' )
+#'
+#' # View PCA results
+#' str(result)
+#' }
+#'
+#' @export
+
+pcaFunc <- function(scEx, scEx_log, 
+                    rank, center, scale,
+                    cale, useSeuratPCA, 
+                    pcaGenes, rmGenes=c(), 
+                    featureData, pcaN, 
+                    maxGenes = 1000, hvgSelection, 
+                    inputNormalization="DE_something") {
   if (DEBUG) {
     cat(file = stderr(), "pcaFunc started.\n")
   }
@@ -1876,7 +1949,7 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
     removeNotification(id = "pcawarning2")
     removeNotification(id = "pcawarning3")
   }
-  
+  # browser()
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/pcaFunc.RData", list = c(ls()))
   }
@@ -1993,43 +2066,29 @@ pcaFunc <- function(scEx, scEx_log, rank, center, scale, useSeuratPCA, pcaGenes,
   
   scaterPCA <- withWarnings({
     # not sure, but this works on another with TsparseMatrix
-    if (is(assays(scEx_log)[["logcounts"]], "TsparseMatrix")) {
+    if (!is(assays(scEx_log)[["logcounts"]], "CsparseMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
         as(assays(scEx_log)[["logcounts"]], "CsparseMatrix")
     }
-    x <- assays(scEx_log)[["logcounts"]]
+    # x <- assays(scEx_log)[["logcounts"]]
     genesin = genesin[genesin %in% rownames(scEx_log)]
-    x <- as.matrix(x)[genesin, , drop = FALSE]
-    # if (maxGenes > 0) {
-    #   maxGenes = min(maxGenes, length(genesin))
-    #   keep1 <- order(rv, decreasing = TRUE)[1:maxGenes]
-    #   genesin = genesin[keep1]
-    #   x = as.matrix(x)[keep1, , drop = FALSE]
-    #   rv <- rowVars((as.matrix(x)))
-    #   keep <- rv >= 1e-8
-    #   x <- x[keep,,drop=FALSE]
-    #   rv <- rowVars((as.matrix(x)))
-    # }
-    ## This is not being in Seurat
-    # if (scale) {
-    #   rv <- rowVars((as.matrix(x)))
-    #   x <- x/sqrt(rv)
-    #   # rv <- rep(1, nrow(x))
-    # }
+    # x <- x[genesin, , drop = FALSE]
+    mi = BPCells::write_matrix_memory(assays(scEx_log)[["logcounts"]][genesin,], compress = F)
     if (scale | center) {
       set.seed(1)
-      x <- Seurat::ScaleData(x, do.scale = scale, do.center = center, verbose = T)
-      genesin = rownames(x) # ScaleData can remove genes.
+      mi <- Seurat::ScaleData(mi, do.scale = scale, do.center = center, verbose = T)
+      genesin = rownames(mi) # ScaleData can remove genes.
     }
     if (useSeuratPCA){
       # Seurat:
-      reductObj = RunPCA(x, npcs = rank, verbose = FALSE, assay = "RNA")
+      reductObj = RunPCA(mi, npcs = rank, verbose = FALSE, assay = "RNA")
       pca = list()
       pca$rotation = Loadings(reductObj)
       pca$x = Embeddings(reductObj)
       pca$sdev = Stdev(reductObj)
     } else {
       # # scran:
+      x <- assays(scEx_log)[["logcounts"]][genesin,]
       x <- t(x)
       pca <- runPCA(x, rank=rank, get.rotation=TRUE)
     }
@@ -2096,6 +2155,7 @@ pcaReact <- reactive({
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("pca", id = "pca", duration = NULL)
   }
+  # browser()
   scEx <- scEx()
   scEx_log <- scEx_log()
   # only redo calculations if button is pressed.
@@ -2387,16 +2447,68 @@ scran_Cluster <- function(){
   return(retVal)
 }
 
+BPCellsLog <- reactive({
+  scEx_log = scEx_log()
+  req(scEx_log)
+  # browser()
+  mi = NULL
+  m = tryCatch({
+    if(!is(assay(scEx_log, "logcounts"),"dgCMatrix")){
+      as(assay(scEx_log, "logcounts"),"dgCMatrix")
+    }else{
+      assay(scEx_log, "logcounts")
+    }
+    mi = BPCells::write_matrix_memory(m, compress = F)
+  }, error = function(e) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("Problem BPCellsLog", type = "warning", duration = NULL)
+    }
+    return(NULL)
+  }
+  )
+  return(mi)
+})
+
+
+BPCellsCounts <- reactive({
+  scEx = scEx()
+  req(scEx)
+  if(!is(assay(scEx, "counts"),"dgCMatrix")){
+    m = as(assay(scEx, "counts"),"dgCMatrix")
+  }else{
+    m = assay(scEx, "counts")
+  }
+  mi = BPCells::write_matrix_memory(m, compress = F)
+  return(mi)
+})
+
+
 # Seurat clustering ----
 runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution) {
   # creates object @assays$RNA@data and @assays$RNA@counts
-  seurDat <- CreateSeuratObject(
-    counts = assays(scEx)[[1]],
-    meta.data = meta.data
-  )
+  seurDat <- NULL
+  if(is(scEx,"SingleCellExperiment")){
+    seurDat <- CreateSeuratObject(
+      counts = as(assays(scEx)[[1]], "CsparseMatrix"),
+      meta.data = meta.data
+    )
+  }else{
+    # if(is(scEx,"BPCells")){
+    if(is(scEx,"UnpackedMatrixMem_double")){
+      seurDat <- CreateSeuratObject(
+        counts = scEx,
+        meta.data = meta.data
+      )
+    } else{
+      cat(file = stderr(), "Neither SingleCellExperiment nor UnpackedMatrixMem_double. \n")
+      stop()
+    }
+  }
+  # bowser()
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = which(rownames(seurDat@assays$RNA@data) %in% rownames(as(assays(scEx)[[1]], "CsparseMatrix")))
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  useGenes = which(rownames(seurDat[["RNA"]]$counts) %in% rownames(scEx))
+  # seurDat[["RNA"]]$counts = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  seurDat = seurDat[useGenes,]
   dims = min(dims,ncol(pca$x)) 
   
   seurDat[["pca"]] = CreateDimReducObject(embeddings = pca$x[colnames(seurDat),], 
@@ -2407,7 +2519,7 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
   
   
   seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
-  seurDat <- FindClusters(seurDat, resolution = resolution)
+  seurDat <- FindClusters(seurDat, resolution = resolution, method = "igraph", algorithm=1 )
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
 }
@@ -2441,8 +2553,9 @@ seurat_Clustering <- function() {
   if (!is.null(getDefaultReactiveDomain())) {
     showNotification("seurat_Clustering", id = "seurat_Clustering", duration = NULL)
   }
-  
+  # browser()
   scEx = scEx() # need to be run when updated
+  scExMat <- BPCellsCounts()
   scEx_log = scEx_log()
   pca = pcaReact()
   tabsetCluster = isolate(input$tabsetCluster)
@@ -2453,8 +2566,10 @@ seurat_Clustering <- function() {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/seurat_Clustering.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
-  
+  # cp =load(file="~/SCHNAPPsDebug/seurat_Clustering.RData")
+  if(any(c(is.null(k.param), is.null(tabsetCluster), is.null(dims), is.null(resolution)))) {
+    return(NULL)
+  }
   if (tabsetCluster != "seurat_Clustering" | is.null(pca)){
     return(NULL)
   }
@@ -2468,8 +2583,23 @@ seurat_Clustering <- function() {
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
   # browser()
-  retVal <- runSeuratClustering_m(scEx, meta.data, dims, pca, k.param, resolution)  
+  retVal = NULL
+  retVal <- tryCatch({
+    runSeuratClustering_m(scExMat, meta.data, dims, pca, k.param, resolution)
+  },
+  error = function(e) {
+    cat(file = stderr(), paste("\n\n!!!Error during Seurat clustering:\ncheck console", e, "\n\n"))
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("ERROR in seurat_Clustering", id = "seurat_ClusteringERROR", duration = NULL, type = "error")
+    }
+    return(NULL)
+  }
+  )
   # runSeuratClustering(scEx, meta.data, dims, pca, k.param, resolution)
+  
+  if(is.null(retVal)){
+    return(NULL)
+  }
   
   setRedGreenButton(
     vars = list(
@@ -2631,40 +2761,54 @@ simlrFunc  <- function(){
     }
     return(NULL)
   }
-  retVal <- tryCatch(
-    {
-      if (nClust == 0) {
-        estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
-                                                      NUMC=2:maxClust,
-                                                      cores.ratio = 1)
-        nClust = max(which.min(estimates$K1), which.min(estimates$K2))
+  
+  withWarnings <- function(expr) {
+    wHandler <- function(w) {
+      if (DEBUG) {
+        cat(file = stderr(), paste("simlrFunc created a warning:", w, "\n"))
       }
-      sim = SIMLR(X = as.matrix(assays(scEx_log)[[1]]), 
-                  c = nClust, 
-                  cores.ratio = 1)
-      
-      cluster <- factor(sim$y$cluster)
-      cluster
-    },
-    error = function(e) {
-      cat(file = stderr(), paste("\nProblem with simlrFunc:\n\n", as.character(e), "\n\n"))
       if (!is.null(getDefaultReactiveDomain())) {
-        showNotification("snnClusterError", id = "snnClusterError", type = "error", duration = NULL)
+        showNotification(
+          "Problem with simlrFunc?",
+          type = "warning",
+          id = "pcawarning",
+          duration = NULL
+        )
       }
-      
-      return(NULL)
-    },
-    warning = function(e) {
-      if (DEBUG) cat(file = stderr(), paste("\nSNN clustering produced Warning:\n", e, "\n"))
-      # cluster
+      invokeRestart("muffleWarning")
+    }
+    eHandler <- function(e) {
+      cat(file = stderr(), paste("error in PCA:", e))
+      if (!is.null(getDefaultReactiveDomain())) {
+        showNotification(
+          paste("Problem with PCA, probably not enough cells?", e),
+          type = "warning",
+          id = "pcawarning",
+          duration = NULL
+        )
+      }
+      cat(file = stderr(), "PCA FAILED!!!\n")
       return(NULL)
     }
-  )
-  # if ("barcode" %in% colnames(colData(scEx_log))) {
-  #   barCode <- colData(scEx_log)$barcode
-  # } else {
-  # barCode <- rownames(colData(scEx_log))
-  # }
+    val <- withCallingHandlers(expr, warning = wHandler, error = eHandler)
+    return(val)
+  }
+  
+  retVal <- withWarnings({
+    if (nClust == 0) {
+      estimates = SIMLR_Estimate_Number_of_Clusters(X = as.matrix(assays(scEx_log)[[1]]),
+                                                    NUMC=2:maxClust,
+                                                    cores.ratio = 1)
+      nClust = max(which.min(estimates$K1), which.min(estimates$K2))
+    }
+    sim = SIMLR(X = as.matrix(assays(scEx_log)[[1]]), 
+                c = nClust, 
+                cores.ratio = 1)
+    
+    cluster <- factor(sim$y$cluster)
+    cluster
+  })
+  
   
   if (is.null(retVal)) {return(NULL)}
   
@@ -2718,9 +2862,10 @@ dbCluster <- reactive({
   clustering <- do.call(tabsetCluster, args = list())
   
   if (.schnappsEnv$DEBUGSAVE) {
+    prjCols = isolate( reactiveValuesToList(projectionColors))
     save(file = "~/SCHNAPPsDebug/dbCluster.RData", list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/dbCluster.RData")
+  # cp = load(file="~/SCHNAPPsDebug/dbCluster.RData")
   
   if (is.null(clustering)) {
     if (DEBUG) {
@@ -2744,6 +2889,7 @@ dbCluster <- reactive({
   inCols <- allowedColors[rep(1:length(allowedColors),ceiling(length(lev) / length(allowedColors)))[1:length(lev)]]
   # inCols <- allowedColors[1:length(lev)]
   names(inCols) <- lev
+  # browser()
   isolate(
     if(is.null(names(projectionColors$dbCluster)) | !all(levels(dbCluster) %in% names(projectionColors$dbCluster))){
       projectionColors$dbCluster <- unlist(inCols)
@@ -2800,6 +2946,7 @@ projections <- reactive({
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
   # .schnappsEnv$DEBUGSAVE = T
+  
   scEx <- scEx()
   printTimeEnd(start.time, "projections scEx")
   pca <- pcaReact()
@@ -2876,13 +3023,14 @@ projections <- reactive({
       }
       if (DEBUG) cat(file = stderr(), paste("projection: ", proj[2], "\n"))
       assign("tmp", eval(parse(text = paste0(proj[2], "()"))))
+      #browser()
       if (.schnappsEnv$DEBUGSAVE) {
         save(file = paste0("~/SCHNAPPsDebug/projections.", iter, ".RData"),
              list = c("tmp")
         )
         iter <- iter + 1
       }
-      # load(file="~/SCHNAPPsDebug/projections.3.RData")
+      # cp = load(file="~/SCHNAPPsDebug/projections.5.RData")
       # deepDebug()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (is(tmp, "data.frame")) {

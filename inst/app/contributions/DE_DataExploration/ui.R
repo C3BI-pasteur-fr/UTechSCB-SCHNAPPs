@@ -8,9 +8,8 @@ menuList <- list(
                            # id="dataExplorationID",
                            tabName = "expore", icon = icon("wpexplorer"), startExpanded = FALSE,
                            shinydashboard::menuSubItem("Expression", tabName = "DE_expression"),
-                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot")
-                           # ,
-                           # shinydashboard::menuSubItem("Panel plot factorials", tabName = "DE_panelPlotFact")
+                           shinydashboard::menuSubItem("Panel plot", tabName = "DE_panelPlot"),
+                           shinydashboard::menuSubItem("Panel plot factorials", tabName = "DE_panelPlotFact")
                            # shinydashboard::menuSubItem("Sorted plot", tabName = "DE_sortedPl")
   )
 )

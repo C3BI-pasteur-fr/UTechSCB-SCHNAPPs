@@ -1,0 +1,30 @@
+OK NormalizeData()
+OK ScaleData()
+OK JackStraw()
+OK FindMarkers()
+OK FindIntegrationAnchors()
+OK FindClusters() - if clustering over multiple resolutions
+
+check that those functions are using BPCells
+
+
+###################################
+
+OK??? colors are not correctly updated
+
+###################################
+
+
+configure tap, that requires restarts
+
+###################################
+
+
+OK ???  liana
+
+###################################
+
+
+atac seq for michel
+
+###################################

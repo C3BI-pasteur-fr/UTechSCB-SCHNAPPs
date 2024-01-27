@@ -253,7 +253,7 @@ output$dimPlotPCA <- renderPlot({
   logDat = assays(scEx_log)[[1]]
   rData = rowData(scEx_log)
   rownames(logDat) = rData$symbol
-  seurDat@assays$RNA@data = as(logDat,"CsparseMatrix")
+  seurDat@assays$RNA$counts = as(logDat,"CsparseMatrix")
   # seurDat <- NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
   # seurDat <- FindVariableFeatures(seurDat, selection.method = "vst", nfeatures = 2000)
   
@@ -276,7 +276,7 @@ output$dimPlotPCA <- renderPlot({
   # DimPlot(seurDat, reduction = "pca")
   # seurDat <- ProjectDim(seurDat, reduction = "pca", assay = 'RNA')
   
-  d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'data',
+  d = DimHeatmap(seurDat, dims = 1:ndim, slot = 'counts',
                  balanced = TRUE, fast = TRUE, projected = FALSE, 
                  reduction = "pca")
   d
@@ -483,7 +483,7 @@ output$summaryStatsSideBar <- renderUI({
          list = c("normaliztionParameters", ls())
     )
   }
-  # load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
+  # cp = load("~/SCHNAPPsDebug/summaryStatsSideBar.RData")
   line0 <- paste(infile, " _ ", annFile)
   line0a <- paste("Number of samples: ", length(levels(scEx$sampleNames)), sep = "\t")
   line1 <- paste("No. of cells: ", dim(scEx)[2], sep = "\t")
@@ -1023,15 +1023,23 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # cp = load(file="~/SCHNAPPsDebug/ob_colorParams.RData")
-  
+  # input = inputList
   # browser()
   lapply(names(projections), FUN = function(name){
     if(is.factor(projections[,name])){
-      if(length(levels(projections[,name]))>30) return(NULL)
+      if(length(levels(projections[,name]))>30) {
+        cat(file = stderr(), paste0(name, "factor", ">30 levels\n"))
+        return(NULL)
+      }
+      # browser()
       ccols <- lapply(levels(projections[,name]), function(i) {
         input[[paste0(name, ".col.", i)]]
       })
       ccols[ccols==""] = "#000000"
+      nullCol = lapply(ccols,is.null) %>% unlist()
+      if(any(nullCol)){
+        ccols[nullCol] = allowedColors[!allowedColors %in% unlist(ccols)][1:sum(nullCol)]
+      }
       # if not initialized
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
@@ -1051,13 +1059,14 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
         .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = unlist(ccols)
       }
     } else{
+      # browser()
       minMax = c("min","max")
       ccols <- lapply(minMax, function(i) {
         input[[paste0(name, ".col.", i)]]
       })
       if(any(is.null(ccols %>% unlist()))){
         if(!paste0(name, ".colVec") %in% names(.schnappsEnv$defaultValues))
-          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("red", "blue")
+          .schnappsEnv$defaultValues[[paste0(name, ".colVec")]] = c("#D4070F", "#1C1AAF")
         # if vector is named then complexheatmap thinks it is a factorial
         names(.schnappsEnv$defaultValues[[paste0(name, ".colVec")]] ) = NULL
         projectionColors[[name]] = .schnappsEnv$defaultValues[[paste0(name, ".colVec")]]

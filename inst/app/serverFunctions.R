@@ -68,7 +68,6 @@ printTimeEnd <- function(start.time, messtr) {
     cat(file = stderr(), paste("---", hms::round_hms(hms::as_hms(duration),0.25), "--- done:", messtr, "\n"))
   }
 }
-
 #' Plot High Expression Genes
 #' 
 #' Generates a plot of the highest expression genes using the `plotHighestExprs` function from the 'scater' package.
@@ -88,18 +87,30 @@ pltHighExp <- function( scaterReads, n, scols) {
   p1
 }
 
-# Gene Name to Index ----
-#' Gene Name to Index
+#' Convert gene names to indices in featureData
+#'
+#' This function takes in a vector of gene names and a featureData object and 
+#' returns the indices of the gene names in the featureData object. It performs 
+#' case-insensitive comparisons to match the gene names. If any of the gene names 
+#' are not found in the featureData, a warning notification is displayed.
+#'
+#' @param g_id A comma separated string of gene names to be converted to indices.
+#' @param featureData A data frame or matrix containing gene information, with gene 
+#'   names stored in the 'symbol' column.
+#'
+#' @return A vector of indices corresponding to the input gene names in the 
+#'   featureData object.
+#'
+#' @examples
+#' # Create a featureData object 'features' with gene names in the 'symbol' column
+#' features <- data.frame(symbol = c("GeneA", "GeneB", "GeneC"))
 #' 
-#' Converts gene names to corresponding indices in the featureData of a SingleCellExperiment object.
-#' 
-#' @param g_id A character vector of gene names.
-#' @param featureData The featureData of a SingleCellExperiment object containing gene information.
-#' 
-#' @return A character vector of gene indices corresponding to the provided gene names.
-#' 
-#' @export geneName2Index
-#' 
+#' # Convert gene names to indices
+#' gene_indices <- geneName2Index(c("GeneA", "GeneC"), features)
+#' gene_indices
+#'
+#' @export
+# some comments removed because they cause too much traffic ----
 geneName2Index <- function(g_id, featureData) {
   # if (DEBUG) cat(file = stderr(), "geneName2Index started.\n")
   # start.time <- base::Sys.time()
@@ -136,6 +147,8 @@ geneName2Index <- function(g_id, featureData) {
                        id = "moduleNotFound", type = "warning",
                        duration = 20
       )
+    }else{
+      warning(paste("following genes were not found", notFound, collapse = " "))
     }
   }
   
@@ -151,19 +164,34 @@ geneName2Index <- function(g_id, featureData) {
 
 # updateProjectionsWithUmiCount ----
 #' Update Projections with UMI Count
-#' 
-#' Updates the projection matrix with UMI count information based on specified gene names.
-#' 
-#' @param geneNames A character vector of gene names for UMI count calculation.
-#' @param geneNames2 A character vector of additional gene names for UMI count calculation (optional).
-#' @param scEx A SingleCellExperiment object containing expression data.
-#' @param projections A list containing projection matrices.
-#' 
-#' @return A list containing updated projection matrices with UMI count information.
-#' 
-#' @export updateProjectionsWithUmiCount
-#' 
-updateProjectionsWithUmiCount <- function(geneNames, geneNames2 = NULL, scEx, projections) {
+#'
+#' This function updates the `projections` object with UMI count information 
+#' for specified genes from a `SingleCellExperiment` object. It handles both 
+#' single genes and multiple genes, calculating the sum of UMI counts across 
+#' multiple genes if necessary.
+#'
+#' @param geneNames A vector of gene names or indices for which UMI counts 
+#'                  are to be retrieved.
+#' @param geneNames2 An optional second vector of gene names or indices for 
+#'                   an alternative set of UMI counts.
+#' @param scEx A `SingleCellExperiment` object containing the UMI count data.
+#' @param projections A list or data structure where the UMI count information 
+#'                    will be stored.
+#'
+#' @return Returns the updated `projections` object with added UMI count data.
+#'
+#' @examples
+#' # Assuming scEx is a valid SingleCellExperiment object 
+#' # and projections is a valid projections object
+#' gene_list = c("Gene1", "Gene2")
+#' updateProjectionsWithUmiCount(gene_list, NULL, scEx, projections)
+#'
+#' @export
+#'
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom Matrix colSums
+updateProjectionsWithUmiCount <- function(
+    geneNames, geneNames2 = NULL, scEx, projections) {
   featureData <- rowData(scEx)
   geneNames <- geneName2Index(g_id = geneNames, featureData = featureData)
   if ((length(geneNames) > 0) && (length(geneNames[[1]]) > 0)) {
@@ -1316,9 +1344,25 @@ add2history <- function(type, comment = "", input = input, ...) {
   if (!base::exists("historyPath", envir = .schnappsEnv)) {
     # if this variable is not set we are not saving
     if (!is.null(getDefaultReactiveDomain())) {
-      showNotification("add 2 history is not active", id = "startSCHNAPPs",type = "warning", duration = NULL)
+      showNotification(
+        "history path not set, not saving",
+        id = "noHistoryWARNING",
+        type = "warning",
+        duration = 20
+      )
     }
-    
+    return(NULL)
+  }
+  if (is.null(.schnappsEnv$historyPath)) {
+    # if this variable is not set we are not saving
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        "history path NULL, not saving",
+        id = "noHistoryWARNING",
+        type = "warning",
+        duration = 20
+      )
+    }
     return(NULL)
   }
   # browser()

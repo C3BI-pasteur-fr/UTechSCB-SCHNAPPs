@@ -84,6 +84,7 @@ sCA_getCells <- function(projections, cl1, db1, db2, db1x, db1y) {
 
 #' define different methods for calculating diff. expressed genes
 #' first entry is displayed in Radio box, second is function to be called.
+#' to set sCA_dgeRadioButton
 myDiffExpFunctions <- list(
   c("Chi-square test of an estimated binomial distribution", "sCA_dge_CellViewfunc"),
   c("t-test", "sCA_dge_ttest"),
@@ -127,7 +128,7 @@ if("scDEA" %in% rownames(installed.packages())){
 #' Seurat FindMarkers
 #'
 #' cellMeta = colData(scEx)
-sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFact = 1){
+sCA_seuratFindMarkers <- function(scEx, scEx_logMat, cells.1, cells.2, test="wilcox", normFact = 1){
   if (DEBUG) cat(file = stderr(), "sCA_seuratFindMarkers started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -152,10 +153,18 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
   rData <- rowData(scEx)
   meta.data <- cellMeta[, "sampleNames", drop = FALSE]
   # creates object @assays$RNA@data and @assays$RNA@counts
-  seurDat <- tryCatch.W.E(Seurat::CreateSeuratObject(
-    counts = assays(scEx)[[1]],
-    meta.data = as.data.frame(meta.data)
-  ))
+  # browser()
+  if(!is.null(scEx_logMat)){
+    seurDat <- tryCatch.W.E(Seurat::CreateSeuratObject(
+      counts = scEx_logMat, 
+      meta.data = as.data.frame(meta.data)
+    ))
+  }else{
+    seurDat <- tryCatch.W.E(Seurat::CreateSeuratObject(
+      counts = assays(scEx)[[1]],
+      meta.data = as.data.frame(meta.data)
+    ))
+  }
   
   if (is(seurDat$value, "Seurat")) {
     seurDat = seurDat$value
@@ -166,15 +175,19 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
     return(NULL)
   }
   
+  
   # change "_" to "-"
   rowNameLookup = data.frame(org = rownames(scEx), seurat = stringr::str_replace_all(rownames(scEx),"_","-"))
   rownames(rowNameLookup) = rowNameLookup$org
   # rownames(scEx) = stringr::str_replace_all(rownames(scEx),"_","-")
   # we remove e.g. "genes" from total seq (CD3-TotalSeqB)
-  useGenes = rowNameLookup[which(rowNameLookup$seurat %in% rownames(seurDat@assays$RNA@data)),"seurat"]
+  useGenes = rowNameLookup[which(rowNameLookup$seurat %in% Features(seurDat)),"seurat"]
   rownames(scEx) = rowNameLookup[rownames(scEx),"seurat"]
-  seurDat@assays$RNA@data = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
-  seurDat@assays$RNA@scale.data = as.matrix(seurDat@assays$RNA@data)
+  
+  
+  
+  # seurDat@assays$RNA$counts = as(assays(scEx)[[1]], "CsparseMatrix")[useGenes,]
+  # seurDat@assays$RNA$scale.data = as.matrix(seurDat@assays$RNA$counts)
   
   # not sure we need the normalization factor
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
@@ -185,7 +198,8 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
                         ident.2 = cells.2,
                         min.pct = 0.00000000001,
                         test.use = test,
-                        logfc.threshold = 0.000001
+                        logfc.threshold = 0.000001,
+                        slot = Layers(seurDat)[1]
                         # test.use = "wilcox" # p_val  avg_logFC pct.1 pct.2    p_val_adj
                         # test.use = "bimod"  # p_val  avg_logFC pct.1 pct.2    p_val_adj
                         # test.use = "roc"    # myAUC   avg_diff power pct.1 pct.2
@@ -195,7 +209,8 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
                         # test.use = "LR"     # p_val  avg_logFC pct.1 pct.2 p_val_adj
                         # test.use = "MAST" # not working: Assay in position 1, with name et is unlogged. Set `check_sanity = FALSE` to override and then proceed with caution.
                         # test.use = "DESeq2" # needs UMI # done separately because the estimating process isn't working with 0s
-    ))
+    )
+  )
   
   if (is(markers$value , "data.frame")) {
     markers = markers$value
@@ -226,28 +241,29 @@ sCA_seuratFindMarkers <- function(scEx, cells.1, cells.2, test="wilcox", normFac
 sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
 
 
-sCA_dge_s_wilcox <- function(scEx_log, cells.1, cells.2){
+sCA_dge_s_wilcox <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="wilcox", normFact) 
+  sCA_seuratFindMarkers_m(scEx_log, scEx_logMat, cells.1, cells.2, test="wilcox", normFact) 
 }
-sCA_dge_s_bimod <- function(scEx_log, cells.1, cells.2){
+#Differential expression with BPCells currently only supports the 'wilcox' method. Please rerun with test.use = 'wilcox'
+sCA_dge_s_bimod <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="bimod") 
+  sCA_seuratFindMarkers_m(scEx_log, scEx_logMat = NULL, cells.1, cells.2, test="bimod") 
 }
-sCA_dge_s_t <- function(scEx_log, cells.1, cells.2){
+sCA_dge_s_t <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   if (.schnappsEnv$DEBUG) cat(file = stderr(), paste0("sCA_dge_s_t: \n"))
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="t", normFact) 
+  sCA_seuratFindMarkers_m(scEx_log, scEx_logMat = NULL, cells.1, cells.2, test="t", normFact) 
 }
-sCA_dge_s_LR<- function(scEx_log, cells.1, cells.2){
+sCA_dge_s_LR<- function(scEx_log, scEx_logMat, cells.1, cells.2){
   normFact = .schnappsEnv$normalizationFactor
-  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="LR", normFact)
+  sCA_seuratFindMarkers_m(scEx_log, scEx_logMat = NULL, cells.1, cells.2, test="LR", normFact)
 }
-sCA_dge_s_negbinom <- function(scEx_log, cells.1, cells.2){
-  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="negbinom", normFact = 1)
+sCA_dge_s_negbinom <- function(scEx_log, scEx_logMat, cells.1, cells.2){
+  sCA_seuratFindMarkers_m(scEx_log, scEx_logMat = NULL, cells.1, cells.2, test="negbinom", normFact = 1)
 }
-sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2){
-  sCA_seuratFindMarkers_m(scEx_log, cells.1, cells.2, test="poisson", normFact = 1) 
+sCA_dge_s_poisson <- function(scEx_log, scEx_logMat, cells.1, cells.2){
+  sCA_seuratFindMarkers_m(scEx_log, scEx_logMat = NULL, cells.1, cells.2, test="poisson", normFact = 1) 
 }
 
 #' scDEA
@@ -255,7 +271,7 @@ sCA_dge_s_poisson <- function(scEx_log, cells.1, cells.2){
 
 
 
-sCA_scDEA <- function(scEx_log, cells.1, cells.2){
+sCA_scDEA <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   withWarnings <- function(expr) {
     wHandler <- function(w) {
       if (DEBUG) {
@@ -309,7 +325,7 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
     save(file = "~/SCHNAPPsDebug/sCA_scDEA.RData", list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_scDEA.RData')
-
+  
   dups = c(cells.1, cells.2)[duplicated(c(cells.1, cells.2))]
   if(length(dups) > 0){
     cells.1 = cells.1[!cells.1 %in% dups]
@@ -333,32 +349,32 @@ sCA_scDEA <- function(scEx_log, cells.1, cells.2){
   Pvals <- withWarnings(
     suppressMessages(scDEA::scDEA_individual_methods(raw.count = as.matrix(counts), 
                                                      cell.label = group.info$group,
-                             BPSC = isolate(input$scDEA_BPSC), 
-                             DEsingle = isolate(input$scDEA_BPSC), 
-                             DESeq2 = isolate(input$scDEA_DESeq2), 
-                             edgeR = isolate(input$scDEA_edgeR), 
-                             MAST = isolate(input$scDEA_MAST), 
-                             monocle = isolate(input$scDEA_monocle), 
-                             scDD = isolate(input$scDEA_scDD),
-                             Ttest = isolate(input$scDEA_Ttest),
-                             
-                             
-                             
-                             Wilcoxon = isolate(input$scDEA_Wilcoxon), 
-                             limma = isolate(input$scDEA_limma), 
-                             Seurat = isolate(input$scDEA_Seurat),
-                             zingeR.edgeR = isolate(input$scDEA_zingeR.edgeR),
-                             
-                             BPSC.parallel = isolate(input$scDEA_parallel),
-                             DEsingle.parallel = isolate(input$scDEA_parallel),
-                             DESeq2.parallel = isolate(input$scDEA_parallel),
-                             MAST.parallel = isolate(input$scDEA_parallel),
-                             monocle.cores = ifelse(isolate(input$scDEA_parallel),
-                                                    max(floor(parallel::detectCores()/2),1), #assure min 1 core used and not all, i.e. about 50% for memory reasons
-                                                    1)
-                             
-                             ))
-    )
+                                                     BPSC = isolate(input$scDEA_BPSC), 
+                                                     DEsingle = isolate(input$scDEA_BPSC), 
+                                                     DESeq2 = isolate(input$scDEA_DESeq2), 
+                                                     edgeR = isolate(input$scDEA_edgeR), 
+                                                     MAST = isolate(input$scDEA_MAST), 
+                                                     monocle = isolate(input$scDEA_monocle), 
+                                                     scDD = isolate(input$scDEA_scDD),
+                                                     Ttest = isolate(input$scDEA_Ttest),
+                                                     
+                                                     
+                                                     
+                                                     Wilcoxon = isolate(input$scDEA_Wilcoxon), 
+                                                     limma = isolate(input$scDEA_limma), 
+                                                     Seurat = isolate(input$scDEA_Seurat),
+                                                     zingeR.edgeR = isolate(input$scDEA_zingeR.edgeR),
+                                                     
+                                                     BPSC.parallel = isolate(input$scDEA_parallel),
+                                                     DEsingle.parallel = isolate(input$scDEA_parallel),
+                                                     DESeq2.parallel = isolate(input$scDEA_parallel),
+                                                     MAST.parallel = isolate(input$scDEA_parallel),
+                                                     monocle.cores = ifelse(isolate(input$scDEA_parallel),
+                                                                            max(floor(parallel::detectCores()/2),1), #assure min 1 core used and not all, i.e. about 50% for memory reasons
+                                                                            1)
+                                                     
+    ))
+  )
   if(is.null(Pvals)) return(NULL)
   
   if (.schnappsEnv$DEBUGSAVE) {
@@ -419,7 +435,7 @@ sCA_seuratFindMarkers_m = sCA_seuratFindMarkers
 runDESEQ2_m <- runDESEQ2
 
 
-sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
+sCA_dge_deseq2 <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   if (DEBUG) cat(file = stderr(), "sCA_dge_deseq2 started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -475,7 +491,7 @@ sCA_dge_deseq2 <- function(scEx_log, cells.1, cells.2) {
 
 #' sCA_dge_CellViewfunc
 #' calculate differentically expressed genes given 2 sets of cells
-sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
+sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   if (DEBUG) cat(file = stderr(), "sCA_dge_CellViewfunc started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -519,7 +535,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, cells.1, cells.2) {
 
 #' sCA_dge_ttest
 #' t-test on selected cells
-sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
+sCA_dge_ttest <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   if (DEBUG) cat(file = stderr(), "sCA_dge_ttest started.\n")
   start.time <- base::Sys.time()
   on.exit({
@@ -535,19 +551,27 @@ sCA_dge_ttest <- function(scEx_log, cells.1, cells.2) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls()))
   }
   #cp = load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
-  
+  # browser()
   featureData <- rowData(scEx_log)
   scEx_log <- as.matrix(assays(scEx_log)[[1]])
   subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
   genes.use <- rownames(subsetExpression)
   
-  p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
+  if(!exists("t.test.cores", envir = .schnappsEnv)) .schnappsEnv$t.test.cores = 1
+  cl <- makeCluster(.schnappsEnv$t.test.cores)
+  
+  p_val <- parApply(cl,subsetExpression, 1, cells.1=cells.1,cells.2=cells.2,function(x, cells.1, cells.2) t.test(x[cells.1], x[cells.2])$p.value)
+  # p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
   p_val[is.na(p_val)] <- 1
   dat <- subsetExpression[genes.use, cells.1]
-  data.1 <- apply(dat, 1, function(x) expMean(x, normFactor = .schnappsEnv$normalizationFactor))
+  if(!is.null(.schnappsEnv$normalizationFactor))
+    if(.schnappsEnv$normalizationFactor == 0) normFact = 1000
+  clusterExport(cl, "expMean")
+  data.1 <- parApply(cl, dat, 1, normFact=normFact, function(x, normFact) expMean(x, normFactor = normFact))
   dat <- subsetExpression[genes.use, cells.2]
-  data.2 <- apply(dat, 1, function(x) expMean(x, normFactor = .schnappsEnv$normalizationFactor))
+  data.2 <- parApply(cl, dat, 1, normFact=normFact, function(x, normFact) expMean(x, normFactor = normFact))
   avg_diff <- (data.1 - data.2)
+  stopCluster(cl)
   
   retVal <- data.frame(p_val = p_val, avg_diff = avg_diff, symbol = featureData[names(p_val), "symbol"])
   return(retVal)
@@ -569,8 +593,13 @@ sCA_dge <- reactive({
     removeNotification(id = "dgewarning")
   }
   
+  selectedCells <- isolate(Liana_dataInput())
+  
   scEx_log <- scEx_log()
   scEx <- scEx()
+  scEx_logMat <- BPCellsLog()
+  scExMat <- BPCellsCounts()
+  
   projections <- projections()
   # cl1 <- input$sCA_dgeClustersSelection
   # selectedCells <- isolate(dePanelCellSelection())
@@ -618,6 +647,7 @@ sCA_dge <- reactive({
   # in case we need counts and not normalized counts
   if (dgeFunc %in% c("sCA_dge_deseq2", "sCA_dge_s_negbinom", "sCA_dge_s_poisson", "sCA_scDEA")) {
     scEx_log = scEx
+    scEx_logMat = scExMat
   }
   # retVal <- do.call(dgeFunc, args = list(
   #   scEx_log = scEx_log,
@@ -653,10 +683,12 @@ sCA_dge <- reactive({
     return(val)
   }
   
+  # browser()
   
   retVal <- withWarnings({
     do.call(dgeFunc, args = list(
       scEx_log = scEx_log,
+      scEx_logMat = scEx_logMat,
       cells.1 = gCells$c1, cells.2 = gCells$c2
     ))})
   # browser()
@@ -673,7 +705,7 @@ sCA_dge <- reactive({
       showNotification("dge: nothing found", id = "dgewarning", duration = 10, type = "warning")
     }
   }
-
+  
   # update reactiveValue
   sCA_selectedDge$sCA_dgeTable <- retVal
   
@@ -791,10 +823,10 @@ subCluster2Dplot <- function() {
     
     p1 <- subsetData %>%
       ggplot(
-             # this version causes a crash with unknown column selected
-             aes(x = .data[[x1]], y = .data[[y1]]),
-             # aes_string(x = x1, y = y1),
-             colour = mycolPal[subsetData[,prjs]]
+        # this version causes a crash with unknown column selected
+        aes(x = .data[[x1]], y = .data[[y1]]),
+        # aes_string(x = x1, y = y1),
+        colour = mycolPal[subsetData[,prjs]]
       ) +
       geom_point(colour = mycolPal[subsetData[,prjs]]) +
       geom_point(
