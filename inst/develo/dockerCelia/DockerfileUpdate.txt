@@ -20,8 +20,8 @@ RUN git --version
 
 RUN ls
 RUN R -e "install.packages('markdown')"
-Run ls ..
-RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = TRUE)"
+RUN ls 
+RUN R -e "devtools::install_github('C3BI-pasteur-fr/UTechSCB-SCHNAPPs' , dependencies = FALSE)"
 
 
 EXPOSE 3838

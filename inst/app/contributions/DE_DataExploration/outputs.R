@@ -576,7 +576,7 @@ output$DE_panelPlotFact <- renderPlot({
   .schnappsEnv[["DE_panelPlotFact"]] <- list(plotFunc = af,
                                          scEx_log = scEx_log, 
                                          projections=projections, 
-                                         genesin=genesin, dimx4=dimx4, 
+                                         dimx4=dimx4, 
                                          dimy4=dimy4, sameScale=sameScale, 
                                          nCol=nCol, sampdesc=sampdesc,
                                          cellNs=cellNs,

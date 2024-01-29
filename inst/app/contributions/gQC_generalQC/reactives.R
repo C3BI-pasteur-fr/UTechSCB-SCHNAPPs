@@ -359,6 +359,7 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
       return(NULL)
     }
   )
+  
   if (is.null(tsne)) {
     return(NULL)
   }
