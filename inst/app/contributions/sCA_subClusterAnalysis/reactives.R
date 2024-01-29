@@ -564,6 +564,7 @@ sCA_dge_ttest <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   # p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
   p_val[is.na(p_val)] <- 1
   dat <- subsetExpression[genes.use, cells.1]
+  normFact = 1000
   if(!is.null(.schnappsEnv$normalizationFactor))
     if(.schnappsEnv$normalizationFactor == 0) normFact = 1000
   clusterExport(cl, "expMean")

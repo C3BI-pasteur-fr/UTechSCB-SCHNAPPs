@@ -33,8 +33,13 @@ liana_scExReact <- reactive({
   
   # browser()
   proj = proj[cellNs,]
-  proj[,idents_col] = droplevels(proj[,idents_col])
+  if(is.factor(proj[,idents_col])){
+    proj[,idents_col] = droplevels(proj[,idents_col])
+  } else {
+    proj[,idents_col] = as.factor(proj[,idents_col])
+  }
   liana_scEx <- liana_scExFunc(scEx=scEx[, cellNs], scEx_log = scEx_log[, cellNs], proj, resource, idents_col, method, min_cells)
+  if(is.null(liana_scEx)) return(NULL)
   for(na in names(liana_scEx)){
     if(is(liana_scEx[[na]], "error")){
       liana_scEx[[na]] = NULL
@@ -52,7 +57,7 @@ liana_aggr <- reactive({
   if(length(method) > 1){
     liana_scEx <- tryCatch(liana_scEx %>% liana_aggregate(),
                            error = function(e) {
-                             cat(file = stderr(), "\n\ncaught exception with liana_aggregate:", e,  "\n\n")
+                             cat(file = stderr(), "\n\ncaught exception with liana_aggregate:", toString(e),  "\n\n")
                              return(NULL)
                            }
     )
@@ -72,10 +77,15 @@ liana_scExFunc <- function(scEx, scEx_log, proj, resource, idents_col, method, m
   assays(scEx)[["logcounts"]] = as(assays(scEx_log)[["logcounts"]],"CsparseMatrix")
   
   # what if only one method is used? do we still need to aggregate?
-  liana_scEx <- liana_wrap(scEx, idents_col = idents_col, assay="logcounts",
+  liana_scEx <- tryCatch(
+   liana_wrap(scEx, idents_col = idents_col, assay="logcounts",
                            base = 2 , # log expression base
                            method = method,
-                           resource = resource)
+                           resource = resource),
+   error = function(e)  {
+     cat(file = stderr(), "\n\ncaught exception with liana_wrap:", toString(e),  "\n\n")
+     return(NULL)
+   })
   
   return(liana_scEx)
   
