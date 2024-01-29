@@ -2452,13 +2452,13 @@ BPCellsLog <- reactive({
   req(scEx_log)
   # browser()
   mi = NULL
-  m = tryCatch({
+  mi = tryCatch({
     if(!is(assay(scEx_log, "logcounts"),"dgCMatrix")){
-      as(assay(scEx_log, "logcounts"),"dgCMatrix")
+      m = as(assay(scEx_log, "logcounts"),"dgCMatrix")
     }else{
-      assay(scEx_log, "logcounts")
+      m = assay(scEx_log, "logcounts")
     }
-    mi = BPCells::write_matrix_memory(m, compress = F)
+    BPCells::write_matrix_memory(m, compress = F)
   }, error = function(e) {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("Problem BPCellsLog", type = "warning", duration = NULL)
