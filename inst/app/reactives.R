@@ -2453,8 +2453,8 @@ BPCellsLog <- reactive({
   # browser()
   mi = NULL
   mi = tryCatch({
-    if(!is(assay(scEx_log, "logcounts"),"dgCMatrix")){
-      m = as(assay(scEx_log, "logcounts"),"dgCMatrix")
+    if(!is(assay(scEx_log, "logcounts"),"CsparseMatrix")){
+      m = as(assay(scEx_log, "logcounts"),"CsparseMatrix")
     }else{
       m = assay(scEx_log, "logcounts")
     }
@@ -2473,8 +2473,8 @@ BPCellsLog <- reactive({
 BPCellsCounts <- reactive({
   scEx = scEx()
   req(scEx)
-  if(!is(assay(scEx, "counts"),"dgCMatrix")){
-    m = as(assay(scEx, "counts"),"dgCMatrix")
+  if(!is(assay(scEx, "counts"),"CsparseMatrix")){
+    m = as(assay(scEx, "counts"),"CsparseMatrix")
   }else{
     m = assay(scEx, "counts")
   }
