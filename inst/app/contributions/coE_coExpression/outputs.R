@@ -671,6 +671,10 @@ observe({
                     choices = projF,
                     selected = .schnappsEnv$alluiv1
   )
+  updateSelectInput(session, "coE_subSampleFactor",
+                    choices = projF,
+                    selected = .schnappsEnv$coE_subSampleFactor
+  )
   updateSelectInput(session, "alluiv2",
                     choices = projF,
                     selected = .schnappsEnv$alluiv2

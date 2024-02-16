@@ -38,25 +38,25 @@ clusterUI <- function(id) {
       column(
         width = 4,
         {sc_selectInput(ns("dimension_x"),
-                    label = "X",
-                    choices = c(defaultValue(ns("dimension_x"), "tsne1"), "tsne2", "tsne3"),
-                    selected = defaultValue(ns("dimension_x"), "tsne1")
+                        label = "X",
+                        choices = c(defaultValue(ns("dimension_x"), "tsne1"), "tsne2", "tsne3"),
+                        selected = defaultValue(ns("dimension_x"), "tsne1")
         )}
       ),
       column(
         width = 4,
         sc_selectInput(ns("dimension_y"),
-                    label = "Y",
-                    choices = c("tsne1", defaultValue(ns("dimension_y"), "tsne2"), "tsne3"),
-                    selected = defaultValue(ns("dimension_y"), "tsne2")
+                       label = "Y",
+                       choices = c("tsne1", defaultValue(ns("dimension_y"), "tsne2"), "tsne3"),
+                       selected = defaultValue(ns("dimension_y"), "tsne2")
         )
       ),
       column(
         width = 4,
         sc_selectInput(ns("dimension_col"),
-                    label = "color",
-                    choices = c(defaultValue(ns("dimension_col"), "sampleNames")),
-                    selected = defaultValue(ns("dimension_col"), "sampleNames")
+                       label = "color",
+                       choices = c(defaultValue(ns("dimension_col"), "sampleNames")),
+                       selected = defaultValue(ns("dimension_col"), "sampleNames")
         )
       )
     ),
@@ -66,7 +66,7 @@ clusterUI <- function(id) {
         column(
           width = 12,
           
-            plotly::plotlyOutput(ns("clusterPlot")) %>% jqui_resizable()
+          plotly::plotlyOutput(ns("clusterPlot")) %>% jqui_resizable()
         )
       ),
       shinydashboardPlus::box(
@@ -90,19 +90,19 @@ clusterUI <- function(id) {
           column(
             width = 3,
             sc_selectInput(ns("divideXBy"),
-                        label = "Divide X by",
-                        # choices = c("None", "Gene.count", "UMI.count"),
-                        choices = c(defaultValue(ns("divideXBy"), "None"), "UmiCountPerGenes", "UmiCountPerGenes2"),
-                        selected = defaultValue(ns("divideXBy"), "None")
+                           label = "Divide X by",
+                           # choices = c("None", "Gene.count", "UMI.count"),
+                           choices = c(defaultValue(ns("divideXBy"), "None"), "UmiCountPerGenes", "UmiCountPerGenes2"),
+                           selected = defaultValue(ns("divideXBy"), "None")
             )
           ),
           column(
             width = 3,
             sc_selectInput(ns("divideYBy"),
-                        label = "Divide Y by",
-                        # choices = c("None", "Gene.count", "UMI.count"),
-                        choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2", "normByCol"),
-                        selected = defaultValue(ns("divideYBy"), "None")
+                           label = "Divide Y by",
+                           # choices = c("None", "Gene.count", "UMI.count"),
+                           choices = c("None", "UmiCountPerGenes", "UmiCountPerGenes2", "normByCol"),
+                           selected = defaultValue(ns("divideYBy"), "None")
             )
           )
         ),
@@ -111,13 +111,13 @@ clusterUI <- function(id) {
             width = 12,
             sc_checkboxInput(ns("addToGroup"), "Add to group/otherwise overwrite", defaultValue(ns("addToGroup"), TRUE)),
             list(sc_textInput(ns(id = "groupName"), label = "name group, also used in Plot to color selected cells red.", value = ""),
-            sc_selectInput(ns("groupNames"),
-                        label = "group names, !When modifying a group this list of cells is used as a reference!",
-                        choices = c(defaultValue(ns("groupNames"), "plot"), "all", "none"),
-                        selected = defaultValue(ns("groupNames"), "plot")
-            ),
-            verbatimTextOutput(ns("nCellsVisibleSelected")),
-            actionButton(ns("changeGroups"), "change current selection")) %>% setId("groupTutorial"),
+                 sc_selectInput(ns("groupNames"),
+                                label = "group names, !When modifying a group this list of cells is used as a reference!",
+                                choices = c(defaultValue(ns("groupNames"), "plot"), "all", "none"),
+                                selected = defaultValue(ns("groupNames"), "plot")
+                 ),
+                 verbatimTextOutput(ns("nCellsVisibleSelected")),
+                 actionButton(ns("changeGroups"), "change current selection")) %>% setId("groupTutorial"),
             sc_checkboxInput(ns("showCells"), "show cell names", defaultValue(ns("showCells"), FALSE)),
             verbatimTextOutput(ns("cellSelection")),
             actionButton(ns("save2Hist"), "save to history"),
@@ -138,8 +138,8 @@ clusterUI <- function(id) {
 tableSelectionUi <- function(id) {
   ns <- NS(id)
   tagList(
-   # jqui_resizable(
-     shinydashboardPlus::box(
+    # jqui_resizable(
+    shinydashboardPlus::box(
       width = 12, height = 700,
       fluidRow(
         column(
@@ -189,7 +189,7 @@ tableSelectionUi <- function(id) {
       )
     )
     # )
-     )
+  )
 }
 
 # pHeatMapUI --------------
@@ -206,13 +206,14 @@ pHeatMapUI <- function(id) {
           #                           brush = brushOpts(id = "crh1")
           # ), options = list(width = "99%"))
           # originalHeatmapOutput(heatmap_id = ns("pHeatMapPlot"), title = NULL) %>% jqui_resizable()
+          
           plotOutput(ns("pHeatMapPlot"), click = ns("heatmap_click"), 
                      brush = ns("heatmap_brush")) %>% jqui_resizable()
         )),
       fluidRow(
         column(width = 12,
                verbatimTextOutput(ns("pHeatMapPlotSelection"))
-               )
+        )
       ),
       shinydashboardPlus::box(
         title = "additional options", solidHeader = TRUE, width = 12, status = "primary",
@@ -243,9 +244,9 @@ pHeatMapUI <- function(id) {
           column(
             width = 6,
             sc_selectInput(ns("normRow"),
-                        label = "scale by row (for color)",
-                        choices = c("row", "column", "row_order", "col_order", defaultValue(ns("normRow"), "none")),
-                        selected = defaultValue(ns("normRow"), "none")
+                           label = "scale by row (for color)",
+                           choices = c("row", "column", "row_order", "col_order", defaultValue(ns("normRow"), "none")),
+                           selected = defaultValue(ns("normRow"), "none")
             ),
             sc_selectInput(
               ns("ColNames"),

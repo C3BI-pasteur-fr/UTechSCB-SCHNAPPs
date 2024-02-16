@@ -1106,6 +1106,9 @@ coE_updateInputXviolinPlot <- observe({
 
 observe(label = "obs_coE_heatmap_geneids", x= {
   .schnappsEnv$defaultValues[["coE_heatmap_geneids"]] = input$coE_heatmap_geneids
+  .schnappsEnv$defaultValues[["coE_subSampleFactor"]] = input$coE_subSampleFactor
+  .schnappsEnv$defaultValues[["coE_nSubsample"]] = input$coE_nSubsample
+  
 })
 
 # coE_heatmapReactive -------
@@ -1130,6 +1133,8 @@ coE_heatmapReactive <- reactive({
   sampCol <- projectionColors$sampleNames
   ccols <- projectionColors$dbCluster
   projections <- projections()
+  subSampleFactor = input$coE_subSampleFactor
+  nSubsample = input$coE_nSubsample
   
   if (is.null(scEx_log) | is.null(projections)) {
     return(list(
@@ -1145,11 +1150,24 @@ coE_heatmapReactive <- reactive({
     save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/heatmap.RData")
+  # browser()
   
   featureData <- rowData(scEx_log)
+  cData = colData(scEx_log)
+  if(!subSampleFactor %in% colnames(projections)){
+    return(list(
+      src = "empty.png",
+      contentType = "image/png",
+      width = 96,
+      height = 96,
+      alt = "heatmap should be here"
+    ))
+  }
   if (genesin == "") return(NULL)
+  groupedData = split(seq_len(nrow(projections)), projections[,subSampleFactor])
+  matIdx = lapply(groupedData, FUN=function(x)base::sample(x,min(nSubsample,length(x)))) %>% unlist()  %>% sort()
   
-  scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]])
+  scEx_matrix <- as.matrix(assays(scEx_log)[["logcounts"]][,matIdx])
   retVal <- coE_heatmapFunc(
     featureData = featureData, scEx_matrix = scEx_matrix,
     projections = projections, genesin = genesin, cells = colnames(scEx_matrix),
