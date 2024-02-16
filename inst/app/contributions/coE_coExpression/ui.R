@@ -38,7 +38,18 @@ tabList <- list(
         fluidRow(
         column(
           width = 12,
-          sc_textInput("coE_heatmap_geneids", "Comma separated gene names", value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes))
+          sc_textInput("coE_heatmap_geneids", "Comma separated gene names", 
+                       width = '100%',
+                       value = defaultValue("coE_heatmap_geneids", defaultValueMultiGenes)),
+          fluidRow(column(
+            width = 6,
+            sc_selectInput("coE_subSampleFactor", "factor to subsample", selected = defaultValue("coE_subSampleFactor", "dbCluster"),
+                           choices = c("dbCluster", "sample"))),
+            column(
+              width = 6,
+              sc_numericInput("coE_nSubsample", "max number of cells per group", value = defaultValue("coE_nSubsample", 1000), min=10)
+            )
+          ),
         )
       ),
       fluidRow(

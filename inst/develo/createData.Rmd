@@ -176,7 +176,7 @@ pd = data.frame(barcodes = sub("(.*)-(.*)", "\\1", colnames(alldata)),
 )
 pd$barcodes = as.character(pd$barcodes)
 pd
-counts <- as(alldata, "dgCMatrix")
+counts <- as(alldata, "CsparseMatrix")
 scEx = SingleCellExperiment(assay = list(counts=counts),
                             colData = pd,
                             rowData = featuredata)
