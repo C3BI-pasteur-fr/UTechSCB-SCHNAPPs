@@ -447,6 +447,7 @@ scranFindMarkerFullReactiveTable <- reactive({
     return(NULL)
   }
   clicked <- input$scranFindMarkerApply
+  # parallel
   wmarkers <- tryCatch({
     scran::findMarkers(scEx_log, 
                        projections$dbCluster,
@@ -678,6 +679,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
           duration = NULL
         )
       }
+      # parallel (BPPARAM)
       x <- bplapply(1:xPerm, FUN = function(r) finner(xPerm, r, genesin, featureData, scEx, perms, minMaxExpr))
       
       for (idx in 1:length(x)) {

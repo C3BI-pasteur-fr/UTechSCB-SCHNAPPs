@@ -347,6 +347,7 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   np <- dim(pca$x)[2]
   tsne <- tryCatch(
     {
+      # parallel (BPPARAM)
       Rtsne::Rtsne(
         pca$x[, 1:np],
         pca = FALSE, dims = gQC_tsneDim,

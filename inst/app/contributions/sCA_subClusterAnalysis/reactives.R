@@ -193,6 +193,9 @@ sCA_seuratFindMarkers <- function(scEx, scEx_logMat, cells.1, cells.2, test="wil
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
   require(Seurat)
   markers <- tryCatch.W.E(
+    # parallel
+    # plan("multiprocess", workers = 4)
+    
     Seurat::FindMarkers(seurDat, 
                         ident.1 = cells.1,
                         ident.2 = cells.2,
@@ -347,6 +350,7 @@ sCA_scDEA <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   counts = assays(scEx_log)[[1]][,rownames(group.info)]
   
   Pvals <- withWarnings(
+    # parallel (monocle cores see below)
     suppressMessages(scDEA::scDEA_individual_methods(raw.count = as.matrix(counts), 
                                                      cell.label = group.info$group,
                                                      BPSC = isolate(input$scDEA_BPSC), 
@@ -419,6 +423,7 @@ runDESEQ2 <- function(data.use, group.info) {
   if (DEBUG) cat(file = stderr(), "DESeq2 nbinomWaldTest\n")
   dds1 <- DESeq2::nbinomWaldTest(object = dds1)
   if (DEBUG) cat(file = stderr(), "DESeq2 results\n")
+  # parallel (BPPARAM)
   res <- DESeq2::results(
     object = dds1,
     contrast = c("group", "Group1", "Group2"),

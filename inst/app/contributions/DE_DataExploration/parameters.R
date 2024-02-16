@@ -243,7 +243,10 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
       reference_dataset <- order(unlist(lapply(seur.list, FUN = function(x) {ncol(x)})), decreasing =T)[1]
       integrated = NULL
       if (length(seur.list) > 1) {
-        anchors <- FindIntegrationAnchors(
+        # parallel
+        # plan("multiprocess", workers = 4)
+        
+        anchors <- Seurat::FindIntegrationAnchors(
           object.list = seur.list, 
           normalization.method = "SCT",
           anchor.features = features, 
@@ -256,7 +259,7 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
         )
         # keep.features = keep.features[keep.features %in% rownames(scEx)]
         # anchors = unique(c(anchors, keep.features))
-        integrated <- IntegrateData(
+        integrated <- Seurat::IntegrateData(
           anchorset = anchors, normalization.method = "SCT",
           verbose = DEBUG,
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
@@ -438,7 +441,10 @@ DE_seuratSCtransformFunc <- function(scEx,
       )
       
       if (length(seur.list) > 1) {
-        anchors <- FindIntegrationAnchors(
+        # parallel
+        # plan("multiprocess", workers = 4)
+        
+        anchors <- Seurat::FindIntegrationAnchors(
           object.list = seur.list, 
           normalization.method = "SCT",
           anchor.features = sel.features, 
@@ -450,7 +456,7 @@ DE_seuratSCtransformFunc <- function(scEx,
         )
         # keep.features = keep.features[keep.features %in% rownames(scEx)]
         # anchors = unique(c(anchors, keep.features))
-        integrated <- IntegrateData(
+        integrated <- Seurat::IntegrateData(
           anchorset = anchors, normalization.method = "SCT",
           verbose = DEBUG,
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
@@ -608,15 +614,17 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
         # meta.data = meta.data[limitCells,, drop = FALSE]
       }
       # browser()
-      seurDat <- CreateSeuratObject(
+      seurDat <- Seurat::CreateSeuratObject(
         # BPCells not compatible with RunCCA
         counts = assay(scEx, "counts"),
         meta.data = meta.data
       )
-      seur.list <- SplitObject(seurDat, split.by = splitby)
+      seur.list <- Seurat::SplitObject(seurDat, split.by = splitby)
       seur.list <- lapply(seur.list, FUN = function(x) {
-        x <- NormalizeData(x, verbose = DEBUG)
-        x <- FindVariableFeatures(x,
+        # parallel
+        # plan("multiprocess", workers = 4)
+        x <- Seurat::NormalizeData(x, verbose = DEBUG)
+        x <- Seurat::FindVariableFeatures(x,
                                   selection.method = "vst",
                                   nfeatures = 2000, verbose = DEBUG
         )
@@ -630,14 +638,19 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
       #   )
       # }
       if (length(seur.list) > 1){
-        anchors <- FindIntegrationAnchors(
+        # parallel
+        # plan("multiprocess", workers = 4)
+        anchors <- Seurat::FindIntegrationAnchors(
           object.list = seur.list, dims = 1:dims, anchor.features = anchorsF,
           k.filter = kF
         )
-        integrated <- IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight, verbose = DEBUG)
+        integrated <- Seurat::IntegrateData(anchorset = anchors, dims = 1:dims, k.weight = k.weight, verbose = DEBUG)
         DefaultAssay(integrated) <- "integrated"
         
         # Run the standard workflow for visualization and clustering
+        # parallel
+        # plan("multiprocess", workers = 4)
+        
         integrated <- Seurat::ScaleData(integrated, verbose = DEBUG)
         integrated[["integrated"]]["scale.data"]
       } else {
@@ -839,6 +852,9 @@ DE_seuratSCTnormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   )
   # UMI-based normalisation & logTransformation
   # browser()
+  # parallel
+  # plan("multiprocess", workers = 4)
+  
   seurDat = Seurat::NormalizeData(seurDat)
   
   seurDat <- SCTransform(object = seurDat, 
@@ -982,6 +998,8 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   )
   # UMI-based normalisation & logTransformation
   # browser()
+  # parallel
+  # plan("multiprocess", workers = 4)
   seurDat = Seurat::NormalizeData(seurDat)
   # Finding variable genes
   seurDat = Seurat::FindVariableFeatures(object = seurDat,
@@ -990,6 +1008,7 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   if (length(var2reg) == 0)
     var2reg = NULL
   # # scaling the data (only variable genes)
+  # parallel
   seurDat = Seurat::ScaleData(object = seurDat,
                               vars.to.regress = var2reg)
   

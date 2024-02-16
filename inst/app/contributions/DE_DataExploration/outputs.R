@@ -680,7 +680,8 @@ observeEvent(input$runScater,{
   #   createScaterPNG(scaterReads, n, scols, width=width, height=height)
   # })
   #span the process/function call
-  options(future.globals.maxSize= maxMemory * 1024^3)
+  # This should be set globally as it is also not reset here
+  # options(future.globals.maxSize= maxMemory * 1024^3)
   
   detachedProc$process <- tryCatch({
     future({

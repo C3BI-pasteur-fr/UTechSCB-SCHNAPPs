@@ -2129,6 +2129,9 @@ pcaFunc <- function(scEx, scEx_log,
     mi = BPCells::write_matrix_memory(assays(scEx_log)[["logcounts"]][genesin,], compress = F)
     if (scale | center) {
       set.seed(1)
+      # parallel
+      # plan("multiprocess", workers = 4)
+      
       mi <- Seurat::ScaleData(mi, do.scale = scale, do.center = center, verbose = T)
       genesin = rownames(mi) # ScaleData can remove genes.
     }
@@ -2340,6 +2343,7 @@ scranCluster <- function(pca,
   require(scran)
   retVal <- tryCatch(
     {
+      # parallel (BSPARAM)
       suppressMessages(BiocGenerics::do.call("quickCluster", params))
     },
     error = function(e) {
@@ -2553,6 +2557,8 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
   
   
   seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
+  # parallel
+  # plan("multiprocess", workers = 4)
   seurDat <- FindClusters(seurDat, resolution = resolution, method = "igraph", algorithm=1 )
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
@@ -2785,6 +2791,7 @@ simlrFunc  <- function(){
     return(NULL)
   }
   require(SIMLR)
+  # why????
   if (Sys.getenv("RSTUDIO") == "1" && !nzchar(Sys.getenv("RSTUDIO_TERM")) && 
       Sys.info()["sysname"] == "Darwin" && getRversion() == "4.0.2") {
     parallel:::setDefaultClusterOptions(setup_strategy = "sequential")
