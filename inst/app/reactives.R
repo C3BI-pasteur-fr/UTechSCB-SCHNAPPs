@@ -532,7 +532,7 @@ readGMT <- function(inFile, scEx){
     name = x[1]
     desc = x[2]
     genes = x[3:length(x)]
-    
+
     # Find the genes that are not in the rowData of scEx
     noGenes = genes[which(!genes %in% rowData(scEx)$symbol)]
     
@@ -2117,7 +2117,6 @@ pcaFunc <- function(scEx, scEx_log,
   }
   
   scaterPCA <- withWarnings({
-
     # not sure, but this works on another with TsparseMatrix
     if (!is(assays(scEx_log)[["logcounts"]], "CsparseMatrix")) {
       assays(scEx_log)[["logcounts"]] <-
@@ -2131,7 +2130,6 @@ pcaFunc <- function(scEx, scEx_log,
       set.seed(1)
       # parallel
       # plan("multiprocess", workers = 4)
-      
       mi <- Seurat::ScaleData(mi, do.scale = scale, do.center = center, verbose = T)
       genesin = rownames(mi) # ScaleData can remove genes.
     }
@@ -2148,7 +2146,7 @@ pcaFunc <- function(scEx, scEx_log,
       x <- t(x)
       pca <- runPCA(x, rank=rank, get.rotation=TRUE)
     }
-     
+
     pca
   })
   

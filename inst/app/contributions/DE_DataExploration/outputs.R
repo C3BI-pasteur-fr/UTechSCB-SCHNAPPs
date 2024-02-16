@@ -682,7 +682,7 @@ observeEvent(input$runScater,{
   #span the process/function call
   # This should be set globally as it is also not reset here
   # options(future.globals.maxSize= maxMemory * 1024^3)
-  
+
   detachedProc$process <- tryCatch({
     future({
       # detachedProc$process$pid = Sys.getpid()

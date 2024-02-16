@@ -10,6 +10,7 @@ t=Rtsne::Rtsne(
   perplexity = gQC_tsnePerplexity,
   theta = gQC_tsneTheta,
   check_duplicates = FALSE, num_threads = 0
+
 )
 end_time <- Sys.time()
 end_time - start_time
