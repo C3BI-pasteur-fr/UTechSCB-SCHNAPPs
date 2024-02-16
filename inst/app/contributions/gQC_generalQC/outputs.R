@@ -506,6 +506,7 @@ output$gQC_geneSetsearchOutput = renderText({
     cat(file = stderr(), "!!!!geneSetsearchOutput: no genes found\n")
     return(NULL)
   }
+  # parallel
   counts = bplapply(gd, FUN=function(x)sum(li %in% x$genes))
   counts = counts[which(counts>0)]
   outStr = ""
