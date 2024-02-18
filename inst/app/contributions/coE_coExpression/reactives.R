@@ -228,25 +228,25 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
     features$common =c(features$common, dupGene)
   }
   seurDat@assays$RNA$data = seurDat@assays$RNA$counts
-
+  
   p = SCHNAPPs::DotPlotwithModuleScore(object = seurDat, 
-                             assay="RNA", 
-                             features = features,
-                             featureDat = featureDat,
-                             cols = col,
-                             col.min = col.min,
-                             col.max = col.max,
-                             dot.min = dot.min,
-                             dot.scale = dot.scale,
-                             idents = NULL,
-                             clusters = clusters,
-                             group.by = NULL,
-                             split.by = NULL,
-                             cluster.idents = FALSE,
-                             scale = TRUE,
-                             scale.by = scale.by,
-                             scale.min = NA,
-                             scale.max = NA
+                                       assay="RNA", 
+                                       features = features,
+                                       featureDat = featureDat,
+                                       cols = col,
+                                       col.min = col.min,
+                                       col.max = col.max,
+                                       dot.min = dot.min,
+                                       dot.scale = dot.scale,
+                                       idents = NULL,
+                                       clusters = clusters,
+                                       group.by = NULL,
+                                       split.by = NULL,
+                                       cluster.idents = FALSE,
+                                       scale = TRUE,
+                                       scale.by = scale.by,
+                                       scale.min = NA,
+                                       scale.max = NA
   )
   p
 }
@@ -422,7 +422,6 @@ coE_topExpGenesTable <- reactive({
   return(retVal)
 })
 
-
 scranFindMarkerFullReactiveTable <- reactive({
   if (DEBUG) cat(file = stderr(), "coE_scranFindMarkerTableReact started.\n")
   start.time <- base::Sys.time()
@@ -440,6 +439,8 @@ scranFindMarkerFullReactiveTable <- reactive({
   projections <- isolate(projections())
   direction <- isolate(input$coE_direction)
   lfc <- isolate(input$coE_lfc)
+  prjFact <- isolate(input$coE_scranFactor)
+  nCPU = isolate(input$coE_nCPU)
   if (is.null(scEx_log)) {
     if (DEBUG) {
       cat(file = stderr(), "pca:NULL because scEx_log is null\n")
@@ -447,22 +448,35 @@ scranFindMarkerFullReactiveTable <- reactive({
     return(NULL)
   }
   clicked <- input$scranFindMarkerApply
-  # parallel
+  if(clicked<1) return(NULL)
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scranFindMarkerFullReactiveTable.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
+  
+  # browser()
+  # 4.18 GB
+  register(MulticoreParam(nCPU))
+  
+  start.time <- base::Sys.time()
   wmarkers <- tryCatch({
     scran::findMarkers(scEx_log, 
-                       projections$dbCluster,
+                       projections[,prjFact],
                        direction = direction,
                        lfc = lfc,
                        BPPARAM = BiocParallel::bpparam())
-    
-    
-    
   }, error = function(e) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("There might be only factor", id = "coE_scranFindMarkerTableReactError",
+                       duration = NULL, type = "error")
+    }
+    # cat(file = stderr(), unlist(e))
     return(NULL)
   })
-  updateSelectInput(session = session, inputId = "coE_scranFindMarkerCluster",
-                    choices = levels(projections$dbCluster))
+  if(is.null(wmarkers)) return(NULL)
   
+  updateSelectInput(session = session, inputId = "coE_scranFindMarkerCluster",
+                    choices = levels(projections[,prjFact]))
   
   return(wmarkers)
 })
@@ -711,7 +725,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   if(dbCluster %in% names(pc)){
     mycolPal = pc[[dbCluster]]
   }else{
-     mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
+    mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
       n = 6, name =
         "RdYlBu"
     ))(length(levels(prj)))
@@ -920,31 +934,31 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
     } 
   }
   
-
+  
   p1 <- projections %>% plotly::plot_ly(type = 'violin', colors=mycolPal2)
   for (lv2 in levels(prj2)) {
     for (lv in levels(projections[, dbCluster[1]])) {
       p1 <- p1 %>% plotly::add_trace(
-      x = {
-        # cat(file = stderr(), projections[prj2 == lv2 & projections[dbCluster[1]] == lv, dbCluster[1]] %>% as.character() )
-        projections[prj2 == lv2 & projections[dbCluster[1]] == lv, dbCluster[1]] %>% as.character() 
+        x = {
+          # cat(file = stderr(), projections[prj2 == lv2 & projections[dbCluster[1]] == lv, dbCluster[1]] %>% as.character() )
+          projections[prj2 == lv2 & projections[dbCluster[1]] == lv, dbCluster[1]] %>% as.character() 
         },
-      y = projections$coExpVal[prj2 == lv2 & projections[dbCluster[1]] == lv],
-      legendgroup = lv,
-      scalegroup = lv,
-      showlegend = showLegend[which(lv == levels(projections[, dbCluster[1]]))],
-      name = lv2,
-      visible=T,
-      box = list(
-        visible = T
-      ),
-      meanline = list(
-        visible = T
+        y = projections$coExpVal[prj2 == lv2 & projections[dbCluster[1]] == lv],
+        legendgroup = lv,
+        scalegroup = lv,
+        showlegend = showLegend[which(lv == levels(projections[, dbCluster[1]]))],
+        name = lv2,
+        visible=T,
+        box = list(
+          visible = T
+        ),
+        meanline = list(
+          visible = T
+        )
+        ,line = list(color=mycolPal2[[lv2]])
+        , fillcolor = mycolPal2[[lv2]]
       )
-      ,line = list(color=mycolPal2[[lv2]])
-      , fillcolor = mycolPal2[[lv2]]
-    )
-    # print(p1)
+      # print(p1)
     }
   }
   
@@ -1072,47 +1086,6 @@ observe(label = "save2histVio2", {
 # .schnappsEnv$coE_vioGrp <- "sampleNames"
 
 
-coE_updateInputXviolinPlot <- observe({
-  if (DEBUG) cat(file = stderr(), "coE_updateInputXviolinPlot started.\n")
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "coE_updateInputXviolinPlot")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "coE_updateInputXviolinPlot")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("coE_updateInputXviolinPlot", id = "coE_updateInputXviolinPlot", duration = NULL)
-  }
-  
-  tsneData <- projections()
-  projFactors <- projFactors()
-  # Can use character(0) to remove all choices
-  if (is.null(tsneData)) {
-    return(NULL)
-  }
-  updateSelectInput(
-    session,
-    "coE_dimension_xVioiGrp",
-    choices = projFactors,
-    selected = .schnappsEnv$coE_dimension_xVioiGrp
-  )
-  updateSelectInput(
-    session,
-    "coE_dimension_xVioiGrp2",
-    choices = projFactors,
-    selected = .schnappsEnv$coE_dimension_xVioiGrp2
-  )
-})
-
-
-observe(label = "obs_coE_heatmap_geneids", x= {
-  .schnappsEnv$defaultValues[["coE_heatmap_geneids"]] = input$coE_heatmap_geneids
-  .schnappsEnv$defaultValues[["coE_subSampleFactor"]] = input$coE_subSampleFactor
-  .schnappsEnv$defaultValues[["coE_nSubsample"]] = input$coE_nSubsample
-  
-})
-
 # coE_heatmapReactive -------
 # reactive for module pHeatMapModule
 # for all clusters menu item
@@ -1221,5 +1194,4 @@ observe(label = "save2HistAlluvial", {
               plotData = .schnappsEnv[["coE_alluvialPlot"]])
   
 })
-
 
