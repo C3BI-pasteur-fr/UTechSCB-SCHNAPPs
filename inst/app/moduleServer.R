@@ -1763,7 +1763,7 @@ pHeatMapModule <- function(input, output, session,
     } else if("matrix" %in% slotNames(htDat)) {
       htMat = htDat@matrix
     }
-    
+    # browser()
     # unlist(selection$row_index)
     geneName = rowData(scEx_log)[rownames(htMat)[selection$row_index],"symbol"]
     renderGeneName(geneName)

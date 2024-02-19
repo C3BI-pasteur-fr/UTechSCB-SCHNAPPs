@@ -137,6 +137,27 @@ observeEvent(input$openBrowser, {
   
 }
 )
+
+checkLevels <- function(scEx) {
+  # check levels of factorials from colData
+  cdat = colData(scEx)
+  for(colName in colnames(cdat)){
+    if(is.factor(cdat[,colName])){
+      lv = levels(cdat[,colName])
+      if(!all(lv == make.names(lv))){
+        if(is.numeric(lv))next()
+        if (!is.null(getDefaultReactiveDomain())) {
+          showNotification(paste("Level",colName," has invalid levels\n correcting!\n"), type = "error")
+        }
+        levels(cdat[,colName]) = make.names(lv)
+        cat(file = stderr(), "\n\nLevel",colName," has invalid levels\n correcting!\n\n")
+      }
+    }
+  }
+  SummarizedExperiment::colData(scEx) = cdat
+  return(scEx)
+}
+
 # When OK button is pressed, attempt to load the data set. If successful,
 # remove the modal. If not show another modal, but this time with a failure
 # message.
@@ -399,6 +420,8 @@ inputDataFunc <- function(inFile) {
     featuredata$symbol <- make.unique(featuredata$symbol)
     rowData(allScEx) <- featuredata
   }
+  # check factorials in featuredata for levels
+  
   
   # dataTables$featuredataOrg <- rowData(allScEx)
   dataTables$scEx <- allScEx
@@ -407,6 +430,11 @@ inputDataFunc <- function(inFile) {
     assays(allScEx_log)[["counts"]] <- NULL
   }
   dataTables$scEx_log <- allScEx_log
+  
+  dataTables$scEx = checkLevels(scEx = dataTables$scEx)
+  if(!is.null( dataTables$scEx_log)) {
+    dataTables$scEx_log = checkLevels(scEx = dataTables$scEx_log)
+  }
   
   if (is.null(allScEx$barcode)) {
     showNotification("scEx doesn't contain barcode column", type = "error")
@@ -452,6 +480,7 @@ inputDataFunc <- function(inFile) {
   #
   # }
   # deepDebug()
+  
   
   isolate(allCellNames(rownames(colData(dataTables$scEx))))
   inputFileStats$stats <- stats
@@ -532,7 +561,7 @@ readGMT <- function(inFile, scEx){
     name = x[1]
     desc = x[2]
     genes = x[3:length(x)]
-
+    
     # Find the genes that are not in the rowData of scEx
     noGenes = genes[which(!genes %in% rowData(scEx)$symbol)]
     
@@ -2146,7 +2175,7 @@ pcaFunc <- function(scEx, scEx_log,
       x <- t(x)
       pca <- runPCA(x, rank=rank, get.rotation=TRUE)
     }
-
+    
     pca
   })
   
@@ -2524,6 +2553,8 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
   # creates object @assays$RNA@data and @assays$RNA@counts
   seurDat <- NULL
   if(is(scEx,"SingleCellExperiment")){
+    # gives the following warning:
+    # Warning: [[<- defined for objects of type "S4" only for subclasses of environment
     seurDat <- CreateSeuratObject(
       counts = as(assays(scEx)[[1]], "CsparseMatrix"),
       meta.data = meta.data
@@ -2552,12 +2583,18 @@ runSeuratClustering <- function(scEx, meta.data, dims, pca, k.param, resolution)
                                           stdev = pca$var_pcs, 
                                           key = "PC_", 
                                           assay = "RNA")
-  
-  
+  # the following FindNeighbors produces the following
+  # Computing nearest neighbor graph
+  # Computing SNN
   seurDat = FindNeighbors(seurDat, dims = 1:dims, k.param = k.param)
-  # parallel
-  # plan("multiprocess", workers = 4)
+  # parallel - not in our case as we are only using 1 resolution
+  # plan("multisession", workers = 1)
+  # parallelized for mulitiple resolution values
+  # setting to one process to avoid message about random variables
+  pl = plan()
+  plan("multisession", workers = 1)
   seurDat <- FindClusters(seurDat, resolution = resolution, method = "igraph", algorithm=1 )
+  plan(pl)
   retVal = data.frame(Barcode = colnames(seurDat),
                       Cluster = Idents(seurDat))
 }
@@ -3202,7 +3239,7 @@ projections_Hash <- reactive({
 })
 
 # projFactors ----
-# which projections are factors?
+# which projections can be considered factors?
 projFactors <- reactive({
   if (DEBUG) {
     cat(file = stderr(), "projFactors started.\n")

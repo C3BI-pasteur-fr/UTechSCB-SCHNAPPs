@@ -180,6 +180,45 @@ observe(label = "ob_UMAPParams", {
   ))
 })
 
+## observe coE_updateInputXviolinPlot ----
+observe({
+  if (DEBUG) cat(file = stderr(), "coE_updateInputXviolinPlot started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_updateInputXviolinPlot")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_updateInputXviolinPlot")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_updateInputXviolinPlot", id = "coE_updateInputXviolinPlot", duration = NULL)
+  }
+  
+  tsneData <- projections()
+  projFactors <- projFactors()
+  # Can use character(0) to remove all choices
+  if (is.null(tsneData)) {
+    return(NULL)
+  }
+  updateSelectInput(
+    session,
+    "coE_dimension_xVioiGrp",
+    choices = projFactors,
+    selected = .schnappsEnv$coE_dimension_xVioiGrp
+  )
+  updateSelectInput(
+    session,
+    "coE_scranFactor",
+    choices = projFactors
+  )
+  
+  updateSelectInput(
+    session,
+    "coE_dimension_xVioiGrp2",
+    choices = projFactors,
+    selected = .schnappsEnv$coE_dimension_xVioiGrp2
+  )
+})
 
 
 # observe: cellNameTable_rows_selected ----

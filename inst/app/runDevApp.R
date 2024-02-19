@@ -22,7 +22,7 @@ plan("multisession", workers = 8)
 # plan(callr, workers = 4)
 
 library("BiocParallel")
-register(MulticoreParam(9))
+register(MulticoreParam(2))
 # register(SerialParam())
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/working/"
