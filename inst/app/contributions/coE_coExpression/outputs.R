@@ -222,7 +222,7 @@ output$coE_objSize <- renderText({
     }
   })
   if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("coE_scranFindMarkerTableReact", id = "coE_scranFindMarkerTableReact", duration = NULL)
+    showNotification("coE_objSize", id = "coE_objSize", duration = NULL)
   }
   # deepDebug()
   scEx_log <- scEx_log()

@@ -422,6 +422,8 @@ coE_topExpGenesTable <- reactive({
   return(retVal)
 })
 
+## scranFindMarkerFullReactiveTable -----
+
 scranFindMarkerFullReactiveTable <- reactive({
   if (DEBUG) cat(file = stderr(), "coE_scranFindMarkerTableReact started.\n")
   start.time <- base::Sys.time()
@@ -452,7 +454,7 @@ scranFindMarkerFullReactiveTable <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/scranFindMarkerFullReactiveTable.RData", list = c(ls()))
   }
-  # cp = load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
+  # cp = load(file="~/SCHNAPPsDebug/scranFindMarkerFullReactiveTable.RData")
   
   # browser()
   # 4.18 GB
@@ -474,7 +476,8 @@ scranFindMarkerFullReactiveTable <- reactive({
     return(NULL)
   })
   if(is.null(wmarkers)) return(NULL)
-  
+  names(wmarkers) = make.names(names(wmarkers))
+  # lapply(wmarkers,length)
   updateSelectInput(session = session, inputId = "coE_scranFindMarkerCluster",
                     choices = levels(projections[,prjFact]))
   
@@ -487,9 +490,14 @@ coE_scranFindMarkerTableReact <- reactive({
   markerlist = scranFindMarkerFullReactiveTable()
   selectedCluster = input$coE_scranFindMarkerCluster
   projections = projections()
+  prjFact <- input$coE_scranFactor
   req(markerlist)
-  if(! selectedCluster %in% levels(projections$dbCluster)) return(NULL)
+  if(! selectedCluster %in% levels(projections[,prjFact])) return(NULL)
   
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/scranFindMarkerTableReact.RData", list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/scranFindMarkerTableReact.RData")
   return(markerlist[[selectedCluster]] %>% as.data.frame())
 })
 
