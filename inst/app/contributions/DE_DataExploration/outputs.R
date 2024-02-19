@@ -1,5 +1,5 @@
-require(parallel)
-
+require(parallel) # done
+ 
 
 # source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
@@ -651,6 +651,7 @@ observeEvent(input$runScater,{
     showNotification("DE_scaterPNG", id = "DE_scaterPNG", duration = NULL)
     removeNotification(id="DE_scaterPNG_Error")
   }
+  require(future.callr)
   scaterReads <- isolate(scaterReads())
   scols <- isolate(projectionColors$sampleNames)
   maxMemory = isolate(input$maxMemory)
@@ -681,8 +682,9 @@ observeEvent(input$runScater,{
   # })
   #span the process/function call
   # This should be set globally as it is also not reset here
-  # options(future.globals.maxSize= maxMemory * 1024^3)
-
+  options(future.globals.maxSize= maxMemory * 1024^3)
+  plan(callr, workers = 2)
+  
   detachedProc$process <- tryCatch({
     future({
       # detachedProc$process$pid = Sys.getpid()
@@ -707,7 +709,10 @@ observeEvent(input$runScater,{
   }
   # cp=load(file='~/SCHNAPPsDebug/scater2.RData')
   # browser()
-  if(is.null(detachedProc$process)) return(NULL)
+  if(is.null(detachedProc$process)) {
+    plan(pl)
+    return(NULL)
+  }
   activateObserver(1)
   if(!is.null(detachedProc$process$process))
     cat(file = stderr(), paste("input$start",detachedProc$process$process$get_pid(),"me:",Sys.getpid(),"\n"))
@@ -725,6 +730,7 @@ observeEvent(input$runScater,{
   
   detachedProc$startTime = start.time
   detachedProc$msg <- sprintf("%1$s started", detachedProc$process$pid)
+  plan(pl)
 })
 #
 # Stop the process

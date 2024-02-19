@@ -105,6 +105,7 @@ observe(label = "ob16", {
   if (DEBUG) cat(file = stderr(), paste0("observe: coE_dimension_xVioiGrp\n"))
   .schnappsEnv$coE_dimension_xVioiGrp <- input$coE_dimension_xVioiGrp
   .schnappsEnv$defaultValues$coE_dimension_xVioiGrp <- input$coE_dimension_xVioiGrp
+  .schnappsEnv$defaultValues$coE_scranFactor <- input$coE_scranFactor
 })
 
 observe(label = "ob16a", {
@@ -210,6 +211,37 @@ coeMinMax = reactive({
     input$coEminMaxExpr
 }) %>% debounce(1000)
 
+
+output$coE_objSize <- renderText({
+  if (DEBUG) cat(file = stderr(), "coE_objSize started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_objSize")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_objSize")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_objSize", id = "coE_objSize", duration = NULL)
+  }
+  # deepDebug()
+  scEx_log <- scEx_log()
+  projections <- projections()
+  direction <- isolate(input$coE_direction)
+  prjFact <- input$coE_scranFactor
+  
+  lfc <- isolate(input$coE_lfc)
+  if (is.null(scEx_log)) {
+    return(NULL)
+  }
+  if(!prjFact %in% colnames(projections)) return("please select factor")
+  objSize = pryr::object_size(scEx_log, 
+                        projections[,prjFact],
+                        direction = direction,
+                        lfc = lfc)
+  
+  paste("size of input object for one factor: ", format(objSize))
+})
 
 # coE_dotPlot_GeneSets ----
 output$coE_dotPlot_GeneSets <- renderPlotly({
@@ -664,15 +696,29 @@ observe({
   )
 })
 
+
+# observe obs_coE_heatmap_geneids ----
+observe(label = "obs_coE_heatmap_geneids", x= {
+  .schnappsEnv$defaultValues[["coE_heatmap_geneids"]] = input$coE_heatmap_geneids
+  .schnappsEnv$defaultValues[["coE_subSampleFactor"]] = input$coE_subSampleFactor
+  .schnappsEnv$defaultValues[["coE_nSubsample"]] = input$coE_nSubsample
+  .schnappsEnv[["coE_heatmap_geneids"]] = input$coE_heatmap_geneids
+  .schnappsEnv[["coE_subSampleFactor"]] = input$coE_subSampleFactor
+  .schnappsEnv[["coE_nSubsample"]] = input$coE_nSubsample
+  
+})
+
 # observe alluiv ----
 observe({
   projF = projFactors()
+  # browser()
   updateSelectInput(session, "alluiv1",
                     choices = projF,
                     selected = .schnappsEnv$alluiv1
   )
   updateSelectInput(session, "coE_subSampleFactor",
-                    choices = projF,
+                    choices = projF
+                    ,
                     selected = .schnappsEnv$coE_subSampleFactor
   )
   updateSelectInput(session, "alluiv2",
@@ -686,4 +732,3 @@ observe({
                     choices = projF,
                     selected = .schnappsEnv$coE_dimension_ydotPlotModuleScoreClusters)
 })
-

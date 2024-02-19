@@ -308,6 +308,55 @@ output$sCA_volc_selected <- renderText({
   return(retVal)
 })
 
+
+### sCA_cells used started ----
+observe({
+  if (DEBUG) cat(file = stderr(), "sCA_cells used started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "sCA_cells_used")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "sCA_cells_used")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("sCA_cells used", id = "sCA_cells_used", duration = NULL)
+    removeNotification(id = "dgewarning")
+  }
+  
+  
+
+  db1 <- isolate(input$db1)
+  db2 <- isolate(input$db2)
+  db1x <- isolate(input$sCA_subscluster_x1)
+  db1y <- isolate(input$sCA_subscluster_y1)
+  projections <- projections()
+  if ( is.null(projections)  || is.null(db1)) {
+    return(NULL)
+  }
+  
+  selectedCells <- sCA_dataInp()
+  sampdesc <- isolate(selectedCells$selectionDescription())
+  prj <- isolate(selectedCells$ProjectionUsed())
+  cellNs <- isolate(selectedCells$cellNames())
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = "~/SCHNAPPsDebug/sCA_cells_used.RData", list = c(ls(), ".schnappsEnv"))
+  }
+  # cp = load(file='~/SCHNAPPsDebug/sCA_cells_used.RData')
+  # browser()
+  gCells <- sCA_getCells(projections, cl1 = cellNs, db1, db2, db1x, db1y)
+  
+  sCA_dge_Ncells(c(cells.1 = gCells$c1, cells.2 = gCells$c2))
+})
+
+output$sCA_dge_plot1_Ncells = renderText(
+  sCA_dge_Ncells()[[1]]
+)
+output$sCA_dge_plot2_Ncells = renderText(
+  sCA_dge_Ncells()[[2]]
+)
+
 output$sCA_volcanoPlot <- plotly::renderPlotly({
   require(manhattanly)
   if (DEBUG) cat(file = stderr(), "sCA_volcanoPlot started.\n")

@@ -1,3 +1,6 @@
+sCA_dge_Ncells <- reactiveVal(c(0,0))
+
+
 #' sCA_selectedDge
 #' stores table with differentially expressed genes
 #' is used to export file and write csv file
@@ -192,9 +195,12 @@ sCA_seuratFindMarkers <- function(scEx, scEx_logMat, cells.1, cells.2, test="wil
   # not sure we need the normalization factor
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
   require(Seurat)
+  
   markers <- tryCatch.W.E(
-    # parallel
-    # plan("multiprocess", workers = 4)
+    # parallel - done in calling function
+    # plan("multisession", workers = 4)
+    # plan("multicore", workers = 6)
+    # register(MulticoreParam(6))
     
     Seurat::FindMarkers(seurDat, 
                         ident.1 = cells.1,
@@ -309,6 +315,7 @@ sCA_scDEA <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   
   if (DEBUG) cat(file = stderr(), "sCA_scDEA started.\n")
   start.time <- base::Sys.time()
+  
   on.exit({
     printTimeEnd(start.time, "sCA_scDEA")
     if (!is.null(getDefaultReactiveDomain())) {
@@ -410,9 +417,13 @@ runDESEQ2 <- function(data.use, group.info) {
   if (DEBUG) cat(file = stderr(), "DESeq2 setup.\n")
   
   # TODO DESeqParallel 
+  # dataUse = data.use
   
+  # sampIdx = sample(ncol(dataUse),1000)
+  # data.use = dataUse[,sampIdx]
   dds1 <- DESeq2::DESeqDataSetFromMatrix(
     countData = data.use,
+    # colData = group.info[sampIdx,],
     colData = group.info,
     design = ~group
   )
@@ -423,7 +434,7 @@ runDESEQ2 <- function(data.use, group.info) {
   if (DEBUG) cat(file = stderr(), "DESeq2 nbinomWaldTest\n")
   dds1 <- DESeq2::nbinomWaldTest(object = dds1)
   if (DEBUG) cat(file = stderr(), "DESeq2 results\n")
-  # parallel (BPPARAM)
+  # parallel (BPPARAM) plan is done in calling function
   res <- DESeq2::results(
     object = dds1,
     contrast = c("group", "Group1", "Group2"),
@@ -462,6 +473,13 @@ sCA_dge_deseq2 <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
   
+  if(length(c(cells.1, cells.2)) > 1000){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("please select less than 1000 cells", id = "sCA_dge_deseqError", duration = NULL, type = "error")
+      return(NULL)
+    }
+  }
+  
   dups = c(cells.1, cells.2)[duplicated(c(cells.1, cells.2))]
   if(length(dups) > 0){
     cells.1 = cells.1[!cells.1 %in% dups]
@@ -481,6 +499,7 @@ sCA_dge_deseq2 <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
     .schnappsEnv$normalizationFactor = 1
   }
   data.use = assays(scEx_log)[[1]][,rownames(group.info)]
+  # browser()
   res = runDESEQ2_m(data.use, group.info) 
   featureData <- rowData(scEx_log)
   
@@ -495,6 +514,7 @@ sCA_dge_deseq2 <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
 
 
 #' sCA_dge_CellViewfunc
+# "Chi-square test of an estimated binomial distribution"
 #' calculate differentically expressed genes given 2 sets of cells
 sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   if (DEBUG) cat(file = stderr(), "sCA_dge_CellViewfunc started.\n")
@@ -514,21 +534,40 @@ sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   # cp =load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
   
   featureData <- rowData(scEx_log)
-  scEx_log <- as.matrix(assays(scEx_log)[[1]])
-  subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
-  genes.use <- rownames(subsetExpression)
+  # scEx_logMat = scEx_logMat[, union(cells.1, cells.2)]
+  scEx_log <- as.matrix(assays(scEx_log)[[1]][, union(cells.1, cells.2)])
+  # handle small number of cells which can not be complete.
+  if(length(union(cells.1, cells.2))<1000){
+    scEx_log <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
+  }
+  genes.use <- rownames(scEx_log) # since some genes might have been removed due to complete cases.
   # expMean exponential mean
-  dat <- subsetExpression[genes.use, cells.1]
-  data.1 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
-  dat <- subsetExpression[genes.use, cells.2]
-  data.2 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
+  # dat <- scEx_log[genes.use, cells.1]
+  # data.1 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
+  # dat <- subsetExpression[genes.use, cells.2]
+  # data.2 <- apply(dat, 1, function(x) expMean(x, .schnappsEnv$normalizationFactor))
+  # parallel done
+  if(is.null(.schnappsEnv$normalizationFactor)){
+    normFact = 1
+  } else {
+    normFact = .schnappsEnv$normalizationFactor
+  }
+  data.1 <- (scEx_logMat[genes.use, cells.1] /normFact )|> expm1_slow() |> rowMeans() |> log1p() * normFact
+  data.2 <- (scEx_logMat[genes.use, cells.2] /normFact )|> expm1_slow() |> rowMeans() |> log1p() * normFact
+  
+  # data.1 <- bplapply(genes.use, function(x) expMean(scEx_log[x, cells.1], .schnappsEnv$normalizationFactor)) %>% unlist()
+  # data.2 <- bplapply(genes.use, function(x) expMean(scEx_log[x, cells.2], .schnappsEnv$normalizationFactor)) %>% unlist()
+  
   total.diff <- (data.1 - data.2)
-  
-  genes.diff <- names(which(abs(total.diff) > .2))
-  genes.use <- ainb(genes.use, genes.diff)
-  
+  # 
+  # genes.diff <- names(which(abs(total.diff) > .2))
+  # genes.use <- ainb(genes.use, genes.diff)
+  if (DEBUG) cat(file = stderr(), "DiffExpTest started.\n")
+  # browser()
   retVal <-
-    DiffExpTest(subsetExpression, cells.1, cells.2, genes.use = genes.use)
+    DiffExpTest(scEx_log, cells.1, cells.2, genes.use = genes.use)
+  if (DEBUG) cat(file = stderr(), "DiffExpTest done\n")
+  
   if(is.null(retVal)) return(NULL)
   if(nrow(retVal)==0) return(NULL)
   retVal[is.na(retVal[, "p_val"]), ] <- 1
@@ -556,29 +595,32 @@ sCA_dge_ttest <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls()))
   }
   #cp = load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
-  # browser()
   featureData <- rowData(scEx_log)
-  scEx_log <- as.matrix(assays(scEx_log)[[1]])
-  subsetExpression <- scEx_log[complete.cases(scEx_log[, union(cells.1, cells.2)]), ]
-  genes.use <- rownames(subsetExpression)
-  
-  if(!exists("t.test.cores", envir = .schnappsEnv)) .schnappsEnv$t.test.cores = 1
-  cl <- makeCluster(.schnappsEnv$t.test.cores)
-  
-  p_val <- parApply(cl,subsetExpression, 1, cells.1=cells.1,cells.2=cells.2,function(x, cells.1, cells.2) t.test(x[cells.1], x[cells.2])$p.value)
+  scEx_log <- as.matrix(assays(scEx_log[, union(cells.1, cells.2)])[[1]])
+  if(length(c(cells.1, cells.2))<1000)
+    scEx_log <- scEx_log[complete.cases(scEx_log), ]
+  genes.use <- rownames(scEx_log)
+  featureData = featureData[genes.use,]
+  # browser()
+  # parallel- todo, need to use bpapply
+  # if(!exists("t.test.cores", envir = .schnappsEnv)) .schnappsEnv$t.test.cores = 1
+  # cl <- makeCluster(.schnappsEnv$t.test.cores)
+  if (DEBUG) cat(file = stderr(), "bplapply of t.test started.\n")
+  p_val <- bplapply(seq(nrow(scEx_log)), FUN=function(x, cells.1, cells.2) t.test(scEx_log[x,cells.1], scEx_log[x,cells.2])$p.value) %>% unlist()
+  names(p_val) = rownames(scEx_log)
   # p_val <- apply(subsetExpression, 1, function(x) t.test(x[cells.1], x[cells.2])$p.value)
   p_val[is.na(p_val)] <- 1
-  dat <- subsetExpression[genes.use, cells.1]
+  dat <- scEx_log[genes.use, cells.1]
   normFact = 1000
   if(!is.null(.schnappsEnv$normalizationFactor))
     if(.schnappsEnv$normalizationFactor == 0) normFact = 1000
-  clusterExport(cl, "expMean")
-  data.1 <- parApply(cl, dat, 1, normFact=normFact, function(x, normFact) expMean(x, normFactor = normFact))
-  dat <- subsetExpression[genes.use, cells.2]
-  data.2 <- parApply(cl, dat, 1, normFact=normFact, function(x, normFact) expMean(x, normFactor = normFact))
+  # clusterExport(cl, "expMean")
+  data.1 <- bplapply(seq(nrow(dat)), FUN=function(x) expMean(dat[x,], normFactor = normFact)) %>% unlist()
+  dat <- scEx_log[genes.use, cells.2]
+  data.2 <-  bplapply(seq(nrow(dat)), FUN=function(x) expMean(dat[x,], normFactor = normFact)) %>% unlist()
   avg_diff <- (data.1 - data.2)
-  stopCluster(cl)
-  
+  # stopCluster(cl)
+
   retVal <- data.frame(p_val = p_val, avg_diff = avg_diff, symbol = featureData[names(p_val), "symbol"])
   return(retVal)
 }
@@ -588,8 +630,10 @@ sCA_dge_ttest <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
 sCA_dge <- reactive({
   if (DEBUG) cat(file = stderr(), "sCA_dge started.\n")
   start.time <- base::Sys.time()
+  oldPlan = plan()
   on.exit({
     printTimeEnd(start.time, "sCA_dge")
+    plan(oldPlan)
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "sCA_dge")
     }
@@ -623,6 +667,20 @@ sCA_dge <- reactive({
   db1 <- isolate(input$db1)
   db2 <- isolate(input$db2)
   method <- isolate(input$sCA_dgeRadioButton)
+  nCPU = isolate(input$sCA_nCPU)
+  planMethod = isolate(input$sCA_plan)
+  
+  if(planMethod ==  "sequential"){
+    plan(sequential)
+    register(SerialParam())
+  } else if(planMethod == "callr"){
+    plan(callr, workers = nCPU)
+    register(SnowParam(workers = nCPU))
+  } else{
+    plan(multisession, workers = nCPU)
+    register(MulticoreParam(workers = nCPU))
+  }
+  
   
   if (is.null(scEx_log) | is.null(projections)  || is.null(db1)) {
     return(NULL)
@@ -630,6 +688,7 @@ sCA_dge <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
   }
+  # cp = load(file='~/SCHNAPPsDebug/sCA_dge.RData')
   # browser()
   if(method==""){
     if (!is.null(getDefaultReactiveDomain())) {
@@ -638,7 +697,6 @@ sCA_dge <- reactive({
     }
     return(NULL)
   }
-  # cp = load(file='~/SCHNAPPsDebug/sCA_dge.RData')
   # require(archivist)
   # library(tools)
   # lazyLoad = local({load("~/SCHNAPPsDebug/sCA_dge.RData"); environment()})

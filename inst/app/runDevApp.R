@@ -7,6 +7,7 @@
 
 library(doParallel)
 library("future.callr")
+library(BPCells)
 
 registerDoParallel(cores=12)
 suppressMessages(require(shinyjqui))
@@ -22,7 +23,7 @@ plan("multisession", workers = 8)
 # plan(callr, workers = 4)
 
 library("BiocParallel")
-register(MulticoreParam(9))
+register(MulticoreParam(2))
 # register(SerialParam())
 
 localContributionDir = "~/Rstudio/SCHNAPPsContributions/working/"
@@ -177,7 +178,7 @@ source("R/DotPlotwithModuleScore.R")
 # testapp <- shinytest2::AppDriver$new(app, load_timeout = 1505 * 1000)
 
 
-runApp(app, port=3838, launch.browser = chromeBrowser)
+runApp(app, launch.browser = chromeBrowser)
 
 # 
 # last.dump[length(last.dump)]

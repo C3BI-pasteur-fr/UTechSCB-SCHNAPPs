@@ -342,7 +342,7 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
     save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/tsne.RData')
-  suppressMessages(require(parallel))
+  suppressMessages(require(parallel)) # num_threads = 0 should be OK
   suppressMessages(require(Rtsne))
   np <- dim(pca$x)[2]
   tsne <- tryCatch(
@@ -425,19 +425,20 @@ umapReact <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/umap_react.RData", list = c(ls()))
   }
-  # load("~/SCHNAPPsDebug/umap_react.RData")
+  # cp = load("~/SCHNAPPsDebug/umap_react.RData")
   if (!runUMAP) {
     if (DEBUG) cat(file = stderr(), "output$umap_react:NULL\n")
     return(NULL)
   }
-  umapData <- as.matrix(assays(scEx_log)[[1]])
-  compCases <- complete.cases(umapData)
+  # umapData <- as.matrix(assays(scEx_log)[[1]])
+  # compCases <- complete.cases(umapData)
   
   # TODO it might be possible to reuse nearest neighbor information to speeed up recomputations
   # with eg. new seed
   
   set.seed(myseed)
   # embedding <- uwot::umap(t(as.matrix(assays(scEx_log)[[1]])),
+  # parallel -- uses max cores and doesn't crash (for now;))
   embedding <- uwot::umap(pca$x,
                           n_neighbors = n_neighbors,
                           n_components = n_components,
@@ -452,7 +453,7 @@ umapReact <- reactive({
                           # gamma = gamma,
                           negative_sample_rate = negative_sample_rate,
                           metric = metric,
-                          n_threads = detectCores()
+                          n_threads = (detectCores()-1)
   )
   embedding <- as.data.frame(embedding)
   colnames(embedding) <- paste0("UMAP", 1:n_components)

@@ -64,15 +64,20 @@ tabList <- list(
         fluidRow(
           column(
             width = 3,
-            sc_numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 10, min=2)
+            sc_numericInput("coE_nFindMarker", "number of markerGenes to plot (if gene names are empty)", 10, min=2),
+            verbatimTextOutput("coE_objSize") 
           ),
           column(
             width = 3,
-            sc_numericInput("coE_lfc", "min log fold change", 2, min=0.1)
+            sc_numericInput("coE_lfc", "min log fold change", 2, min=0.1),
+            sc_numericInput("coE_nCPU", "number of CPUs to use", 2, min=1, max=(parallel::detectCores()-1) )
           ),
           column(
             width = 3,
-            sc_selectInput("coE_direction", "direction", "up", choices = c("up", "down", "any"))
+            sc_selectInput("coE_direction", "direction", "up", choices = c("up", "down", "any")),
+            sc_selectInput(inputId = "coE_scranFactor", label = "select factor for findmarkers", 
+                           selected = defaultValue("coE_scranFactor", "dbCluster"), 
+                           choices = c("please run normalization","dbCluster"), multiple = F)
           ),
           column(width = 3,
                  actionButton(inputId = "scranFindMarkerApply", label = "apply changes", width = "80%"))
@@ -86,7 +91,7 @@ tabList <- list(
           column(width = 3,
                  sc_selectInput(inputId = "coE_scranFindMarkerCluster", label = "select cluster", 
                                  selected = defaultValue("coE_scranFindMarkerCluster", "1"), 
-                                 choices = c("please run normalization","1"), multiple = F)
+                                 choices = c("please run scran.findclusters","1"), multiple = F)
                  )
         ),
         fluidRow(

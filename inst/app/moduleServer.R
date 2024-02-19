@@ -1086,7 +1086,7 @@ tableSelectionServer <- function(input, output, session,
            list = c(ls())
       )
     }
-    # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
+    # cp = load(file=paste0("~/SCHNAPPsDebug/rowSelection-coE_scranFindMarkerTable-bkup.RData"))
     # deepDebug()
     # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "_#_" appended plus a number
     # remove this here
@@ -1763,7 +1763,7 @@ pHeatMapModule <- function(input, output, session,
     } else if("matrix" %in% slotNames(htDat)) {
       htMat = htDat@matrix
     }
-    
+    # browser()
     # unlist(selection$row_index)
     geneName = rowData(scEx_log)[rownames(htMat)[selection$row_index],"symbol"]
     renderGeneName(geneName)

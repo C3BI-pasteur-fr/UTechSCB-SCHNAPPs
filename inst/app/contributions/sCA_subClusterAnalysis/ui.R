@@ -41,25 +41,25 @@ tabList <- list(
                  )},
                cellSelectionUI("sCA_dataInput"),
                shinydashboardPlus::box(width = 6,
-                                   title = "Dimensions for plot",
-                                   fluidRow(
-                                     column(width = 6,
-                                            sc_selectInput(
-                                              "sCA_subscluster_x1",
-                                              label = "X",
-                                              choices = c(defaultValue("sCA_subscluster_x1", "tsne1"), "tsne2", "tsne3"),
-                                              selected = defaultValue("sCA_subscluster_x1", "tsne1")
-                                            )
-                                     ),
-                                     column(width = 6,
-                                            sc_selectInput(
-                                              "sCA_subscluster_y1",
-                                              label = "Y",
-                                              choices = c("tsne1", defaultValue("sCA_subscluster_y1", "tsne2"), "tsne3"),
-                                              selected = defaultValue("sCA_subscluster_y1", "tsne2")
-                                            )
-                                     )
-                                   )
+                                       title = "Dimensions for plot",
+                                       fluidRow(
+                                         column(width = 6,
+                                                sc_selectInput(
+                                                  "sCA_subscluster_x1",
+                                                  label = "X",
+                                                  choices = c(defaultValue("sCA_subscluster_x1", "tsne1"), "tsne2", "tsne3"),
+                                                  selected = defaultValue("sCA_subscluster_x1", "tsne1")
+                                                )
+                                         ),
+                                         column(width = 6,
+                                                sc_selectInput(
+                                                  "sCA_subscluster_y1",
+                                                  label = "Y",
+                                                  choices = c("tsne1", defaultValue("sCA_subscluster_y1", "tsne2"), "tsne3"),
+                                                  selected = defaultValue("sCA_subscluster_y1", "tsne2")
+                                                )
+                                         )
+                                       )
                ),
                fluidRow(
                  column(
@@ -78,26 +78,44 @@ tabList <- list(
                         actionButton("updateDGEParameters", "apply changes", width = "80%")
                  )
                ),
-               
-               
+               br(),
+               fluidRow(
+                 column(width = 3,
+                        sc_radioButtons("sCA_plan", "how to parallize", 
+                                        choices = c(
+                                          "sequential" = "sequential",
+                                          "callr/snow" = "callr",
+                                          "multisession/MulticoreParam" = "multisession"
+                                        ),
+                                        selected = defaultValue("sCA_plan", "multisession")),
+                 ),
+                 column(width = 3,
+                        sc_numericInput(
+                          inputId = "sCA_nCPU", label = "number of CPUs to use", 
+                          value = defaultValue("sCA_nCPU", 4), min = 1, max = (parallel::detectCores()-1),
+                          step = 1
+                        ))
+               ),
                br(),
                shinydashboardPlus::box(width = 12,
-                                   fluidRow(
-                                     
-                                     column(width = 6,
-                                            # plotly::plotlyOutput("sCA_dge_plot1")
-                                            plotOutput("sCA_dge_plot1", brush = brushOpts(
-                                              id = "db1"
-                                            )) %>% withSpinner()
-                                     )
-                                     ,
-                                     column(width = 6,
-                                            # plotly::plotlyOutput("sCA_dge_plot2")
-                                            plotOutput("sCA_dge_plot2", brush = brushOpts(
-                                              id = "db2"
-                                            )) %>% withSpinner()
-                                     )
-                                   )
+                                       fluidRow(
+                                         
+                                         column(width = 6,
+                                                # plotly::plotlyOutput("sCA_dge_plot1")
+                                                plotOutput("sCA_dge_plot1", brush = brushOpts(
+                                                  id = "db1"
+                                                )) %>% withSpinner(),
+                                                verbatimTextOutput("sCA_dge_plot1_Ncells")
+                                         )
+                                         ,
+                                         column(width = 6,
+                                                # plotly::plotlyOutput("sCA_dge_plot2")
+                                                plotOutput("sCA_dge_plot2", brush = brushOpts(
+                                                  id = "db2"
+                                                )) %>% withSpinner(),
+                                                verbatimTextOutput("sCA_dge_plot2_Ncells")
+                                         )
+                                       )
                ),
                br(),
                shinydashboardPlus::box(
@@ -108,34 +126,35 @@ tabList <- list(
                  collapsible = TRUE, collapsed = TRUE,
                  id = "dgeAddOptions",
                  shinydashboardPlus::box(title = "scDEA parameters", width = 12,solidHeader = TRUE, 
-                     fluidRow(
-                       column(width = 3,
-                              sc_checkboxInput("scDEA_parallel", "use parallel implementations", value = defaultValue("scDEA_parallel", FALSE)),
-                       )
-                     ),
-                     fluidRow(
-                       column(width = 3,
-                              sc_checkboxInput("scDEA_BPSC", "BPSC", value = defaultValue("scDEA_BPSC", TRUE)),
-                              sc_checkboxInput("scDEA_DEsingle", "DEsingle", value = defaultValue("scDEA_DEsingle", TRUE)),
-                              sc_checkboxInput("scDEA_DESeq2", "DESeq2", value = defaultValue("scDEA_DESeq2", TRUE)),
-                              sc_checkboxInput("scDEA_edgeR", "edgeR", value = defaultValue("scDEA_edgeR", TRUE))),
-                       column(width = 3,
-                              sc_checkboxInput("scDEA_MAST", "MAST", value = defaultValue("scDEA_MAST", TRUE)),
-                              sc_checkboxInput("scDEA_monocle", "monocle", value = defaultValue("scDEA_monocle", TRUE)),
-                              sc_checkboxInput("scDEA_scDD", "scDD", value = defaultValue("scDEA_scDD", TRUE)),
-                              sc_checkboxInput("scDEA_Ttest", "Ttest", value = defaultValue("scDEA_Ttest", TRUE))),
-                       column(width=3,
-                              sc_checkboxInput("scDEA_Wilcoxon", "Wilcoxon", value = defaultValue("scDEA_Wilcoxon", TRUE)),
-                              sc_checkboxInput("scDEA_limma", "limma", value = defaultValue("scDEA_limma", TRUE)),
-                              sc_checkboxInput("scDEA_Seurat", "Seurat", value = defaultValue("scDEA_Seurat", TRUE)),
-                              sc_checkboxInput("scDEA_zingeR.edgeR", "zingeR.edgeR", value = defaultValue("scDEA_zingeR.edgeR", TRUE))
-                       )
-                     )
-                     
+                                         
+                                         fluidRow(
+                                           column(width = 3,
+                                                  sc_checkboxInput("scDEA_parallel", "use parallel implementations", value = defaultValue("scDEA_parallel", FALSE)),
+                                           )
+                                         ),
+                                         fluidRow(
+                                           column(width = 3,
+                                                  sc_checkboxInput("scDEA_BPSC", "BPSC", value = defaultValue("scDEA_BPSC", TRUE)),
+                                                  sc_checkboxInput("scDEA_DEsingle", "DEsingle", value = defaultValue("scDEA_DEsingle", TRUE)),
+                                                  sc_checkboxInput("scDEA_DESeq2", "DESeq2", value = defaultValue("scDEA_DESeq2", TRUE)),
+                                                  sc_checkboxInput("scDEA_edgeR", "edgeR", value = defaultValue("scDEA_edgeR", TRUE))),
+                                           column(width = 3,
+                                                  sc_checkboxInput("scDEA_MAST", "MAST", value = defaultValue("scDEA_MAST", TRUE)),
+                                                  sc_checkboxInput("scDEA_monocle", "monocle", value = defaultValue("scDEA_monocle", TRUE)),
+                                                  sc_checkboxInput("scDEA_scDD", "scDD", value = defaultValue("scDEA_scDD", TRUE)),
+                                                  sc_checkboxInput("scDEA_Ttest", "Ttest", value = defaultValue("scDEA_Ttest", TRUE))),
+                                           column(width=3,
+                                                  sc_checkboxInput("scDEA_Wilcoxon", "Wilcoxon", value = defaultValue("scDEA_Wilcoxon", TRUE)),
+                                                  sc_checkboxInput("scDEA_limma", "limma", value = defaultValue("scDEA_limma", TRUE)),
+                                                  sc_checkboxInput("scDEA_Seurat", "Seurat", value = defaultValue("scDEA_Seurat", TRUE)),
+                                                  sc_checkboxInput("scDEA_zingeR.edgeR", "zingeR.edgeR", value = defaultValue("scDEA_zingeR.edgeR", TRUE))
+                                           )
+                                         )
+                                         
                  )
                )
       ),
-
+      
       if ("manhattanly" %in% rownames(installed.packages()))
         tabPanel(
           title = "Volcano plot",  width = 12, 

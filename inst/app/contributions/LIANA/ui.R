@@ -61,7 +61,7 @@ tabList = list(
                                    min = 2, max = 10000
                    )
             )
-            # parallelize
+            # parallelize don't do it for now
             # whether to parallelize cellphonedb-like
             # 
             # workers
