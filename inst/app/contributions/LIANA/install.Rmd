@@ -21,15 +21,16 @@ remotes::install_github("statOmics/zingeR")
 
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS = TRUE) # ignore warningfrom iTALK 
 BiocManager::install("ComplexHeatmap") # required forConnectome
-devtools::install_github('saezlab/OmnipathR\@ff3ad88e3915747e1b557bf44ac5396f9525dd7e')
+# devtools::install_github('saezlab/OmnipathR\@ff3ad88e3915747e1b557bf44ac5396f9525dd7e')
+devtools::install_github('saezlab/OmnipathR',dependencies = T)
 # install 4.0 version of OmnipathR
 
 # install tools
 
-devtools::install_github("sqjin/CellChat")
-devtools::install_github('msraredon/Connectome', ref = 'master')
-devtools::install_github("Coolgenome/iTALK", build_vignettes = FALSE) #A modified version of SingleCellSignalR (SCA) that enables external resources 
-devtools::install_github(repo = "saezlab/SingleCellSignalR_v1", subdir = "SingleCellSignalR")
+devtools::install_github("sqjin/CellChat",dependencies = T)
+devtools::install_github('msraredon/Connectome', ref = 'master',dependencies = T)
+devtools::install_github("Coolgenome/iTALK", build_vignettes = FALSE,dependencies = T) #A modified version of SingleCellSignalR (SCA) that enables external resources 
+devtools::install_github(repo = "saezlab/SingleCellSignalR_v1",dependencies = T, subdir = "SingleCellSignalR")
 
 # Finally, install LIANA
 
@@ -40,9 +41,10 @@ Download yml file:
 https://github.com/saezlab/liana/blob/master/liana_env.yml
 
 
-```{bash, engine.opts='-l'}
+```{sh, engine.opts='-l'}
 # setup conda on bash
 # 
+
 wget https://github.com/saezlab/liana/blob/master/liana_env.yml
 conda create -n liana_env
 conda activate liana_env

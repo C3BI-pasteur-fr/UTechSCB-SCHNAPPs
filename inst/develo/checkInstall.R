@@ -42,9 +42,9 @@ remotes::install_github("satijalab/seurat-data", quiet = TRUE, dependencies  = T
 BiocManager::install("scran", dependencies  = TRUE, build = T, update = TRUE, ask = F, type = "source", upgrade = "always")
 devtools::install_github("kassambara/ggpubr", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 
-‘psychTools’, ‘Seurat’, ‘scran’, ‘ggpubr’ are not available for package ‘SCHNAPPs’
-Warning messages:
-  1: packages ‘multtest’, ‘limma’, ‘monocle’, ‘rtracklayer’, ‘MAST’ are not available for this version of R
+# ‘psychTools’, ‘Seurat’, ‘scran’, ‘ggpubr’ are not available for package ‘SCHNAPPs’
+# Warning messages:
+#   1: packages ‘multtest’, ‘limma’, ‘monocle’, ‘rtracklayer’, ‘MAST’ are not available for this version of R
 
 
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE, build = T,type = "source", upgrade = "always", ref = "seurat5")
@@ -63,6 +63,7 @@ devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRU
 # sudo port install leptonica
 install.packages("stringi", configure.args="--disable-pkg-config")
 
+# sudo apt install libtesseract-dev libleptonica-dev tesseract-ocr-eng gnome-mahjongg librsvg2-dev libmagick++-dev
 install.packages("tesseract", build = T,type = "source", upgrade = "always")
 install.packages("rsvg", build = T,type = "source", upgrade = "always")
 install.packages("gifski", build = T,type = "source", upgrade = "always")
@@ -85,7 +86,6 @@ BiocManager::install('limma', dependencies  = TRUE, build = T,type = "source", u
 BiocManager::install("Rhdf5lib", dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F,force = TRUE)
 BiocManager::install("rhdf5", dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
 BiocManager::install('monocle', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
-
 Sys.setenv(BPCELLS_DEBUG_INSTALL="true")
 remotes::install_github("bnprks/BPCells", build = T,type = "source", upgrade = "always")
 
@@ -94,9 +94,16 @@ remotes::install_github("bnprks/BPCells", build = T,type = "source", upgrade = "
 # remotes::install_github("satijalab/azimuth", "seurat5", quiet = TRUE)
 # remotes::install_github("satijalab/seurat-wrappers", "seurat5", quiet = TRUE)
 # remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)
+BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')
 remotes::install_github("satijalab/azimuth", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 remotes::install_github("satijalab/seurat-wrappers", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
-remotes::install_github("stuart-lab/signac", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
+BiocManager::install('biovizBase')
+BiocManager::install('motifmatchr')
+BiocManager::install('chromVAR')
+BiocManager::install('ggseqlogo')
+
+
+remotes::install_github("stuart-lab/signac", quiet = F, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 install.packages("psychTools", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 BiocManager::install("scran", dependencies  = TRUE, build = T, update = TRUE, ask = F, type = "source", upgrade = "always")
 
