@@ -31,6 +31,7 @@ sCA_getCells <- function(projections, cl1, db1, db2, db1x, db1y) {
   # db1y = db1$mapping$y
   db1$mapping$x = db1x
   db1$mapping$y = db1y
+  if(!all(c(db1x, db1y) %in% colnames(subsetData))) return(NULL)
   if (is(subsetData[,db1x], "logical")) {
     subsetData[,db1x] = as.numeric(subsetData[,db1x]) + 1
   }
@@ -532,7 +533,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
     save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls()))
   }
   # cp =load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
-  
+  # browser()
   featureData <- rowData(scEx_log)
   # scEx_logMat = scEx_logMat[, union(cells.1, cells.2)]
   scEx_log <- as.matrix(assays(scEx_log)[[1]][, union(cells.1, cells.2)])
@@ -552,8 +553,8 @@ sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   } else {
     normFact = .schnappsEnv$normalizationFactor
   }
-  data.1 <- (scEx_logMat[genes.use, cells.1] /normFact )|> expm1_slow() |> rowMeans() |> log1p() * normFact
-  data.2 <- (scEx_logMat[genes.use, cells.2] /normFact )|> expm1_slow() |> rowMeans() |> log1p() * normFact
+  data.1 <- (scEx_logMat[genes.use, cells.1] /normFact )|> expm1_slow() |> BPCells::rowMeans() |> log1p() * normFact
+  data.2 <- (scEx_logMat[genes.use, cells.2] /normFact )|> expm1_slow() |> BPCells::rowMeans() |> log1p() * normFact
   
   # data.1 <- bplapply(genes.use, function(x) expMean(scEx_log[x, cells.1], .schnappsEnv$normalizationFactor)) %>% unlist()
   # data.2 <- bplapply(genes.use, function(x) expMean(scEx_log[x, cells.2], .schnappsEnv$normalizationFactor)) %>% unlist()
@@ -572,6 +573,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
   if(nrow(retVal)==0) return(NULL)
   retVal[is.na(retVal[, "p_val"]), ] <- 1
   retVal[, "avg_diff"] <- total.diff[rownames(retVal)]
+  retVal[is.na(retVal[, "avg_diff"]), "avg_diff"] <- 0
   retVal$symbol <-
     featureData[rownames(retVal), "symbol"]
   return(retVal)

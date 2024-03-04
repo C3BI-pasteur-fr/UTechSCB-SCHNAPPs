@@ -32,7 +32,7 @@ defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
 historyPath = "/home/schnapps/history"
-historyPath = "/Volumes/LaCie2022//RStudio_history/"
+# historyPath = "/Volumes/LaCie2022//RStudio_history/"
 #historyPath = NULL
 
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)

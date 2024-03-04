@@ -26,8 +26,8 @@ library("BiocParallel")
 register(MulticoreParam(2))
 # register(SerialParam())
 
-localContributionDir = "~/Rstudio/SCHNAPPsContributions/working/"
-localContributionDir = ""
+localContributionDir = "~/Rstudio/SCHNAPPsContributions/working"
+# localContributionDir = ""
 defaultValueSingleGene = "IL7R" # CD52
 defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
 defaultValueMultiGenes = "LINC00115, NOC2L, HES4, ISG15, TNFRSF18, CD52, SH3BGRL3"

@@ -2040,6 +2040,7 @@ checkAllowed <- function(x, env=.schnappsEnv) {
     return(x)
   }
   id = paste0("allowFunctionality--", x$attribs$id)
+  # if not set it is allowed.
   if (exists(id, envir = env)) {
     if (!get(id, envir = env)) {
       return("")

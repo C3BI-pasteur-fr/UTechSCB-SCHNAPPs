@@ -17,6 +17,7 @@
 #' @param DEBUGSAVE TRUE/FALSE where or not save internal data (very time consuming)
 #' @param historyPath location (directory) where history directories and data will be stored.
 #' @param defaultValues list of default values to use for inputs
+#' @param workers number of CPUs to be used for normlization/clustering
 #' @param launch.browser a function to call with the application's URL.
 #'
 #' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu dashboardBody
@@ -42,6 +43,7 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
                      historyPath = NULL,
                      defaultValues = list(),
                      port = NULL,
+                     workers = 2,
                      launch.browser = getOption("shiny.launch.browser", interactive())
                      # ,
                      # historyFile = NULL
@@ -72,6 +74,9 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   if (! "Wind" %in% installed.packages()){
     devtools::install_github("haowulab/Wind", build_opts = c("--no-resave-data"))
   }
+  options(future.globals.maxSize= 2024^3)
+  future::plan("multisession", workers = workers)
+  BiocParallel::register(BiocParallel::MulticoreParam(workers))
   
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL

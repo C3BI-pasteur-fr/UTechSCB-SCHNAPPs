@@ -570,6 +570,12 @@ panelPlotFunc_m = panelPlotFunc
 # sampdes header for plot
 # cellNs cell names to be used
 
+require(dplyr)
+require(BiocParallel)
+require(SingleCellExperiment)
+require(BPCells)
+require(cowplot)
+require(ggpubr)
 
 panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs,
                           lowCol = "blue", highCol = "red", midCol = "white",
@@ -586,7 +592,7 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
   featureData <- rowData(scEx_log)
  
   par(mfrow = c(ceiling(length(finalLevels) / 4), 4), mai = c(0., .3, .3, .3))
-  rbPal <- colorRampPalette(c("#f0f0f0", "red"))
+  rbPal <- colorRampPalette(c("#018c0f", "red"))
   ylim <- c(min(projections[, dimy4]), max(projections[, dimy4]))
   # if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
   #   ymax <- 0
@@ -608,43 +614,31 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
   # color for each cell based on the expression
   # this will always show the max value per cell
   # this should apply when sameScale = FALSE
+  # cuts is a factor with the ranges
+  cuts = cut(
+    as.numeric(
+      projections[, dimy4]
+    ),
+    breaks = 10
+  )
   Col <- rbPal(10)[
     as.numeric(
-      cut(
-        as.numeric(
-          assays(scEx_log)[[1]]
-        ),
-        breaks = 10
-      )
+      cuts
     )
   ]
-  names(Col) <- rownames(projections)
-    
-  for (i in 1:length(finalLevels)) {
-    subsetTSNE <- projections[projections[,factsin]==finalLevels[i],]
-    plotCol <- Col[rownames(subsetTSNE)]
-    # if (is(projections[, dimx4], "factor") & dimy4 == "UMI.count") {
-    #   projections[, dimy4] <- Matrix::colSums(assays(scEx_log)[[1]][geneIdx, , drop = FALSE])
-    #   subsetTSNE <- projections[cellNs, ]
-    # }
-    # colData = assays(scEx_log)[[1]]
-    # if (!sameScale){
-    #   colData = (colData -min(colData) )/ (max(colData) - min(colData)) 
-    # }
-    printData = rbind(printData, data.frame(level = finalLevels[i], 
-# <<<<<<< HEAD
-#                                             dimx = subsetTSNE[, dimx4] , 
-#                                             dimy = subsetTSNE[, dimy4],
-#                                             col = plotCol
-# =======
-                                            dimx = subsetTSNE[cellNs, dimx4] , 
-                                            dimy = subsetTSNE[cellNs, dimy4],
-                                            col = Col #projections[,]
-# >>>>>>> master
-    ))
-  }
-  require(cowplot)
-  require(ggpubr)
+  names(Col) <- cuts
+  colF = Col[unique(names(Col))] %>% sort(decreasing=T)
+  
+  printData =  bplapply (seq(finalLevels), FUN = function(i) {
+    prjIdx = projections[,factsin]==finalLevels[i]
+    subsetTSNE <- projections[prjIdx,]
+    plotCol <- Col[prjIdx]
+    data.frame(level = finalLevels[i], 
+               dimx = subsetTSNE[, dimx4, drop=T] , 
+               dimy = subsetTSNE[, dimy4, drop=T],
+               col = plotCol #projections[,]
+    )
+  }) %>% bind_rows()
   printData = printData[order(printData$col, decreasing = F),]
   # printData$gene = factor(printData$gene, levels = unique(genesin))
   # if (is(subsetTSNE[, dimx4], "factor") & dimy4 == "UMI.count") {
@@ -663,12 +657,18 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, same
   # }
   if (sameScale){
     retVal = retVal + 
-      facet_wrap("level",ncol = nCol) 
+      facet_wrap(~level,ncol = nCol) 
   } else {
-    retVal = retVal + facet_wrap("level",ncol = nCol,scales = "free")
+    retVal = retVal + facet_wrap(~level ,ncol = nCol,scales = "free")
   }
   retVal = retVal + xlab(dimx4) + 
     ylab(dimy4) 
+  # dotcolors = printData$col
+  # names(dotcolors) = cuts
+  
+  retVal = retVal + scale_color_identity(name = dimy4, breaks = colF, labels = names(colF),guide = "legend", aesthetics = "colour") 
+  
+  # , labels = c("A", "B", "C")
   # +
   #   scale_colour_gradient2()
   

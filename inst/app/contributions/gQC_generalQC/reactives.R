@@ -647,7 +647,7 @@ if("DoubletFinder" %in% installed.packages()){
     ## Run DoubletFinder
     pann_name = paste0("pANN_",pN, "_", pK, "_", nExp_poi_adj)
     df_name = paste0("DF.classifications_",pN,"_", pK, "_", nExp_poi_adj)
-    srt = doubletFinder_v3(srt, PCs = dims, pN = pN, pK = pK, nExp = nExp_poi_adj,sct = T)
+    srt = doubletFinder(srt, PCs = dims, pN = pN, pK = pK, nExp = nExp_poi_adj,sct = T)
     result = srt[[c(pann_name, df_name)]]
     # colnames(result) = c("DF.score", "DF.class")
     return(result)
