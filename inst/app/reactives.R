@@ -146,6 +146,8 @@ checkLevels <- function(scEx) {
       lv = levels(cdat[,colName])
       if(!all(lv == make.names(lv))){
         if(is.numeric(lv))next()
+        # if all numbers, but as strings
+        if(!any(is.na(suppressWarnings(lv %>% as.numeric())  ))) next()
         if (!is.null(getDefaultReactiveDomain())) {
           showNotification(paste("Level",colName," has invalid levels\n correcting!\n"), type = "error", duration = NULL)
         }

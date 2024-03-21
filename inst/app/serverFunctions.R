@@ -2252,7 +2252,7 @@ debugControl <- function( name = "cellSelectionModule", list = c(ls())){
     saveVal = .schnappsEnv[[paste0("DEBUGSAVE_",name)]]
   }
   if (saveVal ) {
-    browser()
+    # browser()
     save(file = paste0("~/SCHNAPPsDebug/", name, ".RData"), list = list)
   }
   if(.schnappsEnv[["DEBUG"]]){

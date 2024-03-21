@@ -47,7 +47,7 @@ devtools::install_github("kassambara/ggpubr", dependencies  = TRUE, build = T,ty
 #   1: packages ‘multtest’, ‘limma’, ‘monocle’, ‘rtracklayer’, ‘MAST’ are not available for this version of R
 
 
-devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE, build = T,type = "source", upgrade = "always", ref = "seurat5")
+devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 
 
 # 
