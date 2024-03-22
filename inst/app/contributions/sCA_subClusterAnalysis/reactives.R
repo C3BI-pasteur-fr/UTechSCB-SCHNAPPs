@@ -166,6 +166,7 @@ sCA_seuratFindMarkers <- function(scEx, scEx_logMat, cells.1, cells.2, test="wil
   }else{
     seurDat <- tryCatch.W.E(Seurat::CreateSeuratObject(
       counts = assays(scEx)[[1]],
+      names.delim = "-",
       meta.data = as.data.frame(meta.data)
     ))
   }
@@ -196,7 +197,9 @@ sCA_seuratFindMarkers <- function(scEx, scEx_logMat, cells.1, cells.2, test="wil
   # not sure we need the normalization factor
   # markers <- Seurat::FindMarkers(seurDat@assays$RNA@data/normFact, 
   require(Seurat)
-  
+  # seurDat[["joined"]] <- JoinLayers(seurDat[["RNA"]])
+  LayerData(seurDat,"data") <- LayerData(seurDat,"counts")
+  # LayerData(seurDat)
   markers <- tryCatch.W.E(
     # parallel - done in calling function
     # plan("multisession", workers = 4)
