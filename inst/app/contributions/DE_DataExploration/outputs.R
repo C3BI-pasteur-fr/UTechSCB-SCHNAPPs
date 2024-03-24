@@ -1,5 +1,6 @@
 require(parallel) # done
- 
+source(paste0(packagePath, "contributions/DE_DataExploration/panelPlotFactFunc.R"))
+
 
 # source(paste0(packagePath, "/reactives.R"), local = TRUE)
 
@@ -67,6 +68,10 @@ observe(label ="obs_DE_pFact_dim_x", x = {
 observe(label ="obs_DE_pFact_dim_y", x = {
   .schnappsEnv$DE_pFact_dim_y = input$DE_pFact_dim_y
   .schnappsEnv$defaultValues[["DE_pFact_dim_y"]] = input$DE_pFact_dim_y
+})
+observe(label ="DE_pFact_dim_col", x = {
+  .schnappsEnv$DE_pFact_dim_col = input$DE_pFact_dim_col
+  .schnappsEnv$defaultValues[["DE_pFact_dim_col"]] = input$DE_pFact_dim_col
 })
 observe(label ="obs_DE_panelplotFactSameScale", x = {
   .schnappsEnv$DE_panelplotFactSameScale = input$DE_panelplotFactSameScale
@@ -206,6 +211,9 @@ observe({
   updateSelectInput(session,"DE_pFact_dim_y",
                     choices = colnames(projections),
                     selected = .schnappsEnv$DE_pFact_dim_y)
+  updateSelectInput(session,"DE_pFact_dim_col",
+                    choices = colnames(projections),
+                    selected = .schnappsEnv$DE_pFact_dim_col)
   updateSelectInput(session, "DE_pFactIds",
                     choices = projFactors,
                     selected = .schnappsEnv$DE_pFactIds)
@@ -515,7 +523,7 @@ output$DE_panelPlotFact <- renderPlot({
     showNotification("DE_panelPlotFact", id = "DE_panelPlotFact", duration = NULL)
   }
   if (DEBUG) cat(file = stderr(), "output$DE_panelPlotFact\n")
-  
+  # source("~/Rstudio/schnapps/inst/app/contributions/DE_DataExploration/panelPlotFactFunc.R")
   clicked <- input$updatePanelPlotFact
   applyPvalue <- isolate(input$DE_panelplotFactPvalue)
   scEx_log <- scEx_log()
@@ -532,6 +540,7 @@ output$DE_panelPlotFact <- renderPlot({
   
   dimx4 <- isolate(input$DE_pFact_dim_x)
   dimy4 <- isolate(input$DE_pFact_dim_y)
+  dimCol4 <- isolate(input$DE_pFact_dim_col)
   sameScale <- isolate(input$DE_panelplotFactSameScale)
   nCol <- isolate(as.numeric(input$DE_pFactnCol))
   
@@ -548,13 +557,14 @@ output$DE_panelPlotFact <- renderPlot({
   # genesin <- genesin[[1]]
   
   # if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
-  retVal <- panelPlotFactFunc(scEx_log, projections, factsin, dimx4, dimy4, sameScale, nCol, sampdesc, cellNs, applyPvalue = applyPvalue) 
+  retVal <- panelPlotFactFunc(scEx_log, projections, factsin, dimx4, dimy4, dimCol4, sameScale, nCol, sampdesc, cellNs, applyPvalue = applyPvalue) 
   
   setRedGreenButton(
     vars = list(
       c("DE_pFactIds", isolate(input$DE_pFactIds)),
       c("DE_pFact_dim_x", isolate(input$DE_pFact_dim_x)),
       c("DE_pFact_dim_y", isolate(input$DE_pFact_dim_y)),
+      c("DE_pFact_dim_col", isolate(input$DE_pFact_dim_col)),
       c("DE_panelplotFactSameScale", isolate(input$DE_panelplotFactSameScale)),
       c("DE_pFactnCol", isolate(input$DE_pFactnCol)),
       c("DE_PanelPlotFactCellSelection-Mod_clusterPP", isolate(input$`DE_PanelPlotFactCellSelection-Mod_clusterPP`)),

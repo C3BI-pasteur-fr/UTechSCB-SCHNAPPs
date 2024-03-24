@@ -962,9 +962,9 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
         scalegroup = lv,
         showlegend = showLegend[which(lv == levels(projections[, dbCluster[1]]))],
         name = lv2,
-        visible=T,
+        visible=T, points = FALSE,
         box = list(
-          visible = T
+          visible = T, points = FALSE
         ),
         meanline = list(
           visible = T
@@ -988,7 +988,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
         # ticknames = permsNames
       )
       ,
-      # violingap = 0,violingroupgap = 1,
+      # # violingap = 0,violingroupgap = 1,
       violinmode = 'group'
       # ,
       # annotations = list(y = permsNames, yref = "y")

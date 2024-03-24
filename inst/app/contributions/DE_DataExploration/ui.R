@@ -217,19 +217,27 @@ tabList <- list(
         width = 6, 
         fluidRow(
           column(
-            width = 6,
+            width = 4,
             sc_selectInput("DE_pFact_dim_x",
                            label = "X",
-                           choices = c(defaultValue("DE_dim_x", "tsne1"), "tsne2", "tsne3"),
-                           selected = defaultValue("DE_dim_x", "tsne1")
+                           choices = c(defaultValue("DE_pFact_dim_x", "tsne1"), "tsne2", "tsne3"),
+                           selected = defaultValue("DE_pFact_dim_x", "tsne1")
             )
           ),
           column(
-            width = 6,
+            width = 4,
             sc_selectInput("DE_pFact_dim_y",
                            label = "Y",
-                           choices = c("tsne1", defaultValue("DE_dim_y", "tsne2"), "tsne3"),
-                           selected = defaultValue("DE_dim_y", "tsne2")
+                           choices = c("tsne1", defaultValue("DE_pFact_dim_y", "tsne2"), "tsne3"),
+                           selected = defaultValue("DE_pFact_dim_y", "tsne2")
+            )
+          ),
+          column(
+            width = 4,
+            sc_selectInput("DE_pFact_dim_col",
+                           label = "color",
+                           choices = c("tsne1", defaultValue("DE_pFact_dim_col", "tsne2"), "tsne3"),
+                           selected = defaultValue("DE_pFact_dim_col", "tsne2")
             )
           )
         ),

@@ -196,8 +196,8 @@ shortCutsList = list(
 
 shortCutsList = list(
   Head = "histogramSelected",
-  Descr = "histogram",
-  Explain = "histogram of factorial values. If the color is also factorial, each bar is divided by the respective amount.",
+  Descr = "barchart",
+  Explain = "barchart of factorial values. If the color is also factorial, each bar is divided by the respective amount.",
   URL = "www/images/HistogramSelected.png",
   Func = function(session){
     updateTabItems(
@@ -221,8 +221,8 @@ shortCutsList = list(
 
 shortCutsList = list(
   Head = "histogramNormBy",
-  Descr = "histogram -2",
-  Explain = "histogram of factorial values. If the color is also factorial, each bar is divided by the respective amount. Now the sum of heights for each color is 1. This is achieved by setting divide Y by to 'normByCol'.",
+  Descr = "barchart -2",
+  Explain = "barchart of factorial values. If the color is also factorial, each bar is divided by the respective amount. Now the sum of heights for each color is 1. This is achieved by setting divide Y by to 'normByCol'.",
   URL = "www/images/HistogramNormby.png",
   Func = function(session){
     updateTabItems(

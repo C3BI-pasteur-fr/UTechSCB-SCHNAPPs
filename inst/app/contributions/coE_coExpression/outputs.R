@@ -295,6 +295,9 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
   
 
   if(is.null(retVal)) return(NULL)
+  if(length(levels(projections[,clusters]))<3){
+    retVal + scale_color_gradient(low = "#808080", high = "white", limits=c(-2, 2))
+  }
   af = coE_dotPlot_GeneSets
   # remove env because it is too big
   specEnv = emptyenv()
