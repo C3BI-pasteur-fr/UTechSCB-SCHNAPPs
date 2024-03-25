@@ -59,50 +59,50 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                        ),
                        li(
                          div(a(id="wkfl1.nFeatureViolin.click", "visualize the number of features per cell in a violin plot per sample.")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = sampleNames; y=Feature.Count; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = sampleNames; y=Feature.Count; color = sampleNames"))),
                        ),
                        li(
                          div(a(id="wkfl1.nFeatureSelection.click", "select cells to be removed based on the number of features per cell")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = barcode; y=Feature.Count; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = barcode; y=Feature.Count; color = sampleNames"))),
                          div(h5("set 'name group, also used in Plot to color selected cells red.' to 'rmCells'.")),
                          div(h5("Select the cells to be removed and click 'change current selection' button, while 'Add to group/otherwise overwrite' is checked.")),
                          div(h5("repeat until all cells are selected. Using the plotly functionality it might be necessary to zoom into the plot and select within the zoomed region."))
                        ),
                        li(
                          div(a(id="wkfl1.nCountViolin.click", "view number of UMIs per cell")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = sampleNames; y=UMI.Count; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = sampleNames; y=UMI.Count; color = sampleNames"))),
                          div(h5("Proceed similar to 3."))
                        ),
                        li(
                          div(a(id="wkfl1.nCountSelection.click", "select cells to be removed based on the number of UMIs per cell")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = barcode; y=UMI.Count; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = barcode; y=UMI.Count; color = sampleNames"))),
                          div(h5("Proceed similar to 4."))
                        ),
                        li(
                          div(a(id="wkfl1.npMTViolin.click", "view  number of mitochondrial genes per cell")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = sampleNames; y=percent.mt; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = sampleNames; y=percent.mt; color = sampleNames"))),
                          div(h5("Proceed similar to 3."))
                        ),
                        li(
                          div(a(id="wkfl1.npMTSelection.click", "select cells to be removed based on the number of mitochondrial genes per cell")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = barcode; y=percent.mt; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = barcode; y=percent.mt; color = sampleNames"))),
                          div(h5("Proceed similar to 4."))
                        ),
                        li(
                          div(a(id="wkfl1.countFeature.click", "view the selected cells in the count vs Feature projection")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = nCount_RNA; y=Feature.count; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = nCount_RNA; y=Feature.count; color = sampleNames"))),
                          div(h5("test the effect of log-transforming the data.")),
                          div(h5("Proceed similar to 4."))
                        ),
                        li(
                          div(a(id="wkfl1.countMt.click", "view the selected cells in the count vs mitochondrial percentage projection")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] x = nCount_RNA; y=percent.mt; color = sampleNames"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] x = nCount_RNA; y=percent.mt; color = sampleNames"))),
                          div(h5("test the effect of log-transforming the data.")),
                          div(h5("Proceed similar to 4."))
                        ),
                        li(
                          div(h5("copy cell names")),
-                         div(h6(HTML("[<em>Co-expression - Selected</em>] show cell names = checked; tripple-click"))),
+                         div(h6(HTML("[<em>Co-expression - 2D plot</em>] show cell names = checked; tripple-click"))),
                          div(h5("Selected cell names are shown at the bottom of the page (tripple click). Those can be copied into memory and then pasted 
                               in the ", a("'Cell selection'",id="wkfl1.go2CellSelection.click")," tab. ")),
                          div(h5("paste the cell names under 'Cells to be removed' and click 'apply changes' to update the underlying count 
@@ -250,7 +250,7 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                    nav(div(),ol(
                      li(
                        div(h5("show standard heatmap"), align = "left"),
-                       div(h6(HTML("[<em>Co-expression -  All clusters</em>]"))),
+                       div(h6(HTML("[<em>Co-expression -  heatmap</em>]"))),
                        div(h5(""), align = "left")
                      ),
                      li(

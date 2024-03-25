@@ -10,9 +10,9 @@ menuList <- list(
                            icon = icon("tachometer-alt"),
                            expandedName = "coexpressionID",
                            tabName = "coexpression", startExpanded = FALSE,
-                           shinydashboard::menuSubItem("All clusters", tabName = "coexpressionAll"),
+                           shinydashboard::menuSubItem("Heatmap", tabName = "coexpressionAll"),
                            shinydashboard::menuSubItem("Gene sets", tabName = "geneSets"),
-                           shinydashboard::menuSubItem("Selected", tabName = "coexpressionSelected"),
+                           shinydashboard::menuSubItem("2D plot", tabName = "coexpressionSelected"),
                            shinydashboard::menuSubItem("Violin plot", tabName = "CoExpressionViolin"),
                            if(("ggalluvial" %in% rownames(installed.packages()))){
                              shinydashboard::menuSubItem("alluvialTab", tabName = "alluvialTab")
