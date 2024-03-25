@@ -131,6 +131,7 @@ coE_dotPlot_GeneSets <- function(projections = projections,
   )
   Idents(seurDat) <- as.factor(projections[,clusters])
   featureDat = rowData(scEx_log)
+  require(shiny)
   if(length(geneSets) == 1){
     features = geneName2Index(paste(gmtData[[geneSets]]$genes,collapse = ", "), featureDat)
   } else {
@@ -151,22 +152,25 @@ coE_dotPlot_GeneSets <- function(projections = projections,
     features =lapply(features,FUN = FUN,g=dupGene)
     features$common =c(features$common, dupGene)
   }
-  p = DotPlot(seurDat, 
-              assay="RNA", 
-              features = features, 
-              cols = col,
-              col.min = col.min,
-              col.max = col.max,
-              dot.min = dot.min,
-              dot.scale = dot.scale,
-              idents = NULL,
-              group.by = NULL,
-              split.by = NULL,
-              cluster.idents = FALSE,
-              scale = TRUE,
-              scale.by = scale.by,
-              scale.min = NA,
-              scale.max = NA
+  if (length(levels(Idents(seurDat)))<3){
+    col = c("lightgrey", "darkgrey")
+  }
+  p = Seurat::DotPlot(seurDat, 
+                      assay="RNA", 
+                      features = features, 
+                      cols = col,
+                      col.min = col.min,
+                      col.max = col.max,
+                      dot.min = dot.min,
+                      dot.scale = dot.scale,
+                      idents = NULL,
+                      group.by = NULL,
+                      split.by = NULL,
+                      cluster.idents = FALSE,
+                      scale = TRUE,
+                      scale.by = scale.by,
+                      scale.min = NA,
+                      scale.max = NA
   )
   labFun <- function(breakval){featureDat[breakval,"symbol"]}
   ylabFun <- function(val){stringr::str_replace(val,"SeuratProject_","bla")}
@@ -228,7 +232,9 @@ coE_dotPlot_GeneSetsModuleScore <- function(projections = projections,
     features$common =c(features$common, dupGene)
   }
   seurDat@assays$RNA$data = seurDat@assays$RNA$counts
-  
+  if (length(levels(Idents(seurDat)))<3){
+    col = c("lightgrey", "darkgrey")
+  }
   p = SCHNAPPs::DotPlotwithModuleScore(object = seurDat, 
                                        assay="RNA", 
                                        features = features,
