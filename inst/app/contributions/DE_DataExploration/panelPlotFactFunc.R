@@ -18,7 +18,8 @@ require(ggpubr)
 
 panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, dimCol, sameScale, nCol, sampdesc, cellNs,
                               lowCol = "blue", highCol = "red", midCol = "white",
-                              midFunc = function(x){(max(x)-min(x))/2}, applyPvalue=FALSE) {
+                              midFunc = function(x){(max(x)-min(x))/2}, applyPvalue=FALSE,
+                              projectionColors=NULL) {
   prjCol = projectionColors[[dimCol]]
   if (.schnappsEnv$DEBUGSAVE) {
     # prjCol= reactiveValuesToList(projectionColors)
