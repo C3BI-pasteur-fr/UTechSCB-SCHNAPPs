@@ -558,5 +558,5 @@ panelPlotFunc <- function(scEx_log, projections, genesin, dimx4, dimy4, sameScal
 } 
 #   panelPlotFunc_m = memoise::memoise(panelPlotFunc,cache=do.call(cachem::cache_disk,.schnappsEnv$cacheDir))
 panelPlotFunc_m = panelPlotFunc
-source(paste0(packagePath, "contributions/DE_DataExploration/panelPlotFactFunc.R"))
+source(paste0(packagePath, "/contributions/DE_DataExploration/panelPlotFactFunc.R"))
 

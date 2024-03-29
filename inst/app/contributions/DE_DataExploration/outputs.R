@@ -1,5 +1,5 @@
 require(parallel) # done
-source(paste0(packagePath, "contributions/DE_DataExploration/panelPlotFactFunc.R"))
+source(paste0(packagePath, "/contributions/DE_DataExploration/panelPlotFactFunc.R"))
 
 
 # source(paste0(packagePath, "/reactives.R"), local = TRUE)
@@ -557,7 +557,9 @@ output$DE_panelPlotFact <- renderPlot({
   # genesin <- genesin[[1]]
   
   # if (DEBUG) cat(file = stderr(), paste("output:sampdesc",sampdesc,"\n"))
-  retVal <- panelPlotFactFunc(scEx_log, projections, factsin, dimx4, dimy4, dimCol4, sameScale, nCol, sampdesc, cellNs, applyPvalue = applyPvalue, projectionColors=projectionColors) 
+  retVal <- panelPlotFactFunc(scEx_log, projections, factsin, dimx4, dimy4, dimCol4, 
+                              sameScale, nCol, sampdesc, cellNs,
+                              applyPvalue = applyPvalue, projectionColors=projectionColors, .schnappsEnv = .schnappsEnv) 
   
   setRedGreenButton(
     vars = list(
