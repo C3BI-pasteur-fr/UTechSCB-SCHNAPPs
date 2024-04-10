@@ -406,7 +406,7 @@ inputDataFunc <- function(inFile) {
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/readInp.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/readInp.RData')
+  # cp =load(file='~/SCHNAPPsDebug/readInp.RData')
   
   
   #' save orginial data
@@ -3370,7 +3370,7 @@ sample <- reactive({
   for (pdColName in colnames(pd)) {
     # in case dbCluster is already in the colData this would create dbCluster.1 later on
     if (pdColName == "dbCluster") next()
-    if (length(levels(factor(pd[, pdColName]))) < 30) {
+    if (length(levels(factor(pd[, pdColName]))) < 100) {
       if (is.null(retVal)) {
         retVal <- data.frame(pd[, pdColName])
         colnames(retVal) <- pdColName
@@ -3658,13 +3658,18 @@ inputSample <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = "~/SCHNAPPsDebug/inputSample.RData", list = c(ls()))
   }
-  # load(file='~/SCHNAPPsDebug/inputSample.RData')
-  
+  # cp=load(file='~/SCHNAPPsDebug/inputSample.RData')
+  if(!"sampleNames" %in% colnames(colData(scEx))){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("no sampleNames in colData(scEx)", id = "inputSampleErr", duration = NULL)
+      return(NULL)
+    }
+  }
   # TODO should come from sampleInfo
-  sampInf <- gsub(".*-(.*)", "\\1", scEx$barcode)
+  # sampInf <- gsub(".*-(.*)", "\\1", scEx$barcode)
   cellIds <- data.frame(
     cellName = colnames(scEx),
-    sample = sampInf,
+    sample = colData(scEx)$sampleNames,
     # number of genes per cell
     ngenes = Matrix::colSums(assays(scEx)[[1]]>0),
     nUMI = Matrix::colSums(assays(scEx)[[1]])
@@ -3707,12 +3712,18 @@ inputSampleOrg <- reactive({
     save(file = "~/SCHNAPPsDebug/inputSample.RData", list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/inputSample.RData')
+  if(!"sampleNames" %in% colnames(colData(scEx))){
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("no sampleNames in colData(scEx)", id = "inputSampleErr", duration = NULL)
+      return(NULL)
+    }
+  }
   
   # TODO should come from sampleInfo
-  sampInf <- gsub(".*-(.*)", "\\1", dataTables$scEx$barcode)
+  # sampInf <- gsub(".*-(.*)", "\\1", dataTables$scEx$barcode)
   cellIds <- data.frame(
     cellName = colnames(dataTables$scEx),
-    sample = sampInf,
+    sample = colData(dataTables$scEx)$sampleNames,
     # number of genes per cell
     ngenes = Matrix::colSums(assays(dataTables$scEx)[[1]]>0),
     nUMI = Matrix::colSums(assays(dataTables$scEx)[[1]])

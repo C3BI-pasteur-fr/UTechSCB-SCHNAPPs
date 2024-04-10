@@ -811,14 +811,21 @@ output$ColorSelection <- renderUI({
   # where and how to store the colors
   tabs= lapply(names(projections), FUN = function(name){
     if(is.factor(projections[,name])){
-      if(length(levels(projections[,name]))>30) return(NULL)
+      if(length(levels(projections[,name]))>100) {
+        showNotification(
+          paste(name," has more than 100 levels\n"),
+          type = "error",
+          duration = NULL
+        )
+        return(NULL)
+      }
       return(tmpFun(name = name, value = paste0(name, "ColorPanel"), lev = levels(projections[,name]), idStr = paste0(name, ".col."),
                     sampCol = defaultValue(paste0(name, ".colVec"), allowedColors[seq(levels(projections[,name]))]),
                     allowedColors = allowedColors)
       )
     } else {
       return(tmpFunCont(name = name, value = paste0(name, "ColorPanel"),
-                        sampCol = defaultValue(paste0(name, ".colVec"), c("white", "#2D96FA")),
+                        sampCol = defaultValue(paste0(name, ".colVec"), c("#FAF4F5", "#2D96FA")),
                         allowedColors = allowedColors)
       )
     }
@@ -1027,8 +1034,8 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
   # browser()
   lapply(names(projections), FUN = function(name){
     if(is.factor(projections[,name])){
-      if(length(levels(projections[,name]))>30) {
-        cat(file = stderr(), paste0(name, "factor", ">30 levels\n"))
+      if(length(levels(projections[,name]))>100) {
+        cat(file = stderr(), paste0("\n\n\t", name, " factor", ">100 levels\n\n"))
         return(NULL)
       }
       # browser()
