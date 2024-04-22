@@ -15,7 +15,7 @@ library(future)
 plan(sequential)
 
 library("BiocParallel")
-register(MulticoreParam(6))
+register(safeBPParam(6))
 
 schnapps(DEBUG=T)
 

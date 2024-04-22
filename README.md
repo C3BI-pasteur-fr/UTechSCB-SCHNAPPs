@@ -22,10 +22,11 @@ Windows: <https://cran.r-project.org/bin/windows/>
 
 MAC: <https://cran.r-project.org/bin/macosx/>
 
-    update.packages()
+   
     if (!require("devtools"))
       install.packages("devtools")
     # devtools::install_github("mul118/shinyMCE")
+     update.packages()
     if (!requireNamespace("BiocManager", quietly = TRUE))
         install.packages("BiocManager")
     # update bioconductor packages if required

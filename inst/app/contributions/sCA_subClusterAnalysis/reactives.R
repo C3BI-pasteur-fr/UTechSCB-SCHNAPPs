@@ -683,7 +683,7 @@ sCA_dge <- reactive({
     register(SnowParam(workers = nCPU))
   } else{
     plan(multisession, workers = nCPU)
-    register(MulticoreParam(workers = nCPU))
+    register(safeBPParam(nCPU))
   }
   
   

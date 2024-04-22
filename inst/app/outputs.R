@@ -180,18 +180,18 @@ observe(label ="obs_pcaN", x = {
 })
 
 
-# check gene names ----
-observe({
-  scEx = scEx()
-  req(scEx)
-  if(any(stringr::str_detect( rownames(scEx), "_"))){
-    showNotification(
-      "gene names contain '_', which will be replaced by Seurat by '.', which can cause artefacts",
-      type = "error",
-      duration = NULL
-    )
-  }
-})
+# # check gene names ----
+# observe({
+#   scEx = scEx()
+#   req(scEx)
+#   if(any(stringr::str_detect( rownames(scEx), "_"))){
+#     showNotification(
+#       "gene names contain '_', which will be replaced by Seurat by '.', which can cause artefacts",
+#       type = "error",
+#       duration = NULL
+#     )
+#   }
+# })
 
 
 output$noLogWarning <- renderText({

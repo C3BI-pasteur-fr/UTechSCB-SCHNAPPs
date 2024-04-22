@@ -436,7 +436,7 @@ scranFindMarkerFullReactiveTable <- reactive({
   oldNcpu = bpnworkers(bpparam())
   on.exit({
     printTimeEnd(start.time, "coE_scranFindMarkerTableReact")
-    register(MulticoreParam(oldNcpu))
+    register(safeBPParam(oldNcpu))
     if (!is.null(getDefaultReactiveDomain())) {
       removeNotification(id = "coE_scranFindMarkerTableReact")
     }
@@ -467,7 +467,7 @@ scranFindMarkerFullReactiveTable <- reactive({
   # browser()
   # 4.18 GB
   # parallel --- done
-  register(MulticoreParam(nCPU))
+  register(safeBPParam(nCPU))
   
   start.time <- base::Sys.time()
   wmarkers <- tryCatch({

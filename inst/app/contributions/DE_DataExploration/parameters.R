@@ -19,15 +19,15 @@ myNormalizationChoices <- list(
 myNormalizationParameters <- list(
   DE_logNormalization = tagList(
     sc_numericInput("DE_logNormalization_sf",
-                 label = "scale by (0 => minvalue)",
-                 min = 0, max = 200000, step = 1, value = defaultValue("DE_logNormalization_sf", 0)
+                    label = "scale by (0 => minvalue)",
+                    min = 0, max = 200000, step = 1, value = defaultValue("DE_logNormalization_sf", 0)
     )
-    ),
+  ),
   DE_scaterNormalization = h5("no Parameters implemented"),
   DE_seuratSCTnorm = tagList(
     sc_numericInput("DE_seuratSCTnorm_nHVG",
-                 label = "Number of variable genes",
-                 min = 10, max = 200000, step = 1, value = 3000
+                    label = "Number of variable genes",
+                    min = 10, max = 200000, step = 1, value = 3000
     ),
     sc_selectInput(
       "DE_seuratSCTnorm_var2reg",
@@ -42,8 +42,8 @@ myNormalizationParameters <- list(
   ),
   DE_seuratLogNorm = tagList(
     sc_numericInput("DE_seuratLogNorm_nHVG",
-                 label = "Number of variable genes",
-                 min = 10, max = 200000, step = 1, value = 3000
+                    label = "Number of variable genes",
+                    min = 10, max = 200000, step = 1, value = 3000
     ),
     sc_selectInput(
       "DE_seuratLogNorm_var2reg",
@@ -59,23 +59,23 @@ myNormalizationParameters <- list(
   DE_logGeneNormalization = sc_textInput(inputId = "DE_geneIds_norm", label = "comma separated list of genes used for normalization", value = ""),
   DE_seuratStandard = tagList(
     sc_numericInput("DE_seuratStandard_dims",
-                 label = "Which dimensions to use from the CCA to specify the neighbor search space",
-                 min = 2, max = 20000, step = 1, value = 30
+                    label = "Which dimensions to use from the CCA to specify the neighbor search space",
+                    min = 2, max = 20000, step = 1, value = 30
     ),
     sc_numericInput("DE_seuratStandard_anchorF",
-                 label = "select the provided number of features to be used in anchor finding",
-                 min = 60, max = 30000, step = 10,
-                 value = 2000
+                    label = "select the provided number of features to be used in anchor finding",
+                    min = 60, max = 30000, step = 10,
+                    value = 2000
     ),
     sc_numericInput("DE_seuratStandard_kF",
-                 label = "How many neighbors (k) to use when filtering anchors",
-                 min = 2, max = 3000, step = 1,
-                 value = 200
+                    label = "How many neighbors (k) to use when filtering anchors",
+                    min = 2, max = 3000, step = 1,
+                    value = 200
     ),
     sc_numericInput("DE_seuratStandard_k.weight",
-                 label = "Number of neighbors to consider when weighting",
-                 min = 2, max = 3000, step = 1,
-                 value = 100
+                    label = "Number of neighbors to consider when weighting",
+                    min = 2, max = 3000, step = 1,
+                    value = 100
     ),
     sc_selectInput(
       "DE_seuratStandard_splitby",
@@ -89,8 +89,8 @@ myNormalizationParameters <- list(
   ),
   DE_seuratSCtransform = tagList(
     sc_numericInput("DE_seuratSCtransform_nhvg",
-                 label = "number of highly variable genes",
-                 min = 200, max = 400000, step = 10, value = 3000
+                    label = "number of highly variable genes",
+                    min = 200, max = 400000, step = 10, value = 3000
     ),
     sc_selectInput(
       "DE_seuratSCtransform_vars2regress",
@@ -103,31 +103,31 @@ myNormalizationParameters <- list(
       # options = list(maxItems = 20)
     ),
     sc_numericInput("DE_seuratSCtransform_dimsMin",
-                 label = "minimum dimension (PCA) to use",
-                 min = 1, max = 100, step = 1, value = 1
+                    label = "minimum dimension (PCA) to use",
+                    min = 1, max = 100, step = 1, value = 1
     ),
     sc_numericInput("DE_seuratSCtransform_dimsMax",
-                 label = "maximum dimension (PCA) to use",
-                 min = 3, max = 100, step = 1, value = 30
+                    label = "maximum dimension (PCA) to use",
+                    min = 3, max = 100, step = 1, value = 30
     ),
     sc_numericInput("DE_seuratSCtransform_nfeatures",
-                 label = "number of genes to keep for the integration step",
-                 min = 200, max = 400000, step = 10, value = 3000
+                    label = "number of genes to keep for the integration step",
+                    min = 200, max = 400000, step = 10, value = 3000
     ),
     sc_numericInput("DE_seuratSCtransform_k.anchor",
-                 label = "Number of anchors to use",
-                 min = 1, max = 100, step = 1,
-                 value = 5
+                    label = "Number of anchors to use",
+                    min = 1, max = 100, step = 1,
+                    value = 5
     ),
     sc_numericInput("DE_seuratSCtransform_k.filter",
-                 label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
-                 min = 1, max = 1000, step = 10,
-                 value = 200
+                    label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
+                    min = 1, max = 1000, step = 10,
+                    value = 200
     ),
     sc_numericInput("DE_seuratSCtransform_k.score",
-                 label = "k score",
-                 min = 1, max = 1000, step = 1,
-                 value = 30
+                    label = "k score",
+                    min = 1, max = 1000, step = 1,
+                    value = 30
     ),
     # sc_numericInput("DE_seuratSCtransform_scalingFactor",
     #              label = "Scaling to use for transformed data",
@@ -148,13 +148,13 @@ myNormalizationParameters <- list(
   ),
   DE_seuratRefBased = tagList(
     sc_numericInput("DE_seuratRefBased_nfeatures",
-                 label = "Number of features to retain/use",
-                 min = 200, max = 20000, step = 10, value = 3000
+                    label = "Number of features to retain/use",
+                    min = 200, max = 20000, step = 10, value = 3000
     ),
     sc_numericInput("DE_seuratRefBased_k.filter",
-                 label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
-                 min = 60, max = 30000, step = 10,
-                 value = 200
+                    label = "How many neighbors (k) to use when filtering anchors, should be smaller than the lowest number of cells per sample",
+                    min = 60, max = 30000, step = 10,
+                    value = 200
     ),
     # sc_numericInput("DE_seuratRefBased_scaleFactor",
     #              label = "Scaling to use for transformed data",
@@ -198,9 +198,9 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
         # not sure that NA would be a good solution
         # so we are asking to remove the cells manually
         if (sum(limitCells) < ncol(scEx)) {
-          errStr = paste("please remove the following cells:\n", 
+          errStr = paste("\n\nplease remove the following cells:\n", 
                          paste(colnames(scEx)[!limitCells],
-                               collapse = ", "))
+                               collapse = ", "),"\n\n")
           cat (file = stderr(), errStr)
           if (!is.null(getDefaultReactiveDomain())) {
             showNotification(errStr, id = "DE_seuratError", duration = NULL, type = "error")  
@@ -215,6 +215,12 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
         counts = scExMat,
         meta.data = meta.data
       )
+      rownameMap = tibble("scExName" = rownames(scExMat), "seurName" = str_replace_all(rownames(scExMat),"_","-"))
+      if(!all(rownameMap$seurName == rownames(seurDat))){
+        cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\nrownames not equal\n\n\n"))
+        return(NULL)
+      }
+      
       seur.list <- SplitObject(seurDat, split.by = splitby)
       # for (i in 1:length(seur.list)) {
       #   seur.list[[i]] <- SCTransform(seur.list[[i]], verbose = TRUE)
@@ -265,7 +271,8 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
         )
         # return matrix object!!!
-        integrated[["integrated"]]$scale.data  %>% as.matrix()
+        LayerData(GetAssay(seurDat),"scale.data") %>% as.matrix()
+        # integrated[["integrated"]]$scale.data  %>% as.matrix()
       } else {
         seur.list[[1]][["SCT"]]$scale.data  %>% as.matrix()
       }
@@ -287,9 +294,11 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
       return(NULL)
     }
   )
-  if (is.null(A)) {
+  if (is.null(A) || nrow(A)<2 || ncol(A)<2) {
     return(NULL)
   }
+  rownames(A) = (rownameMap[match(rownames(A), rownameMap$seurName),"scExName"] %>% as.vector())[[1]]
+  
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -399,9 +408,9 @@ DE_seuratSCtransformFunc <- function(scEx,
         # not sure that NA would be a good solution
         # so we are asking to remove the cells manually
         if (sum(limitCells) < ncol(scEx)) {
-          errStr = paste("please remove the following cells:\n", 
+          errStr = paste("\n\nplease remove the following cells:\n", 
                          paste(colnames(scEx)[!limitCells],
-                               collapse = ", "))
+                               collapse = ", "),"\n\n")
           cat (file = stderr(), errStr)
           if (!is.null(getDefaultReactiveDomain())) {
             showNotification(errStr, id = "DE_seuratError", duration = NULL, type = "error")  
@@ -411,13 +420,18 @@ DE_seuratSCtransformFunc <- function(scEx,
         # scEx = scEx[, limitCells]
         # meta.data = meta.data[limitCells,, drop = FALSE]
       }
-      if(vars2regress %in% names(colData(scEx))){
-        meta.data[,vars2regress] = colData(scEx)[,vars2regress]
+      if(all(vars2regress %in% names(colData(scEx)))){
+        meta.data = cbind(meta.data ,colData(scEx)[,c(vars2regress)])
       }
       seurDat <- CreateSeuratObject(
         counts = scExMat,
         meta.data = meta.data
       )
+      rownameMap = tibble("scExName" = rownames(scExMat), "seurName" = str_replace_all(rownames(scExMat),"_","-"))
+      if(!all(rownameMap$seurName == rownames(seurDat))){
+        cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\nrownames not equal\n\n\n"))
+        return(NULL)
+      }
       
       seur.list <- SplitObject(seurDat, split.by = splitby)
       seur.list <- lapply(seur.list, FUN = function(x) SCTransform(object = x, 
@@ -461,7 +475,8 @@ DE_seuratSCtransformFunc <- function(scEx,
           verbose = DEBUG,
           k.weight = min(100, min(unlist(lapply(seur.list, ncol))))
         )
-        integrated@assays$integrated@scale.data
+        LayerData(GetAssay(seurDat),"scale.data") %>% as.matrix()
+        # integrated@assays$integrated@scale.data
       } else {
         seur.list[[1]]@assays$SCT@scale.data 
       }
@@ -483,10 +498,12 @@ DE_seuratSCtransformFunc <- function(scEx,
   
   # FeaturePlot(integrated, c("CCR7", "S100A4", "GZMB", "GZMK", "GZMH"))
   
-  if (is.null(A)) {
+  if (is.null(A) || nrow(A)<2 || ncol(A)<2) {
     return(NULL)
   }
   A=as.matrix(A)
+  rownames(A) = (rownameMap[match(rownames(A), rownameMap$seurName),"scExName"] %>% as.vector())[[1]]
+  
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -600,9 +617,9 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
         # not sure that NA would be a good solution
         # so we are asking to remove the cells manually
         if (sum(limitCells) < ncol(scEx)) {
-          errStr = paste("please remove the following cells:\n", 
+          errStr = paste("\n\nplease remove the following cells:\n", 
                          paste(colnames(scEx)[!limitCells],
-                               collapse = ", "))
+                               collapse = ", "),"\n\n")
           cat (file = stderr(), errStr)
           if (!is.null(getDefaultReactiveDomain())) {
             showNotification(errStr, id = "DE_seuratError", duration = NULL, type = "error")  
@@ -619,14 +636,20 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
         counts = assay(scEx, "counts"),
         meta.data = meta.data
       )
+      rownameMap = tibble("scExName" = rownames(scExMat), "seurName" = str_replace_all(rownames(scExMat),"_","-"))
+      if(!all(rownameMap$seurName == rownames(seurDat))){
+        cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\nrownames not equal\n\n\n"))
+        return(NULL)
+      }
+      
       seur.list <- Seurat::SplitObject(seurDat, split.by = splitby)
       seur.list <- lapply(seur.list, FUN = function(x) {
         # parallel
         # plan("multiprocess", workers = 4)
         x <- Seurat::NormalizeData(x, verbose = DEBUG)
         x <- Seurat::FindVariableFeatures(x,
-                                  selection.method = "vst",
-                                  nfeatures = 2000, verbose = DEBUG
+                                          selection.method = "vst",
+                                          nfeatures = 2000, verbose = DEBUG
         )
       }
       )
@@ -653,6 +676,7 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
         
         integrated <- Seurat::ScaleData(integrated, verbose = DEBUG)
         integrated[["integrated"]]["scale.data"]
+        
       } else {
         seur.list[[1]][["RNA"]]$counts
       }
@@ -664,10 +688,12 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
       return(NULL)
     }
   )
-  if (is.null(A)) {
+  if (is.null(A) || nrow(A)<2 || ncol(A)<2) {
     return(NULL)
   }
-  A <- as.matrix(A)
+  # A <- as.matrix(A)
+  # A <- seurDat[["SCT"]]@scale.data %>% as.matrix()
+  A <- LayerData(GetAssay(seurDat),"scale.data") %>% as.matrix()
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -767,7 +793,7 @@ DE_seuratSCTnorm <- reactive({
   runThis <- DE_seuratSCTnormButton()
   nHVG =  isolate(input$DE_seuratSCTnorm_nHVG)
   var2reg =  isolate(input$DE_seuratSCTnorm_var2reg)
-
+  
   # if (length(var2reg)<1)
   if (is.null(scEx) | runThis == "") {
     if (DEBUG) {
@@ -815,19 +841,19 @@ DE_seuratSCTnormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   if (is.null(var2reg)) {
     var2reg = NULL
     meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
-  } else if(var2reg == "" ) {
+  } else if(length(var2reg) == 1 && var2reg == "" ) {
     var2reg = NULL
     meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
   } else {
-    meta.data <- as.data.frame(cellMeta[, var2reg, drop = FALSE])
+    meta.data <- as.data.frame(cellMeta[, c(var2reg), drop = FALSE])
     limitCells = meta.data[,1] %in% levels(meta.data[,1])[table(meta.data[,1]) > 30]
     # we cannot remove cell here because this would change scEX and projections
     # not sure that NA would be a good solution
     # so we are asking to remove the cells manually
     if (sum(limitCells) < ncol(scEx)) {
-      errStr = paste("please remove the following cells:\n", 
+      errStr = paste("\n\nplease remove the following cells:\n", 
                      paste(colnames(scEx)[!limitCells],
-                           collapse = ", "))
+                           collapse = ", "),"\n\n")
       cat (file = stderr(), errStr)
       if (!is.null(getDefaultReactiveDomain())) {
         showNotification(errStr, id = "DE_seuratError", duration = NULL, type = "error")  
@@ -850,6 +876,11 @@ DE_seuratSCTnormfunc <- function(scEx, scExMat, nHVG, var2reg) {
       return(NULL)
     }
   )
+  rownameMap = tibble("scExName" = rownames(scExMat), "seurName" = str_replace_all(rownames(scExMat),"_","-"))
+  if(!all(rownameMap$seurName == rownames(seurDat))){
+    cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\nrownames not equal\n\n\n"))
+    return(NULL)
+  }
   # UMI-based normalisation & logTransformation
   # browser()
   # parallel
@@ -863,7 +894,11 @@ DE_seuratSCTnormfunc <- function(scEx, scExMat, nHVG, var2reg) {
                          verbose = DEBUG) 
   
   
-  A <- seurDat[["SCT"]]@scale.data %>% as.matrix()
+  A <- GetAssay(seurDat)@scale.data %>% as.matrix()
+  if(is.null(A)  || nrow(A)<2 || ncol(A)<2){
+    return(NULL)
+  }
+  rownames(A) = (rownameMap[match(rownames(A), rownameMap$seurName),"scExName"] %>% as.vector())[[1]]
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -960,19 +995,19 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
     var2reg = NULL
     meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
     
-  } else if(var2reg == "" ) {
+  } else if((length(var2reg) == 1 && var2reg == "" )) {
     var2reg = NULL
     meta.data <- as.data.frame(cellMeta[, "sampleNames", drop = FALSE])
   } else {
-    meta.data <- as.data.frame(cellMeta[, var2reg, drop = FALSE])
+    meta.data <- as.data.frame(cellMeta[, c(var2reg), drop = FALSE])
     limitCells = meta.data[,1] %in% levels(meta.data[,1])[table(meta.data[,1]) > 30]
     # we cannot remove cell here because this would change scEX and projections
     # not sure that NA would be a good solution
     # so we are asking to remove the cells manually
     if (sum(limitCells) < ncol(scEx)) {
-      errStr = paste("please remove the following cells:\n", 
+      errStr = paste("\n\nplease remove the following cells:\n", 
                      paste(colnames(scEx)[!limitCells],
-                           collapse = ", "))
+                           collapse = ", "),"\n\n")
       cat (file = stderr(), errStr)
       if (!is.null(getDefaultReactiveDomain())) {
         showNotification(errStr, id = "DE_seuratError", duration = NULL, type = "error")  
@@ -983,7 +1018,7 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
     # scEx = scEx[, limitCells]
     # meta.data = meta.data[limitCells,, drop = FALSE]
   }
- 
+  
   seurDat <- tryCatch(
     {
       seurDat <- CreateSeuratObject(
@@ -996,6 +1031,12 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
       return(NULL)
     }
   )
+  rownameMap = tibble("scExName" = rownames(scExMat), "seurName" = str_replace_all(rownames(scExMat),"_","-"))
+  if(!all(rownameMap$seurName == rownames(seurDat))){
+    cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\nrownames not equal\n\n\n"))
+    return(NULL)
+  }
+  
   # UMI-based normalisation & logTransformation
   # browser()
   # parallel
@@ -1012,7 +1053,12 @@ DE_seuratLogNormfunc <- function(scEx, scExMat, nHVG, var2reg) {
   seurDat = Seurat::ScaleData(object = seurDat,
                               vars.to.regress = var2reg)
   
-  A <- seurDat[["RNA"]]["scale.data"] %>% as.matrix()
+  A <- LayerData(GetAssay(seurDat),"scale.data") %>% as.matrix()
+  if(is.null(A) || nrow(A)<2 || ncol(A)<2){
+    return(NULL)
+  }
+  rownames(A) = (rownameMap[match(rownames(A), rownameMap$seurName),"scExName"] %>% as.vector())[[1]]
+  
   scEx_bcnorm <- SingleCellExperiment(
     assay = list(logcounts = as(A, "TsparseMatrix")),
     colData = colData(scEx)[colnames(A), , drop = FALSE],
@@ -1255,9 +1301,9 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
   if (is.null(sfactor)) {
-      sfactor = defaultValue("DE_logNormalization_sf", 0)
+    sfactor = defaultValue("DE_logNormalization_sf", 0)
   }
- 
+  
   # TODO ?? define scaling factor somewhere else???
   # sfactor <- max(max(assays(scEx)[["counts"]]), 1000)
   retVal <- DE_logNormalizationfunc(scEx, sfactor)

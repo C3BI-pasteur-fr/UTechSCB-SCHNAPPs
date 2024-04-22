@@ -19,7 +19,7 @@ plan(sequential)
 
 
 library("BiocParallel")
-register(MulticoreParam(WORKERS))
+register(safeBPParam(WORKERS))
 # register(SerialParam())
 
 localContributionDir = "/root/SCHNAPPsContributions/"

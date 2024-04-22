@@ -12,14 +12,14 @@ params <- list(
 params$assay.type <- "counts"
 params$x <- scEx
 
-register(MulticoreParam(
-  workers = ifelse(detectCores() > 1, detectCores() - 1, 1)
+register(safeBPParam(
+ ifelse(detectCores() > 1, detectCores() - 1, 1)
 ),
 default = TRUE
 )
 
-register(MulticoreParam(
-  workers = 13
+register(safeBPParam(
+  13
 ),
 default = TRUE
 )

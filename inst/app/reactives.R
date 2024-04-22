@@ -1842,8 +1842,16 @@ scEx_log <- reactive({
   } else {
     scEx_log <- do.call(normMethod, args = list())
   }
+  # browser()
   if (is.null(scEx_log)) {
     # problem with normalization
+    return(NULL)
+  }
+  if(nrow(scEx_log)<2){
+    cat(file = stderr(), "\n\nnormalization returned 0 genes.\n\n\n")
+    return(NULL)
+  }
+  if(ncol(scEx_log)<2){
     return(NULL)
   }
   .schnappsEnv$calculated_normalizationRadioButton <- normMethod
@@ -2148,6 +2156,34 @@ pcaFunc <- function(scEx, scEx_log,
     return(val)
   }
   
+  if(nrow(scEx_log)<10){
+    cat(file = stderr(), paste("error in PCA:", e))
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        paste("Problem with PCA, probably not enough genes?", e),
+        type = "warning",
+        id = "pcawarning",
+        duration = NULL
+      )
+    }
+    cat(file = stderr(), "PCA FAILED!!!\n")
+    return(NULL)
+  }
+  
+  if(ncol(scEx_log)<10){
+    cat(file = stderr(), paste("error in PCA:", e))
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(
+        paste("Problem with PCA, probably not enough cells?", e),
+        type = "warning",
+        id = "pcawarning",
+        duration = NULL
+      )
+    }
+    cat(file = stderr(), "PCA FAILED!!!\n")
+    return(NULL)
+  }
+  
   scaterPCA <- withWarnings({
     # not sure, but this works on another with TsparseMatrix
     if (!is(assays(scEx_log)[["logcounts"]], "CsparseMatrix")) {
@@ -2182,6 +2218,9 @@ pcaFunc <- function(scEx, scEx_log,
     pca
   })
   
+  if(!exists("scaterPCA")){
+    return(NULL)
+  }
   if (is.null(scaterPCA)) {
     return(NULL)
   }
@@ -3213,7 +3252,7 @@ projections <- reactive({
   printTimeEnd(start.time, "projections add history")
   add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "projections", projections = projections)
   
-  cat(file = stderr(), paste("\n\nscLog: ",isolate(input$whichscLog),"\n\n"))
+  if (DEBUG) cat(file = stderr(), paste("scLog: ",isolate(input$whichscLog),"\n"))
   # add2history(type = "save", comment = "projections", projections = projections)
   
   exportTestValues(projections = {

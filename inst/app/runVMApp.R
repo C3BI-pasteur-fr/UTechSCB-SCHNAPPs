@@ -20,7 +20,7 @@ library(doParallel)
 registerDoParallel(cores=WORKERS)
 
 library("BiocParallel")
-register(MulticoreParam(WORKERS))
+register(safeBPParam(WORKERS))
 # register(SerialParam())
 
 localContributionDir = "/home/schnapps/SCHNAPPsContributions/"

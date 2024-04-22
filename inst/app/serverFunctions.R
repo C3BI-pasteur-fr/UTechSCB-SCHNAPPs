@@ -16,6 +16,15 @@ suppressMessages(library(InteractiveComplexHeatmap))
 library(dendsort)
 library(MASS)
 
+# from LTLA (https://github.com/Bioconductor/BiocParallel/issues/98)
+safeBPParam <- function(nworkers) {
+  if (.Platform$OS.type=="windows") {
+    BiocParallel::SerialParam()
+  } else {
+    BiocParallel::MulticoreParam(nworkers)
+  }
+}
+
 
 ### Try catch from extended examples ----
 #' tryCatch with Warning Extraction
@@ -1551,7 +1560,7 @@ heatmapModuleFunction <- function(
   if (is.null(sortingCols)) return(NULL)
   if (sortingCols == "dendrogram") colTree = TRUE
   
-  if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat)) {
+  if (is.null(heatmapData) | is.null(proje) | is.null(heatmapData$mat) ) {
     return(NULL)
     # return(list(
     #   src = "empty.png",
@@ -1560,6 +1569,9 @@ heatmapModuleFunction <- function(
     #   height = 96,
     #   alt = "pHeatMapPlot should be here (null)"
     # ))
+  }
+  if(nrow(heatmapData$mat)<2 | ncol(heatmapData$mat)<2){
+    return(NULL)
   }
   if(is.null(minMaxVal)) minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat))
   if (.schnappsEnv$DEBUGSAVE) {
