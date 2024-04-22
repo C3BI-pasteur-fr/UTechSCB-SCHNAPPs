@@ -53,8 +53,8 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                        li(
                          div(a(id="wkfl1.gQC_umiHist.click", "check UMI histogram")),
                          div(h6(HTML("[<em>General QC - UMI histogram</em>]"))),
-                         div(h5("check that the there is only one obvious distribution. Multiple peaks may indicate contaminations")),
-                         div(h5("take note of where to potentially set a threshold.")),
+                         div(h5("check that there is only one obvious distribution. Multiple peaks may indicate contaminations")),
+                         div(h5("Take note of where to potentially set a threshold.")),
                          div(h5("This graph can be saved to the history RMD file by clicking on the 'save to history' button."))
                        ),
                        li(
@@ -168,7 +168,7 @@ controlbarContext <- shinydashboardPlus::dashboardControlbar(
                      li(
                        div(h5(a(id="wkfl1.geneSelection.click", "Gene selection")), align = "left"),
                        div(h6(HTML("[<em>Gene selection</em>]"))),
-                       div(h5("The min expression threshold is already applied durint the QC phase.")),
+                       div(h5("The min expression threshold is already applied during the QC phase.")),
                        div(h5("Verify that the 'regular expression for selection of genes to be removed' is correct.")),
                        div(h5("Click on 'apply changes' button"), align = "left"),
                        div(h5("Validate that the interesting genes are still in the 'Gene kept' table and which 

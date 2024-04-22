@@ -229,7 +229,7 @@ workflowObsList = list(
       selected = "coexpressionSelected"
     )
     updateSelectInput(session, "coE_selected-dimension_x",
-                      selected = "nCount_RNA"
+                      selected = "UMI.count"
     )
     updateSelectInput(session, "coE_selected-dimension_y",
                       selected = "Feature.count"
@@ -255,7 +255,7 @@ workflowObsList = list(
       selected = "coexpressionSelected"
     )
     updateSelectInput(session, "coE_selected-dimension_x",
-                      selected = "nCount_RNA"
+                      selected = "UMI.count"
     )
     updateSelectInput(session, "coE_selected-dimension_y",
                       selected = "percent.mt"
