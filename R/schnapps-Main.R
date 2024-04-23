@@ -76,6 +76,7 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   }
   options(future.globals.maxSize= 2024^3)
   future::plan("multisession", workers = workers)
+  source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
   BiocParallel::register(safeBPParam(workers))
   
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
