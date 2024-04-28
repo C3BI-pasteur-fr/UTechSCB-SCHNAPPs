@@ -10,7 +10,7 @@
 
 ### might remove the following if we include the source(ui.R)
 suppressMessages(require(shiny))
-source(paste0(packagePath, "/toolTips.R"), local = TRUE)
+source(normalizePath(paste0(packagePath, "/toolTips.R")), local = TRUE)
 suppressMessages(require(shinydashboardPlus))
 suppressMessages(require(shinydashboard))
 suppressMessages(require(plotly))
@@ -23,7 +23,7 @@ suppressMessages(require(threejs))
 suppressMessages(require(shinyTree))
 suppressMessages(require(shinyjs))
 
-source(paste0(packagePath, "/tabs.R"), local = TRUE)
+source(normalizePath(paste0(packagePath, "/tabs.R")), local = TRUE)
 
 introTab <- function(){
   shinydashboard::tabItem(
@@ -74,7 +74,7 @@ if (!exists('AllowClustering')) {
 #   }
 # }
 
-base::source(paste0(packagePath, "/serverFunctions.R"))
+base::source(normalizePath(paste0(packagePath, "/serverFunctions.R")))
 
 # load("global.RData")
 
@@ -82,11 +82,11 @@ base::source(paste0(packagePath, "/serverFunctions.R"))
 scShinyUI <- function(request) {
   if (exists("devscShinyApp")) {
     if (devscShinyApp) {
-      if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
-        packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
+        packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
       } else {
-        if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
-          packagePath <- "~/Rstudio/Schnapps/inst/app/"
+        if (dir.exists(paths = normalizePath("~/Rstudio/Schnapps/inst/app/"))){
+          packagePath <- normalizePath("~/Rstudio/Schnapps/inst/app/")
         } else {
           stop("package path not found\n")
         }
@@ -94,7 +94,7 @@ scShinyUI <- function(request) {
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
       
     } else {
-      packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+      packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/") %>% normalizePath()
     }
   }
   localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
@@ -104,7 +104,7 @@ scShinyUI <- function(request) {
   DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
   DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
   
-  base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/serverFunctions.R")), local = TRUE)
   
   # source(paste0(packagePath,  "/ui.R"))
   
@@ -114,7 +114,7 @@ scShinyUI <- function(request) {
   # }
   # input, cell/gene selection tabs
   # source('tabs.R',  local = TRUE)
-  source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
+  source(normalizePath(paste0(packagePath, "/modulesUI.R")), local = FALSE)
   # source(paste0(packagePath, "/tabs.R"), local = TRUE)
   
   # remove up to here ------------------
@@ -140,7 +140,7 @@ scShinyUI <- function(request) {
     # modTab
   )
   # parameters tab, includes basic normalization
-  source(paste0(packagePath, "/parameters.R"), local = TRUE)
+  source(normalizePath(paste0(packagePath, "/parameters.R")), local = TRUE)
   
   # Basic menu Items
   allMenus <- list(
@@ -165,7 +165,8 @@ scShinyUI <- function(request) {
   
   
   # parse all ui.R files under contributions to include in application
-  uiFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
+  uiFiles <- dir(path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), 
+                 pattern = "ui.R", full.names = TRUE, recursive = TRUE)
   for (fp in uiFiles) {
     menuList <- list()
     tabList <- list()
@@ -205,7 +206,7 @@ scShinyUI <- function(request) {
   # todo
   # parse all parameters.R files under contributions to include in application
   # allTabs holds all tabs regardsless of their location in the GUI
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  parFiles <- dir(path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     tabList <- list()
     source(fp, local = TRUE)

@@ -265,7 +265,7 @@ clusterServer <- function(input, output, session,
     
     if (.schnappsEnv$DEBUGSAVE) {
       if (DEBUG) cat(file = stderr(), "cluster: selectedCellNames: saving\n")
-      save(file = "~/SCHNAPPsDebug/selectedCellNames.RData", list = c(ls(), "legend.position"))
+      save(file = normalizePath("~/SCHNAPPsDebug/selectedCellNames.RData"), list = c(ls(), "legend.position"))
     }
     # cp = load(file="~/SCHNAPPsDebug/selectedCellNames.RData")
     # deepDebug()
@@ -367,7 +367,7 @@ clusterServer <- function(input, output, session,
       
       if (.schnappsEnv$DEBUGSAVE) {
         cat(file = stderr(), paste("selectedCell: saving\n"))
-        base::save(file = "~/SCHNAPPsDebug/clusterServerreturnValues.RData", list = c(ls()))
+        base::save(file = normalizePath("~/SCHNAPPsDebug/clusterServerreturnValues.RData"), list = c(ls()))
       }
       # load(file="~/SCHNAPPsDebug/clusterServerreturnValues.RData")
       # in case no normalization is done:
@@ -508,7 +508,7 @@ clusterServer <- function(input, output, session,
     featureData <- rowData(scEx_log)
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), paste("cluster plot saving\n"))
-      save(file = paste0("~/SCHNAPPsDebug/clusterPlot-", ns("-"), ".RData", collapse = "."),
+      save(file = normalizePath(paste0("~/SCHNAPPsDebug/clusterPlot-", ns("-"), ".RData", collapse = ".")),
            list = c(ls(), "legend.position")
       )
       cat(file = stderr(), paste("cluster plot saving done\n"))
@@ -692,7 +692,7 @@ clusterServer <- function(input, output, session,
     # browser()
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "save: changeGroups\n")
-      save(file = "~/SCHNAPPsDebug/changeGroups.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/changeGroups.RData"), list = c(ls()))
       cat(file = stderr(), "done save: changeGroups\n")
       # deepDebug()
     }
@@ -805,7 +805,7 @@ clusterServer <- function(input, output, session,
     }
     # deepDebug()
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/nCellsVisibleSelected.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/nCellsVisibleSelected.RData"), list = c(ls()))
     }
     # cp = load(file="~/SCHNAPPsDebug/nCellsVisibleSelected.RData")
     inpClusters <- levels(projections$dbCluster)
@@ -902,7 +902,7 @@ clusterServer <- function(input, output, session,
     # }
     
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/additionalOptions.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/additionalOptions.RData"), list = c(ls()))
     }
     # load(file="~/SCHNAPPsDebug/additionalOptions.RData")
     
@@ -959,7 +959,7 @@ clusterServer <- function(input, output, session,
       return("")
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/clustercellSelection.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/clustercellSelection.RData"), list = c(ls()))
     }
     # cp = load(file=paste0("~/SCHNAPPsDebug/clustercellSelection.RData"))
     
@@ -1082,7 +1082,7 @@ tableSelectionServer <- function(input, output, session,
       showNotification("rowSelection", id = "rowSelection", duration = NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".RData", collapse = "."),
+      save(file = normalizePath(paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".RData", collapse = ".")),
            list = c(ls())
       )
     }
@@ -1125,7 +1125,7 @@ tableSelectionServer <- function(input, output, session,
     allrows <- input$cellNameTable_rows_all
     
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = "."),
+      save(file = normalizePath(paste0("~/SCHNAPPsDebug/inputselectAll.RData", collapse = ".")),
            list = c(ls(), ls(envir = globalenv()))
       )
     }
@@ -1187,7 +1187,7 @@ tableSelectionServer <- function(input, output, session,
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = paste0("~/SCHNAPPsDebug/cellNameTable-", nsStr, ".RData", collapse = "."),
+      save(file = normalizePath(paste0("~/SCHNAPPsDebug/cellNameTable-", nsStr, ".RData", collapse = ".")),
            # list = c(ls(),ls(envir = .schnappsEnv))
            list = c(ls())
       )
@@ -1322,8 +1322,8 @@ tableSelectionServer <- function(input, output, session,
       showNotification("rowSelection.return", id = "rowSelection.return", duration = NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".return.RData", 
-                         collapse = "."),list = c(ls())
+      save(file = normalizePath(paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".return.RData", 
+                         collapse = ".")),list = c(ls())
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
@@ -1476,12 +1476,12 @@ pHeatMapModule <- function(input, output, session,
     if (DEBUG) cat(file = stderr(), paste("output$pHeatMapModule:pHeatMapPlot", ns("t"),"\n"))
     if (.schnappsEnv$DEBUGSAVE) {
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving\n")
-      save(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData", 
+      save(file = normalizePath("~/SCHNAPPsDebug/pHeatMapPlotModule.RData"), 
            list = c(ls()))
       cat(file = stderr(), "output$pHeatMapModule:pHeatMapPlot saving done\n")
     }
     # cp = load(file = "~/SCHNAPPsDebug/pHeatMapPlotModule.RData")
-    outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
+    outfile <- paste0(tempdir(), .Platform$file.sep, "heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
     outfile <- normalizePath(outfile, mustWork = FALSE)
     if (!"annotation_colors" %in% names(heatmapData)) {
       heatmapData$annotation_colors = list()
@@ -1559,7 +1559,7 @@ pHeatMapModule <- function(input, output, session,
       }
       # deepDebug()
       if (.schnappsEnv$DEBUGSAVE) {
-        save(file = "~/SCHNAPPsDebug/pHeatMapModule.RData",
+        save(file = normalizePath("~/SCHNAPPsDebug/pHeatMapModule.RData"),
              list = ls()
         )
       }
@@ -1606,7 +1606,7 @@ pHeatMapModule <- function(input, output, session,
                  if (is.null(htobj)) return(NULL)
                  # deepDebug()
                  if (.schnappsEnv$DEBUGSAVE) {
-                   save(file = "~/SCHNAPPsDebug/heatMapGrpNameButton.RData",
+                   save(file = normalizePath("~/SCHNAPPsDebug/heatMapGrpNameButton.RData"),
                         list = ls()
                    )
                  }
@@ -1649,7 +1649,7 @@ pHeatMapModule <- function(input, output, session,
                      return(NULL)}
                  )
                  if (is.null(selection)) {
-                   save(file = "~/SCHNAPPsDebug/pHeatMapAreaNULL2.RData", list = c( ls()  ))
+                   save(file = normalizePath("~/SCHNAPPsDebug/pHeatMapAreaNULL2.RData"), list = c( ls()  ))
                    return(NULL)
                  }
                  # cp = load("~/SCHNAPPsDebug/pHeatMapAreaNULL2.RData")
@@ -1729,7 +1729,7 @@ pHeatMapModule <- function(input, output, session,
         return(NULL)}
     )
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData",
+      save(file = normalizePath("~/SCHNAPPsDebug/heatMapGrpNameClickButton.RData"),
            list = ls()
       )
     }
@@ -1842,7 +1842,7 @@ pHeatMapModule <- function(input, output, session,
         return(NULL)}
     )
     if (is.null(selection)) {
-      save(file = "~/SCHNAPPsDebug/pHeatMapAreaNULL.RData", list = c( ls()  ))
+      save(file = normalizePath("~/SCHNAPPsDebug/pHeatMapAreaNULL.RData"), list = c( ls()  ))
       return(NULL)
     }
     # cp = load("~/SCHNAPPsDebug/pHeatMapAreaNULL.RData")
@@ -1859,7 +1859,7 @@ pHeatMapModule <- function(input, output, session,
     } else if("matrix" %in% slotNames(htDat)) {
       htMat = htDat@matrix
     } else {
-      save(file = "~/SCHNAPPsDebug/pHeatMaphtDat.RData", list = c( ls()  ))
+      save(file = normalizePath("~/SCHNAPPsDebug/pHeatMaphtDat.RData"), list = c( ls()  ))
       return(NULL)
     }
     if(!is.null(selection)){
@@ -2059,13 +2059,13 @@ pHeatMapModule <- function(input, output, session,
       scale <- addOptions()$normRow
       proje <- projections()
       if (.schnappsEnv$DEBUGSAVE) {
-        save(file = "~/SCHNAPPsDebug/download_pHeatMapUI.RData", list = c(
+        save(file = normalizePath("~/SCHNAPPsDebug/download_pHeatMapUI.RData"), list = c(
           "outfilePH", ls(),
           ls(.schnappsEnv)
         ))
       }
       # load("~/SCHNAPPsDebug/download_pHeatMapUI.RData")
-      dfilename <- paste0(.schnappsEnv$reportTempDir, "/sessionData.RData")
+      dfilename <- normalizePath(paste0(.schnappsEnv$reportTempDir, "/sessionData.RData"))
       base::save(file = dfilename, list =
                    c("heatmapData", "addColNames", "orderColNames", "proje", "groupNs", "scale")
       )
@@ -2073,7 +2073,7 @@ pHeatMapModule <- function(input, output, session,
       
       # 2do: not sure why I cannot find the original file...
       # maybe there is an intermediate session created?
-      outfile <- paste0(tempdir(), "/heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
+      outfile <- paste0(tempdir(), .Platform$file.sep, "heatmap", ns("debug"), base::sample(1:10000, 1), ".png")
       outfile <- normalizePath(outfile, mustWork = FALSE)
       heatmapData$filename <- outfile
       
@@ -2233,7 +2233,7 @@ cellSelectionModule <- function(input, output, session) {
         prjVals <- input$Mod_PPGrp
         
         if (.schnappsEnv$DEBUGSAVE) {
-          save(file = "~/SCHNAPPsDebug/selectionDescription.RData", list = c(ls()))
+          save(file = normalizePath("~/SCHNAPPsDebug/selectionDescription.RData"), list = c(ls()))
         }
         # cp = load(file = "~/SCHNAPPsDebug/selectionDescription.RData")
         retVal <- paste("projections: ", prjNames, "with levels:", paste(prjVals, collapse = ", "))

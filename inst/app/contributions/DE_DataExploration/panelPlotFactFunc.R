@@ -25,7 +25,7 @@ panelPlotFactFunc <- function(scEx_log, projections, factsin, dimx4, dimy4, dimC
   if(exists(".schnappsEnv") & is.environment(.schnappsEnv)){
     if (.schnappsEnv$DEBUGSAVE) {
       # prjCol= reactiveValuesToList(projectionColors)
-      save(file = "~/SCHNAPPsDebug/panelPlotFactFunc.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/panelPlotFactFunc.RData"), list = c(ls()))
     }
   }
   # cp=load(file='~/SCHNAPPsDebug/panelPlotFactFunc.RData')

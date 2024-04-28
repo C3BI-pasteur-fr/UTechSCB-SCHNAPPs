@@ -14,7 +14,7 @@ menuList <- list(
   )
 )
 
-source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
+source(paste0(packagePath, .Platform$file.sep, "modulesUI.R"), local = TRUE)
 # list of tab Items
 tabList <- list(
   # DE_expression ----

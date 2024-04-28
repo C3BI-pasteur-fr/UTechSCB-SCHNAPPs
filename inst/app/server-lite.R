@@ -37,19 +37,19 @@ scShinyServer <- shinyServer(function(input, output, session) {
   base::set.seed(seed)
   # check that directory is availabl, otherwise create it
   if (DEBUG) {
-    if (!dir.exists("~/SCHNAPPsDebug")) {
-      base::dir.create("~/SCHNAPPsDebug")
+    if (!dir.exists(normalizePath("~/SCHNAPPsDebug"))) {
+      base::dir.create(normalizePath("~/SCHNAPPsDebug"))
     }
     # TODO ??? clean directory??
   }
   
   if (base::exists("devscShinyApp")) {
     if (devscShinyApp) {
-      if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
-        packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
+        packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
       } else {
-        if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
-          packagePath <- "~/Rstudio/Schnapps/inst/app/"
+        if (dir.exists(paths = normalizePath("~/Rstudio/Schnapps/inst/app/"))){
+          packagePath <- normalizePath("~/Rstudio/Schnapps/inst/app/")
         } else {
           stop("package path not found\n")
         }
@@ -57,7 +57,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
-    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/") %>% normalizePath()
   }
   
   
@@ -74,8 +74,8 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # TODO check if file exists
   # TODO as parameter to load user specified information
   # TODO have this as an option to load other files
-  if (file.exists(paste0(packagePath, "/geneLists.RData"))) {
-    base::load(file = paste0(packagePath, "/geneLists.RData"))
+  if (file.exists(normalizePath(paste0(packagePath, "/geneLists.RData")))) {
+    base::load(file = normalizePath(paste0(packagePath, "/geneLists.RData")))
   } else {
     if (!exists("geneLists")) {
       geneLists <- list(emtpy = list())
@@ -97,7 +97,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   ### history setup
   if (base::exists("historyPath", envir = .schnappsEnv)) {
     if (!is.null(x = .schnappsEnv$historyPath)) {
-      .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
+      .schnappsEnv$historyPath = normalizePath(paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M")))
       if (!dir.exists(.schnappsEnv$historyPath)){
         dir.create(.schnappsEnv$historyPath, recursive = T)
       }  
@@ -182,10 +182,10 @@ scShinyServer <- shinyServer(function(input, output, session) {
   
   
   # load global reactives, modules, etc ----
-  base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
-  base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
-  base::source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
-  base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/reactives.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/outputs.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/modulesUI.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/moduleServer.R")), local = TRUE)
   
   
   
@@ -204,7 +204,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # load contribution reactives ----
   # parse all reactives.R files under contributions to include in application
   uiFiles <- base::dir(
-    path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "reactives.R",
+    path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "reactives.R",
     full.names = TRUE, recursive = TRUE
   )
   for (fp in uiFiles) {
@@ -242,7 +242,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   # load contribution outputs ----
   # parse all outputs.R files under contributions to include in application
   uiFiles <- base::dir(
-    path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "outputs.R",
+    path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "outputs.R",
     full.names = TRUE, recursive = TRUE
   )
   for (fp in uiFiles) {
@@ -257,7 +257,7 @@ scShinyServer <- shinyServer(function(input, output, session) {
   }
   
   # overwrite all reactives not needed or modified
-  base::source(paste0(packagePath, "/reactives-lite.R"), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/reactives-lite.R")), local = TRUE)
   cat(file = stderr(), "HALL============================\n")
   # deepDebug()
   .schnappsEnv$projectionFunctions <- projectionFunctions

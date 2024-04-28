@@ -47,14 +47,14 @@ if (!exists(".schnappsEnv")) {
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
-      packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+    if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
+      packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
     } else {
-      if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
-        packagePath <- "~/Rstudio/Schnapps/inst/app/"
+      if (dir.exists(paths = normalizePath("~/Rstudio/Schnapps/inst/app/"))){
+        packagePath <- normalizePath("~/Rstudio/Schnapps/inst/app/")
       } else {
-        if (dir.exists(paths = "~/rstudio/schnappsGit/inst/app/")){
-          packagePath <- "~/rstudio/schnappsGit/inst/app/"
+        if (dir.exists(paths = normalizePath("~/rstudio/schnappsGit/inst/app/"))){
+          packagePath <- normalizePath("~/rstudio/schnappsGit/inst/app/")
         } else {
           stop("package path not found\n")
         }
@@ -63,7 +63,7 @@ if (exists("devscShinyApp")) {
     # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
   }
 } else {
-  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/") %>% normalizePath()
 }
 if (exists(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)) {
   localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
@@ -98,7 +98,7 @@ if (exists(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)) {
 
 # list available colors for samples and clusters, other colors are defined independantly.
 # Sys.setenv(DEBUGME = ".")
-base::source(paste0(packagePath, "/defaultValues.R"), local = TRUE)
+base::source(normalizePath(paste0(packagePath, "/defaultValues.R")), local = TRUE)
 if (!exists("allowedColors")) {
   allowedColors <- unique(c(
     "#8c510a", "#d8b365", "#f6e8c3", "#c7eae5", "#5ab4ac", "#01665e", "#c51b7d", "#e9a3c9",
@@ -122,7 +122,7 @@ if (all(c("future", "parallel") %in% rownames(installed.packages()))) {
 # Sys.setenv(DEBUGME = ".")
 # this one will be overwritten later, but just in case
 .schnappsEnv$cacheDir = NULL
-base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
+base::source(normalizePath(paste0(packagePath, "/serverFunctions.R")), local = TRUE)
 
 
 # enableBookmarking(store = "server")
@@ -168,8 +168,8 @@ scShinyServer <- function(input, output, session) {
   # debug directory ----
   # check that directory is availabl, otherwise create it
   if (DEBUG) {
-    if (!dir.exists("~/SCHNAPPsDebug")) {
-      base::dir.create("~/SCHNAPPsDebug")
+    if (!dir.exists(normalizePath("~/SCHNAPPsDebug"))) {
+      base::dir.create(normalizePath("~/SCHNAPPsDebug"))
     }
     # TODO ??? clean directory??
   }
@@ -177,14 +177,14 @@ scShinyServer <- function(input, output, session) {
   # in development mode, called not from package? ----
   if (base::exists("devscShinyApp")) {
     if (devscShinyApp) {
-      if (dir.exists(paths = "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")){
-        packagePath <- "~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"
+      if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
+        packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
       } else {
-        if (dir.exists(paths = "~/Rstudio/Schnapps/inst/app/")){
-          packagePath <- "~/Rstudio/Schnapps/inst/app/"
+        if (dir.exists(paths = normalizePath("~/Rstudio/Schnapps/inst/app/"))){
+          packagePath <- normalizePath("~/Rstudio/Schnapps/inst/app/")
         } else {
-          if (dir.exists(paths = "~/rstudio/schnappsGit/inst/app/")){
-            packagePath <- "~/rstudio/schnappsGit/inst/app/"
+          if (dir.exists(paths = normalizePath("~/rstudio/schnappsGit/inst/app/"))){
+            packagePath <- normalizePath("~/rstudio/schnappsGit/inst/app/")
           } else {
             stop("package path not found\n")
           }
@@ -193,7 +193,7 @@ scShinyServer <- function(input, output, session) {
       # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
     }
   } else {
-    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/") %>% normalizePath()
   }
   
   
@@ -210,8 +210,8 @@ scShinyServer <- function(input, output, session) {
   # TODO check if file exists
   # TODO as parameter to load user specified information
   # TODO have this as an option to load other files
-  if (file.exists(paste0(packagePath, "/geneLists.RData"))) {
-    base::load(file = paste0(packagePath, "/geneLists.RData"))
+  if (file.exists(normalizePath(paste0(packagePath, "/geneLists.RData")))) {
+    base::load(file = normalizePath(paste0(packagePath, "/geneLists.RData")))
   } else {
     if (!exists("geneLists")) {
       geneLists <- list(emtpy = list())
@@ -240,10 +240,10 @@ scShinyServer <- function(input, output, session) {
   projectionColors <- reactiveValues()
   
   # load global reactives, modules, etc ----
-  base::source(paste0(packagePath, "/reactives.R"), local = TRUE)
-  base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
-  base::source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
-  base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/reactives.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/outputs.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/modulesUI.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/moduleServer.R")), local = TRUE)
   # # bookmarking ----
   # ### too complicated to debug.
   # setBookmarkExclude(c("bookmark1"))
@@ -292,7 +292,7 @@ scShinyServer <- function(input, output, session) {
   # load contribution reactives ----
   # parse all reactives.R files under contributions to include in application
   uiFiles <- base::dir(
-    path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "reactives.R",
+    path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "reactives.R",
     full.names = TRUE, recursive = TRUE
   )
   for (fp in uiFiles) {
@@ -329,7 +329,7 @@ scShinyServer <- function(input, output, session) {
   # load contribution outputs ----
   # parse all outputs.R files under contributions to include in application
   uiFiles <- base::dir(
-    path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "outputs.R",
+    path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "outputs.R",
     full.names = TRUE, recursive = TRUE
   )
   for (fp in uiFiles) {
@@ -442,7 +442,7 @@ scShinyServer <- function(input, output, session) {
         
         cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
         cat(file = stderr(),  "\n")
-        tfile <- paste0(.schnappsEnv$historyPath, "/userProjections.RData")
+        tfile <- normalizePath(paste0(.schnappsEnv$historyPath, "/userProjections.RData"))
         prjs = NULL
         newPrjs = NULL
         if(file.exists(tfile)){
@@ -465,7 +465,7 @@ scShinyServer <- function(input, output, session) {
         createHistory(.schnappsEnv)
       }
       if(!is.null(.schnappsEnv$historyPath))
-        .schnappsEnv$cacheDir = list(dir=paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/"),
+        .schnappsEnv$cacheDir = list(dir=normalizePath(paste0(.schnappsEnv$historyPath, "/app_cache2/functioncache/")),
                                      max_size = 20 * 1024 * 1024^2,
                                      logfile = stderr()
         )
@@ -476,7 +476,8 @@ scShinyServer <- function(input, output, session) {
       rm("historyPath", envir = .schnappsEnv)
       
     }
-    if(!is.null(.schnappsEnv$historyPath)) shinyOptions(cache = cachem::cache_disk(dir = paste0(.schnappsEnv$historyPath, "/app_cache2/cache/")))
+    if(!is.null(.schnappsEnv$historyPath)) 
+      shinyOptions(cache = cachem::cache_disk(dir = normalizePath(paste0(.schnappsEnv$historyPath, "/app_cache2/cache/"))))
     # shinyOptions(cache = NULL)
     # bindCache <- function(x, ...){return(x)}
   }

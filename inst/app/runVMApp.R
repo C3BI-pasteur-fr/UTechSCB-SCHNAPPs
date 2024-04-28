@@ -23,7 +23,7 @@ library("BiocParallel")
 register(safeBPParam(WORKERS))
 # register(SerialParam())
 
-localContributionDir = "/home/schnapps/SCHNAPPsContributions/"
+localContributionDir = normalizePath("/home/schnapps/SCHNAPPsContributions/")
 #localContributionDir = NULL
 defaultValueSingleGene = "CD3g" # CD52
 defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA" # itgae, cd69, itga1" # CD52, S100A9, S100A4
@@ -31,7 +31,7 @@ defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl1
 defaultValueRegExGene = "" # tip: '^CD7$|^KIT$; genes with min expression
 DEBUG = T
 DEBUGSAVE = F
-historyPath = "/home/schnapps/history"
+historyPath = normalizePath("/home/schnapps/history")
 # historyPath = "/Volumes/LaCie2022//RStudio_history/"
 #historyPath = NULL
 
@@ -88,11 +88,11 @@ defaultValues = list()
 # assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
 devscShinyApp = FALSE
-packagePath <<- "/home/schnapps/rstudio/schnappsGit/inst/app"
-packagePath <<- "inst/app/"
+packagePath <<- normalizePath("/home/schnapps/rstudio/schnappsGit/inst/app")
+packagePath <<- paste0("inst",.Platform$file.sep, "app/")
 
-source(paste0(packagePath,  "/ui.R"))
-source(paste0(packagePath,  "/server.R"))
+source(normalizePath(paste0(packagePath,  "/ui.R")))
+source(normalizePath(paste0(packagePath,  "/server.R")))
 
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=FALSE)

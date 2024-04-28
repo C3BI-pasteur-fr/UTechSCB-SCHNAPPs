@@ -27,7 +27,7 @@ liana_scExReact <- reactive({
   if(is.null(scEx_log)) return(NULL)
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/liana_scExReact.Rdata", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/liana_scExReact.Rdata"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/liana_scExReact.Rdata")
   

@@ -69,7 +69,7 @@ printTimeEnd <- function(start.time, messtr) {
   if (.schnappsEnv$DEBUG & !is.null(start.time)) {
     duration = difftime(end.time, start.time, units = "min")
     if(.schnappsEnv$DEBUGSAVE){
-      save(file = "~/SCHNAPPsDebug/printTimeEnd.RData",
+      save(file = normalizePath("~/SCHNAPPsDebug/printTimeEnd.RData"),
            list = c(ls())
       )
     }
@@ -304,7 +304,7 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
   # names(projections)[ncol(projections)] <- "exprs"
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/clusterPlot.RData", 
+    save(file = normalizePath("~/SCHNAPPsDebug/clusterPlot.RData"), 
          list = c(ls(), "legend.position")
     )
     cat(file = stderr(), paste("plot2Dprojection saving done.\n"))
@@ -866,7 +866,7 @@ checkShaCache <- function(moduleName = "traj_elpi_modules",
   
   shaStr <- ""
   idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
-  infile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
+  infile <- normalizePath(paste0("schnappsCache/", moduleName, "_", idStr, ".RData"))
   if (!file.exists("schnappsCache")) {
     dir.create("schnappsCache")
   }
@@ -906,7 +906,7 @@ writeShaCache <- function(moduleName = "",
                           message = "") {
   require(digest)
   idStr <- paste0(moduleName, getshaStr(moduleParameters), collapse = "_")
-  outfile <- paste0("schnappsCache/", moduleName, "_", idStr, ".RData")
+  outfile <- normalizePath(paste0("schnappsCache/", moduleName, "_", idStr, ".RData"))
   if (!file.exists("schnappsCache")) {
     dir.create("schnappsCache")
   }
@@ -1104,7 +1104,7 @@ addColData <- function(allScEx_log, scEx) {
 # valuesChanged ----
 valuesChanged <- function(parameters) {
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/valuesChanged.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/valuesChanged.RData"), list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/valuesChanged.RData')
   modified <- FALSE
@@ -1152,7 +1152,7 @@ valuesChanged <- function(parameters) {
 # updateButtonColor ----
 updateButtonColor <- function(buttonName, parameters) {
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateButtonColor.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/updateButtonColor.RData"), list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/updateButtonColor.RData')
   modified <- valuesChanged(parameters)
@@ -1168,7 +1168,7 @@ updateButtonColor <- function(buttonName, parameters) {
 # setRedGreenButton ----
 setRedGreenButton <- function(vars = list(), button = "") {
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/setRedGreenButton.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/setRedGreenButton.RData"), list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/setRedGreenButton.RData')
   for (v1 in vars) {
@@ -1184,7 +1184,7 @@ setRedGreenButton <- function(vars = list(), button = "") {
 # setRedGreenButtonCurrent ----
 setRedGreenButtonCurrent <- function(vars = list()) {
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/setRedGreenButtonCurrent.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/setRedGreenButtonCurrent.RData"), list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/setRedGreenButtonCurrent.RData')
   for (v1 in vars) {
@@ -1388,7 +1388,7 @@ add2history <- function(type, comment = "", input = input, ...) {
   # deepDebug()
   sessionI = sessionInfo()
   defaultValues = .schnappsEnv$defaultValues
-  dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
+  dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData") %>% normalizePath()
   if (DEBUG) cat(file = stderr(), paste0("add2history: saving default Values to", dvFile, "\n"))
   save(file=dvFile, list = c("defaultValues"))
   # browser()
@@ -1401,7 +1401,7 @@ add2history <- function(type, comment = "", input = input, ...) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/add2history.RData", list = c(ls(), ".schnappsEnv"), compress = F)
+    save(file = normalizePath("~/SCHNAPPsDebug/add2history.RData"), list = c(ls(), ".schnappsEnv"), compress = F)
   }
   # cp =load(file='~/SCHNAPPsDebug/add2history.RData')
   if (type == "text") {
@@ -1575,7 +1575,7 @@ heatmapModuleFunction <- function(
   }
   if(is.null(minMaxVal)) minMaxVal = c(min(heatmapData$mat), max(heatmapData$mat))
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/heatmapModuleFunction.RData"), list = c(ls()))
   }
   # cp =load(file = "~/SCHNAPPsDebug/heatmapModuleFunction.RData")
   # require(heatmaply)
@@ -1807,7 +1807,7 @@ heatmapModuleFunction <- function(
     # do.call(TRONCO::pheatmap, heatmapData),
     error = function(e){
       cat (file = stderr(), paste(e))
-      save(file = "~/SCHNAPPsDebug/heatmapError.rdata", list = ls(parent.frame(n=4)))
+      save(file = normalizePath("~/SCHNAPPsDebug/heatmapError.rdata"), list = ls(parent.frame(n=4)))
       # cp = load("~/SCHNAPPsDebug/heatmapError.rdata")
       # browser()
       return(NULL)
@@ -2066,7 +2066,7 @@ checkAllowed <- function(x, env=.schnappsEnv) {
 
 createHistory <- function(.schnappsEnv) {
   
-  .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, "/hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
+  .schnappsEnv$historyPath = paste0(.schnappsEnv$historyPath, .Platform$file.sep, "hist_",format(Sys.time(), "%Y-%b-%d.%H.%M"))
   if (!dir.exists(.schnappsEnv$historyPath)){
     dir.create(.schnappsEnv$historyPath, recursive = T)
   }  
@@ -2265,7 +2265,7 @@ debugControl <- function( name = "cellSelectionModule", list = c(ls())){
   }
   if (saveVal ) {
     # browser()
-    save(file = paste0("~/SCHNAPPsDebug/", name, ".RData"), list = list)
+    save(file = normalizePath(paste0("~/SCHNAPPsDebug/", name, ".RData")), list = list)
   }
   if(.schnappsEnv[["DEBUG"]]){
     cat(file = stderr(), paste("debugControl: ", name, "done\n"))
@@ -2297,7 +2297,7 @@ add2Projections <- function(proj2Add, acn, newPrjs, projections){
   }
   if(!is.data.frame(newPrjs))
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/add2Projections.RData",
+      save(file = normalizePath("~/SCHNAPPsDebug/add2Projections.RData"),
            list = c( ls())
       )
     }

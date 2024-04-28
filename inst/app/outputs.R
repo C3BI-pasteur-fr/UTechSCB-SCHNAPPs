@@ -5,7 +5,7 @@ suppressMessages(require(shinyTree))
 suppressMessages(require(stringr))
 # require(rintrojs)
 # SUMMARY STATS ----------------------------------------------------------------
-base::source(paste0(packagePath, "/moduleServer.R"), local = TRUE)
+base::source(paste0(packagePath, .Platform$file.sep, "moduleServer.R"), local = TRUE)
 
 DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # normalizationRadioButtonValue --------------------------------
@@ -21,7 +21,7 @@ normaliztionParameters <- list(raw = "no Parameters needed")
 # localContributionDir <- .SCHNAPPs_locContributionDir
 parFiles <-
   dir(
-    path = c(paste0(packagePath, "/contributions"), localContributionDir),
+    path = c(paste0(packagePath, .Platform$file.sep, "contributions"), localContributionDir),
     pattern = "parameters.R",
     full.names = TRUE,
     recursive = TRUE
@@ -30,7 +30,7 @@ for (fp in parFiles) {
   myNormalizationParameters <- list()
   source(fp, local = TRUE)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/normalizationsParameters.RData",
+    save(file = normalizePath("~/SCHNAPPsDebug/normalizationsParameters.RData"),
          list = c("normaliztionParameters", ls())
     )
   }
@@ -228,7 +228,7 @@ output$dimPlotPCA <- renderPlot({
     return(0)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/dimPlotPCA.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/dimPlotPCA.RData"), list = c(ls()))
   }
   # cp =load(file='~/SCHNAPPsDebug/dimPlotPCA.RData')
   
@@ -291,7 +291,7 @@ output$normalizationsParametersDynamic <- renderUI({
   selectedChoice <- input$normalizationRadioButton
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/normalizationsParametersDynamic.RData",
+    save(file = normalizePath("~/SCHNAPPsDebug/normalizationsParametersDynamic.RData"),
          list = c("normaliztionParameters", ls())
     )
   }
@@ -479,7 +479,7 @@ output$summaryStatsSideBar <- renderUI({
   infile <- inputFile$inFile
   normalizationRadioButton <- input$normalizationRadioButton
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/summaryStatsSideBar.RData",
+    save(file = normalizePath("~/SCHNAPPsDebug/summaryStatsSideBar.RData"),
          list = c("normaliztionParameters", ls())
     )
   }
@@ -754,7 +754,7 @@ output$ColorSelection <- renderUI({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleColorSelection.RData",
+    save(file = normalizePath("~/SCHNAPPsDebug/sampleColorSelection.RData"),
          list = c("normaliztionParameters", ls())
     )
   }
@@ -1026,7 +1026,7 @@ observeEvent(eventExpr = obscolorParamsChanger() , label = "ob_colorParams", {
   if (.schnappsEnv$DEBUGSAVE) {
     # browser()
     inputList = input %>% reactiveValuesToList()
-    save(file = "~/SCHNAPPsDebug/ob_colorParams.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/ob_colorParams.RData"), list = c(ls()))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # cp = load(file="~/SCHNAPPsDebug/ob_colorParams.RData")
@@ -1114,7 +1114,7 @@ output$Nclusters <- renderText({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Nclusters.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/Nclusters.RData"), list = c(ls()))
     cat(file = stderr(), paste0("observeEvent save done\n"))
   }
   # load(file="~/SCHNAPPsDebug/Nclusters.RData")
@@ -1190,7 +1190,7 @@ output$RDSsave <- downloadHandler(
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RDSsave.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/RDSsave.RData"), list = c(ls()))
     }
     # load(file='~/SCHNAPPsDebug/RDSsave.RData')
     deepDebug()
@@ -1246,7 +1246,7 @@ output$RmdSave <- downloadHandler(
     #   return(NULL)
     # }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/RmdSave.RData", list = c(ls(), ".schnappsEnv"))
+      save(file = normalizePath("~/SCHNAPPsDebug/RmdSave.RData"), list = c(ls(), ".schnappsEnv"))
     }
     # cp = load(file='~/SCHNAPPsDebug/RmdSave.RData')
     
@@ -1589,8 +1589,8 @@ callModule(
   clusterBootstrapReactive
 )
 
-source(paste0(packagePath, "/shortCuts.R"), local = TRUE)
-source(paste0(packagePath, "/controlbarObservers.R"), local = TRUE)
+source(paste0(packagePath, .Platform$file.sep, "shortCuts.R"), local = TRUE)
+source(paste0(packagePath, .Platform$file.sep, "controlbarObservers.R"), local = TRUE)
 
 if (DEBUG) {
   cat(file = stderr(), paste("end: outputs.R\n"))

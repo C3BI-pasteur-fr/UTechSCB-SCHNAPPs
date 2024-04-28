@@ -228,7 +228,7 @@ projectionTable <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/projectionTable.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/projectionTable.RData"), list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/projectionTable.RData")
   
@@ -339,7 +339,7 @@ tsneFunc <- function(pca, gQC_tsneDim, gQC_tsnePerplexity, gQC_tsneTheta, gQC_ts
   
   set.seed(seed = gQC_tsneSeed)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/tsne.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/tsne.RData"), list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/tsne.RData')
   suppressMessages(require(parallel)) # num_threads = 0 should be OK
@@ -423,7 +423,7 @@ umapReact <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/umap_react.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/umap_react.RData"), list = c(ls()))
   }
   # cp = load("~/SCHNAPPsDebug/umap_react.RData")
   if (!runUMAP) {

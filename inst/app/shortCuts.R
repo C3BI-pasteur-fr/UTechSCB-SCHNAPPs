@@ -1,5 +1,5 @@
 # Definition of the short cuts tab images and on-click events.
-source(paste0(packagePath, "/shortCuts.def.R"), local=T)
+source(normalizePath(paste0(packagePath, "/shortCuts.def.R")), local=T)
 
 # output images ----
 # output$shortCut.geneSelection <- renderUI({

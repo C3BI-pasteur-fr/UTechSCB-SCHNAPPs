@@ -4,7 +4,7 @@ suppressMessages(require(shinyjqui))
 suppressMessages(require(shiny))
 # require(shinyMCE)
 
-source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
+source(normalizePath(paste0(packagePath, "/modulesUI.R")), local = TRUE)
 # this is where the general tabs are defined:
 
 # localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
@@ -14,7 +14,7 @@ source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
 # DEBUG <- get(".SCHNAPPs_DEBUG", envir = .schnappsEnv)
 # DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 
-source(paste0(packagePath, "/toolTips.R"), local = TRUE)
+source(normalizePath(paste0(packagePath, "/toolTips.R")), local = TRUE)
 
 
 # inputTab ----
@@ -172,7 +172,7 @@ inputTab <- function() {
   )
 }
 
-source(paste0(packagePath, "/shortCutsTab.R"), local = TRUE)
+source(normalizePath(paste0(packagePath, "/shortCutsTab.R")), local = TRUE)
 
 # geneSelectionTab ----
 geneSelectionTab <- function() {
@@ -316,7 +316,7 @@ cellSelectionTab <- function() {
 getparameterContributions <- function() {
   parameterContributions <- list()
   # localContributionDir <- .SCHNAPPs_locContributionDir
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
+  parFiles <- dir(path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     myPparameters <- list()
     source(fp, local = TRUE)
@@ -354,7 +354,7 @@ clusterParametersTab <- function() {
   }
   # parameterContributions = list()
   # localContributionDir <- .SCHNAPPs_locContributionDir
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), 
+  parFiles <- dir(path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), 
                   pattern = "parameters.R", full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     if (DEBUG) {

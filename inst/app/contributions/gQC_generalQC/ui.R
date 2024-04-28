@@ -1,7 +1,7 @@
 # gQC_generalQC/ui.R
 
 suppressMessages(require(magrittr))
-source(paste0(packagePath, "/modulesUI.R"), local = TRUE)
+source(paste0(packagePath, .Platform$file.sep , "modulesUI.R"), local = TRUE)
 menuList <- list(
   shinydashboard::menuItem("General QC",
                            # id="generalQCID",

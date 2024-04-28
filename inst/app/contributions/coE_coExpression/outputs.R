@@ -169,7 +169,7 @@ observe({
   # genesin <- input$coE_geneGrpVioIds
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioOBS.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_geneGrp_vioOBS.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vioOBS.RData")
   if(is.null(scEx_log)) return(NULL)
@@ -275,7 +275,7 @@ output$coE_dotPlot_GeneSets <- renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_dotPlot_GeneSets.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_dotPlot_GeneSets.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/coE_dotPlot_GeneSets.RData")
   featureData <- rowData(scEx_log)
@@ -365,7 +365,7 @@ output$coE_dotPlot_GeneSetsModuleScore <- renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_dotPlotModuleScore_GeneSets.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_dotPlotModuleScore_GeneSets.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/coE_dotPlotModuleScore_GeneSets.RData")
   featureData <- rowData(scEx_log)
@@ -492,7 +492,7 @@ output$coE_geneGrp_vio_plot <- renderPlot({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData"), list = c(ls()))
   }
   # cp=load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot.RData")
   
@@ -589,7 +589,7 @@ output$coE_geneGrp_vio_plot2 <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData"), list = c(ls()))
   }
   #cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vio_plot2.RData")
 
@@ -666,7 +666,7 @@ output$alluvial_plot <- renderPlot({
   }
   # for development and debugging purposes
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/alluvial_plot.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/alluvial_plot.RData"), list = c(ls()))
   }
   # cp =load(file="~/SCHNAPPsDebug/alluvial_plot.RData")
   

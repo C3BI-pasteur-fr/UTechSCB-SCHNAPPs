@@ -274,7 +274,7 @@ output$gQC_tsne_main <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_tsne_main.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/gQC_tsne_main.RData"), list = c(ls()))
   }
   # cp =load(file="~/SCHNAPPsDebug/gQC_tsne_main.RData")
   
@@ -330,7 +330,7 @@ output$gQC_plotUmiHist <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/gQC_plotUmiHist.RData"), list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/gQC_plotUmiHist.RData")
   
@@ -393,7 +393,7 @@ output$gQC_plotSampleHist <- plotly::renderPlotly({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sampleHist.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sampleHist.RData"), list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/sampleHist.RData")
   retVal <- gQC_sampleHistFunc(sampleInf, scols)
@@ -419,7 +419,7 @@ output$gQC_variancePCA <- renderPlot({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/gQC_variancePCA.RData"), list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/gQC_variancePCA.RData")
   
@@ -468,7 +468,7 @@ observeEvent(input$geneSetModifyButton,{
   # browser()
   # deepDebug()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/geneSetModifyButton.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/geneSetModifyButton.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/geneSetModifyButton.RData")
   
@@ -531,7 +531,7 @@ output$gQC_geneSetsearchOutput = renderText({
   # browser()
   # deepDebug()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/geneSetsearchOutput.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/geneSetsearchOutput.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/geneSetsearchOutput.RData")
   
@@ -589,7 +589,7 @@ output$gQC_renameGenes <- renderText({
   }
   # deepDebug()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_renameGenes.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/gQC_renameGenes.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/gQC_renameGenes.RData")
   if(inputGS %in% names(gd)) {
@@ -624,7 +624,7 @@ output$gQC_geneSetModifyInputGL <- renderText({
   }
   # deepDebug()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_geneSetModifyInput.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/gQC_geneSetModifyInput.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/gQC_geneSetModifyInput.RData")
   if(inputGS %in% names(gd)) {
@@ -653,7 +653,7 @@ observeEvent(input$updateGSButton,{
   names(li) = newName
   gmtUserData(append(userData, li))
   if(.schnappsEnv$DEBUGSAVE){
-    save(file = "~/SCHNAPPsDebug/updateGSButton.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/updateGSButton.RData"), list = c(ls()))
   }
   # cp =load(file='~/SCHNAPPsDebug/updateGSButton.RData')
   
@@ -678,7 +678,7 @@ observeEvent(
     }
     
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/updatePrjsButton.RData",
+      save(file = normalizePath("~/SCHNAPPsDebug/updatePrjsButton.RData"),
            list = c("normaliztionParameters", ls())
       )
     }
@@ -740,7 +740,7 @@ observeEvent(
     }
     # deepDebug()
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/delPrjsButton.RData",
+      save(file = normalizePath("~/SCHNAPPsDebug/delPrjsButton.RData"),
            list = c("normaliztionParameters", ls())
       )
     }
@@ -772,7 +772,7 @@ observeEvent(
     }
     
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData",
+      save(file = normalizePath("~/SCHNAPPsDebug/gQC_updateCombPrjsButton.RData"),
            list = c("normaliztionParameters", ls())
       )
     }
@@ -880,7 +880,7 @@ observeEvent(eventExpr = input$gQC_rearrangeLevButton,
                  return(NULL)
                }
                if (.schnappsEnv$DEBUGSAVE) {
-                 save(file = "~/SCHNAPPsDebug/gQC_rearrangeButton.RData",
+                 save(file = normalizePath("~/SCHNAPPsDebug/gQC_rearrangeButton.RData"),
                       list = c("normaliztionParameters", ls())
                  )
                }
@@ -962,7 +962,7 @@ observeEvent(eventExpr = input$gQC_renameLevButton,
                
                if (.schnappsEnv$DEBUGSAVE) {
                  # browser()
-                 save(file = "~/SCHNAPPsDebug/gQC_renameLevButton.RData",
+                 save(file = normalizePath("~/SCHNAPPsDebug/gQC_renameLevButton.RData"),
                       list = c("normaliztionParameters", ls())
                  )
                }
@@ -1165,7 +1165,7 @@ output$gQC_windHC <- renderPlot({
     }
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/gQC_windHC.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/gQC_windHC.RData"), list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/gQC_windHC.RData")
   Y <- as.matrix(assays(scEx)[[1]])
@@ -1229,7 +1229,7 @@ if("DoubletFinder" %in% installed.packages()){
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/GS_DF_button.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/GS_DF_button.RData"), list = c(ls()))
     }
     # cp = load(file = "~/SCHNAPPsDebug/GS_DF_button.RData")
     

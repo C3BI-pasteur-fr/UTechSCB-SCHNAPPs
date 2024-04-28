@@ -20,13 +20,9 @@ library(reactlog)
 library(future)
 library(future.callr)
 plan("multisession", workers = 8)
-# plan(callr, workers = 4)
-
-library("BiocParallel")
-register(safeBPParam(2))
 # register(SerialParam())
 
-localContributionDir = "~/Rstudio/SCHNAPPsContributions/working"
+localContributionDir = normalizePath("~/Rstudio/SCHNAPPsContributions/working")
 # localContributionDir = ""
 defaultValueSingleGene = "IL7R" # CD52
 defaultValueMultiGenes = "IL7R, CCR7 IL7R, S100A4, CD8A, CD8A ,GNLY, NKG7,PPBP, FCER1A, MS4A7,CD14, LYZ,FCGR3A, MS4A7,MS4A"
@@ -40,7 +36,7 @@ DEBUGSAVE = F
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-08.10.02/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_grp3/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_3 samples/"
-historyPath = "/Volumes/LaCie2022/RStudio_history/julia/"
+historyPath = normalizePath("/Volumes/LaCie2022/RStudio_history/julia/")
 # # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/"
 # historyPath = "demoHistory/hist_2023-May-11.12.43/"
 # # historyPath = "demoHistory/hist_2023-May-11.12.43/"
@@ -109,10 +105,6 @@ defaultValues = list()
 # defaultValues[["DE_panelplotids"]] = c("CD8A", "CD4", "CD8B", "FCER1G", "CCR7", "GZMK", "FoxP3", "GZMK", "GZMB", "CCR7", "LEF1", "CCL5", "VIM", "CCL5", "TCF7", "NKG7", "LGALs1", "NKG7", "SELL", "CST7", "ANXA2", "CST7", "IL7R", "HLA-DRB1", "KLRG1", "CD27", "CTLA4A")
 assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
-devscShinyApp = TRUE
-packagePath <<- "inst/app/"
-source(paste0(packagePath,  "/ui.R"))
-source(paste0(packagePath,  "/server.R"))
 
 options(shinyjqui.debug = TRUE)
 options(shinyjquiui.debug = TRUE)
@@ -156,6 +148,14 @@ shiny::addResourcePath(
   prefix = "www",
   directoryPath = "./inst/www/"
 )
+# plan(callr, workers = 4)
+devscShinyApp = TRUE
+packagePath <<- paste0("inst",.Platform$file.sep , "app", .Platform$file.sep)
+source(paste0(packagePath, .Platform$file.sep ,  "ui.R"))
+source(paste0(packagePath, .Platform$file.sep ,  "server.R"))
+
+library("BiocParallel")
+register(safeBPParam(2))
 
 chromeBrowser = function(url){
   system(paste("open -a 'Google Chrome' ", url))
@@ -164,7 +164,7 @@ edgeBrowser = function(url){
   system(paste("open -a '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' ", url))
 }
 # chromeBrowser = getOption("shiny.launch.browser", interactive())
-source("R/DotPlotwithModuleScore.R")
+source(normalizePath("R/DotPlotwithModuleScore.R"))
 # if(!is.null(historyPath)){
 #   shinyOptions(cache = cachem::cache_disk(paste0(historyPath, "/app_cache/cache/")))
 # }

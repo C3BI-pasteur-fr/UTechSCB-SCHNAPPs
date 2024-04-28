@@ -15,7 +15,7 @@ coE_heatmapFunc <- function(featureData, scEx_matrix, projections, genesin, cell
     showNotification("coE_heatmapFunc", id = "coE_heatmapFunc", duration = NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_heatmapFunc.RData"), list = c(ls()))
   }
   # cp=load(file = "~/SCHNAPPsDebug/coE_heatmapFunc.RData")
   # browser()
@@ -314,7 +314,7 @@ coE_heatmapSelectedReactive <- reactive({
   featureData <- rowData(scEx_log)
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/selectedHeatmap.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/selectedHeatmap.RData"), list = c(ls()))
   }
   # load(file = "~/SCHNAPPsDebug/selectedHeatmap.RData")
   
@@ -380,7 +380,7 @@ coE_topExpGenesTable <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_coE_topExpGenes.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/output_coE_topExpGenes.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/output_coE_topExpGenes.RData")
   
@@ -460,7 +460,7 @@ scranFindMarkerFullReactiveTable <- reactive({
   clicked <- input$scranFindMarkerApply
   if(clicked<1) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scranFindMarkerFullReactiveTable.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/scranFindMarkerFullReactiveTable.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/scranFindMarkerFullReactiveTable.RData")
   
@@ -507,7 +507,7 @@ coE_scranFindMarkerTableReact <- reactive({
   if(! selectedCluster %in% levels(projections[,prjFact])) return(NULL)
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scranFindMarkerTableReact.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/scranFindMarkerTableReact.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/scranFindMarkerTableReact.RData")
   return(markerlist[[selectedCluster]] %>% as.data.frame())
@@ -571,7 +571,7 @@ coE_topExpCCTable <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_topExpCCTable.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_topExpCCTable.RData"), list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/coE_topExpCCTable.RData")
   
@@ -652,7 +652,7 @@ coE_geneGrp_vioFunc <- function(genesin, projections, scEx, featureData, minMaxE
   pc = projectionColors 
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc.RData")
   
@@ -858,7 +858,7 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
   map <- rownames(featureData[which(toupper(featureData$symbol) %in% genesin), ])
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/coE_geneGrp_vioFunc2.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_geneGrp_vioFunc2.RData"), list = c(ls()))
   }
   # cp =load(file="~/SCHNAPPsDebug/coE_geneGrp_vioFunc2.RData")
   
@@ -1142,7 +1142,7 @@ coE_heatmapReactive <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/heatmap.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/heatmap.RData"), list = c(ls()))
   }
   # cp = load(file = "~/SCHNAPPsDebug/heatmap.RData")
   # browser()

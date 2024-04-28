@@ -109,7 +109,7 @@ observeEvent(projections(), {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/updateInputSubclusterAxes.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/updateInputSubclusterAxes.RData"), list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/updateInputSubclusterAxes.RData")
   # if (length(gn) > 0) {
@@ -162,7 +162,7 @@ sCA_dgeTableReac <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/output_dge.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/output_dge.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/output_dge.RData")
   featureData <- rowData(scEx)
@@ -296,7 +296,7 @@ output$sCA_volc_selected <- renderText({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_volc_selected.RData", list = ls())
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_volc_selected.RData"), list = ls())
   }
   # cp =load(file=paste0("~/SCHNAPPsDebug/sCA_volc_selected.RData"))
   # cells.names <- brushedPs$key
@@ -341,7 +341,7 @@ observe({
   cellNs <- isolate(selectedCells$cellNames())
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_cells_used.RData", list = c(ls(), ".schnappsEnv"))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_cells_used.RData"), list = c(ls(), ".schnappsEnv"))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_cells_used.RData')
   # browser()
@@ -382,7 +382,7 @@ output$sCA_volcanoPlot <- plotly::renderPlotly({
   # reset selection
   # js$sCA_volcanoPlot_resetClick()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_volcanoPlot.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_volcanoPlot.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/sCA_volcanoPlot.RData")
   if ("p_val_adj" %in% colnames(DGEdata)) {

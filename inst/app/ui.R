@@ -9,7 +9,7 @@
 
 suppressMessages(require(shinyjqui))
 suppressMessages(require(shiny))
-source(paste0(packagePath, "/toolTips.R"), local = TRUE)
+source(normalizePath(paste0(packagePath, "/toolTips.R")), local = TRUE)
 suppressMessages(require(shinydashboard))
 suppressMessages(require(shinydashboardPlus))
 suppressMessages(require(plotly))
@@ -24,13 +24,13 @@ suppressMessages(require(shinyTree))
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    packagePath <- "inst/app"
+    packagePath <- paste0("inst", .Platform$file.sep, "app")
     # setwd("~/Rstudio/UTechSCB-SCHNAPPs/")
   } else {
-    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+    packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/") %>% normalizePath()
   }
 } else {
-  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/") %>% normalizePath()
 }
 localContributionDir <- get(".SCHNAPPs_locContributionDir", envir = .schnappsEnv)
 defaultValueSingleGene <- get(".SCHNAPPs_defaultValueSingleGene", envir = .schnappsEnv)
@@ -63,7 +63,7 @@ scShinyUI <- function(request) {
   
   # browser()
   # load from history directory the old input variable that use defaultValues function
-  dvFile = paste0(.schnappsEnv$historyPath, "/defaultValues.RData")
+  dvFile = normalizePath(paste0(.schnappsEnv$historyPath, "/defaultValues.RData"))
   if(file.exists(dvFile)){
     cp = load(file=dvFile)
     if("defaultValues" %in% cp){
@@ -73,8 +73,8 @@ scShinyUI <- function(request) {
       warning("defaultValues file exist but no defaultValues\n\n")
     }
   }
-  source(paste0(packagePath, "/modulesUI.R"), local = FALSE)
-  source(paste0(packagePath, "/tabs.R"), local = TRUE)
+  source(normalizePath(paste0(packagePath, "/modulesUI.R")), local = FALSE)
+  source(normalizePath(paste0(packagePath, "/tabs.R")), local = TRUE)
   # general tabs
   allTabs <- list(
     inputTab(),
@@ -87,8 +87,8 @@ scShinyUI <- function(request) {
   )
   
   # parameters tab, includes basic normalization
-  source(paste0(packagePath, "/parameters.R"), local = TRUE)
-  base::source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
+  source(normalizePath(paste0(packagePath, "/parameters.R")), local = TRUE)
+  base::source(normalizePath(paste0(packagePath, "/serverFunctions.R")), local = TRUE)
   
   # Basic menu Items
   allMenus <- list(
@@ -121,7 +121,7 @@ scShinyUI <- function(request) {
   
   
   # parse all ui.R files under contributions to include in application
-  uiFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
+  uiFiles <- dir(path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), pattern = "ui.R", full.names = TRUE, recursive = TRUE)
   for (fp in uiFiles) {
     # fp = uiFiles[5]
     menuList <- list()
@@ -162,7 +162,8 @@ scShinyUI <- function(request) {
   # todo
   # parse all parameters.R files under contributions to include in application
   # allTabs holds all tabs regardsless of their location in the GUI
-  parFiles <- dir(path = c(paste0(packagePath, "/contributions"), localContributionDir), pattern = "parameters.R",
+  parFiles <- dir(path = c(normalizePath(paste0(packagePath, "/contributions")), localContributionDir), 
+                  pattern = "parameters.R",
                   full.names = TRUE, recursive = TRUE)
   for (fp in parFiles) {
     tabList <- list()
@@ -203,8 +204,8 @@ scShinyUI <- function(request) {
     allMenus
   }
   controlbarContext =NULL
-  if(file.exists(paste0(packagePath, "/controlbarContext.R"))) 
-    source(file = paste0(packagePath, "/controlbarContext.R"), local = TRUE)
+  if(file.exists(paste0(packagePath, .Platform$file.sep, "controlbarContext.R"))) 
+    source(file = paste0(packagePath, .Platform$file.sep,  "controlbarContext.R"), local = TRUE)
   
   # jsCode <- "shinyjs.hidemenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'none'; x.classList.remove('menu-open');}; shinyjs.showmenuItem = function(targetid) {var x = document.getElementById(targetid); x.style.display = 'block'; x.classList.add('menu-open');};"
   # jsCode2 <- "shinyjs.pageCol = function(params){console.log(params);$('body').css('color', params);}"

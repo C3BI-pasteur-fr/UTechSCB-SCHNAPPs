@@ -1,4 +1,4 @@
-source(paste0(packagePath, "/shortCuts.def.R"), local=T)
+source(normalizePath(paste0(packagePath, "/shortCuts.def.R")), local=T)
 # shortCutsList[[.twoDHeader]]  = list()
 
 shortCutItem <- function(scLset, namItem){

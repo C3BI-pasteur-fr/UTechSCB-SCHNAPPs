@@ -1,5 +1,6 @@
 require(parallel) # done
-source(paste0(packagePath, "/contributions/DE_DataExploration/panelPlotFactFunc.R"))
+source(paste0(packagePath, .Platform$file.sep,"contributions",
+              .Platform$file.sep,"DE_DataExploration", .Platform$file.sep, "panelPlotFactFunc.R"))
 
 
 # source(paste0(packagePath, "/reactives.R"), local = TRUE)
@@ -678,12 +679,12 @@ observeEvent(input$runScater,{
   width <- NULL
   height <- NULL
   # outfile has to be set outside of the future since it will be removed after the session closes.
-  outfile <- paste0(tempdir(), "/scaterPlot.png")
+  outfile <- paste0(tempdir(), .Platform$file.sep, "scaterPlot.png")
   
   n <- min(nrow(scaterReads), 50)
   # browser()
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/scater.RData"), list = c(ls()))
   }
   # cp=load(file='~/SCHNAPPsDebug/scater.RData')
   detachedProc$result <- emptyImage
@@ -717,7 +718,7 @@ observeEvent(input$runScater,{
     }
   )
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater2.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/scater2.RData"), list = c(ls()))
   }
   # cp=load(file='~/SCHNAPPsDebug/scater2.RData')
   # browser()
@@ -751,7 +752,7 @@ observeEvent(input$stopScater, {
   if(.schnappsEnv$DEBUG) cat(file = stderr(), "input$stopScater\n")
 
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/stopScater.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/stopScater.RData"), list = c(ls()))
   }
   # cp=load(file='~/SCHNAPPsDebug/stopScater.RData')
   if (!is.null(detachedProc$PID)) {
@@ -785,7 +786,7 @@ observe({
   # browser()
   if (.schnappsEnv$DEBUG) cat(file = stderr(), "observeEvent: detachedProc$process2\n")
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/processScater.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/processScater.RData"), list = c(ls()))
   }
   # cp=load(file='~/SCHNAPPsDebug/processScater.RData')
   
@@ -827,7 +828,7 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
   # browser()
   result = detachedProc$result
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/result1Scater.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/result1Scater.RData"), list = c(ls()))
   }
   # cp=load(file='~/SCHNAPPsDebug/result1Scater.RData')
   
@@ -836,7 +837,7 @@ output$DE_scaterQC <- renderImage(deleteFile = F, {
     return(emptyImage)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/result2Scater.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/result2Scater.RData"), list = c(ls()))
   }
   # cp=load(file='~/SCHNAPPsDebug/result2Scater.RData')
   af = pltHighExp

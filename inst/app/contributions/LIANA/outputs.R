@@ -54,7 +54,7 @@ Liana_all_Table <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Liana_all_Table.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/Liana_all_Table.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/Liana_all_Table.RData")
   # browser()
@@ -82,7 +82,7 @@ Liana_aggr_Table <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Liana_aggr_Table.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/Liana_aggr_Table.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/Liana_aggr_Table.RData")
   liana_scEx
@@ -138,7 +138,7 @@ output$Liana_dotPlot <- plotly::renderPlotly({
   liana_scEx = liana_aggr()
   if (is.null(liana_scEx)) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Liana_dotPlot.Rdata", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/Liana_dotPlot.Rdata"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/Liana_dotPlot.Rdata")
   if(!is(liana_scEx,"tbl_df")){
@@ -195,7 +195,7 @@ output$Liana_Heatmap <- renderPlot({
   liana_scEx = liana_aggr()
   if (is.null(liana_scEx)) return(NULL)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/Liana_Heatmap.Rdata", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/Liana_Heatmap.Rdata"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/Liana_Heatmap.Rdata")
   if(!is(liana_scEx,"tbl_df")){

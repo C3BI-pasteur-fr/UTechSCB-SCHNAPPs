@@ -78,7 +78,7 @@ if (!AllowClustering)
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/projections.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/projections.RData"), list = c(ls()))
     }
     # cp = load(file="~/SCHNAPPsDebug/projections.RData"); DEBUGSAVE=FALSE
     
@@ -263,7 +263,7 @@ DE_scaterPNG <- reactive({
   height <- session$clientData$output_plot_height
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/scater.Rmd", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/scater.Rmd"), list = c(ls()))
   }
   # load(file='~/SCHNAPPsDebug/scater.Rmd')
   
@@ -278,7 +278,7 @@ DE_scaterPNG <- reactive({
   myPNGwidth <- width / 96
   myPNGheight <- height / 96
   
-  outfile <- paste0(getwd(), "/scaterPlot.png")
+  outfile <- paste0(getwd(), .Platform$file.sep, "scaterPlot.png")
   if (file.exists(normalizePath(outfile, mustWork = FALSE)) & clicked == 0){
     return(list(
       src = normalizePath(outfile, mustWork = FALSE),

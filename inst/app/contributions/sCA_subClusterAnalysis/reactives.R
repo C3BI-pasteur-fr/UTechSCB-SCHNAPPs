@@ -150,7 +150,7 @@ sCA_seuratFindMarkers <- function(scEx, scEx_logMat, cells.1, cells.2, test="wil
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData"), list = c(ls()))
   }
   #cp = load(file='~/SCHNAPPsDebug/sCA_seuratFindMarkers.RData')
   cellMeta <- colData(scEx)
@@ -336,7 +336,7 @@ sCA_scDEA <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   }
   require(scDEA)
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_scDEA.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_scDEA.RData"), list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_scDEA.RData')
   
@@ -393,7 +393,7 @@ sCA_scDEA <- function(scEx_log, scEx_logMat, cells.1, cells.2){
   if(is.null(Pvals)) return(NULL)
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_scDEA.res.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_scDEA.res.RData"), list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_scDEA.res.RData')
   allOnes = which(apply(Pvals,1,FUN=function(x)all(x==1)))
@@ -473,7 +473,7 @@ sCA_dge_deseq2 <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_deseq2.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_dge_deseq2.RData"), list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_dge_deseq2.RData')
   
@@ -533,7 +533,7 @@ sCA_dge_CellViewfunc <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
     showNotification("sCA_dge_CellViewfunc", id = "sCA_dge_CellViewfunc", duration = NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData"), list = c(ls()))
   }
   # cp =load(file='~/SCHNAPPsDebug/sCA_dge_CellViewfunc.RData')
   # browser()
@@ -597,7 +597,7 @@ sCA_dge_ttest <- function(scEx_log, scEx_logMat, cells.1, cells.2) {
     showNotification("sCA_dge_ttest", id = "sCA_dge_ttest", duration = NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge_ttest.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_dge_ttest.RData"), list = c(ls()))
   }
   #cp = load(file='~/SCHNAPPsDebug/sCA_dge_ttest.RData')
   featureData <- rowData(scEx_log)
@@ -691,7 +691,7 @@ sCA_dge <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/sCA_dge.RData", list = c(ls(), ".schnappsEnv"))
+    save(file = normalizePath("~/SCHNAPPsDebug/sCA_dge.RData"), list = c(ls(), ".schnappsEnv"))
   }
   # cp = load(file='~/SCHNAPPsDebug/sCA_dge.RData')
   # browser()
@@ -841,7 +841,7 @@ subCluster2Dplot <- function() {
       return(NULL)
     }
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = "~/SCHNAPPsDebug/sCA_dge_plot2.RData", list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/sCA_dge_plot2.RData"), list = c(ls()))
     }
     # cp = load(file="~/SCHNAPPsDebug/sCA_dge_plot2.RData")
     

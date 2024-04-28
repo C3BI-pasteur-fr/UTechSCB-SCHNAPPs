@@ -343,7 +343,7 @@ DE_seuratRefBased <- reactive({
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratRefBased.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_seuratRefBased.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratRefBased.RData")
   # .schnappsEnv$normalizationFactor = scalingFactor
@@ -554,7 +554,7 @@ DE_seuratSCtransform <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratSCtransform.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_seuratSCtransform.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratSCtransform.RData")
   # .schnappsEnv$normalizationFactor <- scalingFactor
@@ -737,7 +737,7 @@ DE_seuratStandard <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratStandard.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_seuratStandard.RData"), list = c(ls()))
   }
   # cp =load(file="~/SCHNAPPsDebug/DE_seuratStandard.RData")
   
@@ -802,7 +802,7 @@ DE_seuratSCTnorm <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratSCTnorm.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_seuratSCTnorm.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratSCTnorm.RData")
   
@@ -956,7 +956,7 @@ DE_seuratLogNorm <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_seuratLogNorm.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_seuratLogNorm.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_seuratLogNorm.RData")
   
@@ -1108,7 +1108,7 @@ DE_logGeneNormalization <- reactive(label = "rlogGene", {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_logGeneNormalization.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_logGeneNormalization.RData"), list = c(ls()))
   }
   # load(file="~/SCHNAPPsDebug/DE_logGeneNormalization.RData")
   
@@ -1212,7 +1212,7 @@ DE_scaterNormalization <- reactive(label = "scaterNorm", {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_scaterNormalization.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_scaterNormalization.RData"), list = c(ls()))
   }
   # cp=load(file="~/SCHNAPPsDebug/DE_scaterNormalization.RData")
   
@@ -1297,7 +1297,7 @@ DE_logNormalization <- reactive(label = "rlogNorm", {
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = "~/SCHNAPPsDebug/DE_logNormalization.RData", list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/DE_logNormalization.RData"), list = c(ls()))
   }
   # cp = load(file="~/SCHNAPPsDebug/DE_logNormalization.RData")
   if (is.null(sfactor)) {
