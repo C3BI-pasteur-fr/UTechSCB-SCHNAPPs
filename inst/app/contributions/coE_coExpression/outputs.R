@@ -35,6 +35,15 @@ callModule(
   coE_topExpGenesTable, caption = "Tables with highest expressed genes"
 )
 
+# gene counts table
+callModule(
+  tableSelectionServer,
+  "coE_AllGenes",
+  coE_AllGenesTable, caption = "Table gene information for all genes"
+)
+
+
+
 # max expressed genes ----
 callModule(
   tableSelectionServer,

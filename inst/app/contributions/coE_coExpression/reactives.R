@@ -514,6 +514,79 @@ coE_scranFindMarkerTableReact <- reactive({
 })
 
 
+
+
+# coE_AllGenesTable ----
+#' coE_AllGenesTable
+#' in coE_AllGenesTable tab we show a table with all information about the genes
+coE_AllGenesTable <- reactive({
+  if (DEBUG) cat(file = stderr(), "coE_AllGenesTable started.\n")
+  start.time <- base::Sys.time()
+  on.exit({
+    printTimeEnd(start.time, "coE_AllGenesTable")
+    if (!is.null(getDefaultReactiveDomain())) {
+      removeNotification(id = "coE_AllGenesTable")
+    }
+  })
+  if (!is.null(getDefaultReactiveDomain())) {
+    showNotification("coE_AllGenesTable", id = "coE_AllGenesTable", duration = NULL)
+  }
+  # deepDebug()
+  scEx_log <- scEx_log()
+  scEx <- scEx()
+  projections <- projections()
+  if (is.null(scEx_log)) {
+    if (DEBUG) {
+      cat(file = stderr(), "coE_AllGenesTable: scEx_log:NULL\n")
+    }
+    return(NULL)
+  }
+  
+  sc <- (coE_selctedCluster())
+  scCells <- (sc$selectedCells())
+
+  if (is.null(scCells) || length(scCells) == 0) {
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification("No cells selected", id = "coE_AllGenesTableProbl", type = "error", duration = 10)
+      return(NULL)
+    }
+  }
+  
+  featureData <- rowData(scEx_log)
+
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = normalizePath("~/SCHNAPPsDebug/coE_AllGenesTable.RData"), list = c(ls()))
+  }
+  # cp = load(file="~/SCHNAPPsDebug/coE_AllGenesTable.RData")
+  
+  # get numeric columns from projections.
+  # nums <- unlist(lapply(projections, is.numeric))
+  # numProje <- projections[, nums]
+  scCells <- scCells[scCells %in% colnames(assays(scEx_log)[[1]])]
+  # we only work on cells that have been selected
+  mat <- assays(scEx_log)[[1]][, scCells, drop = FALSE]
+  # only genes that express at least coEtgminExpr UMIs
+  # mat[mat < coEtgminExpr] <- 0
+  # only genes that are expressed in coEtgPerc or more cells
+  # allexpressed <- Matrix::rowSums(mat > 0) / length(scCells) * 100 >= coEtgPerc
+  # mat <- mat[allexpressed, ]
+  
+  if (length(mat) == 0) {
+    return(NULL)
+  }
+ 
+  retVal = data.frame(row.names = rownames(mat),stringsAsFactors = F)
+  retVal$rowSums = rowSums(mat)
+  retVal$nCells = ncol(mat)
+  retVal$rowSumsPerCell = retVal$rowSums / ncol(mat)
+  retVal = cbind(retVal, featureData,mat)
+  exportTestValues(coE_AllGenesTable = {
+    retVal
+  })
+  return(retVal)
+})
+
+
 # coE_topExpCCTable ----
 #' coE_topExpCCTable
 #' in coE_topExpCCTable tab we show a table correlation coefficients and associated p-values

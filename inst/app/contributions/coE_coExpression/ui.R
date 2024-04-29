@@ -349,6 +349,23 @@ tabList <- list(
                                            tableSelectionUi("coE_topCCGenes")
                                          )
                                        )
+                                     ),
+                                     tabPanel(
+                                       title = "Table with counts", width = 12,
+                                       footer = div(
+                                         tags$ul(
+                                           tags$li(
+                                             "list of counts for all genes and selected cells\n"
+                                           )
+                                         )
+                                       ),
+                                       fluidRow(
+                                         column(
+                                           width = 12,
+                                           # sc_checkboxInput(inputId = "coE_topCCGenesShow", label = "calc correlations", value = FALSE)),
+                                           tableSelectionUi("coE_AllGenes")
+                                         )
+                                       )
                                      )
                               ) 
                       )
