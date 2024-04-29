@@ -290,7 +290,7 @@ DE_seuratRefBasedFunc <- function(scEx, scExMat, nfeatures = 3000, k.filter = 10
       # FeaturePlot(integrated, c("CCR7", "S100A4", "GZMB", "GZMK", "GZMH"))
     },
     error = function(e) {
-      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\ncheck console", e, "\n\n"))
+      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization: \nmaybe not enough anchors?\ncheck console", e, "\n\n"))
       return(NULL)
     }
   )
@@ -684,7 +684,7 @@ DE_seuratStandardfunc <- function(scEx, scExMat, dims = 10, anchorsF = 2000, kF 
       # NormalizeData(seurDat, normalization.method = "LogNormalize", scale.factor = 10000)
     },
     error = function(e) {
-      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization:\n", e, "\n\n"))
+      cat(file = stderr(), paste("\n\n!!!Error during Seurat normalization: \nmaybe not enough anchors?\ncheck console", e, "\n\n"))
       return(NULL)
     }
   )
