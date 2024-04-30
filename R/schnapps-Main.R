@@ -76,13 +76,13 @@ schnapps <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
   }
   options(future.globals.maxSize= 2024^3)
   future::plan("multisession", workers = workers)
+  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
   source(paste0(packagePath, "/serverFunctions.R"), local = TRUE)
   BiocParallel::register(safeBPParam(workers))
   
   # will be set during sourcing, but we need to define them, otherwise there will be a warning
   scShinyUI <- NULL
   scShinyServer <- NULL
-  packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
   devscShinyApp <<- FALSE
   devscShinyApp <- FALSE
   source(paste0(packagePath, "/server.R"), local = TRUE)
