@@ -64,7 +64,7 @@ Remotes:
     nghiavtr/BPSC,
     statOmics/zingeR,
     cysouw/qlcMatrix,
-    bnprks/BPCells,
+    bnprks/BPCells/r,
     saezlab/liana
 Suggests:
     tidyverse,

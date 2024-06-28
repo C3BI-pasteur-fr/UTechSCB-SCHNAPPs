@@ -108,7 +108,7 @@ assign("defaultValues", defaultValues, envir = .schnappsEnv)
 
 options(shinyjqui.debug = TRUE)
 options(shinyjquiui.debug = TRUE)
-
+library(shiny)
 app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=TRUE)
 
