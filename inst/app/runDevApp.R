@@ -8,7 +8,7 @@
 library(doParallel)
 library("future.callr")
 library(BPCells)
-
+library(shiny)
 registerDoParallel(cores=12)
 suppressMessages(require(shinyjqui))
 
@@ -36,7 +36,7 @@ DEBUGSAVE = F
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_2023-May-08.10.02/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_grp3/"
 # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/hist_3 samples/"
-historyPath = normalizePath("/Volumes/LaCie2022/RStudio_history/julia/")
+# historyPath = normalizePath("/Volumes/LaCie2022/RStudio_history/julia/")
 # # historyPath = "/Volumes/LaCie2022/RStudio_history/MPI/"
 # historyPath = "demoHistory/hist_2023-May-11.12.43/"
 # # historyPath = "demoHistory/hist_2023-May-11.12.43/"
