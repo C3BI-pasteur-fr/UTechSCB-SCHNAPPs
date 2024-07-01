@@ -50,8 +50,8 @@ if (exists("devscShinyApp")) {
     if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
       packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
     } else {
-      if (dir.exists(paths = normalizePath("~/Rstudio/Schnapps/inst/app/"))){
-        packagePath <- normalizePath("~/Rstudio/Schnapps/inst/app/")
+      if (dir.exists(paths = normalizePath("~/Rstudio/schnapps/inst/app/"))){
+        packagePath <- normalizePath("~/Rstudio/schnapps/inst/app/")
       } else {
         if (dir.exists(paths = normalizePath("~/rstudio/schnappsGit/inst/app/"))){
           packagePath <- normalizePath("~/rstudio/schnappsGit/inst/app/")
@@ -180,8 +180,8 @@ scShinyServer <- function(input, output, session) {
       if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
         packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
       } else {
-        if (dir.exists(paths = normalizePath("~/Rstudio/Schnapps/inst/app/"))){
-          packagePath <- normalizePath("~/Rstudio/Schnapps/inst/app/")
+        if (dir.exists(paths = normalizePath("~/Rstudio/schnapps/inst/app/"))){
+          packagePath <- normalizePath("~/Rstudio/schnapps/inst/app/")
         } else {
           if (dir.exists(paths = normalizePath("~/rstudio/schnappsGit/inst/app/"))){
             packagePath <- normalizePath("~/rstudio/schnappsGit/inst/app/")
