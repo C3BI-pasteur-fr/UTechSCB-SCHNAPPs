@@ -815,7 +815,7 @@ output$ColorSelection <- renderUI({
         showNotification(
           paste(name," has more than 100 levels\n"),
           type = "error",
-          duration = NULL
+          duration = 10
         )
         return(NULL)
       }
