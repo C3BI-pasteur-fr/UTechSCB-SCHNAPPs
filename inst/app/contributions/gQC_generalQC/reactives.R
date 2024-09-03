@@ -546,6 +546,7 @@ tsnePlot <- function(projections, dimX, dimY, dimZ, dimCol, projColors) {
   projections <- as.data.frame(projections)
   if (!all(c(dimX, dimY, dimZ) %in% colnames(projections))) {
     if (!is.null(getDefaultReactiveDomain())) {
+      message("Selected projections not available. Did you run normalization?", id = "tsnePlotERROR", type = "error", duration = NULL)
       showNotification("Selected projections not available. Did you run normalization?", id = "tsnePlotERROR", type = "error", duration = NULL)
     }
     return(NULL)

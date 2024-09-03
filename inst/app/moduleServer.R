@@ -1086,7 +1086,7 @@ tableSelectionServer <- function(input, output, session,
            list = c(ls())
       )
     }
-    # cp = load(file=paste0("~/SCHNAPPsDebug/rowSelection-coE_scranFindMarkerTable-bkup.RData"))
+    # cp = load(file=paste0("~/SCHNAPPsDebug/rowSelection-gQC_projectionTableMod-bkup.RData"))
     # deepDebug()
     # in case there is a table with multiple same row ids (see crPrioGenesTable) the gene names has "_#_" appended plus a number
     # remove this here

@@ -3148,7 +3148,8 @@ projections <- reactive({
         )
         iter <- iter + 1
       }
-      # cp = load(file="~/SCHNAPPsDebug/projections.5.RData")
+      # cp = load(file="~/SCHNAPPsDebug/projections.6.RData")
+      # tmp
       # deepDebug()
       # TODO here, dbCluster is probably overwritten and appended a ".1"
       if (is(tmp, "data.frame")) {

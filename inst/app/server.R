@@ -47,13 +47,13 @@ if (!exists(".schnappsEnv")) {
 
 if (exists("devscShinyApp")) {
   if (devscShinyApp) {
-    if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/"))){
+    if (dir.exists(paths = normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/", mustWork = F))){
       packagePath <- normalizePath("~/Rstudio/UTechSCB-SCHNAPPs/inst/app/")
     } else {
-      if (dir.exists(paths = normalizePath("~/Rstudio/schnapps/inst/app/"))){
+      if (dir.exists(paths = normalizePath("~/Rstudio/schnapps/inst/app/", mustWork = F))){
         packagePath <- normalizePath("~/Rstudio/schnapps/inst/app/")
       } else {
-        if (dir.exists(paths = normalizePath("~/rstudio/schnappsGit/inst/app/"))){
+        if (dir.exists(paths = normalizePath("~/rstudio/schnappsGit/inst/app/", mustWork = F))){
           packagePath <- normalizePath("~/rstudio/schnappsGit/inst/app/")
         } else {
           stop("package path not found\n")
