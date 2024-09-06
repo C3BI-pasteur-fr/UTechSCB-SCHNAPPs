@@ -41,7 +41,7 @@ remotes::install_github("satijalab/seurat", dependencies  = TRUE, build = T,type
 remotes::install_github("satijalab/seurat-data", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 BiocManager::install("scran", dependencies  = TRUE, build = T, update = TRUE, ask = F, type = "source", upgrade = "always")
 devtools::install_github("kassambara/ggpubr", dependencies  = TRUE, build = T,type = "source", upgrade = "always")
-
+remotes::install_github('saezlab/liana')
 # ‘psychTools’, ‘Seurat’, ‘scran’, ‘ggpubr’ are not available for package ‘SCHNAPPs’
 # Warning messages:
 #   1: packages ‘multtest’, ‘limma’, ‘monocle’, ‘rtracklayer’, ‘MAST’ are not available for this version of R
@@ -64,11 +64,13 @@ devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRU
 install.packages("stringi", configure.args="--disable-pkg-config")
 
 # sudo apt install libtesseract-dev libleptonica-dev tesseract-ocr-eng gnome-mahjongg librsvg2-dev libmagick++-dev
-install.packages("tesseract", build = T,type = "source", upgrade = "always")
-install.packages("rsvg", build = T,type = "source", upgrade = "always")
+install.packages("tesseract", build = T,type = "source", upgrade = "always", configure.vars  = c("PKG_CONFIG_PATH='/usr//local/lib/pkgconfig/tesseract.pc' LIB_DIR='/usr/local/Cellar/tesseract/5.4.1/lib/:/usr/local/Cellar/leptonica/1.84.1/lib -larchive -lcurl' INCLUDE_DIR='/usr/local/Cellar/tesseract/5.4.1/include -I/usr/local/Cellar/leptonica/1.84.1//include/leptonica'"))
+# cd /usr/local/Cellar/librsvg/2.58.3/lib
+# ln -s librsvg-2.2.dylib librsvg.dylib
+install.packages("rsvg", build = T,type = "source", upgrade = "always", configure.vars  = c("LIB_DIR='/usr/local/Cellar/librsvg/2.58.3/lib/ -L/usr/local//Cellar/glib/2.80.4/lib -lrsvg-2 -lm' INCLUDE_DIR='//usr/local/Cellar/librsvg/2.58.3/include/librsvg-2.0/ -I/usr/local//Cellar/glib/2.80.4/include/glib-2.0/ -Lusr/local//Cellar/cairo/1.18.0/lib -L/usr/local//Cellar/gdk-pixbuf/2.42.12/ -I/usr/local//Cellar/glib/2.80.4/lib/glib-2.0/include -I/usr/local//Cellar/cairo/1.18.0/include/cairo -I/usr/local//Cellar/gdk-pixbuf/2.42.12/include/gdk-pixbuf-2.0'"))
 install.packages("gifski", build = T,type = "source", upgrade = "always")
 install.packages("magick", build = T,type = "source", upgrade = "always")
-install.packages("pdftools", build = T,type = "source", upgrade = "always")
+install.packages("pdftools", build = T,type = "source", upgrade = "always", configure.vars  = c("LIB_DIR='/usr//local/lib/ ' INCLUDE_DIR='/usr/local/Cellar/poppler/24.04.0_1/include/poppler/cpp/'"))
 install.packages("anndata", build = T,type = "source", upgrade = "always")
 
 install.packages("future.callr", build = T,type = "source", upgrade = "always")
@@ -87,7 +89,7 @@ BiocManager::install("Rhdf5lib", dependencies  = TRUE, build = T,type = "source"
 BiocManager::install("rhdf5", dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
 BiocManager::install('monocle', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
 Sys.setenv(BPCELLS_DEBUG_INSTALL="true")
-remotes::install_github("bnprks/BPCells", build = T,type = "source", upgrade = "always")
+remotes::install_github("bnprks/BPCells/r", build = T,type = "source", upgrade = "always")
 
 # remotes::install_github("satijalab/seurat", "seurat5", dependencies  = TRUE)
 # remotes::install_github("satijalab/seurat-data", "seurat5", quiet = TRUE)
@@ -97,10 +99,10 @@ remotes::install_github("bnprks/BPCells", build = T,type = "source", upgrade = "
 BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')
 remotes::install_github("satijalab/azimuth", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
 remotes::install_github("satijalab/seurat-wrappers", quiet = TRUE, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
-BiocManager::install('biovizBase')
-BiocManager::install('motifmatchr')
-BiocManager::install('chromVAR')
-BiocManager::install('ggseqlogo')
+BiocManager::install('biovizBase', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('motifmatchr', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('chromVAR', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
+BiocManager::install('ggseqlogo', dependencies  = TRUE, build = T,type = "source", upgrade = "always", update = TRUE, ask = F)
 
 
 remotes::install_github("stuart-lab/signac", quiet = F, dependencies  = TRUE, build = T,type = "source", upgrade = "always")
@@ -196,7 +198,8 @@ for (pg in gList) {
 
 BiocManager::install("GSEABase")
 BiocManager::install("GSVA")
-
+install.packages("ggstats")
+BiocManager::install("GGally")
 instList = c('BiocManager', 'pdftools',
              'shinycssloaders', 'network', 'igraph', 'mclust', 'shinyTree', 'shinydashboard', 'hdf5r',
              'forcats', 'kohonen', 'SCORPIUS', 'shinyBS', 'threejs', 'DT', 'shinythemes'
@@ -218,7 +221,7 @@ devtools::install_github("RausellLab/CelliD", ref = "legacy", dependencies = TRU
 # devtools::install_github("C3BI-pasteur-fr/TemporaFork", dependencies = TRUE, build = T,type = "source", upgrade = "always")
 devtools::install_github("Albluca/distutils", dependencies = TRUE, build = T,type = "source", upgrade = "always") 
 devtools::install_github("Albluca/ElPiGraph.R", dependencies = TRUE, build = T,type = "source", upgrade = "always")
-devtools::install_github("rcannood/SCORPIUS", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always")
+devtools::install_github("rcannood/SCORPIUS", build_vignettes = F, dependencies = TRUE, build = T,type = "source", upgrade = "always")
 
 for (pg in instList) {
   require (`pg`,character.only = T)
@@ -279,11 +282,15 @@ install.packages(
 )
 
 install.packages(openmpPacks, build = T,type = "source", upgrade = "always")
-problems = c( "Rtsne")
+problems = c( "Matrix")
 install.packages(problems, build = T,type = "source", upgrade = "always",verbose = T,keep_outputs = T)
 
 devtools::install_github("zdebruine/RcppML", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T) 
-devtools::install_github("zdebruine/singlet", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
+devtools::install_github("zdebruine/RcppML")
+BiocManager::install("fgsea")
+BiocManager::install("limma")
+# fails in 4.4
+# devtools::install_github("zdebruine/singlet", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T)
 
 devtools::install_github("jkrijthe/Rtsne", build_vignettes = TRUE, dependencies = TRUE, build = T,type = "source", upgrade = "always", force = T,
                          configure.vars = "CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++",

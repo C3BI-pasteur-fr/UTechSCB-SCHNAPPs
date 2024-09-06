@@ -679,7 +679,7 @@ appendAnnotation <- function(scEx, annFile) {
   for (fpIdx in 1:length(annFile$datapath)) {
     data <- read.table(file = annFile$datapath[fpIdx], check.names = FALSE, header = TRUE, sep = ",", stringsAsFactors = FALSE)
     if (.schnappsEnv$DEBUGSAVE) {
-      save(file = normalizePath("~/SCHNAPPsDebug/appendAnnotation.RData"), list = c(ls()))
+      save(file = normalizePath("~/SCHNAPPsDebug/appendAnnotation.RData",mustWork = F), list = c(ls()))
     }
     # cp = load(file = "~/SCHNAPPsDebug/appendAnnotation.RData")
     if (colnames(data)[1] %in% c("", "rownames", "ROWNAMES", "CELL_ID")) {
@@ -760,6 +760,9 @@ appendAnnotation <- function(scEx, annFile) {
       success = TRUE
     }
   }
+  # if(class(cDat) == "DFrame"){
+  #   cDat = as.data.frame(cDat)
+  # }
   cDat$sampleNames <- factor(cDat$sampleNames)
   colData(scEx) <- cDat
   rowData(scEx) <- rDat
@@ -3064,7 +3067,7 @@ projections <- reactive({
   # data. Here we ensure that everything is loaded and all varialbles are set by waiting
   # input data being loaded
   # .schnappsEnv$DEBUGSAVE = T
-  
+  # browser()
   scEx <- scEx()
   printTimeEnd(start.time, "projections scEx")
   pca <- pcaReact()
