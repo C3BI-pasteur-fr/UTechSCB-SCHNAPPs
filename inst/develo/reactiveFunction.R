@@ -41,7 +41,7 @@ server <- function(input, output) {
     input$num^2
   }
   number_squared <- reactive_debug(exFun)
-  
+
   output$result <- renderText({
     num_sq <- number_squared()
     paste("The square of", input$num, "is", num_sq)
