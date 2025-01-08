@@ -137,7 +137,7 @@ options(keep.source=TRUE)
 # schnapps(DEBUG = T, historyPath = "/Volumes/Oct2020/RStudio/history/celia/")
 #
 #
-if (DEBUG) base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
+# if (DEBUG) base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
 # zz <- file("schnapps.output.txt", open = "wt")
 # sink(zz, type = "message")
 
