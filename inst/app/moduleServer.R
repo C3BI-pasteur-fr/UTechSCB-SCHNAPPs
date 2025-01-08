@@ -1323,7 +1323,7 @@ tableSelectionServer <- function(input, output, session,
     }
     if (.schnappsEnv$DEBUGSAVE) {
       save(file = normalizePath(paste0("~/SCHNAPPsDebug/rowSelection-", ns("bkup"), ".return.RData", 
-                         collapse = ".")),list = c(ls())
+                                       collapse = ".")),list = c(ls())
       )
     }
     # load(file=paste0("~/SCHNAPPsDebug/cellSelection-coE_topExpGenes-bkup.RData"))
@@ -2133,11 +2133,12 @@ cellSelectionModule <- function(input, output, session) {
   .schnappsEnv[[ns("Mod_PPGrp")]] = "1"
   observe(label = "Mod_PPGrp",
           {
-            if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp",input$Mod_PPGrp,"\n"))
-            # assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
-            .schnappsEnv[[ns("Mod_PPGrp")]] = input$Mod_PPGrp
-            .schnappsEnv$defaultValues[[ns("Mod_PPGrp")]] = input$Mod_PPGrp
-            
+            if("Mod_PPGrp" %in% names(input)){
+              if (DEBUG) cat(file = stderr(), paste0("observe: Mod_PPGrp",input$Mod_PPGrp,"\n"))
+              # assign(ns("Mod_PPGrp"), input$Mod_PPGrp, envir = .schnappsEnv)
+              .schnappsEnv[[ns("Mod_PPGrp")]] = input$Mod_PPGrp
+              .schnappsEnv$defaultValues[[ns("Mod_PPGrp")]] = input$Mod_PPGrp
+            }
           })
   
   

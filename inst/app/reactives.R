@@ -150,7 +150,7 @@ checkLevels <- function(scEx) {
         if(!any(is.na(suppressWarnings(lv %>% as.numeric())  ))) next()
         if(!any(is.na(suppressWarnings(lv %>% as.logical())  ))) next()
         if (!is.null(getDefaultReactiveDomain())) {
-          showNotification(paste("Level",colName," has invalid levels\n correcting!\n"), type = "error", duration = NULL)
+          showNotification(paste("Level",colName," has invalid levels\n correcting!\n"), type = "error", duration = 10)
         }
         levels(cdat[,colName]) = make.names(lv)
         cat(file = stderr(), "\n\nLevel",colName," has invalid levels\n correcting!\n\n")
@@ -285,7 +285,7 @@ inputDataFunc <- function(inFile) {
   }
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = normalizePath("~/SCHNAPPsDebug/readInp1.RData"), list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/readInp1.RData",mustWork = F), list = c(ls()))
   }
   # cp = load(file='~/SCHNAPPsDebug/readInp1.RData')
   
@@ -404,7 +404,7 @@ inputDataFunc <- function(inFile) {
   
   
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = normalizePath("~/SCHNAPPsDebug/readInp.RData"), list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/readInp.RData", mustWork = F), list = c(ls()))
   }
   # cp =load(file='~/SCHNAPPsDebug/readInp.RData')
   
@@ -831,7 +831,8 @@ inputData <- reactive({
     return(NULL)
   }
   if (.schnappsEnv$DEBUGSAVE) {
-    save(file = normalizePath("~/SCHNAPPsDebug/inputData.RData"), list = c(ls()))
+    save(file = normalizePath("~/SCHNAPPsDebug/inputData.RData"), 
+         list = c(ls()))
   }
   # cp =load(file='~/SCHNAPPsDebug/inputData.RData')
   
@@ -871,11 +872,16 @@ inputData <- reactive({
   # browser()
   
   isolate({
-    if (is.null(names(projectionColors$sampleNames)) | !all(names(projectionColors$sampleNames) %in% sampNames)){
-      projectionColors$sampleNames <- rev(allowedColors[rep(1:length(allowedColors),ceiling(length(sampNames) / length(allowedColors)))[1:length(sampNames)]])
+    if (is.null(names(projectionColors$sampleNames)) | 
+        !all(names(projectionColors$sampleNames) %in% sampNames)){
+      projectionColors$sampleNames <- 
+        rev(allowedColors[rep(1:length(allowedColors),
+                              ceiling(length(sampNames)/ length(allowedColors))
+                              )[1:length(sampNames)]])
       # projectionColors$sampleNames <- rev(allowedColors)[seq_along(sampNames)]
       names(projectionColors$sampleNames) <- sampNames
-      add2history(type = "save", input=isolate( reactiveValuesToList(input)), comment = "scol", scol = projectionColors$sampleNames)
+      add2history(type = "save", input=isolate( reactiveValuesToList(input)), 
+                  comment = "scol", scol = projectionColors$sampleNames)
     }
   })
   inputFile$inFile <- paste(inFile$name, collapse = ", ")
@@ -883,7 +889,8 @@ inputData <- reactive({
   
   
   # subsample this number of cells per sample
-  # no replacement. it is possible that one sample is more represented if the required number of cells is larger than there are cells for this sample.
+  # no replacement. it is possible that one sample is more represented if the 
+  # required number of cells is larger than there are cells for this sample.
   # save(file = "~/SCHNAPPsDebug/inputData.RData", list = c(ls()), compress = F)
   # load(file='~/SCHNAPPsDebug/inputData.RData')
   if (sampleCells) {
@@ -1699,6 +1706,7 @@ scEx <- reactive({
     showNotification("scEx", id = "scEx", duration = NULL)
   }
   
+  
   dataTables <- inputData()
   useCells <- useCells()
   useGenes <- useGenes()
@@ -1707,6 +1715,11 @@ scEx <- reactive({
   minGene <- geneSelectionValues$minGenesGS # min number of reads per gene
   minG <- cellSelectionValues$minGenes # min number of reads per cell
   maxG <- cellSelectionValues$maxGenes # max number of reads per cell
+  
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = normalizePath("~/SCHNAPPsDebug/scExa.RData"), list = c(ls()))
+  }
+  # cp= load(file="~/SCHNAPPsDebug/scExa.RData")
   
   # browser()
   if (!exists("dataTables") |
@@ -1720,7 +1733,7 @@ scEx <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = normalizePath("~/SCHNAPPsDebug/scEx.RData"), list = c(ls()))
   }
-  # load(file="~/SCHNAPPsDebug/scEx.RData")
+  # cp= load(file="~/SCHNAPPsDebug/scEx.RData")
   
   # TODO:??? should be keep the cell names from the projections?
   # here we are just reinitializing.

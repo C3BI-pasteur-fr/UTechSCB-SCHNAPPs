@@ -41,16 +41,21 @@ if (!requireNamespace("remotes", quietly = TRUE))
   install.packages("remotes")
 
 remotes::install_github('saezlab/liana')
-Sys.setenv(LD_LIBRARY_PATH=paste("/opt/local/lib/", "/opt/local/", Sys.getenv("LD_LIBRARY_PATH"),sep=":"))
+Sys.setenv(LD_LIBRARY_PATH=paste("/usr/lib/", "/opt/local/lib/", "/opt/local/", Sys.getenv("LD_LIBRARY_PATH"),sep=":"))
 Sys.setenv(HDF5_CFLAGS="-I/opt/local/include/")
-
+Sys.setenv(HDF5_LIBS="-L/opt/local/lib -lhdf5 -Wl,-rpath,/usr/lib/")
+Sys.setenv(HDF5_LIBS="-Wl,-rpath,/usr/lib/")
+#Sys.setenv(PATH = paste("/opt/homebrew/bin/", Sys.getenv("PATH"), sep = .Platform$path.sep))
 # these might be set in sources if compilation fails
 HDF5_CFLAGS="-I/opt/local/include/"
 HDF5_LIBS="-L/opt/local/lib -lhdf5"
 
-remotes::install_github("bnprks/BPCells", 
-                        configure.vars=c(CC="clang -arch x86_64 -I /opt/local/include/"),
-                        build_opts = c( "--no-resave-data", "--no-manual", "--no-build-vignettes"))
+#Warning: unknown option ‘--configure-vars=PKG_LIBS=-Wl,-rpath,/usr/lib/’
+
+remotes::install_github("bnprks/BPCells/r", 
+                        configure.vars=c("PKG_CXXFLAGS='-Wl,-rpath,/usr/lib/'", CC="clang -I/opt/homebrew/include -L/opt/homebrew/lib -lhdf5 -Wl,-rpath,/usr/lib/"),
+                        build_opts = c( "--no-resave-data", "--no-manual", "--no-build-vignettes"), 
+                        verbose=T,dependencies = T, INSTALL_opts = c("--with-keep.source", "--install-tests"))
 
 
 setRepositories(ind=1:6)
@@ -63,3 +68,7 @@ devtools::install_github("RausellLab/CelliD", ref = "legacy")
 devtools::install_github("rcannood/SCORPIUS")
 
 devtools::install_github("C3BI-pasteur-fr/UTechSCB-SCHNAPPs", dependencies = TRUE)
+
+
+***REMOVED***
+

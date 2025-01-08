@@ -2242,7 +2242,7 @@ loadInput = function(inp, session, input){
     updateSelectizeInput(session = session, inputId = id, selected = inp[[id]])
   }
   
-  # updateRadioButtons(session = session, inputId = "whichscLog", selected = "calcLog")
+  updateRadioButtons(session = session, inputId = "whichscLog", selected = "calcLog")
   
   for(inName in names(inp)){
   }

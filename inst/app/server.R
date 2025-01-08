@@ -211,6 +211,7 @@ scShinyServer <- function(input, output, session) {
   # TODO as parameter to load user specified information
   # TODO have this as an option to load other files
   if (file.exists(normalizePath(paste0(packagePath, "/geneLists.RData")))) {
+    if(DEBUG) message("reading: ", normalizePath(paste0(packagePath, "/geneLists.RData")))
     base::load(file = normalizePath(paste0(packagePath, "/geneLists.RData")))
   } else {
     if (!exists("geneLists")) {
@@ -365,7 +366,6 @@ scShinyServer <- function(input, output, session) {
       if(length(rmdFiles)>0 & length(projFiles)>0 & 
          length(sxFiles)>0 & length(sxLogFiles)>0 ){
         deepDebug()
-        # browser()
         # this will be overwritten but should be session specific
         oldTmpFolder = .schnappsEnv$reportTempDir
         # load input variables
@@ -404,19 +404,20 @@ scShinyServer <- function(input, output, session) {
         }else{
           cat(file = stderr(), "input is null from history file please update SCHNAPPs and start over.")
         }
-        rm("tempEnv")
+        if(exists("tempEnv")) rm("tempEnv")
         # gmtData
         # browser()
         if(!isEmpty(gmtFiles)){
           fileInfo = gmtFiles %>% file.info()
           latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
           tempEnv =  new.env(parent=emptyenv())
+          if(DEBUG) message("reading: ", rownames(fileInfo)[latestFile])
           cp = load(rownames(fileInfo)[latestFile], envir = tempEnv)
           if("gmtData" %in% cp) {
             gmtData(tempEnv$gmtData$gmtData) 
           }
         }
-        rm("tempEnv")
+        if(exists("tempEnv")) rm("tempEnv")
         
         
         # #scol
@@ -430,7 +431,7 @@ scShinyServer <- function(input, output, session) {
         # if("scol" %in% cp) {
         #   projectionColors$sampleNames <- unlist(tempEnv$scol$scol)
         # }
-        # rm("tempEnv")
+        # if(exists("tempEnv")) rm("tempEnv")
         # fileInfo = ccolFiles %>% file.info()
         # latestFile = fileInfo %>% pull("ctime") %>% order()  %>% last()
         # tempEnv =  new.env(parent=emptyenv())
@@ -438,19 +439,22 @@ scShinyServer <- function(input, output, session) {
         # if("ccol" %in% cp) {
         #   projectionColors$dbCluster <- unlist(tempEnv$ccol$ccol)
         # }
-        # rm("tempEnv")
+        # if(exists("tempEnv")) rm("tempEnv")
         
         cat(file = stderr(), paste(rownames(fileInfo)[latestFile], paste(cp, collapse = " "), sep  = "\n"))
         cat(file = stderr(),  "\n")
         tfile <- normalizePath(paste0(.schnappsEnv$historyPath, "/userProjections.RData"))
         prjs = NULL
         newPrjs = NULL
+        # browser()
+        
         if(file.exists(tfile)){
-        cp = load(file = tfile)
-        if(all(c("prjs", "newPrjs") %in% cp)){
-          sessionProjections$prjs = prjs
-          projectionsTable$newProjections = newPrjs
-        }
+          if(DEBUG) message("reading: ", tfile)
+          cp = load(file = tfile)
+          if(all(c("prjs", "newPrjs") %in% cp)){
+            sessionProjections$prjs = prjs
+            projectionsTable$newProjections = newPrjs
+          }
         } else {
           
         }
@@ -477,15 +481,15 @@ scShinyServer <- function(input, output, session) {
       
     }
     if(!is.null(.schnappsEnv$historyPath)) 
-      shinyOptions(cache = cachem::cache_disk(dir = normalizePath(paste0(.schnappsEnv$historyPath, "/app_cache2/cache/"))))
+      shinyOptions(cache = cachem::cache_disk(dir = normalizePath(paste0(.schnappsEnv$historyPath, "/app_cache2/cache/"),mustWork = F)))
     # shinyOptions(cache = NULL)
     # bindCache <- function(x, ...){return(x)}
   }
   
   # browser()
-    
+  
   # }
-    
+  
   # }
   # browser()
   # bindCache <- function(x, ...){return(x)}

@@ -48,6 +48,7 @@ DEBUGSAVE = F
 # # historyPath = "demoHistory/MPI"
 # # historyPath = "/Volumes/LaCie2022/RStudio_history/marielle/hist_2022-Dec-15.18.15/"
 historyPath = NULL
+historyPath = "~/Downloads/histo-copy/"
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueSingleGene", defaultValueSingleGene, envir = .schnappsEnv)
 assign(".SCHNAPPs_defaultValueMultiGenes", defaultValueMultiGenes, envir = .schnappsEnv)
@@ -109,7 +110,6 @@ assign("defaultValues", defaultValues, envir = .schnappsEnv)
 options(shinyjqui.debug = TRUE)
 options(shinyjquiui.debug = TRUE)
 library(shiny)
-app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=TRUE)
 
 #
@@ -137,7 +137,7 @@ options(keep.source=TRUE)
 # schnapps(DEBUG = T, historyPath = "/Volumes/Oct2020/RStudio/history/celia/")
 #
 #
-if (DEBUG) base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
+# if (DEBUG) base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
 # zz <- file("schnapps.output.txt", open = "wt")
 # sink(zz, type = "message")
 
@@ -177,10 +177,13 @@ source(normalizePath("R/DotPlotwithModuleScore.R"))
 
 # takes too long to load
 # testapp <- shinytest2::AppDriver$new(app, load_timeout = 1505 * 1000)
+app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 
 
 runApp(app, launch.browser = chromeBrowser)
 
+# library(SCHNAPPs)
+# schnapps(DEBUG = T, DEBUGSAVE = T, historyPath = "~/Downloads/histo-copy/")
 # 
 # last.dump[length(last.dump)]
 # debugger(last.dump)
