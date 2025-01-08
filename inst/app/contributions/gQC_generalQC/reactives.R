@@ -230,7 +230,7 @@ projectionTable <- reactive({
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = normalizePath("~/SCHNAPPsDebug/projectionTable.RData"), list = c(ls()))
   }
-  # load(file = "~/SCHNAPPsDebug/projectionTable.RData")
+  # cp =load(file = "~/SCHNAPPsDebug/projectionTable.RData")
   
   printTimeEnd(start.time, "projectionTable")
   exportTestValues(projectionTable = {

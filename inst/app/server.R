@@ -142,7 +142,8 @@ scShinyServer <- function(input, output, session) {
   gmtData <- reactiveVal()
   gmtUserData <- reactiveVal()
   
-  # Here, we store projections that are created during the session. These can be selections of cells or other values that
+  # Here, we store projections that are created during the session.
+  # These can be selections of cells or other values that
   # are not possible to precalculate.
   sessionProjections <- reactiveValues(
     prjs = data.frame()
