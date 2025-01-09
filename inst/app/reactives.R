@@ -923,40 +923,35 @@ inputData <- reactive({
 
 
 medianENSGfunc <- function(scEx) {
-  if (DEBUG) {
-    cat(file = stderr(), "medianENSGfunc started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "medianENSGfunc")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "medianENSGfunc")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("medianENSGfunc", id = "medianENSGfunc", duration = NULL)
-  }
-  
   geneC <- Matrix::colSums(scEx > 0, na.rm = TRUE)
   return(median(t(geneC)))
 }
 
-# medianENSG ----
-medianENSG <- reactive({
-  if (DEBUG) {
-    cat(file = stderr(), "medianENSG started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "medianENSG")
+# Wrapper function for reactive with debugging
+reactiveWrapper <- function(expr, name="test") {
+  reactive({
+    start_time <- Sys.time()
+    on.exit({
+      elapsed <- Sys.time() - start_time
+      cat(file = stderr(), "DEBUG: myReactive block finished in",
+          round(elapsed, 3), "seconds.\n\n")
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id =  paste0(name, ".id"))
+      }
+    })
     if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "medianENSG")
+      showNotification(name, id = paste0(name, ".id"), duration = NULL)
     }
+    
+    # Call the original reactive expression
+    output <- expr()
+    
+    # Return the result of the reactive expression
+    return(output)
   })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("medianENSG", id = "medianENSG", duration = NULL)
-  }
-  
+}
+
+medianENSGRFunc <- function(){
   scEx_log <- scEx_log()
   if (is.null(scEx_log)) {
     if (DEBUG) {
@@ -969,12 +964,44 @@ medianENSG <- reactive({
     return(0)
   }
   retVal <- medianENSGfunc(scEx_log)
-  
-  exportTestValues(medianENSG = {
-    retVal
-  })
-  return(retVal)
-})
+  retVal
+}
+
+medianENSG <- reactiveWrapper(medianENSGRFunc, "medianENSG")
+# medianENSG ----
+# medianENSG <- reactive({
+#   if (DEBUG) {
+#     cat(file = stderr(), "medianENSG started.\n")
+#   }
+#   start.time <- base::Sys.time()
+#   on.exit({
+#     printTimeEnd(start.time, "medianENSG")
+#     if (!is.null(getDefaultReactiveDomain())) {
+#       removeNotification(id = "medianENSG")
+#     }
+#   })
+#   if (!is.null(getDefaultReactiveDomain())) {
+#     showNotification("medianENSG", id = "medianENSG", duration = NULL)
+#   }
+#   
+#   scEx_log <- scEx_log()
+#   if (is.null(scEx_log)) {
+#     if (DEBUG) {
+#       cat(file = stderr(), "medianENSG:NULL\n")
+#     }
+#     return(0)
+#   }
+#   scEx_log <- assays(scEx_log)[[1]]
+#   if (ncol(scEx_log) <= 1 | nrow(scEx_log) < 1) {
+#     return(0)
+#   }
+#   retVal <- medianENSGfunc(scEx_log)
+#   
+#   exportTestValues(medianENSG = {
+#     retVal
+#   })
+#   return(retVal)
+# })
 
 medianUMIfunc <- function(scEx) {
   if (DEBUG) {
