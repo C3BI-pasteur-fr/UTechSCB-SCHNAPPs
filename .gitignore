@@ -77,6 +77,10 @@ inst/develo/metaDataFigs
 inst/develo/metaDataScExFigs
 omnipathr-log
 vignettes/pkdown/*cache
-
+inst/develo/dockerCelia*
+inst/develo/dockerImage*
+inst/develo/test
+testDir/app.R
+inst/develo/metaDataData
 
 
