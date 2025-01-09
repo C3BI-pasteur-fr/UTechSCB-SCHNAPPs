@@ -25,6 +25,31 @@ safeBPParam <- function(nworkers) {
   }
 }
 
+# Wrapper function for reactive with debugging
+reactiveWrapper <- function(expr, name = "test") {
+  reactive({
+    start_time <- Sys.time()
+    on.exit({
+      elapsed <- Sys.time() - start_time
+      cat(
+        file = stderr(), "DEBUG: myReactive block finished in",
+        round(elapsed, 3), "seconds.\n\n"
+      )
+      if (!is.null(getDefaultReactiveDomain())) {
+        removeNotification(id = paste0(name, ".id"))
+      }
+    })
+    if (!is.null(getDefaultReactiveDomain())) {
+      showNotification(name, id = paste0(name, ".id"), duration = NULL)
+    }
+
+    # Call the original reactive expression
+    output <- expr()
+
+    # Return the result of the reactive expression
+    return(output)
+  })
+}
 
 ### Try catch from extended examples ----
 #' tryCatch with Warning Extraction

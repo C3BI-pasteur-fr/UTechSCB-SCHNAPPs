@@ -496,10 +496,6 @@ readMM <- function(inFile) {
   return(NULL)
 }
 
-# inFile$datapath="~/Downloads/GSE122084_RAW/GSM3855868_Salmonella_exposed_cells.txt"
-# load("data/scEx.RData")
-# scMat = as.matrix(assays(scEx)[[1]])
-# write.file.csv(scMat, row.names=TRUE, file="data/scEx.csv" )
 
 
 ## readGMT ----
@@ -930,40 +926,11 @@ inputData <- reactive({
 
 
 medianENSGfunc <- function(scEx) {
-  if (DEBUG) {
-    cat(file = stderr(), "medianENSGfunc started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "medianENSGfunc")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "medianENSGfunc")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("medianENSGfunc", id = "medianENSGfunc", duration = NULL)
-  }
-  
   geneC <- Matrix::colSums(scEx > 0, na.rm = TRUE)
   return(median(t(geneC)))
 }
 
-# medianENSG ----
-medianENSG <- reactive({
-  if (DEBUG) {
-    cat(file = stderr(), "medianENSG started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "medianENSG")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "medianENSG")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("medianENSG", id = "medianENSG", duration = NULL)
-  }
-  
+medianENSG_R_Func <- function(){
   scEx_log <- scEx_log()
   if (is.null(scEx_log)) {
     if (DEBUG) {
@@ -976,75 +943,12 @@ medianENSG <- reactive({
     return(0)
   }
   retVal <- medianENSGfunc(scEx_log)
-  
-  exportTestValues(medianENSG = {
-    retVal
-  })
-  return(retVal)
-})
-
-medianUMIfunc <- function(scEx) {
-  if (DEBUG) {
-    cat(file = stderr(), "medianUMIfunc started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "medianUMIfunc")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "medianUMIfunc")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("medianUMIfunc", id = "medianUMIfunc", duration = NULL)
-  }
-  
-  umiC <- Matrix::colSums(scEx, na.rm = TRUE)
-  
-  return(median(t(umiC)))
+  retVal
 }
 
-# medianUMI ----
-medianUMI <- reactive({
-  if (DEBUG) {
-    cat(file = stderr(), "medianUMI started.\n")
-  }
-  start.time <- base::Sys.time()
-  on.exit({
-    printTimeEnd(start.time, "medianUMI")
-    if (!is.null(getDefaultReactiveDomain())) {
-      removeNotification(id = "medianUMI")
-    }
-  })
-  if (!is.null(getDefaultReactiveDomain())) {
-    showNotification("medianUMI", id = "medianUMI", duration = NULL)
-  }
-  gmtData()
-  scEx <- scEx()
-  if (is.null(scEx)) {
-    if (DEBUG) {
-      cat(file = stderr(), "medianUMI:NULL\n")
-    }
-    return(0)
-  }
-  if (.schnappsEnv$DEBUGSAVE) {
-    save(file = normalizePath("~/SCHNAPPsDebug/medianUMI.RData"), list = c(ls()))
-  }
-  #cp =  load(file='~/SCHNAPPsDebug/medianUMI.RData')
-  scEx <- assays(scEx)[["counts"]]
-  retVal <- medianUMIfunc(scEx)
-  
-  exportTestValues(medianUMI = {
-    retVal
-  })
-  return(retVal)
-})
+medianENSG <- reactiveWrapper(medianENSG_R_Func, "medianENSG")
 
-
-
-
-# for now we don't have a way to specifically select cells
-# we could cluster numbers or the like
-# internal, should not be used by plug-ins
+# useCellsFunc ----
 useCellsFunc <-
   function(dataTables,
            geneNames,

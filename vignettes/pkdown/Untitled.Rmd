@@ -1,0 +1,26 @@
+---
+title: "How to add functionality to SCHNAPPs"
+author: "Bernd Jagla"
+date: "2023-12-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Design
+
+## ui.R
+
+## reactives.R
+
+### canceling jobs
+
+## outputs.R
+
+## list of available reactives
+
+### scEx
+### scEx_log
