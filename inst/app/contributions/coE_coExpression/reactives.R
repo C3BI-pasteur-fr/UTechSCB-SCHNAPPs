@@ -967,21 +967,6 @@ coE_geneGrp_vioFunc2 <- function(genesin, projections, scEx, featureData, minMax
     ))(length(levels(prj)))
   }
   
-  # mycolPal <- colorRampPalette(RColorBrewer::brewer.pal(
-  #   n = 6, name =
-  #     "RdYlBu"
-  # ))(length(levels(prj)))
-  # 
-  # if (dbCluster[1] == "sampleNames") {
-  #   mycolPal <- sampCol
-  #   names(mycolPal) = names(sampCol)
-  # }
-  # if (dbCluster[1] == "dbCluster") {
-  #   mycolPal <- ccols
-  #   names(mycolPal) = names(ccols)
-  # }
-  
-  
   
   if (length(dbCluster) == 2 ) {
     prj2 = factor(projections[, dbCluster[2]])
