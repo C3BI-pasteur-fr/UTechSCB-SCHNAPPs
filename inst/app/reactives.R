@@ -496,10 +496,6 @@ readMM <- function(inFile) {
   return(NULL)
 }
 
-# inFile$datapath="~/Downloads/GSE122084_RAW/GSM3855868_Salmonella_exposed_cells.txt"
-# load("data/scEx.RData")
-# scMat = as.matrix(assays(scEx)[[1]])
-# write.file.csv(scMat, row.names=TRUE, file="data/scEx.csv" )
 
 
 ## readGMT ----
@@ -925,30 +921,6 @@ inputData <- reactive({
 medianENSGfunc <- function(scEx) {
   geneC <- Matrix::colSums(scEx > 0, na.rm = TRUE)
   return(median(t(geneC)))
-}
-
-# Wrapper function for reactive with debugging
-reactiveWrapper <- function(expr, name="test") {
-  reactive({
-    start_time <- Sys.time()
-    on.exit({
-      elapsed <- Sys.time() - start_time
-      cat(file = stderr(), "DEBUG: myReactive block finished in",
-          round(elapsed, 3), "seconds.\n\n")
-      if (!is.null(getDefaultReactiveDomain())) {
-        removeNotification(id =  paste0(name, ".id"))
-      }
-    })
-    if (!is.null(getDefaultReactiveDomain())) {
-      showNotification(name, id = paste0(name, ".id"), duration = NULL)
-    }
-    
-    # Call the original reactive expression
-    output <- expr()
-    
-    # Return the result of the reactive expression
-    return(output)
-  })
 }
 
 medianENSG_R_Func <- function(){

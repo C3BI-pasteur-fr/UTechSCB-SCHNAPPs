@@ -65,3 +65,18 @@ vignettes/pkdown/scranWorkflow_cache
 
 /doc/
 /Meta/
+asinh.pdf
+cluster.out
+my_data.txt
+schnapps.log
+test.*
+demoHistory/
+inst/develo/metaDataDb
+inst/develo/metaDataDbscEx
+inst/develo/metaDataFigs
+inst/develo/metaDataScExFigs
+omnipathr-log
+vignettes/pkdown/*cache
+
+
+
