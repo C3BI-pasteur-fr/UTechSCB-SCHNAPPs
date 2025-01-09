@@ -109,7 +109,6 @@ assign("defaultValues", defaultValues, envir = .schnappsEnv)
 options(shinyjqui.debug = TRUE)
 options(shinyjquiui.debug = TRUE)
 library(shiny)
-app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 options(shiny.reactlog=TRUE)
 
 #
@@ -153,6 +152,8 @@ devscShinyApp = TRUE
 packagePath <<- paste0("inst",.Platform$file.sep , "app", .Platform$file.sep)
 source(paste0(packagePath, .Platform$file.sep ,  "ui.R"))
 source(paste0(packagePath, .Platform$file.sep ,  "server.R"))
+
+app <- shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
 
 library("BiocParallel")
 register(safeBPParam(2))
