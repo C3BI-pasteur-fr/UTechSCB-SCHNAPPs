@@ -26,7 +26,7 @@ safeBPParam <- function(nworkers) {
 }
 
 # Wrapper function for reactive with debugging
-reactiveWrapper <- function(expr, name = "test") {
+reactiveWrapper <- function(expr, name = "test", requiredReactives = list()) ) {
   reactive({
     start_time <- Sys.time()
     on.exit({
@@ -42,6 +42,13 @@ reactiveWrapper <- function(expr, name = "test") {
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification(name, id = paste0(name, ".id"), duration = NULL)
     }
+   # Ensure all required reactives are not NULL
+   allFound = TRUE
+   if (length(requiredReactives) > 0) {
+     for (reqName in names(requiredReactives)) {
+       req(requiredReactives[[reqName]](), warning = paste("Reactive", reqName, "in ", name, " is NULL"))
+     }
+   }
 
     # Call the original reactive expression
     output <- expr()
@@ -2102,7 +2109,7 @@ createHistory <- function(.schnappsEnv) {
     .schnappsEnv$historyFile = "history2.Rmd"
   }
   .schnappsEnv$historyFile <- paste0(.schnappsEnv$historyPath, .Platform$file.sep, basename(.schnappsEnv$historyFile))
-  line=paste0("---
+  line = paste0("---
 title: \"history\"
 output:
   bookdown::html_document2:
@@ -2112,7 +2119,7 @@ output:
     number_sections: true
     code_folding: hide
 ---
-  
+
 ```{r setup, include=FALSE}
   knitr::opts_chunk$set(echo = TRUE)
   suppressMessages(require(shiny))
@@ -2142,7 +2149,7 @@ output:
   suppressMessages(require(BiocSingular))
   suppressMessages(require(dplyr))
 
-  if (\"debugme\" %in% rownames(installed.packages())) {
+  if (\"debugme\" %in% rownames(installed.packages())) { # nolint: error.
     suppressMessages(require(debugme))
   }
   if (\"gtools\" %in% rownames(installed.packages())) {
@@ -2159,7 +2166,8 @@ output:
   .schnappsEnv$DEBUGSAVE = FALSE
   source(system.file(\"app\", \"serverFunctions.R\", package = \"SCHNAPPs\"))
   DEBUG=FALSE
-```\n\n" )
+```
+\n\n")
   write(line,file=.schnappsEnv$historyFile,append=FALSE)
 }
 

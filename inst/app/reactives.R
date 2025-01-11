@@ -930,7 +930,7 @@ medianENSGfunc <- function(scEx) {
   return(median(t(geneC)))
 }
 
-medianENSG_R_Func <- function(){
+medianENSG <- reactiveWrapper(function() {
   scEx_log <- scEx_log()
   if (is.null(scEx_log)) {
     if (DEBUG) {
@@ -944,9 +944,36 @@ medianENSG_R_Func <- function(){
   }
   retVal <- medianENSGfunc(scEx_log)
   retVal
+}, "medianENSG")
+
+
+medianUMIfunc <- function(scEx) {
+  umiC <- Matrix::colSums(scEx, na.rm = TRUE)
+  return(median(t(umiC)))
 }
 
-medianENSG <- reactiveWrapper(medianENSG_R_Func, "medianENSG")
+# medianUMI ----
+medianUMI <- reactiveWrapper(function(){
+  gmtData()
+  scEx <- scEx()
+  if (is.null(scEx)) {
+    if (DEBUG) {
+      cat(file = stderr(), "medianUMI:NULL\n")
+    }
+    return(0)
+  }
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(file = normalizePath("~/SCHNAPPsDebug/medianUMI.RData"), list = c(ls()))
+  }
+  scEx <- assays(scEx)[["counts"]]
+  retVal <- medianUMIfunc(scEx)
+
+  exportTestValues(medianUMI = {
+    retVal
+  })
+  return(retVal)
+}, name = "medianUMI")
+
 
 # useCellsFunc ----
 useCellsFunc <-

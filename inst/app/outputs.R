@@ -3,13 +3,14 @@
 if (DEBUG) cat(file = stderr(), "outputs.R started.\n")
 suppressMessages(require(shinyTree))
 suppressMessages(require(stringr))
-# require(rintrojs)
+suppressMessages(require(shiny))
 # SUMMARY STATS ----------------------------------------------------------------
-base::source(paste0(packagePath, .Platform$file.sep, "moduleServer.R"), local = TRUE)
+base::source(paste0(packagePath, .Platform$file.sep, "moduleServer.R"),
+  local = TRUE
+)
 
 DEBUGSAVE <- get(".SCHNAPPs_DEBUGSAVE", envir = .schnappsEnv)
 # normalizationRadioButtonValue --------------------------------
-# Parameters / normalization
 output$normalizationRadioButtonValue <- renderPrint({
   input$normalizationRadioButton
 })
@@ -18,10 +19,10 @@ library(profvis)
 callModule(profvis_server, "profiler")
 
 normaliztionParameters <- list(raw = "no Parameters needed")
-# localContributionDir <- .SCHNAPPs_locContributionDir
 parFiles <-
   dir(
-    path = c(paste0(packagePath, .Platform$file.sep, "contributions"), localContributionDir),
+    path = c(paste0(packagePath, .Platform$file.sep, "contributions"), 
+    localContributionDir),
     pattern = "parameters.R",
     full.names = TRUE,
     recursive = TRUE
@@ -31,33 +32,14 @@ for (fp in parFiles) {
   source(fp, local = TRUE)
   if (.schnappsEnv$DEBUGSAVE) {
     save(file = normalizePath("~/SCHNAPPsDebug/normalizationsParameters.RData"),
-         list = c("normaliztionParameters", ls())
+      list = c("normaliztionParameters", ls())
     )
   }
   # load(file = '~/SCHNAPPsDebug/normalizationsParameters.RData')
   if (length(myNormalizationParameters) > 0) {
-    for (li in 1:length(myNormalizationParameters)) {
+    for (li in seq_along(myNormalizationParameters)) {
       lVal <- myNormalizationParameters[[li]]
       if (length(lVal) > 0) {
-        # if (DEBUG) {
-        #   cat(
-        #     file = stderr(),
-        #     paste(
-        #       "normalization Choice: ",
-        #       names(myNormalizationParameters)[li],
-        #       " ",
-        #       lVal,
-        #       "\n"
-        #     )
-        #   )
-        #   cat(file = stderr(), paste(
-        #     "class: ",
-        #     class(myNormalizationParameters[[li]]),
-        #     " ",
-        #     lVal,
-        #     "\n"
-        #   ))
-        # }
         oldNames <- names(normaliztionParameters)
         normaliztionParameters[[length(normaliztionParameters) + 1]] <-
           lVal
@@ -69,113 +51,113 @@ for (fp in parFiles) {
 }
 
 
-observe(label ="obs_pcaRank", x = {
+observe(label = "obs_pcaRank", x = {
   .schnappsEnv$defaultValues[["pcaRank"]] = input$pcaRank
 })
-observe(label ="obs_normalizationRadioButton", x = {
+observe(label = "obs_normalizationRadioButton", x = {
   .schnappsEnv$defaultValues[["normalizationRadioButton"]] = input$normalizationRadioButton
 })
-observe(label ="obs_cellSelectionComment", x = {
+observe(label = "obs_cellSelectionComment", x = {
   .schnappsEnv$defaultValues[["cellSelectionComment"]] = input$cellSelectionComment
 })
-observe(label ="obs_cellsFiltersOut", x = {
+observe(label = "obs_cellsFiltersOut", x = {
   .schnappsEnv$defaultValues[["cellsFiltersOut"]] = input$cellsFiltersOut
 })
-observe(label ="obs_cellKeepOnly", x = {
+observe(label = "obs_cellKeepOnly", x = {
   .schnappsEnv$defaultValues[["cellKeepOnly"]] = input$cellKeepOnly
 })
-observe(label ="obs_cellKeep", x = {
+observe(label = "obs_cellKeep", x = {
   .schnappsEnv$defaultValues[["cellKeep"]] = input$cellKeep
 })
-observe(label ="obs_cellPatternRM", x = {
+observe(label = "obs_cellPatternRM", x = {
   .schnappsEnv$defaultValues[["cellPatternRM"]] = input$cellPatternRM
 })
-observe(label ="obs_maxGenes", x = {
+observe(label = "obs_maxGenes", x = {
   .schnappsEnv$defaultValues[["maxGenes"]] = input$maxGenes
 })
-observe(label ="obs_minGenes", x = {
+observe(label = "obs_minGenes", x = {
   .schnappsEnv$defaultValues[["minGenes"]] = input$minGenes
 })
-observe(label ="obs_minNonExpGenes", x = {
+observe(label = "obs_minNonExpGenes", x = {
   .schnappsEnv$defaultValues[["minNonExpGenes"]] = input$minNonExpGenes
 })
-observe(label ="obs_minExpGenes", x = {
+observe(label = "obs_minExpGenes", x = {
   .schnappsEnv$defaultValues[["minExpGenes"]] = input$minExpGenes
 })
-observe(label ="obs_genesKeep", x = {
+observe(label = "obs_genesKeep", x = {
   .schnappsEnv$defaultValues[["genesKeep"]] = input$genesKeep
 })
-observe(label ="obs_minGenesGS", x = {
+observe(label = "obs_minGenesGS", x = {
   .schnappsEnv$defaultValues[["minGenesGS"]] = input$minGenesGS
 })
-observe(label ="obs_selectIds", x = {
+observe(label = "obs_selectIds", x = {
   .schnappsEnv$defaultValues[["selectIds"]] = input$selectIds
 })
-observe(label ="obs_whichscLog", x = {
+observe(label = "obs_whichscLog", x = {
   .schnappsEnv$defaultValues[["whichscLog"]] = input$whichscLog
 })
-observe(label ="obs_subsampleNum", x = {
+observe(label = "obs_subsampleNum", x = {
   .schnappsEnv$defaultValues[["subsampleNum"]] = input$subsampleNum
 })
-observe(label ="obs_sampleInput", x = {
+observe(label = "obs_sampleInput", x = {
   .schnappsEnv$defaultValues[["sampleInput"]] = input$sampleInput
 })
 
-observe(label ="obs_simlr_maxClust", x = {
+observe(label = "obs_simlr_maxClust", x = {
   .schnappsEnv$defaultValues[["simlr_maxClust"]] = input$simlr_maxClust
 })
-observe(label ="obs_simlr_nClust", x = {
+observe(label = "obs_simlr_nClust", x = {
   .schnappsEnv$defaultValues[["simlr_nClust"]] = input$simlr_nClust
 })
-observe(label ="obs_snnType", x = {
+observe(label = "obs_snnType", x = {
   .schnappsEnv$defaultValues[["snnType"]] = input$snnType
 })
-observe(label ="obs_snnClusterSource", x = {
+observe(label = "obs_snnClusterSource", x = {
   .schnappsEnv$defaultValues[["snnClusterSource"]] = input$snnClusterSource
 })
-observe(label ="obs_geneSelectionClustering", x = {
+observe(label = "obs_geneSelectionClustering", x = {
   .schnappsEnv$defaultValues[["geneSelectionClustering"]] = input$geneSelectionClustering
 })
-observe(label ="obs_useRanks", x = {
+observe(label = "obs_useRanks", x = {
   .schnappsEnv$defaultValues[["useRanks"]] = input$useRanks
 })
-observe(label ="obs_minClusterSize", x = {
+observe(label = "obs_minClusterSize", x = {
   .schnappsEnv$defaultValues[["minClusterSize"]] = input$minClusterSize
 })
-observe(label ="obs_clusterMethod", x = {
+observe(label = "obs_clusterMethod", x = {
   .schnappsEnv$defaultValues[["clusterMethod"]] = input$clusterMethod
 })
-observe(label ="obs_clusterSource", x = {
+observe(label = "obs_clusterSource", x = {
   .schnappsEnv$defaultValues[["clusterSource"]] = input$clusterSource
 })
-observe(label ="obs_seurClustresolution", x = {
+observe(label = "obs_seurClustresolution", x = {
   .schnappsEnv$defaultValues[["seurClustresolution"]] = input$seurClustresolution
 })
-observe(label ="obs_seurClustk.param", x = {
+observe(label = "obs_seurClustk.param", x = {
   .schnappsEnv$defaultValues[["seurClustk.param"]] = input$seurClustk.param
 })
-observe(label ="obs_seurClustDims", x = {
+observe(label = "obs_seurClustDims", x = {
   .schnappsEnv$defaultValues[["seurClustDims"]] = input$seurClustDims
 })
-observe(label ="obs_tabsetCluster", x = {
+observe(label = "obs_tabsetCluster", x = {
   .schnappsEnv$defaultValues[["tabsetCluster"]] = input$tabsetCluster
 })
-observe(label ="obs_genesRMPCA", x = {
+observe(label = "obs_genesRMPCA", x = {
   .schnappsEnv$defaultValues[["genesRMPCA"]] = input$genesRMPCA
 })
-observe(label ="obs_genes4PCA", x = {
+observe(label = "obs_genes4PCA", x = {
   .schnappsEnv$defaultValues[["genes4PCA"]] = input$genes4PCA
 })
-observe(label ="obs_useSeuratPCA", x = {
+observe(label = "obs_useSeuratPCA", x = {
   .schnappsEnv$defaultValues[["useSeuratPCA"]] = input$useSeuratPCA
 })
-observe(label ="obs_hvgSelection", x = {
+observe(label = "obs_hvgSelection", x = {
   .schnappsEnv$defaultValues[["hvgSelection"]] = input$hvgSelection
 })
-observe(label ="obs_pcaScale", x = {
+observe(label = "obs_pcaScale", x = {
   .schnappsEnv$defaultValues[["pcaScale"]] = input$pcaScale
 })
-observe(label ="obs_pcaN", x = {
+observe(label = "obs_pcaN", x = {
   .schnappsEnv$defaultValues[["pcaN"]] = input$pcaN
 })
 
@@ -1206,7 +1188,7 @@ output$RDSsave <- downloadHandler(
     # deepDebug()
     # save projections that shouldn't be recalculated in lite version
     if (length(.schnappsEnv$projectionFunctions) > 0){
-      for (idx in 1:length(.schnappsEnv$projectionFunctions) ){
+      for (idx in seq_along(.schnappsEnv$projectionFunctions)){
         assign(.schnappsEnv$projectionFunctions[[idx]][2],
                eval(parse(text = paste0(.schnappsEnv$projectionFunctions[[idx]][2],"()"))))
         saveList = c(saveList, .schnappsEnv$projectionFunctions[[idx]][2])

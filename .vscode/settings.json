@@ -1,3 +1,8 @@
 {
-    "llm.attributionEndpoint": "https://llms.ai.pasteur.cloud"
+    "llm.attributionEndpoint": "https://llms.ai.pasteur.cloud",
+    "cSpell.words": [
+        "LTLA",
+        "nworkers",
+        "tidyr"
+    ]
 }
