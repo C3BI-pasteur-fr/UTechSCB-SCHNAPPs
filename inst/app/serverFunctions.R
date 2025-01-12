@@ -11,6 +11,7 @@ suppressMessages(library(magrittr))
 suppressMessages(require(digest))
 suppressMessages(require(psychTools))
 suppressMessages(require(tidyr))
+suppressMessages(require(shiny))
 suppressMessages(library(ComplexHeatmap))
 suppressMessages(library(InteractiveComplexHeatmap))
 library(dendsort)
@@ -113,6 +114,7 @@ printTimeEnd <- function(start.time, messtr) {
     cat(file = stderr(), paste("---", hms::round_hms(hms::as_hms(duration), 0.25), "--- done:", messtr, "\n"))
   }
 }
+
 #' Plot High Expression Genes
 #'
 #' Generates a plot of the highest expression genes using the `plotHighestExprs` function from the 'scater' package.
@@ -275,8 +277,364 @@ append2list <- function(myHeavyCalculations, heavyCalculations) {
   return(heavyCalculations)
 }
 
+setupEnvironment <- function() {
+  if (!exists(".schnappsEnv")) {
+    .schnappsEnv <- new.env(parent = emptyenv())
+    .schnappsEnv$DEBUGSAVE <- FALSE
+  } else {
+    if (is.null(.schnappsEnv$DEBUGSAVE)) {
+      .schnappsEnv$DEBUGSAVE <- FALSE
+    }
+  }
+  return(.schnappsEnv)
+}
+
+cleanData <- function(subsetData, dimX, dimY, dimCol) {
+  for (colNa in c(dimX, dimY, dimCol)) {
+    if (!colNa %in% colnames(subsetData)) next()
+    naRows <- which(is.na(subsetData[, colNa]))
+    if (length(naRows) > 0) {
+      if (is.factor(subsetData[, colNa])) {
+        if (!"NA" %in% levels(subsetData[, colNa])) {
+          warning(paste("Found NA in factor", colNa))
+          levels(subsetData[, colNa]) <- c(levels(subsetData[, colNa]), "NA")
+          subsetData[naRows, colNa] <- "NA"
+        }
+      } else if (is.character(subsetData[, colNa])) {
+        warning(paste("Setting NA to character in", colNa))
+        subsetData[naRows, colNa] <- "NA"
+      } else if (is.numeric(subsetData[, colNa])) {
+        warning(paste("Removing rows with NA in", colNa))
+        subsetData <- subsetData[-naRows, ]
+      }
+    }
+  }
+  # Order subsetData if dimCol is numeric
+  if (dimCol %in% colnames(subsetData) && is.numeric(subsetData[, dimCol])) {
+    subsetData <- subsetData[order(subsetData[, dimCol]), ]
+  }
+  return(subsetData)
+}
+
+updateProjections <- function(scEx_log, projections, geneNames, geneNames2) {
+  if (is.null(projections)) {
+    return(NULL)
+  }
+  projections <- updateProjectionsWithUmiCount(
+    geneNames = geneNames,
+    geneNames2 = geneNames2,
+    scEx = scEx_log[, rownames(projections)],
+    projections = projections
+  )
+  return(projections)
+}
+
+createHistogramPlot <- function(subsetData, dimX, dimCol, colors, xAxis, yAxis, gtitle, divYBy) {
+  if (is(subsetData[, dimCol], "factor")) {
+    histnorm <- if (divYBy == "normByCol") "probability" else NULL
+    barmode <- if (divYBy == "normByCol") "group" else "stack"
+
+    p <- plot_ly(alpha = 0.6)
+    groups <- split(subsetData, subsetData[[dimCol]])
+
+    for (lv in names(groups)) {
+      grp_data <- groups[[lv]]
+      if (nrow(grp_data) > 0) {
+        mcol <- if (!is.null(colors) && lv %in% names(colors)) list(color = colors[lv]) else NULL
+        p <- add_histogram(
+          p,
+          x = grp_data[[dimX]],
+          name = lv,
+          marker = mcol,
+          histnorm = histnorm
+        )
+      }
+    }
+    p <- layout(p, barmode = barmode, xaxis = xAxis, yaxis = yAxis, title = gtitle, dragmode = "select")
+    return(p)
+  } else {
+    p <- plot_ly(
+      x = ~ subsetData[[dimX]],
+      type = "histogram"
+    ) %>%
+      layout(
+        xaxis = xAxis,
+        yaxis = yAxis,
+        title = gtitle,
+        dragmode = "select"
+      )
+    return(p)
+  }
+}
+
+createScatterPlot <- function(subsetData, dimX, dimY, dimCol, colors, xAxis, yAxis, gtitle) {
+  p <- plot_ly(
+    data = subsetData,
+    source = "subset",
+    key = rownames(subsetData)
+  ) %>%
+    add_trace(
+      x = ~ get(dimX),
+      y = ~ get(dimY),
+      type = "scatter",
+      mode = "markers",
+      text = ~ paste(seq_len(nrow(subsetData)), " ", rownames(subsetData)),
+      color = ~ get(dimCol),
+      colors = colors,
+      size = ~Freq,
+      sizes = c(1, 10),
+      marker = list(sizemode = "diameter"),
+      showlegend = TRUE
+    ) %>%
+    layout(
+      xaxis = xAxis,
+      yaxis = yAxis,
+      title = gtitle,
+      dragmode = "select"
+    )
+
+  if (!is.factor(subsetData[[dimCol]])) {
+    p <- colorbar(p, title = dimCol)
+  }
+
+  return(p)
+}
+
+generatePlot <- function(subsetData, dimX, dimY, dimCol, colors, gtitle, logx, logy, divXBy, divYBy) {
+  suppressMessages(require(plotly))
+  f <- list(
+    family = "Courier New, monospace",
+    size = 18,
+    color = "#7f7f7f"
+  )
+
+  # Normalization
+  if (divXBy != "None") {
+    subsetData[, dimX] <- subsetData[, dimX] / subsetData[, divXBy]
+    subsetData <- subsetData[!is.infinite(subsetData[, dimX]), ]
+  }
+  if (divYBy != "None" & divYBy != "normByCol" & dimY != "histogram") {
+    subsetData[, dimY] <- subsetData[, dimY] / subsetData[, divYBy]
+    subsetData <- subsetData[!is.infinite(subsetData[, dimY]), ]
+  }
+
+  # Axis types
+  typeX <- if (logx && !(is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX]))) "log" else "linear"
+  typeY <- if (logy && dimY != "histogram" && !(is.factor(subsetData[, dimY]) | is.logical(subsetData[, dimY]))) "log" else "linear"
+
+  xAxis <- list(
+    title = dimX,
+    titlefont = f,
+    type = typeX
+  )
+  yAxis <- list(
+    title = dimY,
+    titlefont = f,
+    type = typeY
+  )
+
+  # Construct plot title
+  if (nchar(gtitle) > 50) {
+    gtitle <- paste0(substr(gtitle, 1, 50), "...")
+  }
+
+  # Plot based on dimY type
+  if (dimY == "histogram") {
+    return(createHistogramPlot(subsetData, dimX, dimCol, colors, xAxis, yAxis, gtitle, divYBy))
+  } else {
+    return(createScatterPlot(subsetData, dimX, dimY, dimCol, colors, xAxis, yAxis, gtitle))
+  }
+}
+
+highlightSelectedCells <- function(p1, subsetData, selectedCells, dimX, dimY) {
+  if (!is.null(selectedCells)) {
+    shape <- rep("a", nrow(subsetData))
+    selRows <- which(rownames(subsetData) %in% selectedCells)
+    shape[selRows] <- "b"
+    x1 <- subsetData[selectedCells, dimX, drop = FALSE]
+    y1 <- subsetData[selectedCells, dimY, drop = FALSE]
+    if (is.logical(x1)) {
+      x1 <- as.factor(x1)
+    }
+    if (is.logical(y1)) {
+      y1 <- as.factor(y1)
+    }
+    p1 <- p1 %>%
+      add_trace(
+        data = subsetData[selectedCells, ],
+        x = x1[, 1], y = y1[, 1],
+        marker = list(
+          color = rep("red", nrow(x1)),
+          size = 5
+        ),
+        text = ~ paste(rownames(subsetData[selectedCells, ])),
+        type = "scatter",
+        mode = "markers",
+        name = "selected",
+        key = rownames(subsetData[selectedCells, ])
+      )
+  }
+  return(p1)
+}
+
+
+
+
+plot2DprojectionNew <- function(scEx_log, projections, g_id, featureData,
+                             geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
+                             logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "sampleNames",
+                             colors = NULL) {
+  # Setup environment
+  .schnappsEnv <- setupEnvironment()
+
+  # Update projections
+  projections <- updateProjections(scEx_log, projections, geneNames, geneNames2)
+  if (is.null(projections)) {
+    return(NULL)
+  }
+
+  # Validate dimensions
+  if (dimCol == "" ||
+    (dimY == "histogram" && !all(c(dimX, dimCol) %in% colnames(projections))) ||
+    (!dimY == "histogram" && !all(c(dimX, dimY) %in% colnames(projections)))) {
+    return(NULL)
+  }
+
+  # Save debug data if enabled
+  if (.schnappsEnv$DEBUGSAVE) {
+    save(
+      file = normalizePath("~/SCHNAPPsDebug/clusterPlot.RData"),
+      list = c(ls(), "legend.position")
+    )
+    cat(file = stderr(), "plot2Dprojection saving done.\n")
+  }
+
+  if (exists("DEBUG") && DEBUG) {
+    cat(file = stderr(), paste("output$sCA_dge_plot1:---", clId[1], "---\n"))
+  }
+
+  # Subset data based on clId
+  subsetData <- if ("dbCluster" %in% clId) {
+    subset(projections, dbCluster %in% clId)
+  } else {
+    projections
+  }
+
+  # Clean data
+  subsetData <- cleanData(subsetData, dimX, dimY, dimCol)
+  if (nrow(subsetData) == 0) {
+    return(NULL)
+  }
+
+  # Construct group title
+  gtitle <- paste(g_id, collapse = " ")
+  if (nchar(gtitle) > 50) {
+    gtitle <- ""
+  }
+
+  # Generate plot
+  p1 <- generatePlot(subsetData, dimX, dimY, dimCol, colors, gtitle, logx, logy, divXBy, divYBy)
+
+  # Handle selected cells
+  selectedCells <- NULL
+  if (length(grpN) > 0) {
+    if (any(grpNs[rownames(subsetData), grpN] == "TRUE", na.rm = TRUE)) {
+      grpNSub <- grpNs[rownames(subsetData), ]
+      selectedCells <- rownames(grpNSub[grpNSub[, grpN] == "TRUE", ])
+    }
+  }
+  p1 <- highlightSelectedCells(p1, subsetData, selectedCells, dimX, dimY)
+
+  # Additional plot adjustments if needed
+  # ...
+
+  return(p1)
+}
+
 # plot2Dprojection ----------------
 # used in moduleServer and reports
+#' Generate an Interactive 2D Projection Plot
+#'
+#' Creates an interactive 2D projection plot using Plotly based on single-cell expression data.
+#'
+#' @param scEx_log A \code{SingleCellExperiment} object containing log-transformed expression data.
+#' @param projections A data frame or matrix containing projection coordinates (e.g., PCA, t-SNE, UMAP) for each cell.
+#' @param g_id A character vector of group identifiers to be used in the plot title.
+#' @param featureData A data frame containing metadata or annotations for features (genes).
+#' @param geneNames A character vector of gene names to be highlighted or used in the projection.
+#' @param geneNames2 A secondary character vector of gene names for additional highlighting or analysis.
+#' @param dimX A string specifying the name of the x-axis dimension (e.g., "PC1", "UMI").
+#' @param dimY A string specifying the name of the y-axis dimension (e.g., "PC2", "Gene Count").
+#' @param clId A vector of cluster identifiers used to subset the data for plotting.
+#' @param grpN An identifier for grouping, used to filter or highlight specific groups within the data.
+#' @param legend.position A string specifying the position of the legend in the plot (e.g., "topright").
+#' @param grpNs A data frame or list containing group assignments for each cell, used for coloring or filtering.
+#' @param logx Logical indicating whether to apply a logarithmic scale to the x-axis (default is \code{FALSE}).
+#' @param logy Logical indicating whether to apply a logarithmic scale to the y-axis (default is \code{FALSE}).
+#' @param divXBy A string specifying the variable to divide the x-axis values by for normalization (default is "None").
+#' @param divYBy A string specifying the variable to divide the y-axis values by for normalization (default is "None").
+#' @param dimCol A string specifying the column name in \code{projections} to use for coloring the plot (default is "sampleNames").
+#' @param colors A vector of colors to be used in the plot. If \code{NULL}, default Plotly colors are applied (default is \code{NULL}).
+#'
+#' @return A \code{plotly} object representing the interactive 2D projection plot. Returns \code{NULL} if input parameters are invalid or if the resulting subset has no data to plot.
+#'
+#' @details
+#' The \code{plot2Dprojection} function generates an interactive 2D scatter plot using the \code{plotly} package. It visualizes single-cell expression data based on specified projection dimensions (e.g., PCA, t-SNE, UMAP). The function offers various customization options, including:
+#'
+#' \itemize{
+#'   \item Logarithmic scaling of axes.
+#'   \item Normalization of projection dimensions by specified variables.
+#'   \item Coloring based on specified metadata or grouping variables.
+#'   \item Handling of missing values (\code{NA}) by removing or marking them.
+#'   \item Conditional plotting based on cluster identifiers.
+#'   \item Dynamic adjustment of plot elements like title truncation and legend positioning.
+#' }
+#'
+#' Additionally, the function includes debugging and data-saving capabilities controlled by the \code{.schnappsEnv} environment.
+
+#' @examples
+#' \dontrun{
+#' library(SingleCellExperiment)
+#' library(plotly)
+#' library(dplyr)
+#'
+#' # Assume scEx_log is a SingleCellExperiment object with log-transformed data
+#' # projections is a PCA result
+#' projections <- runPCA(scEx_log)
+#'
+#' # Feature data and gene names
+#' featureData <- rowData(scEx_log)
+#' geneNames <- c("GeneA", "GeneB")
+#' geneNames2 <- c("GeneC", "GeneD")
+#'
+#' # Generate the plot
+#' p <- plot2Dprojection(
+#'   scEx_log = scEx_log,
+#'   projections = projections,
+#'   g_id = "Sample Group 1",
+#'   featureData = featureData,
+#'   geneNames = geneNames,
+#'   geneNames2 = geneNames2,
+#'   dimX = "PC1",
+#'   dimY = "PC2",
+#'   clId = "Cluster1",
+#'   grpN = NULL,
+#'   legend.position = "topright",
+#'   grpNs = NULL,
+#'   logx = FALSE,
+#'   logy = FALSE,
+#'   divXBy = "None",
+#'   divYBy = "None",
+#'   dimCol = "sampleNames",
+#'   colors = c("Cluster1" = "blue", "Cluster2" = "red")
+#' )
+#'
+#' # Display the plot
+#' p
+#' }
+#'
+#' @export
+
 plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
                              geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
                              logx = FALSE, logy = FALSE, divXBy = "None", divYBy = "None", dimCol = "sampleNames",
@@ -291,29 +649,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
     }
   }
 
-
-  # geneid <- geneName2Index(g_id, featureData)
-
-  # if (length(geneid) == 0) {
-  #   return(NULL)
-  # }
-  # if (length(geneid) == 1) {
-  #   expression <- exprs(scEx_log)[geneid, ,drop=FALSE]
-  # } else {
-  # expression <- Matrix::colSums(assays(scEx_log)[[1]][geneid, rownames(projections), drop = FALSE])
-  # }
-  # validate(need(is.na(sum(expression)) != TRUE, ""))
-  # if (length(geneid) == 1) {
-  #   expression <- exprs(scEx_log)[geneid, ]
-  # } else {
-  #   expression <- Matrix::colSums(exprs(scEx_log)[geneid, ])
-  # }
-  # validate(need(is.na(sum(expression)) != TRUE, ""))
-
-  # geneid <- geneName2Index(geneNames, featureData)
-  #
-  # In the module the input table is coming from the projections (tData) that is a parameter
-  # to the module. Since this can be a subset we need to subset the scEx as well.
   if (is.null(projections)) {
     return(NULL)
   }
@@ -477,11 +812,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
       dimyFact <- TRUE
     }
   } else {
-    # if (is.factor(subsetData[, dimX]) | is.logical(subsetData[, dimX])) {
-    #   # barchart
-    #   # subsetData[, dimX] <- as.character(subsetData[, dimX])
-    # } else {
-
     #
     # histogram
     #
@@ -533,9 +863,6 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         )
     }
     return(p)
-    # %>%
-    #   layout(yaxis=list(type='linear'))
-    # }
   }
 
   #
@@ -565,13 +892,11 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
           add_trace(
             x = formula(paste0("~get(dimX)[subsetData[,dimCol] == \"", lv, "\"]")),
             y = formula(paste0("~get(dimY)[subsetData[,dimCol] == \"", lv, "\"]")),
-            # key = rownames(formula(paste0("~get(dimCol)[subsetData[,dimCol] == \"", lv, "\"]"))),
             name = lv,
             points = "all",
             pointpos = 0,
             scalegroup = lv,
             legendgroup = lv,
-            # alignmentgroup = lv,
             marker = list(size = 1),
             unselected = list(
               marker = list(size = 1)
@@ -605,13 +930,12 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
         x = ~ get(dimX),
         y = ~ get(dimY),
         type = "violin",
-        # text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData), "<br />", subsetData$exprs),
-        text = ~ paste(1:nrow(subsetData), " ", rownames(subsetData)),
+        text = ~ paste(seq_len(nrow(subsetData)), " ", rownames(subsetData)),
         box = list(
-          visible = T
+          visible = TRUE
         ),
         meanline = list(
-          visible = T
+          visible = TRUE
         ),
         showlegend = TRUE
       ) %>%
@@ -743,10 +1067,79 @@ plot2Dprojection <- function(scEx_log, projections, g_id, featureData,
 
 # functions should go in external file
 # n_fun ----
+#' Create a Data Frame with Cell Count Label
+#'
+#' Generates a data frame containing a fixed y-coordinate and a label indicating the number of cells.
+#' This function is typically used for annotating plots with cell count information.
+#'
+#' @param x A vector (e.g., list, numeric, character) where the length represents the number of cells.
+#'
+#' @return A \code{data.frame} with two columns:
+#' \describe{
+#'   \item{y}{A numeric value set to \code{-0.5}, representing the y-coordinate for positioning the label.}
+#'   \item{label}{A character string formatted as "\code{<number>\ncells}", where \code{<number>} is the length of \code{x}.}
+#' }
+#'
+#' @details
+#' The \code{n_fun} function is designed to create a standardized annotation for visualizations, particularly in plotting libraries like \code{ggplot2}.
+#' By providing a consistent y-coordinate and a formatted label, it ensures that cell count annotations are uniformly positioned and styled across different plots.
+#'
+#' @examples
+#' # Example 1: Annotating a scatter plot with cell count
+#' library(ggplot2)
+#'
+#' # Sample data
+#' set.seed(123)
+#' data <- data.frame(
+#'   x = rnorm(100),
+#'   y = rnorm(100)
+#' )
+#'
+#' # Generate cell count annotation
+#' annotation <- n_fun(data$x)
+#'
+#' # Create scatter plot
+#' ggplot(data, aes(x = x, y = y)) +
+#'   geom_point() +
+#'   geom_text(
+#'     data = annotation, aes(x = min(x), y = y, label = label),
+#'     hjust = 0, vjust = 1, size = 5, color = "red"
+#'   ) +
+#'   theme_minimal() +
+#'   labs(title = "Scatter Plot with Cell Count Annotation")
+#'
+#' # Example 2: Using with a list of cells
+#' cell_list <- list(cell1 = "A", cell2 = "B", cell3 = "C", cell4 = "D")
+#' n_fun(cell_list)
+#'
+#' @export
 n_fun <- function(x) {
   return(data.frame(y = -0.5, label = paste0(length(x), "\ncells")))
 }
+
 #' diffLRT ----
+#' Compute Differential Likelihood Ratio Test p-value
+#'
+#' Calculates the p-value for the differential likelihood ratio test between two datasets.
+#'
+#' @param x A numeric vector representing the first dataset.
+#' @param y A numeric vector representing the second dataset.
+#' @param xmin A numeric value specifying the minimum threshold (default is \code{1}).
+#'
+#' @return A numeric value representing the p-value from the chi-squared distribution with \code{3} degrees of freedom.
+#'
+#' @details
+#' The \code{diffLRT} function performs a differential likelihood ratio test by comparing the likelihoods of the two datasets individually and combined.
+#' It calculates the test statistic based on the difference in likelihood ratios and returns the corresponding p-value.
+#'
+#' @examples
+#' # Example usage of diffLRT
+#' x <- c(1.2, 2.3, 3.1, 4.5, 5.7)
+#' y <- c(2.1, 3.4, 1.9, 4.0, 5.2)
+#' p_value <- diffLRT(x, y)
+#' print(p_value)
+#'
+#' @export
 diffLRT <- function(x, y, xmin = 1) {
   lrtX <- bimodLikData(x)
   lrtY <- bimodLikData(y)
@@ -755,6 +1148,55 @@ diffLRT <- function(x, y, xmin = 1) {
   return(pchisq(lrt_diff, 3, lower.tail = F))
 }
 
+#' Compute Bimodal Likelihood for a Dataset
+#'
+#' Calculates the log-likelihood for a bimodal distribution by splitting the dataset at a specified threshold.
+#'
+#' @param x A numeric vector representing the dataset to be evaluated.
+#' @param xmin A numeric value specifying the threshold to split the data into two groups (default is \code{0}).
+#'
+#' @return A numeric value representing the combined log-likelihood of the two groups based on the bimodal model.
+#'
+#' @details
+#' The \code{bimodLikData} function assesses the fit of a bimodal distribution to a given dataset by partitioning the data into two subsets:
+#'
+#' \enumerate{
+#'   \item \strong{Group 1 (\code{x1}):} Consists of all observations in \code{x} that are less than or equal to \code{xmin}.
+#'   \item \strong{Group 2 (\code{x2}):} Consists of all observations in \code{x} that are greater than \code{xmin}.
+#' }
+#'
+#' The function calculates the proportion of data in \code{x2} and constrains it between \code{1e-05} and \code{1 - 1e-05} using the \code{minmax} function. It then computes the log-likelihood for each group:
+#'
+#' \describe{
+#'   \item{\code{likA}}{Log-likelihood for Group 1, assuming a fixed probability of \code{1 - xal}.}
+#'   \item{\code{likB}}{Log-likelihood for Group 2, assuming a normal distribution with mean and standard deviation calculated from \code{x2}. If \code{x2} has fewer than two observations, the standard deviation is set to \code{1}.}
+#' }
+#'
+#' The total log-likelihood is the sum of \code{likA} and \code{likB}.
+#'
+#' **Note:** Ensure that the \code{minmax} function is defined in your environment, as it constrains the proportion \code{xal} to prevent extreme probabilities.
+#'
+#' @examples
+#' # Example 1: Bimodal dataset
+#' set.seed(123)
+#' group1 <- rnorm(50, mean = 5, sd = 1)
+#' group2 <- rnorm(50, mean = 15, sd = 2)
+#' x <- c(group1, group2)
+#'
+#' # Compute bimodal log-likelihood with default xmin = 0
+#' log_likelihood <- bimodLikData(x)
+#' print(log_likelihood)
+#'
+#' # Compute bimodal log-likelihood with xmin = 10
+#' log_likelihood_x10 <- bimodLikData(x, xmin = 10)
+#' print(log_likelihood_x10)
+#'
+#' # Example 2: Single group dataset
+#' y <- rnorm(100, mean = 10, sd = 2)
+#' log_likelihood_y <- bimodLikData(y, xmin = 10)
+#' print(log_likelihood_y)
+#'
+#' @export
 bimodLikData <- function(x, xmin = 0) {
   x1 <- x[x <= xmin]
   x2 <- x[x > xmin]
@@ -768,24 +1210,82 @@ bimodLikData <- function(x, xmin = 0) {
   return(likA + likB)
 }
 
+#' Return Elements of a Vector Present in Another Vector
+#'
+#' Filters and returns the elements from vector \code{a} that are also present in vector \code{b}.
+#'
+#' @param a A vector (e.g., numeric, character) from which elements will be filtered.
+#' @param b A vector (e.g., numeric, character) containing elements to check against.
+#'
+#' @return A vector containing elements from \code{a} that are found in \code{b}.
+#'
+#' @details
+#' The \code{ainb} function serves as a convenience wrapper for the expression \code{a[a %in% b]}. It efficiently filters the first vector, \code{a}, returning only those elements that exist in the second vector, \code{b}.
+#'
+#' **Note:** This function preserves the order of elements in \code{a} and does not remove duplicates unless they are not present in \code{b}.
+#'
+#' @examples
+#' # Example 1: Numeric vectors
+#' a <- c(1, 2, 3, 4, 5)
+#' b <- c(3, 4, 5, 6, 7)
+#' result <- ainb(a, b)
+#' print(result) # Output: 3 4 5
+#'
+#' # Example 2: Character vectors
+#' a <- c("apple", "banana", "cherry", "date")
+#' b <- c("banana", "date", "fig", "grape")
+#' result <- ainb(a, b)
+#' print(result) # Output: "banana" "date"
+#'
+#' # Example 3: Mixed types (numeric and character)
+#' a <- c("1", "2", "three", "4")
+#' b <- c("2", "4", "six")
+#' result <- ainb(a, b)
+#' print(result) # Output: "2" "4"
+#'
+#' @export
 ainb <- function(a, b) {
   a2 <- a[a %in% b]
   return(a2)
 }
 
-minmax <- function(data, min, max) {
-  data2 <- data
-  data2[data2 > max] <- max
-  data2[data2 < min] <- min
-  return(data2)
-}
-set.ifnull <- function(x, y) {
+#' Min-Max Capping Function
+#'
+#' This function takes a numeric vector and caps its values to be within a specified range.
+#' Values greater than the specified maximum are set to the maximum, and values less than the specified minimum are set to the minimum.
+#'
+#' @param data A numeric vector to be capped.
+#' @param min The minimum value to cap the data.
+#' @param max The maximum value to cap the data.
+#' 
+#' @return A numeric vector with values capped between the specified minimum and maximum.
+#' 
+#' @examples
+#' data <- c(1, 5, 10, 15, 20)
+#' minmax(data, 5, 15)
+#' # Returns: 5, 5, 10, 15, 15
   if (is.null(x)) {
     return(y)
   }
   return(x)
 }
 
+#' Calculate the exponential mean of a numeric vector
+#'
+#' This function computes the exponential mean of a numeric vector `x` after normalizing it by a given factor `normFactor`.
+#' The exponential mean is calculated as the logarithm of the mean of the exponentiated normalized values minus one, plus one, 
+#' multiplied by the normalization factor.
+#'
+#' @param x A numeric vector for which the exponential mean is to be calculated.
+#' @param normFactor A numeric value used to normalize the input vector `x`. Default is 1. If `NULL`, it will be set to 1.
+#'
+#' @return A numeric value representing the exponential mean of the input vector `x`.
+#'
+#' @examples
+#' expMean(c(1, 2, 3))
+#' expMean(c(1, 2, 3), normFactor = 2)
+#'
+#' @export
 expMean <- function(x, normFactor = 1) {
   if (is.null(normFactor)) {
     normFactor <- 1
@@ -793,6 +1293,30 @@ expMean <- function(x, normFactor = 1) {
   return(log(mean(exp(x / normFactor) - 1) + 1) * normFactor)
 }
 
+#' Perform Differential Expression Test
+#'
+#' This function performs a differential expression test between two sets of cells for a given set of genes.
+#'
+#' @param expression A matrix of gene expression values, where rows correspond to genes and columns correspond to cells.
+#' @param cells.1 A vector of column indices or names corresponding to the first set of cells.
+#' @param cells.2 A vector of column indices or names corresponding to the second set of cells.
+#' @param genes.use A vector of gene names to be tested. If NULL, all genes in the expression matrix will be used. Default is NULL.
+#' @param print.bar Logical, whether to print a progress bar. Default is TRUE.
+#'
+#' @return A data frame with p-values for each gene, where rows correspond to genes and the column is named `p_val`.
+#'
+#' @examples
+#' # Example usage:
+#' expression_matrix <- matrix(rnorm(1000), nrow = 100, ncol = 10)
+#' rownames(expression_matrix) <- paste0("Gene", 1:100)
+#' cells_group1 <- 1:5
+#' cells_group2 <- 6:10
+#' result <- DiffExpTest(expression_matrix, cells_group1, cells_group2)
+#' head(result)
+#'
+#' @importFrom BiocParallel bplapply
+#' @importFrom magrittr %>%
+#' @export
 
 DiffExpTest <- function(expression, cells.1, cells.2, genes.use = NULL, print.bar = TRUE) {
   genes.use <- set.ifnull(genes.use, rownames(expression))
@@ -803,6 +1327,37 @@ DiffExpTest <- function(expression, cells.1, cells.2, genes.use = NULL, print.ba
 }
 
 
+#' Generate a Heatmap Plot from Module Data
+#'
+#' This function generates a heatmap plot using the provided heatmap data and projections.
+#' It allows for customization of column names, ordering, and clustering options.
+#'
+#' @param heatmapData A list containing the heatmap data, including the matrix to be plotted.
+#' @param moduleName A string representing the name of the module, used to retrieve input parameters.
+#' @param input A list of input parameters, typically from a Shiny app, used to customize the heatmap.
+#' @param projections A data frame containing projection data, used for annotations and ordering.
+#'
+#' @return A heatmap plot generated by the TRONCO::pheatmap function, or NULL if input data is invalid.
+#'
+#' @details
+#' The function performs the following steps:
+#' \itemize{
+#'   \item Checks if the heatmap data, projections, or heatmap matrix are NULL and returns NULL if any are.
+#'   \item Removes the filename from the heatmap data.
+#'   \item Adds column annotations if specified by the input parameters.
+#'   \item Orders columns based on specified order names if they exist in the projections.
+#'   \item Sets clustering options for columns based on input parameters.
+#'   \item Sets the font size for the heatmap.
+#'   \item Calls the TRONCO::pheatmap function to generate the heatmap plot.
+#' }
+#'
+#' @importFrom TRONCO pheatmap
+#' @importFrom stats system.time
+#'
+#' @examples
+#' \dontrun{
+#' heatmapPlotFromModule(heatmapData, "module1", input, projections)
+#' }
 heatmapPlotFromModule <- function(heatmapData, moduleName, input, projections) {
   addColNames <- input[[paste0(moduleName, "-ColNames")]]
   orderColNames <- input[[paste0(moduleName, "-orderNames")]]
@@ -997,6 +1552,26 @@ getshaStr <- function(moduleParameters) {
 # ++++++++++++++++++++++++++++
 # flattenCorrMatrix
 # ++++++++++++++++++++++++++++
+#' Flatten Correlation Matrix
+#'
+#' This function takes a correlation matrix and a corresponding matrix of p-values,
+#' and returns a data frame where each row corresponds to an entry in the upper triangle
+#' of the correlation matrix.
+#'
+#' @param cormat A matrix of correlation coefficients.
+#' @param pmat A matrix of correlation p-values.
+#' @return A data frame with four columns: 
+#' \describe{
+#'   \item{row}{The row names of the correlation matrix.}
+#'   \item{column}{The column names of the correlation matrix.}
+#'   \item{cor}{The correlation coefficients from the upper triangle of the correlation matrix.}
+#'   \item{p}{The p-values corresponding to the correlation coefficients.}
+#' }
+#' @examples
+#' cormat <- matrix(c(1, 0.5, 0.3, 0.5, 1, 0.4, 0.3, 0.4, 1), nrow = 3)
+#' pmat <- matrix(c(0, 0.01, 0.02, 0.01, 0, 0.03, 0.02, 0.03, 0), nrow = 3)
+#' flattenCorrMatrix(cormat, pmat)
+#' @export
 # cormat : matrix of the correlation coefficients
 # pmat : matrix of the correlation p-values
 flattenCorrMatrix <- function(cormat, pmat) {
@@ -1010,99 +1585,6 @@ flattenCorrMatrix <- function(cormat, pmat) {
 }
 
 
-
-# # recHistory ----
-# # record history in env
-# # needs pdftk https://www.pdflabs.com/tools/pdftk-server/
-# # only save to history file if variable historyFile in schnappsEnv is set
-# if (!all(c("pdftools", "gridExtra", "png") %in% rownames(installed.packages()))) {
-#   recHistory <- function(...) {
-#     return(NULL)
-#   }
-# } else {
-#   require(pdftools)
-#   recHistory <- function(name, plot1, envir = .schnappsEnv) {
-#     if (!exists("historyFile", envir = envir)) {
-#       return(NULL)
-#     }
-#     if (!exists("history", envir = .schnappsEnv)) {
-#       .schnappsEnv$history <- list()
-#     }
-#     name <- paste(name, date())
-#     tmpF <- tempfile(fileext = ".pdf")
-#     cat(file = stderr(), paste0("history tmp File: ", tmpF, "\n"))
-#     # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
-#     # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
-#     clP <- class(plot1)
-#     cat(file = stderr(), paste0("class: ", clP[1], "\n"))
-#     # here we create a PDF file for a given plot that is then combined later
-#     created <- FALSE
-#     switch(clP[1],
-#       "plotly" = {
-#         cat(file = stderr(), paste0("plotly\n"))
-#         plot1 <- plot1 %>% layout(title = name)
-#         if ("plotly" %in% class(plot1)) {
-#           # requires orca bing installed (https://github.com/plotly/orca#installation)
-#           # https://github.com/plotly/orca/releases
-#           # https://github.com/plotly/orca
-#           withr::with_dir(dirname(tmpF), plotly::orca(p = plot1, file = basename(tmpF)))
-#         }
-#         created <- TRUE
-#       },
-#       "character" = {
-#         # in case this is a link to a file:
-#         cat(file = stderr(), paste0("character\n"))
-#         if (file.exists(plot1)) {
-#           if (tools::file_ext(plot1) == "png") {
-#             pdf(tmpF)
-#             img <- png::readPNG(plot1)
-#             plot(1:2, type = "n")
-#             rasterImage(img, 1.2, 1.27, 1.8, 1.73, interpolate = FALSE)
-#             dev.off()
-#           }
-#           created <- TRUE
-#         }
-#       },
-#       "datatables" = {
-#         # # // this takes too long
-#         # cat(file = stderr(), paste0("datatables\n"))
-#         # save(file = "~/SCHNAPPsDebug/save2History2.RData", list = c(ls()))
-#         # # cp =load(file="~/SCHNAPPsDebug/save2History2.RData")
-#         #
-#         # pdf(tmpF)
-#         # if (nrow(img) > 20) {
-#         #   maxrow = 20
-#         # } else {
-#         #   maxrow = nrow(plot1)
-#         # }
-#         # gridExtra::grid.table(img[maxrow],)
-#         # dev.off()
-#         # created = TRUE
-#       }
-#     )
-#
-#     if (!created) {
-#       return(FALSE)
-#     }
-#
-#     if (file.exists(.schnappsEnv$historyFile)) {
-#       tmpF2 <- tempfile(fileext = ".pdf")
-#       file.copy(.schnappsEnv$historyFile, tmpF2)
-#       tryCatch(
-#         pdf_combine(c(tmpF2, tmpF), output = .schnappsEnv$historyFile),
-#         error = function(x) {
-#           cat(file = stderr(), paste0("problem while combining PDF files:", x, "\n"))
-#         }
-#       )
-#     } else {
-#       file.copy(tmpF, .schnappsEnv$historyFile)
-#     }
-#     return(TRUE)
-#     # pdf(file = tmpF,onefile = TRUE)
-#     # ggsave(filename = tmpF, plot = plot1, device = pdf())
-#     # dev.off()
-#   }
-# }
 
 #' addColData
 #' adds empty column to SingleCellExperiment object
@@ -1321,73 +1803,6 @@ getReactEnv <- function(DEBUG) {
   return(report.env)
 }
 
-# updateButtonUI = function(input, name, variables){
-#   # deepDebug()
-#   if (is.null(input[[name]])){
-#     cat(file = stderr(), paste("\ncreating button: ", name,"\n"))
-#     return(renderUI({actionButton(inputId = name, label = "apply changes", width = '80%')}))
-#   }
-#
-#   renderUI({
-#     # inp <- isolate(reactiveValuesToList(get("input")))
-#     # save(file = "~/SCHNAPPsDebug/render.RData", list = c(ls(), "name", "variables", ".schnappsEnv", "inp", "session"))
-#     # cp =load(file = "~/SCHNAPPsDebug/render.RData")
-#     # deepDebug()
-#     if (DEBUG) cat(file = stderr(), "updateButtonUI\n")
-#     modified = FALSE
-#     # input$updatetsneParameters
-#     # input$gQC_tsneDim
-#     # input$gQC_tsnePerplexity
-#     # input$gQC_tsneTheta
-#     # input$gQC_tsneSeed
-#     # variables = c("gQC_tsneDim", "gQC_tsnePerplexity", "gQC_tsneTheta", "gQC_tsneSeed"  )
-#
-#     # create button if not exists
-#
-#     for (var in variables) {
-#       oldVar = paste0("calculated_", var)
-#       currVar = var
-#       if (!exists(oldVar, envir = .schnappsEnv)  | !exists(currVar, envir = .schnappsEnv)) {
-#         # cat(file = stderr(), "modified1\n")
-#         modified = TRUE
-#         next()
-#       }
-#       save(file = paste0("~/SCHNAPPsDebug/updateButtonUI", var,".RData"), list = c(
-#         "var", "variables", ".schnappsEnv", "name"
-#       ))
-#       cat(file = stderr(), paste("\noldVar: ", oldVar,"\n"))
-#       cat(file = stderr(), paste("noldVar: ", get(oldVar, envir = .schnappsEnv),"\n"))
-#       cat(file = stderr(), paste("currVar: ", currVar ,"\n"))
-#       cat(file = stderr(), paste("currVar: ", get(currVar, envir = .schnappsEnv),"\n"))
-#       if(is.null(get(oldVar, envir = .schnappsEnv)) | is.null(get(currVar, envir = .schnappsEnv))) {
-#         if (!(is.null(get(oldVar, envir = .schnappsEnv)) & is.null(get(currVar, envir = .schnappsEnv)))) {
-#           modified = TRUE
-#         }
-#       } else {
-#         if (!get(oldVar, envir = .schnappsEnv) == get(currVar, envir = .schnappsEnv)) {
-#           # cat(file = stderr(), "modified12\n")
-#           modified = TRUE
-#         }
-#       }
-#       # observe("input$gQC_tsnePerplexity", quoted = T)
-#     }
-#     # ob = quote("input$gQC_tsnePerplexity")
-#     # observe(ob , quoted = TRUE)
-#     # observe(quote(paste0("input$",currVar)), quoted = F)
-#     if (!modified) {
-#       # cat(file = stderr(), "\n\ntsne not modified\n\n\n")
-#       addClass(name, "green")
-#       # updateActionButton(inputId = name, label = "apply changes", width = '80%',
-#       #              style = "color: #fff; background-color: #00b300; border-color: #2e6da4")
-#     } else {
-#       # cat(file = stderr(), "\n\ntsne modified\n\n\n")
-#       removeClass(name, "green")
-#       # updateActionButton(inputId = name, label = "apply changes", width = '80%',
-#       #              style = "color: #fff; background-color: #cc0000; border-color: #2e6da4")
-#     }
-#   })
-# }
-
 
 # add2history ----
 
@@ -1566,22 +1981,6 @@ get_density <- function(x, y, ...) {
   return(dens$z[ii])
 }
 
-
-# ns <- session$ns
-# heatmapData <- pheatmapList()
-# addColNames <- input$ColNames
-# orderColNames <- input$orderNames
-# colTree <- input$showColTree
-# scale <- input$normRow
-# myns <- ns("pHeatMap")
-# save2History <- input$save2History
-# pWidth <- input$heatmapWidth
-# pHeight <- input$heatmapHeight
-# colPal <- input$colPal
-# minMaxVal <- input$heatmapMinMaxValue
-# # maxVal <- input$heatmapMaxValue
-#
-# proje <- projections()
 
 # heatmapModuleFunction =====
 
@@ -2003,67 +2402,6 @@ dheader <- function() {
   )
 }
 
-# boxWhelp ----
-# box with help
-# modified box function that places a question mark with a botton at the far right
-#
-# boxWhelp <- function (..., title = NULL, footer = NULL, status = NULL, solidHeader = FALSE,
-#                       background = NULL, width = 6, height = NULL, collapsible = FALSE,
-#                       collapsed = FALSE, helpID = NULL)
-# {
-#   boxClass <- "box"
-#   if (solidHeader || !is.null(background)) {
-#     boxClass <- paste(boxClass, "box-solid")
-#   }
-#   if (!is.null(status)) {
-#     # validateStatus(status)
-#     boxClass <- paste0(boxClass, " box-", status)
-#   }
-#   if (collapsible && collapsed) {
-#     boxClass <- paste(boxClass, "collapsed-box")
-#   }
-#   if (!is.null(background)) {
-#     # validateColor(background)
-#     boxClass <- paste0(boxClass, " bg-", background)
-#   }
-#   style <- NULL
-#   if (!is.null(height)) {
-#     style <- paste0("height: ", validateCssUnit(height))
-#   }
-#   titleTag <- NULL
-#   if (!is.null(title)) {
-#     titleTag <- h3(class = "box-title", title)
-#   }
-#   helpTag <- NULL
-#   if (!is.null(helpID)) {
-#     helpTag <- actionButton(inputId = helpID, label = "", icon = icon("fas fa-question")
-#     )
-#   }
-#   collapseTag <- NULL
-#   if (collapsible) {
-#     buttonStatus <- status
-#     if (is.null(buttonStatus)) buttonStatus = "default"
-#     collapseIcon <- if (collapsed)
-#       "plus"
-#     else "minus"
-#     collapseTag <- div(class = "box-tools pull-right", helpTag, tags$button(class = paste0("btn btn-box-tool"),
-#                                                                             `data-widget` = "collapse", shiny::icon(collapseIcon)))
-#   } else {
-#     if (!is.null(helpTag))
-#       collapseTag <- div(class = "box-tools pull-right",
-#                          helpTag
-#       )
-#   }
-#
-#   headerTag <- NULL
-#   if (!is.null(titleTag) || !is.null(collapseTag)) {
-#     headerTag <- div(class = "box-header", titleTag, collapseTag)
-#   }
-#   div(class = if (!is.null(width))
-#     paste0("col-sm-", width), div(class = boxClass, style = if (!is.null(style))
-#       style, headerTag, div(class = "box-body", ...), if (!is.null(footer))
-#         div(class = "box-footer", footer)))
-# }
 
 # setId ----
 # gives an area an ID to be referenced by introjs
