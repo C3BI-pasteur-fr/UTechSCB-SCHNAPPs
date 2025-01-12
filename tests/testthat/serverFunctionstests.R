@@ -1,6 +1,10 @@
 source("../../inst/app/serverFunctions.R")
 library(SingleCellExperiment)
 library(shiny)
+library(testthat)
+library(SingleCellExperiment)
+library(plotly)
+
 # # Define a test case for the pltHighExp function
 # test_that("pltHighExp plots the highest expressed genes", {
 #   # Create a mock SingleCellExperiment object
@@ -23,7 +27,6 @@ library(shiny)
 #   # Example expectation: the plot should have a custom color scale
 #   expect_identical(result$scales$scales[[1]]$palette, scols)
 # })
-library(testthat)
 
 # Define a test case for the pltHighExp function
 test_that("pltHighExp plots the highest expressed genes", {
@@ -83,7 +86,6 @@ test_that("Handle null input correctly", {
 })
 
 # Run the tests
-library(testthat)
 
 # Mock featureData for testing
 features <- data.frame(symbol = c("GeneA", "GeneB", "GeneC"), row.names = c("Row1", "Row2", "Row3"))
@@ -119,43 +121,112 @@ test_that("Handle null input correctly", {
 
 #### update umi
 
-context("Example Code")
 
 test_that("geneName2Index() returns correct gene names", {
   # Define sample inputs and expected output
-  dimX <- 1
-  dimY <- 2
-  geneNames <- c("gene1", "gene2")
-  geneNames2 <- c("gene3", "gene4")
+  geneNames <- c("gene1, gene2")
+  geneNames2 <- c("gene3, gene4")
+  counts <- matrix(rpois(100, 5), nrow = 10, ncol = 10)
+  colnames(counts) = paste0("Cell", 1:10)
+
   scEx <- SingleCellExperiment(assays = list(counts = counts))
-  rownames(rowData(scEx)) <- paste0("gene", 1:10)
+  rownames(scEx) <- paste0("gene", 1:10)
+  rowData(scEx)$symbol = paste0("gene", 1:10)
   colData(scEx)$sampleNames <- c(rep("sample1",3), rep("sample2",3), rep("sample3",4))
   projections <- list()
   
   # Call the function
-  result <- updateProjectionsWithUmiCount(dimX, dimY, geneNames, geneNames2, scEx, projections)
+  result <- updateProjectionsWithUmiCount(geneNames, geneNames2, scEx, projections)
   
   # Check the output
-  expect_equal(result$UmiCountPerGenes, c(1, 1))
-  expect_equal(result$UmiCountPerGenes2, 0)
+  expect_equal(result$UmiCountPerGenes, colSums(counts[1:2, ]))
+  expect_equal(result$UmiCountPerGenes2, colSums(counts[3:4, ]))
 })
 
 test_that("geneName2Index() returns 0 when geneNames and geneNames2 are empty", {
   # Define sample inputs and expected output
-  dimX <- 1
-  dimY <- 1
-  geneNames <- character(0)
-  geneNames2 <- character(0)
-  scEx <- matrix(nrow = 1, ncol = 1)
-  projections <- list(UmiCountPerGenes = 1, UmiCountPerGenes2 = 1)
+  g_id <- character(0)
+  scEx <- SingleCellExperiment(assays = list(counts = counts))
+  rownames(scEx) <- paste0("gene", 1:10)
+  rowData(scEx)$symbol = paste0("gene", 1:10)
+  colData(scEx)$sampleNames <- c(rep("sample1", 3), rep("sample2", 3), rep("sample3", 4))
+  projections <- rowData(scEx)
   
   # Call the function
-  result <- example_function(dimX, dimY, geneNames, geneNames2, scEx, projections)
+  result <- geneName2Index(g_id, projections)
   
   # Check the output
-  expect_equal(result$UmiCountPerGenes, 0)
-  expect_equal(result$UmiCountPerGenes2, 0)
+  expect_equal(result, NULL)
 })
 
 
+
+# Sample data for testing
+set.seed(123)
+scEx_log <- SingleCellExperiment(assays = list(counts = matrix(rnorm(1000), ncol = 10)))
+projections <- data.frame(PC1 = rnorm(10), PC2 = rnorm(10), sampleNames = sample(letters[1:3], 10, replace = TRUE))
+featureData <- data.frame(symbol = rownames(scEx_log))
+geneNames <- c("GeneA", "GeneB")
+geneNames2 <- c("GeneC", "GeneD")
+dimX <- "PC1"
+dimY <- "PC2"
+clId <- "Cluster1"
+grpN <- NULL
+legend.position <- "topright"
+grpNs <- NULL
+logx <- FALSE
+logy <- FALSE
+divXBy <- "None"
+divYBy <- "None"
+dimCol <- "sampleNames"
+colors <- c("a" = "blue", "b" = "red", "c" = "green")
+
+# Test cases
+test_that("plot2DprojectionNew returns a plotly object", {
+  p <- plot2DprojectionNew(
+    scEx_log, projections, "Sample Group 1", featureData,
+    geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
+    logx, logy, divXBy, divYBy, dimCol, colors
+  )
+  expect_s3_class(p, "plotly")
+})
+
+test_that("plot2DprojectionNew returns NULL for invalid projections", {
+  invalid_projections <- data.frame(PC1 = rnorm(10), PC2 = rnorm(10))
+  p <- plot2DprojectionNew(
+    scEx_log, invalid_projections, "Sample Group 1", featureData,
+    geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
+    logx, logy, divXBy, divYBy, dimCol, colors
+  )
+  expect_null(p)
+})
+
+test_that("plot2DprojectionNew handles empty projections", {
+  empty_projections <- data.frame()
+  p <- plot2DprojectionNew(
+    scEx_log, empty_projections, "Sample Group 1", featureData,
+    geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
+    logx, logy, divXBy, divYBy, dimCol, colors
+  )
+  expect_null(p)
+})
+
+test_that("plot2DprojectionNew handles missing columns in projections", {
+  missing_col_projections <- data.frame(PC1 = rnorm(10))
+  p <- plot2DprojectionNew(
+    scEx_log, missing_col_projections, "Sample Group 1", featureData,
+    geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
+    logx, logy, divXBy, divYBy, dimCol, colors
+  )
+  expect_null(p)
+})
+
+test_that("plot2DprojectionNew handles NULL projections", {
+  p <- plot2DprojectionNew(
+    scEx_log, NULL, "Sample Group 1", featureData,
+    geneNames, geneNames2, dimX, dimY, clId, grpN, legend.position, grpNs,
+    logx, logy, divXBy, divYBy, dimCol, colors
+  )
+  expect_null(p)
+})
 

@@ -27,6 +27,24 @@ safeBPParam <- function(nworkers) {
 }
 
 # Wrapper function for reactive with debugging
+#' A wrapper function for reactive expressions with debugging and notification support.
+#'
+#' This function wraps a reactive expression, providing additional functionality such as
+#' timing the execution, showing notifications, and ensuring required reactives are not NULL.
+#'
+#' @param expr A reactive expression to be wrapped.
+#' @param name A character string representing the name of the reactive expression. Default is "test".
+#' @param requiredReactives A named list of reactive expressions that are required to be non-NULL.
+#'
+#' @return A reactive expression that includes the additional functionality.
+#'
+#' @examples
+#' \dontrun{
+#'   myReactive <- reactiveWrapper({
+#'     # Your reactive code here
+#'   }, name = "myReactive", requiredReactives = list(reactive1 = reactive1, reactive2 = reactive2))
+#' }
+#' 
 reactiveWrapper <- function(expr, name = "test", requiredReactives = list()) {
   reactive({
     start_time <- Sys.time()
@@ -178,6 +196,9 @@ geneName2Index <- function(g_id, featureData) {
   g_id <- toupper(g_id)
   g_id <- gsub(" ", "", g_id, fixed = TRUE)
   g_id <- strsplit(g_id, ",")
+  if(length(g_id)==0) {
+    return(NULL)
+  }
   g_id <- g_id[[1]]
 
   notFound <- g_id[!g_id %in% toupper(featureData$symbol)]
@@ -1264,12 +1285,12 @@ ainb <- function(a, b) {
 #' data <- c(1, 5, 10, 15, 20)
 #' minmax(data, 5, 15)
 #' # Returns: 5, 5, 10, 15, 15
-  if (is.null(x)) {
-    return(y)
-  }
-  return(x)
+minmax <- function(data, min, max) {
+  data2 <- data
+  data2[data2 > max] <- max
+  data2[data2 < min] <- min
+  return(data2)
 }
-
 #' Calculate the exponential mean of a numeric vector
 #'
 #' This function computes the exponential mean of a numeric vector `x` after normalizing it by a given factor `normFactor`.
