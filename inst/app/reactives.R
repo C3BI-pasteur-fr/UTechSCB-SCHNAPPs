@@ -10,7 +10,7 @@ suppressMessages(require(dplyr))
 suppressMessages(require(BPCells))
 suppressMessages(require(ggalluvial))
 library(SingleCellExperiment)
-source("inst/app/serverFunctions.R")
+#source("inst/app/serverFunctions.R")
 
 # require(tidySingleCellExperiment)
 # base::source(paste0(packagePath, "/outputs.R"), local = TRUE)
@@ -1719,7 +1719,9 @@ scEx <- reactive({
     if (!is.null(getDefaultReactiveDomain())) {
       showNotification("Less than 100 cells or genes", id = "scExError", type = "error", duration = NULL)
     }
-    return(NULL)
+    # 2DO we need an option to overwrite this low cell number option or otherwise track this information
+    # since this is causing problems during some normalizations or other calculations.
+    # return(NULL)
   }
 
   add2history(type = "save", input = isolate(reactiveValuesToList(input)), comment = "scEx", scEx = retVal)
