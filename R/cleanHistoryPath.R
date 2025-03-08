@@ -7,7 +7,6 @@
 #' @return nothing
 #' @export cleanHistoryPath
 #'
-#' @examples
 cleanHistoryPath <- function(path, verbose=TRUE, dryrun=TRUE){
   if(dryrun) verbose = TRUE
   if(!dir.exists(path)){

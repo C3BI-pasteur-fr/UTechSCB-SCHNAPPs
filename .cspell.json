@@ -1,0 +1,18 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "words": [
+        "tibble",
+        "reactives",
+        "BioC",
+        "pkgdown"
+    ],
+    "ignorePaths": [
+        "**/.git/**",
+        "**/Meta/**",
+        "**/pkgdown/**",
+        "**/testDir/**",
+        "**/.*/**",
+
+    ]
+}
