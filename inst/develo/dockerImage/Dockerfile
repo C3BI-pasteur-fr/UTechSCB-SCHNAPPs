@@ -34,7 +34,7 @@ WORKDIR /root
 RUN apt-get update && apt-get upgrade -y && apt-get -y --fix-missing install git && apt-get install  -y libxml2-dev \
 && apt-get install -y   libgit2-dev  
 RUN git --version
-RUN apt-get -y update && apt-get -y install libssl-dev \
+RUN apt-get -y update && apt-get -y install libssl-dev libopenblas-dev liblapack-dev \
    && apt-get install -y apt-utils \
    && apt-get install -y ssh-client \
    && apt-get install -y libpoppler-cpp-dev \

@@ -46,6 +46,17 @@ setup_schnapps_env <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/
                                workers = 2,
                                packagePath = NULL) {  # Add packagePath parameter
   
+  require(doParallel)
+  require("future.callr")
+  require(BPCells)
+  require(shiny)
+  require(dplyr)
+  require(reactlog)
+  require(future)
+  require("BiocParallel")
+  require("shinydashboard")
+  
+  
   # Initialize environment variables
   .schnappsEnv <- new.env(parent = emptyenv())
   
@@ -75,12 +86,13 @@ setup_schnapps_env <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/
   # Handle packagePath
   if (is.null(packagePath)) {
     tryCatch({
-      packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
+      packagePath <- system.file("", package = "SCHNAPPs")
     }, error = function(e) {
       # If SCHNAPPs package not found, ask for packagePath
       stop("SCHNAPPs package not found. Please provide packagePath parameter.")
     })
   }
+  #packagePath = "/Users/bernd/Rstudio/schnapps/inst/app/"  
   
   # Assign packagePath to environment
   assign("packagePath", packagePath, envir = .schnappsEnv)
