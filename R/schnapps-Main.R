@@ -86,7 +86,7 @@ setup_schnapps_env <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/
   # Handle packagePath
   if (is.null(packagePath)) {
     tryCatch({
-      packagePath <- system.file("", package = "SCHNAPPs")
+      packagePath <- system.file("/app/", package = "SCHNAPPs")
     }, error = function(e) {
       # If SCHNAPPs package not found, ask for packagePath
       stop("SCHNAPPs package not found. Please provide packagePath parameter.")
