@@ -93,7 +93,7 @@ setup_schnapps_env <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/
     })
   }
   #packagePath = "/Users/bernd/Rstudio/schnapps/inst/app/"  
-  
+
   # Assign packagePath to environment
   assign("packagePath", packagePath, envir = .schnappsEnv)
   
