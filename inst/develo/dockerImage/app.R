@@ -12,8 +12,7 @@ scShinyServer <- NULL
 packagePath <- find.package("SCHNAPPs", lib.loc = NULL, quiet = TRUE) %>% paste0("/app/")
 .schnappsEnv <<- new.env(parent=emptyenv())
 
-localContributionDir = "~/Rstudio/shHubgit/Dummy/"
-localContributionDir = NULL
+localContributionDir = "~/SCHNAPPsContributions/working"
 defaultValueSingleGene = "CD3g"
 defaultValueMultiGenes = "cd3g, cd4, cd8b, ms4a1, TCF4, LILRA2, LYZ, cd79a, bcl11b, IL32, hbb, nkg7,MNDA"
 defaultValueRegExGene = ""
@@ -44,7 +43,6 @@ launch.browser = getOption("shiny.launch.browser", interactive())
 defaultValues = list()
 defaultValues[["coEtgMinExpr"]] = 100
 packagePath <<- packagePath
-localContributionDir="."
 assign(".SCHNAPPs_locContributionDir", localContributionDir, envir = .schnappsEnv)
 
 base::cat(file = stderr(), paste("\n\n\n", packagePath,"\n\n\n"))
@@ -65,7 +63,7 @@ shiny::addResourcePath(
 )
 cat(file = stderr(), "here 3\n")
 
-shinyApp(ui = scShinyUI, server = scShinyServer, enableBookmarking = "server")
+shinyApp(ui = scShinyUI, server = scShinyServer, host='0.0.0.0', port=3838, enableBookmarking = "server")
 # 
 # cat(file = stderr(), "here 4\n")
 # 
