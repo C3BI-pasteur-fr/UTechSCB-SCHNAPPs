@@ -47,6 +47,6 @@ Shiny app for the analysis of single cell data
 \examples{
 # create example data
 data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")
+save(file = "scEx.Rdata", list = "scExOrg")
 # use "scEx.Rdata" with load data functionality within the shiny app
 }

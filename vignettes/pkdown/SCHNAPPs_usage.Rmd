@@ -125,7 +125,7 @@ An example data set is provided with the package. Load a small set of 200 cells 
 
 ```
 data("scEx", package = "SCHNAPPs")
-save(file = "scEx.Rdata", list = "scEx")
+save(file = "scEx.Rdata", list = "scExOrg")
 ```
 
 This file can be loaded once the app is started.

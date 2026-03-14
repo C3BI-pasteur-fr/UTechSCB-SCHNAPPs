@@ -32,7 +32,7 @@
 #' @examples
 #' # create example data
 #' data("scEx", package = "SCHNAPPs")
-#' save(file = "scEx.Rdata", list = "scEx")
+#' save(file = "scEx.Rdata", list = "scExOrg")
 #' # use "scEx.Rdata" with load data functionality within the shiny app
 # Create a setup function that extracts the initialization part
 setup_schnapps_env <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/",
@@ -171,7 +171,7 @@ setup_schnapps_env <- function(localContributionDir = "~/Rstudio/shHubgit/Dummy/
 #' @examples
 #' # create example data
 #' data("scEx", package = "SCHNAPPs")
-#' save(file = "scEx.Rdata", list = "scEx")
+#' save(file = "scEx.Rdata", list = "scExOrg")
 #' # use "scEx.Rdata" with load data functionality within the shiny app
 # Create a setup function that extracts the initialization part
 schnapps <- function(..., port = NULL, launch.browser = getOption("shiny.launch.browser", interactive())) {
