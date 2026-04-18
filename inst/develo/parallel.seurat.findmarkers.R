@@ -6,7 +6,7 @@ library(future.callr)
 # save(file = "parallel.Seurat.FindMarkers.RData", list = ls())
 cp = load("parallel.Seurat.FindMarkers.RData")
 cp
-pryr::object_size(seurDat[1:6400,], 
+lobstr::obj_size(seurDat[1:6400,], 
                   ident.1 = cells.1,
                   ident.2 = cells.2,
                   min.pct = 0.00000000001,
@@ -14,7 +14,7 @@ pryr::object_size(seurDat[1:6400,],
                   logfc.threshold = 0.000001,
                   slot = Layers(seurDat)[1])
 
-pryr::object_size(seurDat, 
+lobstr::obj_size(seurDat, 
                   ident.1 = cells.1,
                   ident.2 = cells.2,
                   min.pct = 0.00000000001,

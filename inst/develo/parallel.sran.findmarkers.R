@@ -1,7 +1,7 @@
 
 
 library(furrr)
-library(pryr)
+library(lobstr)
 # library(lineprof)
 # source(file = "~/Rstudio/scran/R/findMarkers.R")
 cp = load("/Users/bernd/SCHNAPPsDebug/clusterServerreturnValues.RData")

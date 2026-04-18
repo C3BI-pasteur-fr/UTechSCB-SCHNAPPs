@@ -3785,11 +3785,11 @@ inputSampleOrg <- reactive({
 
 getMemoryUsed <- reactive({
   #
-  if ("pryr" %in% rownames(installed.packages())) {
-    suppressMessages(require(pryr))
+  if ("lobstr" %in% rownames(installed.packages())) {
+    suppressMessages(require(lobstr))
   } else {
     mem_used <- function() {
-      showNotification("Please install pryr", id = "noPryr", type = "error", duration = NULL)
+      showNotification("Please install lobstr", id = "noPryr", type = "error", duration = NULL)
       return(0)
     }
   }

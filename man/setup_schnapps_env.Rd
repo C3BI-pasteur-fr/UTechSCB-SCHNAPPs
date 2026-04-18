@@ -14,7 +14,8 @@ setup_schnapps_env(
   DEBUGSAVE = FALSE,
   historyPath = NULL,
   defaultValues = list(),
-  workers = 2
+  workers = 2,
+  packagePath = NULL
 )
 }
 \arguments{

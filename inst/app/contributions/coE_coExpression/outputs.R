@@ -244,7 +244,7 @@ output$coE_objSize <- renderText({
     return(NULL)
   }
   if(!prjFact %in% colnames(projections)) return("please select factor")
-  objSize = pryr::object_size(scEx_log, 
+  objSize = lobstr::obj_size(scEx_log, 
                         projections[,prjFact],
                         direction = direction,
                         lfc = lfc)
